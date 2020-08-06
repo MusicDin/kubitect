@@ -1,0 +1,79 @@
+- hosts: haproxy
+
+  gather_facts: false
+
+  tasks:
+    - name: get os-release
+      raw: cat /etc/os-release
+      register: os_release
+      changed_when: false
+      environment: {}
+
+    - name: install python
+      raw:
+        apt-get update -q && \
+        DEBIAN_FRONTEND=noninteractive apt-get install -q -y python
+      environment: {}
+      when: '"Ubuntu" in os_release.stdout'
+
+    - name: configure selinux
+      raw:
+        yum -q -y install policycoreutils-python && \
+        semanage port -a -t http_port_t -p tcp 6443
+      environment: {}
+      when: ("CentOS" in os_release.stdout) or ("Red Hat Enterprise Linux" in os_release.stdout)
+
+    - name: allow binding non-local ip
+      sysctl:
+        name: net.ipv4.ip_nonlocal_bind
+        value: 1
+        reload: true
+        state: present
+
+    - name: install keepalived
+      package: name=keepalived state=present
+
+    - name: configure keepalived master
+      copy:
+        src: ../../config/keepalived-master.cfg
+        dest: /etc/keepalived/keepalived.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart keepalived
+      when: '"haproxy-0" in inventory_hostname'
+
+    - name: configure keepalived slave
+      copy:
+        src: ../../config/keepalived-slave.cfg
+        dest: /etc/keepalived/keepalived.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart keepalived
+      when: '"haproxy-1" in inventory_hostname'
+
+    - name: start and enable keepalived
+      service: name=keepalived state=started enabled=yes
+
+    - name: install haproxy
+      package: name=haproxy state=present
+
+    - name: configure haproxy
+      copy:
+        src: ../../config/haproxy.cfg
+        dest: /etc/haproxy/haproxy.cfg
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart haproxy
+
+    - name: start and enable haproxy
+      service: name=haproxy state=started enabled=yes
+
+  handlers:
+    - name: restart haproxy
+      service: name=haproxy state=restarted
+
+    - name: restart keepalived
+      service: name=keepalived state=restarted
