@@ -2,9 +2,9 @@
 Set up Kubernetes cluster using KVM, Terraform and Kubespray
 
 ## Requirements
-+ [Git](https://git-scm.com/)
-+ [Ansible](https://www.ansible.com/)
-+ [Terraform](https://www.terraform.io/)
++ [Git](https://git-scm.com/) 
++ [Ansible](https://www.ansible.com/) >= v2.6
++ [Terraform](https://www.terraform.io/) == v0.12.x
 + [KVM - Kernel Virtual Machine](https://www.linux-kvm.org/)
 + Internet connection on machine that will run VMs and on VMs
 
