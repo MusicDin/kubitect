@@ -3,10 +3,13 @@ Set up Kubernetes cluster using KVM, Terraform and Kubespray
 
 ## Requirements
 + [Git](https://git-scm.com/) 
++ [Cloud-init](https://cloudinit.readthedocs.io/)
 + [Ansible](https://www.ansible.com/) >= v2.6
-+ [Terraform](https://www.terraform.io/) == v0.12.x
++ [Terraform](https://www.terraform.io/) **>= v0.13.x**
 + [KVM - Kernel Virtual Machine](https://www.linux-kvm.org/)
 + Internet connection on machine that will run VMs and on VMs
+
+*Note: for Terraform v0.12.x see [this branch](https://github.com/MusicDin/terraform-kvm-kubespray/tree/terraform-0.12).*
 
 ## Usage
 
@@ -21,6 +24,7 @@ Change variables to fit your needs:
 ```
 nano terraform.tfvars
 ```
+*Note: Variables are set to work out of the box. Only required variable that is not set is* `vm_image_source`.
 
 Execute terraform script:
 ```bash
@@ -38,12 +42,8 @@ terraform apply
 
 ### Add worker to cluster
 
-In [terraform.tfvars](./terraform.tfvars) file add:
-  + *MAC* address for new VM to `vm_worker_macs` and 
-  + *IP* address for new VM to `vm_worker_ips`.
+In [terraform.tfvars](./terraform.tfvars) file add *MAC* and *IP* address for new VM to `vm_worker_macs_ips`. 
   
-*Note: MAC and IP addresses for certain VM have to be on same index in array.*
-
 Execute terraform script to add worker:
 ```
 terraform apply -var 'action=add_worker'
@@ -51,8 +51,12 @@ terraform apply -var 'action=add_worker'
 
 ### Remove worker from cluster
 
-+ TBD - (Not tested yet)
+In [terraform.tfvars](./terraform.tfvars) file remove *MAC* and *IP* address of VM that is going to be deleted from `vm_worker_macs_ips`.
 
+Execute terraform script to remove worker:
+```
+terraform apply -var 'action=remove_worker'
+```
 ### Upgrade cluster
 
 In [terraform.tfvars](./terraform.tfvars) file modify:
@@ -72,6 +76,6 @@ Script that works on *vSphere* can be found [here](https://github.com/sguyennet/
 
 ## Info/Issues
 
-In case you found a bug or dysfunctionality please open an issue.
+In case you have found a bug or dysfunctionality please open an issue.
 
 If you need anything else contact me on GitHub.
