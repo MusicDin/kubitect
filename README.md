@@ -8,6 +8,8 @@ Set up Kubernetes cluster using KVM, Terraform and Kubespray
 + [KVM - Kernel Virtual Machine](https://www.linux-kvm.org/)
 + Internet connection on machine that will run VMs and on VMs
 
+*Note: for Terraform **v0.13.x** see [this branch](https://github.com/MusicDin/terraform-kvm-kubespray/).*
+
 ## Usage
 
 ### Create cluster
