@@ -119,6 +119,7 @@ module "k8s_cluster" {
   action = var.action
 
   # VM variables
+  vm_distro          = var.vm_distro
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_name_prefix     = var.vm_name_prefix
@@ -126,6 +127,7 @@ module "k8s_cluster" {
   vm_master_ips      = values(var.vm_master_macs_ips)
   vm_lb_ips          = values(var.vm_lb_macs_ips)
   vm_lb_vip          = var.vm_lb_vip
+  network_interface  = var.network_interface
 
   # K8s cluster variables  
   k8s_kubespray_url     = var.k8s_kubespray_url
@@ -180,6 +182,16 @@ data "template_file" "public_ssh_key" {
 # Network bridge configuration (for cloud-init) #
 data "template_file" "network_bridge_tpl" {
   template = file("templates/network_bridge.tpl")
+
+  vars = {
+    network_interface = var.network_interface
+  }
+}
+
+# Creates network bridge configuration file from template #
+resource "local_file" "network_bridge_file" {
+  content  = data.template_file.network_bridge_tpl.rendered
+  filename = "config/network_bridge.cfg"
 }
 
 # Cloud-init configuration template #
@@ -187,14 +199,14 @@ data "template_file" "cloud_init_tpl" {
   template = file("templates/cloud_init.tpl")
   
   vars = {
-    user = var.vm_user
+    user           = var.vm_user
     ssh_public_key = data.template_file.public_ssh_key.rendered
   }
 }
 
 # Creates cloud-init configuration file from template #
 resource "local_file" "cloud_init_file" {
-  content = data.template_file.cloud_init_tpl.rendered
+  content  = data.template_file.cloud_init_tpl.rendered
   filename = "config/cloud_init.cfg"
 }
 

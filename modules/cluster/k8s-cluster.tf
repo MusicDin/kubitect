@@ -127,7 +127,8 @@ data "template_file" "keepalived_master" {
   template = file("templates/keepalived_master.tpl")
 
   vars = {
-    virtual_ip = var.vm_lb_vip
+    network_interface = var.network_interface
+    virtual_ip        = var.vm_lb_vip
   }
 }
 
@@ -136,7 +137,8 @@ data "template_file" "keepalived_slave" {
   template = file("templates/keepalived_slave.tpl")
 
   vars = {
-    virtual_ip = var.vm_lb_vip
+    network_interface = var.network_interface 
+    virtual_ip        = var.vm_lb_vip
   }
 }
 
@@ -185,6 +187,16 @@ resource "local_file" "keepalived_slave" {
 # Null resources - K8s cluster configuration using Kubespray
 #======================================================================================
 
+# Local variables used in many resources #
+locals {
+  extra_args  = {
+    debian    = "-T 3000 -v -e 'ansible_become_method=su'"
+    ubuntu    = "-T 3000 -v"
+    centos    = "-T 3000 -v"
+  }
+  default_extra_args = "-T 3000 -v"
+}
+
 # Modify permissions on config directory #
 resource "null_resource" "config_permissions" {
   provisioner "local-exec" {
@@ -210,14 +222,8 @@ resource "null_resource" "kubespray_download" {
 resource "null_resource" "haproxy_install" {
   count = var.action == "create" ? 1: 0
 
-#  provisioner "remote-exec" {
-#    inline = [
-#      "cloud-init status --wait"
-#    ]
-#  }
-  
   provisioner "local-exec" {
-    command = "cd ansible/haproxy && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -T 3000 -v haproxy.yml"
+    command = "cd ansible/haproxy && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} haproxy.yml"
   }
   
   depends_on = [
@@ -232,7 +238,7 @@ resource "null_resource" "kubespray_create" {
   count = var.action == "create" ? 1 : 0
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" -T 3000 -v cluster.yml"
+    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} cluster.yml"
   }
 
   depends_on = [
@@ -249,7 +255,7 @@ resource "null_resource" "kubespray_add" {
   count = var.action == "add_worker" ? 1 : 0
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" -T 3000 -v scale.yml"
+    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} scale.yml"
   }
 
   depends_on = [
@@ -275,7 +281,7 @@ resource "null_resource" "kubespray_upgrade" {
   }
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" -T 3000 -v upgrade-cluster.yml"
+    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} upgrade-cluster.yml"
   }
 
   depends_on = [
@@ -291,7 +297,7 @@ resource "null_resource" "kubespray_upgrade" {
 # Create the local admin.conf kubectl configuration file #
 resource "null_resource" "kubectl_configuration" {
   provisioner "local-exec" {
-    command = "ansible -i ${var.vm_master_ips[0]}, -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -T 3000 -m fetch -a 'src=/etc/kubernetes/admin.conf dest=config/admin.conf flat=yes' all"
+    command = "ansible -i ${var.vm_master_ips[0]}, -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} -m fetch -a 'src=/etc/kubernetes/admin.conf dest=config/admin.conf flat=yes' all"
   }
 
 #  provisioner "local-exec" {

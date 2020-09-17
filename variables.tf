@@ -23,6 +23,12 @@ variable "network_name" {
   default     = "k8s-network"
 }
 
+variable "network_interface" {
+  type        = string
+  description = "Network interface used for VMs (cloud-init) and Keepalived"
+  default     = "ens3"
+}
+
 variable "network_mac" {
   type        = string
   description = "Network MAC address"
@@ -105,6 +111,12 @@ variable "vm_user" {
 variable "vm_ssh_private_key" {
   type        = string
   description = "Location of private ssh key for VMs"
+}
+
+variable "vm_distro" {
+  type        = string
+  description = "Linux distribution used on VMs. Possible values: [ubuntu, centos, debian]"
+  default     = "N/A"
 }
 
 variable "vm_image_source" {

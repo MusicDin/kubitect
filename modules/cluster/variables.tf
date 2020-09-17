@@ -27,6 +27,11 @@ variable "vm_lb_vip" {
   description = "Floating virtual IP of the load balancer"
 }
 
+variable "vm_distro" {
+  type        = string
+  description = "Linux distribution used for VMs"
+}
+
 variable "vm_user" {
   type        = string
   description = "SSH user for VMs"
@@ -40,6 +45,11 @@ variable "vm_ssh_private_key" {
 variable "vm_name_prefix" {
   type        = string
   description = "Prefix added to names of VMs"
+}
+
+variable "network_interface" {
+  type        = string
+  description = "Network interface used for Keepalived"
 }
 
 #======================================================================================
