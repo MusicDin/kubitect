@@ -37,7 +37,7 @@ backend ic-http-backend
 
 Now it's time to **initialize your cluster**.
 
-*Note: If the cluster is already initialized, you can also configure LBs by SSH-ing into each of them and applying this changes.*
+*Note: If the cluster is already initialized, you can also [configure LBs by SSH-ing](https://github.com/MusicDin/terraform-kvm-kubespray/blob/master/docs/load-balancer.md#modifying-load-balancers-configuration-over-ssh) into each of them and applying this changes.*
 
 ## Installing ingress-controller
 
@@ -76,4 +76,4 @@ Apply ingress controller configuration:
 kubectl apply -f ingress-controller-deployment.yaml
 ``` 
 
-That's it. Now all traffic 
+That's it. Now all HTTP traffic will be load balanced to master nodes on ingress controller's port. 

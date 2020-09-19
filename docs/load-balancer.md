@@ -1,6 +1,6 @@
 # Load balancing
 
-HAProxy load balancer in this configuration is used to load balance traffic between masters.
+HAProxy load balancer in this configuration is used to load balance traffic between master nodes.
 
 If you would like to expose services of type `LoadBalancer` than check [MetalLB](https://metallb.universe.tf/) project. 
 
@@ -13,7 +13,7 @@ First remove all load balancer's IP and MAC addresses:
 vm_lb_macs_ips = {}
 ``` 
 
-Than set floating VIP to point on the master node:
+Than set floating IP to point on the master node:
 <pre>
 vm_lb_vip = "<b>master_node_IP</b>"
 </pre>
@@ -45,7 +45,7 @@ comment `Place custom configurations here` is located.
 ## Modifying load balancer's configuration over SSH
 
 After the cluster is all set up, you can change LB's configuration by SSH-ing into it and modifying it's configuration:
-```
+```bash
 # SSH into load balancer
 ssh <vm_user>@<vm_lb_ip> 
 

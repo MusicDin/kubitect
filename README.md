@@ -27,8 +27,10 @@ Change variables to fit your needs:
 ```
 nano terraform.tfvars
 ```
-*Note: Variables are set to work out of the box. 
-Only required variable that is not set is* `vm_image_source`, *so make sure to add a path or URL to OS image.*
+
+Variables are set to work out of the box. Only required variables that are not set are: 
++ `vm_image_source` URL or path on file system to OS image,
++ `vm_distro` a Linux distribution of OS image.
 
 **IMPORTANT:** Review variables before initializing a cluster, as current configuration will create 8 VMs which are quite resource heavy!
 
@@ -93,7 +95,8 @@ terraform destroy
 ```
 
 ## More documentation
-+ [Load balancing](./docs/load-balancer.md)
++ [Setup libvirt provider](docs/libvirt-provider-setup.md)
++ [Load balancing](docs/load-balancer.md)
 + Examples: 
     - [Load balancing to ingress controller](docs/examples/lb-and-ingress-controller.md)
 
