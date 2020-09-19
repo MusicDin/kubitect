@@ -38,7 +38,7 @@ network_nat_port_end = 65535
 # DHCP is used only for network creation.
 # Based on VM's MAC and IP address, static IPs are configured within network.
 
-# DHCP IP start (from IP)#
+# DHCP IP start (from IP) #
 network_dhcp_ip_start = "192.168.113.2"
 
 # DHCP IP end (to IP) #
@@ -54,7 +54,10 @@ vm_user = "k8s"
 # Private SSH key (for VMs) location (example: ~/.ssh/id_rsa) #
 vm_ssh_private_key = "~/.ssh/id_rsa"
 
-# Source of linux image. It can be path to image on host's filesystem or URL #
+# Linux distribution that will be used on VMs. Possible values are: [ubuntu, debian, centos] #
+vm_distro = ""
+
+# Source of linux image. It can be path to an image on host's filesystem or an URL #
 vm_image_source = ""
 
 # The prefix added to names of VMs #
@@ -68,7 +71,7 @@ vm_name_prefix = "k8s"
 vm_lb_cpu = 1
 
 # The amount of RAM allocated to the load balancer VM (in Megabytes - MB) #
-vm_lb_ram = 4096
+vm_lb_ram = 2048
 
 # The amount of disk allocated to the load balancer VM (in Bytes - B) #
 vm_lb_storage = 16106127360
@@ -76,10 +79,12 @@ vm_lb_storage = 16106127360
 # MAC and IP addresses for load balancer VMs. #
 vm_lb_macs_ips = {
   "52:54:00:00:00:05" = "192.168.113.5"
+  "52:54:00:00:00:06" = "192.168.113.6"
 }
 
-# The IP address of the load balancer floating VIP #
-vm_lb_vip = "192.168.113.5"
+# The floating virtual IP address. #
+# If no load balancers will be installed than vip should point to the master node #
+vm_lb_vip = "192.168.113.200"
 
 
 #======================================================================================
@@ -87,15 +92,16 @@ vm_lb_vip = "192.168.113.5"
 #======================================================================================
 
 # The number of vCPU allocated to the master VM #
-vm_master_cpu = 1
+vm_master_cpu = 2
 
 # The amount of RAM allocated to the master VM (in Megabytes - MB) #
-vm_master_ram = 8192
+vm_master_ram = 2048
 
 # The amount of disk allocated to the master VM (in Bytes - B) #
 vm_master_storage = 16106127360
 
 # MAC and IP addresses for master VMs. It is recommended to have at least 3 masters. #
+# Also note that number of masters cannot be divided by 2. #
 vm_master_macs_ips = {
   "52:54:00:00:00:10" = "192.168.113.10"
   "52:54:00:00:00:11" = "192.168.113.11"
@@ -107,7 +113,7 @@ vm_master_macs_ips = {
 #======================================================================================
 
 # The number of vCPU allocated to the worker VM #
-vm_worker_cpu = 2
+vm_worker_cpu = 4
 
 # The amount of RAM allocated to the worker VM (in Megabytes - MB) #
 vm_worker_ram = 8192
@@ -133,7 +139,7 @@ k8s_kubespray_url = "https://github.com/kubernetes-sigs/kubespray.git"
 k8s_kubespray_version = "v2.13.0"
 
 # The Kubernetes version that will be deployed #
-k8s_version = "v1.17.4"
+k8s_version = "v1.17.5"
 
 # The overlay network plugin used by the Kubernetes cluster (flannel/weave/calico/cilium/canal/contiv/kube-router) #
 k8s_network_plugin = "calico"

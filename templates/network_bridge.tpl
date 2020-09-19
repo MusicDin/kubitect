@@ -1,4 +1,4 @@
 version: 2
 ethernets:
-  ens3:
+  ${network_interface}:
      dhcp4: true
