@@ -36,6 +36,8 @@ defaults
     errorfile 503 /etc/haproxy/errors/503.http
     errorfile 504 /etc/haproxy/errors/504.http
 
+# Place custom configurations here #
+
 # Load balancer configuration #
 
 frontend kubernetes

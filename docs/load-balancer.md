@@ -1,0 +1,62 @@
+# Load balancing
+
+HAProxy load balancer in this configuration is used to load balance traffic between masters.
+
+If you would like to expose services of type `LoadBalancer` than check [MetalLB](https://metallb.universe.tf/) project. 
+
+## Cluster without load balancer
+
+If you decide to omit load balancer, all you have to do is to modify [terraform.tfvars](../terraform.tfvars) file.
+
+First remove all load balancer's IP and MAC addresses:
+```
+vm_lb_macs_ips = {}
+``` 
+
+Than set floating VIP to point on the master node:
+<pre>
+vm_lb_vip = "<b>master_node_IP</b>"
+</pre>
+
+## Cluster with load balancer(s)
+
+*Note: This script supports up to 2 load balancers.*
+
+Provide MAC and IP address for your load balancer(s) in [terraform.tfvars](../terraform.tfvars) file:
+```
+vm_lb_macs_ips = {
+  "mac_for_lb_1" = "ip_for_lb_1"
+  "mac_for_lb_2" = "ip_for_lb_2"
+}
+``` 
+
+Than set a floating IP that should not be taken by any other VM:
+```
+vm_lb_vip = "floating_ip"
+```
+
+## Modifying load balancer's configuration BEFORE cluster initialization
+
+In order to have same configuration on all of your load balancers than modification is required before initialization.
+
+To accomplish that, modify [haproxy.cfg](../templates/haproxy.tpl) file and put your custom configuration where 
+comment `Place custom configurations here` is located. 
+
+## Modifying load balancer's configuration over SSH
+
+After the cluster is all set up, you can change LB's configuration by SSH-ing into it and modifying it's configuration:
+```
+# SSH into load balancer
+ssh <vm_user>@<vm_lb_ip> 
+
+# Modify LB's configuration file (use your favorite editor)
+nano /etc/haproxy/haproxy.cfg
+
+# Test configuration
+haproxy -f /etc/haproxy/haproxy.cfg -c
+
+# Apply changes
+haproxy -f /etc/haproxy/haproxy.cfg
+``` 
+
+*For more information check [HAProxy documentation](https://cbonte.github.io/haproxy-dconv/)*.
