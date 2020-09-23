@@ -72,7 +72,7 @@ spec:
 ```
 
 Apply ingress controller configuration:
-```shell script
+```bash
 kubectl apply -f ingress-controller-deployment.yaml
 ``` 
 

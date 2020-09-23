@@ -1,9 +1,7 @@
 # terraform-kvm-kubespray
 Set up HA Kubernetes cluster using KVM, Terraform and Kubespray.
 
-## Getting Started
-
-### Requirements
+## Requirements
 + [Git](https://git-scm.com/) 
 + [Cloud-init](https://cloudinit.readthedocs.io/)
 + [Ansible](https://www.ansible.com/) >= v2.6
@@ -14,9 +12,40 @@ Set up HA Kubernetes cluster using KVM, Terraform and Kubespray.
 
 *Note: for Terraform v0.12.x see [this branch](https://github.com/MusicDin/terraform-kvm-kubespray/tree/terraform-0.12).*
 
-### Cluster setup
+
+## Getting Started
+
+*If you run into any troubles during installation process, please check [troubleshooting](docs/troubleshooting.md) page first.*
+
+### Libvirt provider
 
 If you haven't yet, [install libvirt provider](docs/libvirt-provider-setup.md).
+
+### SSH keys
+
+Generate SSH keys, which will be used to access created VMs:
+```bash
+ssh-keygen
+```
+
+Follow the instructions to create SSH keys:
+<pre>
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/<b>your_username</b>/.ssh/id_rsa): <b>[1]</b>
+Enter passphrase (empty for no passphrase): <b>[2]</b>
+Enter same passphrase again: <b>[2]</b>
+...
+</pre>
+
+**[1]** You will be asked to enter file in which to save the key. Default is `/home/your_username/.ssh/id_rsa`.
+
+**[2]** When asked to enter a password, press `ENTER` twice to skip setting a password. 
+**DO NOT** enter it, otherwise Terraform will fail to initialize a cluster.
+
+Finally, you have to enter a location of SSH private key in `vm_ssh_private_key` field in [terraform.tfvars](terraform.tfvars) file.
+ 
+
+### Cluster setup
 
 Move to main directory:
 ```
@@ -57,9 +86,9 @@ Test your cluster by displaying all cluster's nodes:
 kubectl --kubeconfig=config/admin.conf get nodes
 ```
 
-### Cluster management
+## Cluster management
 
-#### Add worker to the cluster
+### Add worker to the cluster
 
 In [terraform.tfvars](./terraform.tfvars) file add *MAC* and *IP* address for a new VM to `vm_worker_macs_ips`. 
   
@@ -68,7 +97,7 @@ Execute terraform script to add worker:
 terraform apply -var 'action=add_worker'
 ```
 
-#### Remove worker from the cluster
+### Remove worker from the cluster
 
 In [terraform.tfvars](./terraform.tfvars) file remove *MAC* and *IP* address of VM that is going to be deleted from `vm_worker_macs_ips`.
 
@@ -76,7 +105,7 @@ Execute terraform script to remove worker:
 ```
 terraform apply -var 'action=remove_worker'
 ```
-#### Upgrade cluster
+### Upgrade cluster
 
 In [terraform.tfvars](./terraform.tfvars) file modify:
   + `k8s_kubespray_version` and
@@ -87,7 +116,7 @@ Execute terraform script to upgrade cluster:
 terraform apply -var 'action=upgrade'
 ```
 
-#### Destroy cluster
+### Destroy cluster
 
 To destroy the cluster, simply run:
 ```
@@ -97,6 +126,7 @@ terraform destroy
 ## More documentation
 + [Setup libvirt provider](docs/libvirt-provider-setup.md)
 + [Load balancing](docs/load-balancer.md)
++ [Troubleshooting](docs/troubleshooting.md)
 + Examples: 
     - [Load balancing to ingress controller](docs/examples/lb-and-ingress-controller.md)
 
