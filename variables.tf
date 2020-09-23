@@ -13,6 +13,12 @@ variable "libvirt_resource_pool_name" {
   description = "The libvirt resource pool name"
 }
 
+variable "libvirt_resource_pool_location" {
+  type        = string
+  description = "Location where resource pool will be initialized"
+  default     = "/var/lib/libvirt/pools/"
+}
+
 #======================================================================================
 # Network
 #======================================================================================

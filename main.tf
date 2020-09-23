@@ -158,7 +158,7 @@ module "k8s_cluster" {
 resource "libvirt_pool" "resource_pool" {
   name = var.libvirt_resource_pool_name
   type = "dir"
-  path = "/var/lib/libvirt/pools/${var.libvirt_resource_pool_name}"
+  path = "${var.libvirt_resource_pool_location}${var.libvirt_resource_pool_name}"
 }
 
 # Creates base OS image for nodes in a cluster #

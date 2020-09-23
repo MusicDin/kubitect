@@ -5,6 +5,9 @@
 # Resource pool name #
 libvirt_resource_pool_name = "k8s-resource-pool"
 
+# Location where resource pool will be initialized (Path must contain "/" at the end) #
+libvirt_resource_pool_location = "/var/lib/libvirt/pools/"
+
 #======================================================================================
 # KVM network configuration
 #======================================================================================
