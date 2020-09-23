@@ -8,7 +8,7 @@ module "network_module" {
 
   network_name           = var.network_name
   network_mac            = var.network_mac
-  network_ip             = var.network_ip
+  network_gateway        = var.network_gateway
   network_mask           = var.network_mask
   network_nat_port_start = var.network_nat_port_start
   network_nat_port_end   = var.network_nat_port_end
@@ -180,8 +180,8 @@ data "template_file" "public_ssh_key" {
 }
 
 # Network bridge configuration (for cloud-init) #
-data "template_file" "network_bridge_tpl" {
-  template = file("templates/network_bridge.tpl")
+data "template_file" "cloud_init_network_tpl" {
+  template = file("templates/cloud_init_network.tpl")
 
   vars = {
     network_interface = var.network_interface
@@ -189,9 +189,9 @@ data "template_file" "network_bridge_tpl" {
 }
 
 # Creates network bridge configuration file from template #
-resource "local_file" "network_bridge_file" {
-  content  = data.template_file.network_bridge_tpl.rendered
-  filename = "config/network_bridge.cfg"
+resource "local_file" "cloud_init_network_file" {
+  content  = data.template_file.cloud_init_network_tpl.rendered
+  filename = "config/cloud_init_network.cfg"
 }
 
 # Cloud-init configuration template #
@@ -215,5 +215,5 @@ resource "libvirt_cloudinit_disk" "cloud_init" {
   name           = "cloud-init.iso"
   pool           = libvirt_pool.resource_pool.name
   user_data      = data.template_file.cloud_init_tpl.rendered
-  network_config = data.template_file.network_bridge_tpl.rendered
+  network_config = data.template_file.cloud_init_network_tpl.rendered
 }

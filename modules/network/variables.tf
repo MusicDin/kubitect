@@ -12,9 +12,9 @@ variable "network_mac" {
   description = "Network MAC address"
 }
 
-variable "network_ip" {
+variable "network_gateway" {
   type        = string
-  description = "Network IP address"
+  description = "Network gateway IP address"
 }
 
 variable "network_mask" {

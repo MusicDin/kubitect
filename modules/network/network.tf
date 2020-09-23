@@ -9,7 +9,7 @@ data "template_file" "network-config-tpl" {
   vars = {
     network_name           = var.network_name
     network_mac            = var.network_mac
-    network_ip             = var.network_ip
+    network_gateway        = var.network_gateway
     network_mask           = var.network_mask
     network_nat_port_start = var.network_nat_port_start
     network_nat_port_end   = var.network_nat_port_end

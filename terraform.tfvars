@@ -9,17 +9,39 @@ libvirt_resource_pool_name = "k8s-resource-pool"
 libvirt_resource_pool_location = "/var/lib/libvirt/pools/"
 
 #======================================================================================
+# Global virtual machines parameters
+#======================================================================================
+
+# Username used to SSH to the VM #
+vm_user = "k8s"
+
+# Private SSH key (for VMs) location (example: ~/.ssh/id_rsa) #
+vm_ssh_private_key = "~/.ssh/id_rsa"
+
+# Linux distribution that will be used on VMs. Possible values are: [ubuntu, debian, centos] #
+vm_distro = ""
+
+# Source of linux image. It can be path to an image on host's filesystem or an URL #
+vm_image_source = ""
+
+# The prefix added to names of VMs #
+vm_name_prefix = "k8s"
+
+#======================================================================================
 # KVM network configuration
 #======================================================================================
 
 # Network name #
 network_name = "k8s-network"
 
+# Network interface #
+network_interface = "ens3"
+
 # Network MAC address #
 network_mac = "52:54:00:4f:e3:88"
 
 # Network gateway IP address #
-network_ip = "192.168.113.1"
+network_gateway = "192.168.113.1"
 
 # Network mask #
 network_mask = "255.255.255.0"
@@ -38,33 +60,15 @@ network_nat_port_end = 65535
 
 
 # --- DHCP IP range --- #
-# DHCP is used only for network creation.
-# Based on VM's MAC and IP address, static IPs are configured within network.
+# DHCP is used as network management protocol.
+# VM's IP address is configured as static IP based on it's MAC.
+# IP addresses have to be within DHCP IP range, otherwise IP won't be assigned to VM.
 
 # DHCP IP start (from IP) #
 network_dhcp_ip_start = "192.168.113.2"
 
 # DHCP IP end (to IP) #
 network_dhcp_ip_end = "192.168.113.254"
-
-#======================================================================================
-# Global virtual machines parameters
-#======================================================================================
-
-# Username used to SSH to the VM #
-vm_user = "k8s"
-
-# Private SSH key (for VMs) location (example: ~/.ssh/id_rsa) #
-vm_ssh_private_key = "~/.ssh/id_rsa"
-
-# Linux distribution that will be used on VMs. Possible values are: [ubuntu, debian, centos] #
-vm_distro = ""
-
-# Source of linux image. It can be path to an image on host's filesystem or an URL #
-vm_image_source = ""
-
-# The prefix added to names of VMs #
-vm_name_prefix = "k8s"
 
 #======================================================================================
 # HAProxy load balancer VMs parameters
@@ -104,7 +108,7 @@ vm_master_ram = 2048
 vm_master_storage = 16106127360
 
 # MAC and IP addresses for master VMs. It is recommended to have at least 3 masters. #
-# Also note that number of masters cannot be divided by 2. #
+# Also note that number of masters cannot be divisible by 2. #
 vm_master_macs_ips = {
   "52:54:00:00:00:10" = "192.168.113.10"
   "52:54:00:00:00:11" = "192.168.113.11"
@@ -121,7 +125,7 @@ vm_worker_cpu = 4
 # The amount of RAM allocated to the worker VM (in Megabytes - MB) #
 vm_worker_ram = 8192
 
-# The amount of disk allocated to the master VM (in Bytes - B) #
+# The amount of disk allocated to the worker VM (in Bytes - B) #
 vm_worker_storage = 32212254720
 
 # MAC and IP addresses for worker VMs. #
