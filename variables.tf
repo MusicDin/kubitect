@@ -3,16 +3,19 @@
 #======================================================================================
 
 variable "action" {
+  type        = string
   description = "Which action have to be done on the cluster (create, add_worker, remove_worker, or upgrade)"
   default     = "create"
 }
 
 variable "libvirt_resource_pool_name" {
+  type        = string
   description = "The libvirt resource pool name"
   default     = "k8s-resource-pool"
 }
 
 variable "libvirt_resource_pool_location" {
+  type        = string
   description = "The libvirt resource pool location"
   default     = "/var/lib/libvirt/pools/"
 }
@@ -26,15 +29,18 @@ variable "libvirt_resource_pool_location" {
 #============================#
 
 variable "vm_user" {
+  type        = string
   description = "SSH user for VMs"
   default     = "user"
 }
 
 variable "vm_ssh_private_key" {
+  type        = string
   description = "Location of private ssh key for VMs"
 }
 
 variable "vm_distro" {
+  type        = string
   description = "Linux distribution used by VMs"
   default     = "none"
 }
@@ -45,6 +51,7 @@ variable "vm_image_source" {
 }
 
 variable "vm_name_prefix" {
+  type        = string
   description = "Prefix added to names of VMs"
   default     = "vm"
 }
@@ -137,16 +144,17 @@ variable "vm_lb_storage" {
 }
 
 variable "vm_lb_macs" {
-  type = map(string)
+  type        = map(string)
   description = "The MAC addresses of HAProxy load balancer nodes"
 }
 
 variable "vm_lb_ips" {
-  type = map(string)
+  type        = map(string)
   description = "The IP addresses of HAProxy load balancer nodes"
 }
 
 variable "vm_lb_vip" {
+  type        = string
   description = "The IP address of the HAProxy load balancer floating VIP"
 }
 
@@ -176,7 +184,6 @@ variable "vm_master_macs" {
   type        = map(string)
   description = "The MAC addresses of master nodes"
 }
-
 
 variable "vm_master_ips" {
   type        = map(string)
@@ -220,21 +227,26 @@ variable "vm_worker_ips" {
 #======================================================================================
 
 variable "k8s_kubespray_url" {
+  type        = string
   description = "The Git repository URL to clone Kubespray from"
 }
 
 variable "k8s_kubespray_version" {
+  type        = string
   description = "The version of Kubespray that will be used to deploy Kubernetes"
 }
 
 variable "k8s_version" {
+  type        = string
   description = "The version of Kuberenetes that will be deployed"
 }
 
 variable "k8s_network_plugin" {
+  type        = string
   description = "The overlay network plugin used by Kubernetes cluster"
 }
 
 variable "k8s_dns_mode" {
+  type        = string
   description = "The DNS service used by Kubernetes cluster (coredns/kubedns)"
 }
