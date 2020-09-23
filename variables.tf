@@ -9,6 +9,12 @@ variable "action" {
 
 variable "libvirt_resource_pool_name" {
   description = "The libvirt resource pool name"
+  default     = "k8s-resource-pool"
+}
+
+variable "libvirt_resource_pool_location" {
+  description = "The libvirt resource pool location"
+  default     = "/var/lib/libvirt/pools/"
 }
 
 #======================================================================================
@@ -16,7 +22,7 @@ variable "libvirt_resource_pool_name" {
 #======================================================================================
 
 #============================#
-# General variables           #
+# General variables          #
 #============================#
 
 variable "vm_user" {
@@ -28,17 +34,14 @@ variable "vm_ssh_private_key" {
   description = "Location of private ssh key for VMs"
 }
 
-#variable "vm_privilege_password" {
-#  description = "Sudo or su password for VMs privilege escalation (Don't set this in .tfvars as plain text!)"
-#}
-
 variable "vm_distro" {
-  description = "Linux distribution used by VMs (currently not in use)"
-  default     = "ubuntu"
+  description = "Linux distribution used by VMs"
+  default     = "none"
 }
 
-variable "vm_image_name" {
-  description = "Name of VM image (it has to be in downloads folder)"
+variable "vm_image_source" {
+  type        = string
+  description = "Source of linux image. It can be path to an image on host's filesystem or an URL"
 }
 
 variable "vm_name_prefix" {
@@ -46,26 +49,69 @@ variable "vm_name_prefix" {
   default     = "vm"
 }
 
-variable "vm_network_name" {
+#============================#
+# Network variables          #
+#============================#
+
+
+variable "network_name" {
+  type        = string
   description = "Network used by VMs"
+  default     = "k8s-network"
 }
 
-variable "vm_network_netmask" {
-  description = "The netmask used to configure the network cards of the VMs"
+variable "network_interface" {
+  type        = string
+  description = "Network interface used for VMs (cloud-init) and Keepalived"
+  default     = "ens3"
 }
 
-variable "vm_network_gateway" {
-  description = "The network gateway used by VMs"
+variable "network_mac" {
+  type        = string
+  description = "Network MAC address"
+  default     = "52:54:00:4f:e3:88"
 }
 
-variable "vm_domain" {
-  description = "Domain name used by VMs"
+variable "network_gateway" {
+  type        = string
+  description = "Network gateway IP address"
+  default     = "192.168.113.1"
 }
 
-# Should be set for lb, master and workers separatly! #
-variable "vm_disk_size" {
-  description = "Disk size in bytes (default: 15GB)"
-  default = 16106127360
+variable "network_mask" {
+  type        = string
+  description = "Network mask"
+  default     = "255.255.255.0"
+}
+
+variable "network_mask_bits" {
+  type        = number
+  description = "Bits used for network"
+  default     = 24
+}
+
+variable "network_nat_port_start" {
+  type        = number
+  description = "NAT (Network Address Translation) port start (from port)"
+  default     = 1024
+}
+
+variable "network_nat_port_end" {
+  type        = number
+  description = "NAT port end (to port)"
+  default     = 65535
+}
+
+variable "network_dhcp_ip_start" {
+  type        = string
+  description = "DHCP IP range start"
+  default     = "192.168.113.2"
+}
+
+variable "network_dhcp_ip_end" {
+  type        = string
+  description = "DHCP IP range end"
+  default     = "192.168.113.254"
 }
 
 #============================#
@@ -73,13 +119,21 @@ variable "vm_disk_size" {
 #============================#
 
 variable "vm_lb_cpu" {
+  type        = number
   description = "The number of vCPU allocated to the HAProxy load balancer"
-  default     = "1"
+  default     = 1
 }
 
 variable "vm_lb_ram" {
-  description = "The amount of RAM allocated to the HAProxy load balancer"
-  default     = "4096"
+  type        = number
+  description = "The amount of RAM (in Megabytes) allocated to the HAProxy load balancer"
+  default     = 4096
+}
+
+variable "vm_lb_storage" {
+  type        = number
+  description = "The amount of disk (in Bytes) allocated to HAProxy load balancer. Default: 15GB"
+  default     = 16106127360
 }
 
 variable "vm_lb_macs" {
@@ -92,8 +146,8 @@ variable "vm_lb_ips" {
   description = "The IP addresses of HAProxy load balancer nodes"
 }
 
-variable "vm_haproxy_vip" {
-  description = "The IP address of the load balancer floating VIP"
+variable "vm_lb_vip" {
+  description = "The IP address of the HAProxy load balancer floating VIP"
 }
 
 #============================#
@@ -101,13 +155,21 @@ variable "vm_haproxy_vip" {
 #============================#
 
 variable "vm_master_cpu" {
+  type        = number
   description = "The number of vCPU allocated to the master node"
-  default     = "1"
+  default     = 1
 }
 
 variable "vm_master_ram" {
-  description = "The amount of RAM allocated to the master node"
+  type        = number
+  description = "The amount of RAM (in Megabytes) allocated to the master node"
   default     = "4096"
+}
+
+variable "vm_master_storage" {
+  type        = number
+  description = "The amount of disk (in Bytes) allocated to the master node. Default: 15GB"
+  default     = 16106127360
 }
 
 variable "vm_master_macs" {
@@ -126,13 +188,21 @@ variable "vm_master_ips" {
 #============================#
 
 variable "vm_worker_cpu" {
+  type        = number
   description = "The number of vCPU allocated to the worker node"
-  default     = "2"
+  default     = 2
 }
 
 variable "vm_worker_ram" {
-  description = "The amount of RAM allocated to the worker node"
-  default     = "8192"
+  type        = number
+  description = "The amount of RAM (in Megabytes) allocated to the worker node"
+  default     = 8192
+}
+
+variable "vm_worker_storage" {
+  type        = number
+  description = "The amount of disk (in Bytes) allocated to the worker node. Default: 15GB"
+  default     = 16106127360
 }
 
 variable "vm_worker_macs" {

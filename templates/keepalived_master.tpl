@@ -10,7 +10,7 @@ vrrp_script check_haproxy {
 
 vrrp_instance VI_01 {
     state MASTER
-    interface ens192
+    interface ${network_interface}
     virtual_router_id 51
     priority 101
 
