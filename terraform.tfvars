@@ -143,10 +143,10 @@ vm_worker_macs_ips = {
 k8s_kubespray_url = "https://github.com/kubernetes-sigs/kubespray.git"
 
 # The version of Kubespray that will be used to deploy Kubernetes #
-k8s_kubespray_version = "v2.13.0"
+k8s_kubespray_version = "v2.14.1"
 
 # The Kubernetes version that will be deployed #
-k8s_version = "v1.17.5"
+k8s_version = "v1.18.9"
 
 # The overlay network plugin used by the Kubernetes cluster (flannel/weave/calico/cilium/canal/contiv/kube-router) #
 k8s_network_plugin = "calico"
