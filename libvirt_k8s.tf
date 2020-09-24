@@ -13,24 +13,44 @@ provider "libvirt" {
 #======================================================================================
 
 #================================  
-# Network template
+# Network templates
 #================================
 
-# Network configuration #
+# Network configuration template #
 data "template_file" "network_config" {
-  template = file("network/k8s_network_config.cfg")
+  template = file("templates/network_config.tpl")
+
+  vars = {
+    network_name           = var.network_name
+    network_mac            = var.network_mac
+    network_gateway        = var.network_gateway
+    network_mask           = var.network_mask
+    network_nat_port_start = var.network_nat_port_start
+    network_nat_port_end   = var.network_nat_port_end
+    network_dhcp_ip_start  = var.network_dhcp_ip_start
+    network_dhcp_ip_end    = var.network_dhcp_ip_end
+  }
 }
 
 #================================  
-# Cloud config template
+# Cloud-init template
 #================================
 
-# Public ssh key for vm (it is directly injected in cloud-init configuration) #
+# Public ssh key for vm (it is directly injected into cloud-init's configuration) #
 data "template_file" "public_ssh_key" {
   template = file("${var.vm_ssh_private_key}.pub")
 }
 
-# User data (cloud-init) configuration #
+# Cloud-init network configuration template #
+data "template_file" "cloud_init_network" {
+  template = file("templates/cloud_init_network.tpl")
+
+  vars = {
+    network_interface = var.network_interface
+  }
+}
+
+# Cloud-init configuration template #
 data "template_file" "user_data" {
   template = file("templates/cloud_init.tpl")
   
@@ -44,13 +64,13 @@ data "template_file" "user_data" {
 # Kubespray templates 
 #================================
 
-# Kubespray all.yml template (Currently supports only 1 load balancer) #
+# Kubespray all.yml template #
 data "template_file" "kubespray_all" {
   
   template = file("templates/kubespray_all.tpl")
   
   vars = {
-    loadbalancer_apiserver = var.vm_haproxy_vip
+    loadbalancer_apiserver = var.vm_lb_vip
   }
 }
 
@@ -105,7 +125,7 @@ data "template_file" "worker_hosts" {
   }
 }
 
-# Load balancer hostname list template #
+# Hostname list of load balancers template #
 data "template_file" "lb_hosts_only" {
 
   count = length(var.vm_lb_ips)
@@ -117,7 +137,7 @@ data "template_file" "lb_hosts_only" {
   }
 }
 
-# Kubespray master hostname list template #
+# Hostname list of master nodes template #
 data "template_file" "master_hosts_only" {
 
   count = length(var.vm_master_ips)
@@ -129,7 +149,7 @@ data "template_file" "master_hosts_only" {
   }
 }
 
-# Kubespray worker hostname and ip list template #
+# Hostname list of worker nodes template #
 data "template_file" "worker_hosts_only" {
 
   count = length(var.vm_worker_ips)
@@ -146,11 +166,11 @@ data "template_file" "haproxy" {
   template = file("templates/haproxy.tpl")
 
   vars = {
-    bind_ip = var.vm_haproxy_vip
+    bind_ip = var.vm_lb_vip
   }
 }
 
-# HAProxy server backend template #
+# HAProxy backend template #
 data "template_file" "haproxy_backend" {
   
   count = length(var.vm_master_ips)
@@ -169,16 +189,18 @@ data "template_file" "keepalived_master" {
   template = file("templates/keepalived_master.tpl")
 
   vars = {
-    virtual_ip = var.vm_haproxy_vip
+    virtual_ip        = var.vm_lb_vip
+    network_interface = var.network_interface
   }
 }
 
-# Keepalived slave template #
-data "template_file" "keepalived_slave" {
-  template = file("templates/keepalived_slave.tpl")
+# Keepalived backup (slave) template #
+data "template_file" "keepalived_backup" {
+  template = file("templates/keepalived_backup.tpl")
 
   vars = {
-    virtual_ip = var.vm_haproxy_vip
+    virtual_ip        = var.vm_lb_vip
+    network_interface = var.network_interface
   }
 }
 
@@ -187,10 +209,22 @@ data "template_file" "keepalived_slave" {
 # Local files
 #======================================================================================
 
-# Create user data (cloud-init) file from template #
+# Create network config file from template #
+resource "local_file" "network_config" {
+  content  = data.template_file.network_config.rendered
+  filename = "config/network_config.xml"
+}
+
+# Create cloud-init configuration file from template #
 resource "local_file" "user_data" {
-  content = data.template_file.user_data.rendered
+  content  = data.template_file.user_data.rendered
   filename = "user_data/cloud_init.cfg"
+}
+
+# Creates network bridge configuration file from template #
+resource "local_file" "cloud_init_network" {
+  content  = data.template_file.cloud_init_network.rendered
+  filename = "config/cloud_init_network.cfg"
 }
 
 # Create Kubespray all.yml configuration file from template #
@@ -205,7 +239,7 @@ resource "local_file" "kubespray_k8s_cluster" {
   filename = "config/group_vars/k8s-cluster.yml"
 }
 
-# Create Kubespray hosts.ini configuration file from template #
+# Create hosts.ini configuration file from template #
 resource "local_file" "kubespray_hosts" {
   content  = "[all]\n${join("", data.template_file.lb_hosts.*.rendered)}${join("", data.template_file.master_hosts.*.rendered)}${join("", data.template_file.worker_hosts.*.rendered)}\n[haproxy]\n${join("", data.template_file.lb_hosts_only.*.rendered)}\n[kube-master]\n${join("", data.template_file.master_hosts_only.*.rendered)}\n[etcd]\n${join("", data.template_file.master_hosts_only.*.rendered)}\n[kube-node]\n${join("", data.template_file.worker_hosts_only.*.rendered)}\n[k8s-cluster:children]\nkube-master\nkube-node"
   filename = "config/hosts.ini"
@@ -223,10 +257,10 @@ resource "local_file" "keepalived_master" {
   filename = "config/keepalived-master.cfg"
 }
 
-# Create keepalived slave configuration file from template #
-resource "local_file" "keepalived_slave" {
-  content  = data.template_file.keepalived_slave.rendered
-  filename = "config/keepalived-slave.cfg"
+# Create keepalived backup (slave) configuration file from template #
+resource "local_file" "keepalived_backup" {
+  content  = data.template_file.keepalived_backup.rendered
+  filename = "config/keepalived-backup.cfg"
 }
 
 #======================================================================================
@@ -242,16 +276,18 @@ resource "null_resource" "network" {
 
   # On terraform apply - Create network #
   provisioner "local-exec" {
-    command     = "virsh net-define network/network_config.xml && virsh net-autostart ${var.vm_network_name} && virsh net-start ${var.vm_network_name}"
+    command     = "virsh net-define config/network_config.xml && virsh net-autostart ${var.network_name} && virsh net-start ${var.network_name}"
     interpreter = ["/bin/bash", "-c"]
   }
 
   # On terraform destroy - Remove network #
   provisioner "local-exec" {
     when       = destroy
-    command    = "virsh net-undefine ${var.vm_network_name} && virsh net-destroy ${var.vm_network_name}"
+    command    = "virsh net-destroy ${var.network_name} && virsh net-undefine ${var.network_name}"
     on_failure = continue
   }
+
+  depends_on = [local_file.network_config]
 }
 
 # Assigns static IP addresses to master node VMs depending on their MAC address #
@@ -261,9 +297,8 @@ resource "null_resource" "lb-static-ips" {
   
   # On terraform apply - Add hosts
   provisioner "local-exec" {
-    command     = "virsh net-update ${var.vm_network_name} add ip-dhcp-host \"<host mac='${var.vm_lb_macs[count.index]}' ip='${var.vm_lb_ips[count.index]}'/>\" --live --config"
+    command     = "virsh net-update ${var.network_name} add ip-dhcp-host \"<host mac='${var.vm_lb_macs[count.index]}' ip='${var.vm_lb_ips[count.index]}'/>\" --live --config"
     interpreter = ["/bin/bash", "-c"]
-    #on_failure = continue
   }
 
   depends_on = [null_resource.network]
@@ -276,7 +311,7 @@ resource "null_resource" "master-static-ips" {
   
   # On terraform apply - Add hosts
   provisioner "local-exec" {
-    command     = "virsh net-update ${var.vm_network_name} add ip-dhcp-host \"<host mac='${var.vm_master_macs[count.index]}' ip='${var.vm_master_ips[count.index]}'/>\" --live --config"
+    command     = "virsh net-update ${var.network_name} add ip-dhcp-host \"<host mac='${var.vm_master_macs[count.index]}' ip='${var.vm_master_ips[count.index]}'/>\" --live --config"
     interpreter = ["/bin/bash", "-c"]
   }
 
@@ -290,7 +325,7 @@ resource "null_resource" "worker-static-ips" {
   
   # On terraform apply - Add hosts
   provisioner "local-exec" {
-    command     = "virsh net-update ${var.vm_network_name} add ip-dhcp-host \"<host mac='${var.vm_worker_macs[count.index]}' ip='${var.vm_worker_ips[count.index]}'/>\" --live --config"
+    command     = "virsh net-update ${var.network_name} add ip-dhcp-host \"<host mac='${var.vm_worker_macs[count.index]}' ip='${var.vm_worker_ips[count.index]}'/>\" --live --config"
     interpreter = ["/bin/bash", "-c"]
   }
 
@@ -301,7 +336,17 @@ resource "null_resource" "worker-static-ips" {
 # Kubespray      
 #================================  
 
-# Modify permissions on config directory #
+# Local variables used in many resources #
+locals {
+  extra_args  = {
+    debian    = "-T 3000 -v -e 'ansible_become_method=su'"
+    ubuntu    = "-T 3000 -v"
+    centos    = "-T 3000 -v"
+  }
+  default_extra_args = "-T 3000 -v"
+}
+
+# Modifies permissions on config directory #
 resource "null_resource" "config_permissions" {
   provisioner "local-exec" {
     command = "chmod -R 700 config"
@@ -315,7 +360,7 @@ resource "null_resource" "config_permissions" {
   ]
 }
 
-# Clone Kubespray repository #
+# Clones Kubespray repository #
 resource "null_resource" "kubespray_download" {
   provisioner "local-exec" {
     command = "cd ansible && rm -rf kubespray && git clone --branch ${var.k8s_kubespray_version} ${var.k8s_kubespray_url}"
@@ -326,14 +371,8 @@ resource "null_resource" "kubespray_download" {
 resource "null_resource" "haproxy_install" {
   count = var.action == "create" ? 1: 0
 
-#  provisioner "remote-exec" {
-#    inline = [
-#      "cloud-init status --wait"
-#    ]
-#  }
-  
   provisioner "local-exec" {
-    command = "cd ansible/haproxy && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -T 3000 -v haproxy.yml"
+    command = "cd ansible/haproxy && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} haproxy.yml"
   }
   
   depends_on = [
@@ -349,7 +388,7 @@ resource "null_resource" "kubespray_create" {
   count = var.action == "create" ? 1 : 0
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" -T 3000 -v cluster.yml"
+    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} cluster.yml"
   }
 
   depends_on = [
@@ -367,12 +406,12 @@ resource "null_resource" "kubespray_create" {
   ]
 }
 
-# Execte scale Kubespray Ansible playbook #
+# Executes scale Kubespray Ansible playbook #
 resource "null_resource" "kubespray_add" {
   count = var.action == "add_worker" ? 1 : 0
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" -T 3000 -v scale.yml"
+    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} scale.yml"
   }
 
   depends_on = [
@@ -387,7 +426,7 @@ resource "null_resource" "kubespray_add" {
   ]
 }
 
-# Execute upgrade Kubespray Ansible playbook #
+# Executes upgrade Kubespray Ansible playbook #
 resource "null_resource" "kubespray_upgrade" {
   count = var.action == "upgrade" ? 1 : 0
 
@@ -395,13 +434,13 @@ resource "null_resource" "kubespray_upgrade" {
     ts = "$(timestamp())"
   }
   
-  # Deletes old Kubespray and installs new one #
+  # Deletes old Kubespray and clones new one #
   provisioner "local-exec" {
     command = "cd ansible && rm -rf kubespray && git clone --branch ${var.k8s_kubespray_version} ${var.k8s_kubespray_url}"
   }
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" -T 3000 -v upgrade-cluster.yml"
+    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} upgrade-cluster.yml"
   }
 
   depends_on = [
@@ -420,11 +459,11 @@ resource "null_resource" "kubespray_upgrade" {
 # Create the local admin.conf kubectl configuration file #
 resource "null_resource" "kubectl_configuration" {
   provisioner "local-exec" {
-    command = "ansible -i ${lookup(var.vm_master_ips, 0)}, -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -T 3000 -m fetch -a 'src=/etc/kubernetes/admin.conf dest=config/admin.conf flat=yes' all"
+    command = "ansible -i ${lookup(var.vm_master_ips, 0)}, -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} -m fetch -a 'src=/etc/kubernetes/admin.conf dest=config/admin.conf flat=yes' all"
   }
 
 #  provisioner "local-exec" {
-#    command = "sed 's/lb-apiserver.kubernetes.local/${var.vm_haproxy_vip}/g' config/admin.conf | tee config/admin.conf.new $$ mv config/admin.conf.new config/admin.conf && chmod 700 config/admin.conf"
+#    command = "sed 's/lb-apiserver.kubernetes.local/${var.vm_lb_vip}/g' config/admin.conf | tee config/admin.conf.new $$ mv config/admin.conf.new config/admin.conf && chmod 700 config/admin.conf"
 #  }
 
 #  provisioner "local-exec" {
@@ -439,103 +478,65 @@ resource "null_resource" "kubectl_configuration" {
 #======================================================================================
 
 # Create a resource pool for Kubernetes VMs #
-resource "libvirt_pool" "resource_pool_base" {
-  name = "${var.libvirt_resource_pool_name}-base"
-  type = "dir"
-  path = "/var/lib/libvirt/pools/${var.libvirt_resource_pool_name}-base"
-}
-
-# Create a resource pool for Kubernetes VMs #
 resource "libvirt_pool" "resource_pool" {
   name = var.libvirt_resource_pool_name
   type = "dir"
-  path = "/var/lib/libvirt/pools/${var.libvirt_resource_pool_name}"
+  path = "${var.libvirt_resource_pool_location}${var.libvirt_resource_pool_name}"
 }
 
-
-# Create image volume for each load balancer node #
-resource "libvirt_volume" "lb_volumes_base" {
-  count  = length(var.vm_lb_ips)
-  name   = "${var.vm_name_prefix}-lb-base-${count.index}.qcow2"
-  pool   = libvirt_pool.resource_pool_base.name
-  source = "${path.module}/downloads/${var.vm_image_name}"
+# Creates base image (with OS) for VMs #
+resource "libvirt_volume" "base_volume" {
+  name   = "base-volume"
+  pool   = libvirt_pool.resource_pool.name
+  source = var.vm_image_source
   format = "qcow2"
 
   depends_on = [
-    libvirt_pool.resource_pool_base
+    libvirt_pool.resource_pool
   ]
 }
 
-# Expand load balancer base volume #
+# Creates volumes for load balancers #
 resource "libvirt_volume" "lb_volumes" {
-  count  = length(var.vm_lb_ips)
-  name   = "${var.vm_name_prefix}-lb-${count.index}.qcow2"
-  pool   = libvirt_pool.resource_pool.name
-  base_volume_name = "${var.vm_name_prefix}-lb-base-${count.index}.qcow2"
-  base_volume_pool = libvirt_pool.resource_pool_base.name
-  size   = var.vm_disk_size
-  format = "qcow2"
+  count          = length(var.vm_lb_ips)
+  name           = "${var.vm_name_prefix}-lb-${count.index}.qcow2"
+  pool           = libvirt_pool.resource_pool.name
+  base_volume_id = libvirt_volume.base_volume.id
+  size           = var.vm_lb_storage
+  format         = "qcow2"
 
   depends_on = [
-    libvirt_volume.lb_volumes_base, 
+    libvirt_volume.base_volume, 
     libvirt_pool.resource_pool
   ]
 }
 
-# Create image volume for each master node #
-resource "libvirt_volume" "master_volumes_base" {
-  count  = length(var.vm_master_ips)
-  name   = "${var.vm_name_prefix}-master-base-${count.index}.qcow2"
-  pool   = libvirt_pool.resource_pool_base.name
-  source = "${path.module}/downloads/${var.vm_image_name}"
-  format = "qcow2"
-
-  depends_on = [
-    libvirt_pool.resource_pool_base 
-  ]
-}
-
-# Expand master node base volume #
+# Creates volumes for master nodes #
 resource "libvirt_volume" "master_volumes" {
-  count  = length(var.vm_master_ips)
-  name   = "${var.vm_name_prefix}-master-${count.index}.qcow2"
-  pool   = libvirt_pool.resource_pool.name
-  base_volume_name = "${var.vm_name_prefix}-master-base-${count.index}.qcow2"
-  base_volume_pool = libvirt_pool.resource_pool_base.name
-  size   = var.vm_disk_size
-  format = "qcow2"
+  count          = length(var.vm_master_ips)
+  name           = "${var.vm_name_prefix}-master-${count.index}.qcow2"
+  pool           = libvirt_pool.resource_pool.name
+  base_volume_id = libvirt_volume.base_volume.id
+  size           = var.vm_master_storage
+  format         = "qcow2"
 
   depends_on = [
-    libvirt_volume.master_volumes_base, 
+    libvirt_volume.base_volume, 
     libvirt_pool.resource_pool
   ]
 }
 
-# Create image volume for each worker node #
-resource "libvirt_volume" "worker_volumes_base" {
-  count  = length(var.vm_worker_ips)
-  name   = "${var.vm_name_prefix}-worker-base-${count.index}.qcow2"
-  pool   = libvirt_pool.resource_pool_base.name
-  source = "${path.module}/downloads/${var.vm_image_name}"
-  format = "qcow2"
-
-  depends_on = [
-    libvirt_pool.resource_pool_base 
-  ]
-}
-
-# Expand worker node base volume #
+# Creates volumes for worker nodes #
 resource "libvirt_volume" "worker_volumes" {
-  count  = length(var.vm_worker_ips)
-  name   = "${var.vm_name_prefix}-worker-${count.index}.qcow2"
-  pool   = libvirt_pool.resource_pool.name
-  base_volume_name = "${var.vm_name_prefix}-worker-base-${count.index}.qcow2"
-  base_volume_pool = libvirt_pool.resource_pool_base.name
-  size   = var.vm_disk_size
-  format = "qcow2"
+  count          = length(var.vm_worker_ips)
+  name           = "${var.vm_name_prefix}-worker-${count.index}.qcow2"
+  pool           = libvirt_pool.resource_pool.name
+  base_volume_id = libvirt_volume.base_volume.id
+  size           = var.vm_worker_storage
+  format         = "qcow2"
 
   depends_on = [
-    libvirt_volume.worker_volumes_base, 
+    libvirt_volume.base_volume,
     libvirt_pool.resource_pool
   ]
 }
@@ -545,10 +546,10 @@ resource "libvirt_cloudinit_disk" "cloud_init" {
   name           = "cloud-init.iso"
   pool           = libvirt_pool.resource_pool.name
   user_data      = data.template_file.user_data.rendered
-  network_config = data.template_file.network_config.rendered
+  network_config = data.template_file.cloud_init_network.rendered
 }
 
-# Creates load balancer nodes
+# Creates load balancers #
 resource "libvirt_domain" "lb_nodes" {
 
   count  = length(var.vm_lb_macs)
@@ -561,7 +562,7 @@ resource "libvirt_domain" "lb_nodes" {
   cloudinit = libvirt_cloudinit_disk.cloud_init.id
  
   network_interface {
-    network_name   = var.vm_network_name
+    network_name   = var.network_name
     mac            = var.vm_lb_macs[count.index]
     wait_for_lease = true
   }
@@ -601,8 +602,6 @@ resource "libvirt_domain" "lb_nodes" {
        "while ! grep \"Cloud-init .* finished\" /var/log/cloud-init.log; do echo \"$(date -Ins) Waiting for cloud-init to finish\"; sleep 2; done"
     ]
   }
-
-
 }
 
 # Creates master nodes
@@ -618,7 +617,7 @@ resource "libvirt_domain" "master_nodes" {
   cloudinit = libvirt_cloudinit_disk.cloud_init.id
  
   network_interface {
-    network_name   = var.vm_network_name
+    network_name   = var.network_name
     mac            = var.vm_master_macs[count.index]
     wait_for_lease = true
   }
@@ -659,9 +658,8 @@ resource "libvirt_domain" "master_nodes" {
     ]
   }
 
-  depends_on = [
-    libvirt_domain.lb_nodes
-  ]
+  depends_on = [libvirt_domain.lb_nodes]
+
 }
 
 # Creates worker nodes #
@@ -677,7 +675,7 @@ resource "libvirt_domain" "worker_nodes" {
   cloudinit = libvirt_cloudinit_disk.cloud_init.id
  
   network_interface {
-    network_name   = var.vm_network_name
+    network_name   = var.network_name
     mac            = var.vm_worker_macs[count.index]
     wait_for_lease = true
   }
@@ -732,13 +730,10 @@ resource "libvirt_domain" "worker_nodes" {
   provisioner "local-exec" {
     when = destroy
     command = "sed 's/${var.vm_name_prefix}-worker-[0-9]*$//' config/hosts.ini"
+    on_failure = continue
   }
+
+  depends_on = [libvirt_domain.master_nodes]
   
-  depends_on = [
-    libvirt_domain.master_nodes,
-    local_file.kubespray_hosts,
-    local_file.kubespray_k8s_cluster,
-    local_file.kubespray_all
-  ]
 }
 
