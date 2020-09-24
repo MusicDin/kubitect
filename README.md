@@ -47,17 +47,16 @@ Finally, you have to enter a location of SSH private key in `vm_ssh_private_key`
 
 ### Cluster setup
 
-Move to main directory:
+Clone project and move to main directory:
 ```
+git clone https://github.com/MusicDin/terraform-kvm-kubespray.git
+
 cd terraform-kvm-kubespray
 ```
 
-Change variables to fit your needs:
-```
-nano terraform.tfvars
-```
-
-Variables are set to work out of the box. Only required variables that are not set are: 
+Change variables in [terraform.tfvars](terraform.tfvars) file to fit your needs.
+Variables are set to work out of the box. 
+Only required variables that are not set are: 
 + `vm_image_source` URL or path on file system to OS image,
 + `vm_distro` a Linux distribution of OS image.
 
@@ -92,7 +91,7 @@ kubectl --kubeconfig=config/admin.conf get nodes
 
 In [terraform.tfvars](./terraform.tfvars) file add *MAC* and *IP* address for a new VM to `vm_worker_macs_ips`. 
   
-Execute terraform script to add worker:
+Execute terraform script to add a worker:
 ```
 terraform apply -var 'action=add_worker'
 ```
@@ -101,7 +100,7 @@ terraform apply -var 'action=add_worker'
 
 In [terraform.tfvars](./terraform.tfvars) file remove *MAC* and *IP* address of VM that is going to be deleted from `vm_worker_macs_ips`.
 
-Execute terraform script to remove worker:
+Execute terraform script to remove a worker:
 ```
 terraform apply -var 'action=remove_worker'
 ```
@@ -111,7 +110,9 @@ In [terraform.tfvars](./terraform.tfvars) file modify:
   + `k8s_kubespray_version` and
   + `k8s_version`.
   
-Execute terraform script to upgrade cluster:
+*Note: Before upgrading make sure Kubespray supports provided Kubernetes version.*
+
+Execute terraform script to upgrade a cluster:
 ```
 terraform apply -var 'action=upgrade'
 ```
