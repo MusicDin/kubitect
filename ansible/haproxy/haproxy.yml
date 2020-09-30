@@ -43,9 +43,9 @@
       notify: restart keepalived
       when: "'lb-0' in inventory_hostname"
 
-    - name: configure keepalived slave
+    - name: configure keepalived backup
       copy:
-        src: ../../config/keepalived-slave.cfg
+        src: ../../config/keepalived-backup.cfg
         dest: /etc/keepalived/keepalived.conf
         owner: root
         group: root

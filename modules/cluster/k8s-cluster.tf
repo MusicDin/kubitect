@@ -132,9 +132,9 @@ data "template_file" "keepalived_master" {
   }
 }
 
-# Keepalived slave template #
-data "template_file" "keepalived_slave" {
-  template = file("templates/keepalived_slave.tpl")
+# Keepalived backup template #
+data "template_file" "keepalived_backup" {
+  template = file("templates/keepalived_backup.tpl")
 
   vars = {
     network_interface = var.network_interface 
@@ -177,10 +177,10 @@ resource "local_file" "keepalived_master" {
   filename = "config/keepalived-master.cfg"
 }
 
-# Create keepalived slave configuration file from template #
-resource "local_file" "keepalived_slave" {
-  content  = data.template_file.keepalived_slave.rendered
-  filename = "config/keepalived-slave.cfg"
+# Create keepalived backup configuration file from template #
+resource "local_file" "keepalived_backup" {
+  content  = data.template_file.keepalived_backup.rendered
+  filename = "config/keepalived-backup.cfg"
 }
 
 #======================================================================================

@@ -41,7 +41,7 @@ variable "network_mac" {
   default     = "52:54:00:4f:e3:88"
 }
 
-variable "network_ip" {
+variable "network_gateway" {
   type        = string
   description = "Network gateway IP address"
   default     = "192.168.113.1"
