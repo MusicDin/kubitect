@@ -25,7 +25,7 @@ frontend ic-http-frontend
         default_backend ic-http-backend
 
 backend ic-http-backend           
-        balancer        roundrobin                                                                                                                                                                          balance roundrobin
+        balance roundrobin
         option          forwardfor
         http-request    set-header X-Forwarded-Port %[dst_port]
         option          httpchk HEAD / HTTP/1.1\r\nHost:localhost

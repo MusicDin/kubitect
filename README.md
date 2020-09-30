@@ -79,7 +79,8 @@ terraform apply
 
 ### Test cluster
 
-All configuration files will be generated in `config/` directory, and one of them will be `admin.conf` which actually is a `kubeconfig` file.
+All configuration files will be generated in `config/` directory, 
+and one of them will be `admin.conf` which is actually a `kubeconfig` file.
  
 Test your cluster by displaying all cluster's nodes:
 ```
@@ -133,7 +134,7 @@ terraform destroy
 
 ## Related projects
 
-If you are looking forward to installing kubernetes cluster on *vSphere* instead of *KVM* check [this project](https://github.com/sguyennet/terraform-vsphere-kubespray).
+If you are interested in installing kubernetes cluster on *vSphere* instead of *KVM* check [this project](https://github.com/sguyennet/terraform-vsphere-kubespray).
 
 ## Having issues?
 
