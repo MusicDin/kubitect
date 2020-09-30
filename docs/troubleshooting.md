@@ -105,7 +105,7 @@ This error can occur when trying to remove a faulty Terraform plan.
 
 #### Solution:
 Volumes created by Libvirt are still attached to the images, which prevents a new volume from being applied with the same name. 
-Therefor removal of these volumes is required:
+Therefore, removal of these volumes is required:
 <pre>
 virsh vol-delete <b>cloud-init</b>.iso --pool <b>your_resource_pool</b>
 
