@@ -29,10 +29,10 @@ backend ic-http-backend
         option          forwardfor
         http-request    set-header X-Forwarded-Port %[dst_port]
         option          httpchk HEAD / HTTP/1.1\r\nHost:localhost
-        # IPs of your master nodes
-        server          k8s-master-0 192.168.113.10:80 check
-        server          k8s-master-1 192.168.113.11:80 check
-        server          k8s-master-2 192.168.113.12:80 check
+        # Route traffic to your master nodes on ingress controller port
+        server          k8s-master-0 192.168.113.10:30080 check
+        server          k8s-master-1 192.168.113.11:30080 check
+        server          k8s-master-2 192.168.113.12:30080 check
 ```
 
 Now it's time to **initialize your cluster**.
