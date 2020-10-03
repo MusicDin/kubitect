@@ -66,7 +66,7 @@ nano /etc/haproxy/haproxy.cfg
 haproxy -f /etc/haproxy/haproxy.cfg -c
 
 # Apply changes
-haproxy -f /etc/haproxy/haproxy.cfg
+sudo systemctl restart haproxy
 ``` 
 
 *For more information check [HAProxy documentation](https://cbonte.github.io/haproxy-dconv/)*.
