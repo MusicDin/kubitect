@@ -18,21 +18,20 @@ Place the following code where comment `Place custom configurations here` is loc
 
 # Load balancing to ingress controller configuration #
 
-frontend ic-http-frontend
+frontend ingress-controller
         # Floating IP (192.168.113.200) will be probably diffrent in your configuration. 
         bind            192.168.113.200:80
-        mode            http
-        default_backend ic-http-backend
+        mode            tcp
+        option          tcplog
+        default_backend ingress-controller
 
-backend ic-http-backend           
-        balance         roundrobin
-        option          forwardfor
-        http-request    set-header X-Forwarded-Port %[dst_port]
-        option          httpchk HEAD / HTTP/1.1\r\nHost:localhost
+backend ingress-controller
+        mode tcp           
+        balance roundrobin
         # Route traffic to your master nodes on ingress controller port
-        server          k8s-master-0 192.168.113.10:30080 check
-        server          k8s-master-1 192.168.113.11:30080 check
-        server          k8s-master-2 192.168.113.12:30080 check
+        server          k8s-master-0 192.168.113.10:30080
+        server          k8s-master-1 192.168.113.11:30080
+        server          k8s-master-2 192.168.113.12:30080
 ```
 
 Now it's time to **initialize your cluster**.
