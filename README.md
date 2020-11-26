@@ -111,12 +111,14 @@ In [terraform.tfvars](./terraform.tfvars) file modify:
   + `k8s_kubespray_version` and
   + `k8s_version`.
   
-*Note: Before upgrading make sure Kubespray supports provided Kubernetes version.*
+*Note: Before upgrading make sure [Kubespray](https://github.com/kubernetes-sigs/kubespray#supported-components) supports provided Kubernetes version.* 
 
 Execute terraform script to upgrade a cluster:
 ```
 terraform apply -var 'action=upgrade'
 ```
+
+**IMPORTANT**: *Do not skip releases when upgrading--upgrade by one tag at a time.* For more information read [Kubespray upgrades](https://github.com/kubernetes-sigs/kubespray/blob/master/docs/upgrades.md).
 
 ### Destroy cluster
 
