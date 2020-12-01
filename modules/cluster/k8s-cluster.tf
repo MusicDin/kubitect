@@ -238,7 +238,7 @@ resource "null_resource" "kubespray_create" {
   count = var.action == "create" ? 1 : 0
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} cluster.yml"
+    command = "cd ansible/kubespray && virtualenv venv && source venv/bin/activate && pip install -r requirements.txt && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} cluster.yml"
   }
 
   depends_on = [
@@ -255,7 +255,7 @@ resource "null_resource" "kubespray_add" {
   count = var.action == "add_worker" ? 1 : 0
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} scale.yml"
+    command = "cd ansible/kubespray && virtualenv venv && source venv/bin/activate && pip install -r requirements.txt && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} scale.yml"
   }
 
   depends_on = [
@@ -281,7 +281,7 @@ resource "null_resource" "kubespray_upgrade" {
   }
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} upgrade-cluster.yml"
+    command = "cd ansible/kubespray && virtualenv venv && source venv/bin/activate && pip install -r requirements.txt && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} upgrade-cluster.yml"
   }
 
   depends_on = [

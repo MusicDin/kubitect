@@ -80,7 +80,7 @@ resource "null_resource" "remove_worker" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${self.triggers.vm_user} --private-key=${self.triggers.vm_ssh_private_key} -e \"node=$VM_NAME delete_nodes_confirmation=yes\" -v remove-node.yml"
+    command = "cd ansible/kubespray && virtualenv venv && source venv/bin/activate && pip install -r requirements.txt && ansible-playbook -i ../../config/hosts.ini -b --user=${self.triggers.vm_user} --private-key=${self.triggers.vm_ssh_private_key} -e \"node=$VM_NAME delete_nodes_confirmation=yes\" -v remove-node.yml"
 
     environment = {
       VM_NAME = "${self.triggers.vm_name_prefix}-worker-${count.index}"
