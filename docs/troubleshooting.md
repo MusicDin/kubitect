@@ -40,7 +40,7 @@ sudo systemctl enable libvirtd
 #### Explanation and Possible Solution:
 Check following:
 + Is libvirt running?
-+ Is your user in the libvirt group? 
++ Is your user in the libvirt group?
 + If on a virtual machine and you just installed libvirt for the first time, make sure to restart the machine and try again.
 
 ### -> Problem 3
@@ -110,7 +110,7 @@ and / or
 This error can occur when trying to remove a faulty Terraform plan.
 
 #### Solution:
-Volumes created by Libvirt are still attached to the images, which prevents a new volume from being applied with the same name. 
+Volumes created by Libvirt are still attached to the images, which prevents a new volume from being applied with the same name.
 Therefore, removal of these volumes is required:
 <pre>
 virsh vol-delete <b>cloud-init</b>.iso --pool <b>your_resource_pool</b>

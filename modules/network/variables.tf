@@ -48,7 +48,7 @@ variable "network_dhcp_ip_end" {
 
 variable "vm_lb_macs_ips" {
   type        = map(string)
-  description = "Map of MACs and IPs for load balancers" 
+  description = "Map of MACs and IPs for load balancers"
 }
 
 variable "vm_master_macs_ips" {

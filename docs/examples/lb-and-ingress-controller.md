@@ -8,7 +8,7 @@ This example will show how to set up load balancer to route all traffic coming o
 
 ## Configuring load balancer
 
-In Kubernetes service of type `NodePort` can by default take values from 30000-32767, 
+In Kubernetes service of type `NodePort` can by default take values from 30000-32767,
 we will for the sake of this example expose ingress controller on port `30080` for HTTP and `30443` for HTTPS, though we won't cover HTTPS configuration.
 
 Now that we know on which port ingress controller will listen for HTTP traffic, we can configure our HAProxy configuration.
@@ -19,14 +19,14 @@ Place the following code where comment `Place custom configurations here` is loc
 # Load balancing to ingress controller configuration #
 
 frontend ingress-controller
-        # Floating IP (192.168.113.200) will be probably diffrent in your configuration. 
+        # Floating IP (192.168.113.200) will be probably diffrent in your configuration.
         bind            192.168.113.200:80
         mode            tcp
         option          tcplog
         default_backend ingress-controller
 
 backend ingress-controller
-        mode tcp           
+        mode tcp
         balance roundrobin
         # Route traffic to your master nodes on ingress controller port
         server          k8s-master-0 192.168.113.10:30080
@@ -40,8 +40,8 @@ Now it's time to **initialize your cluster**.
 
 ## Installing ingress-controller
 
-Now we are going to install ingress controller and expose it as [NodePort](https://kubernetes.io/docs/concepts/services-networking/service/#nodeport). 
-We will expose it on port `30080` for HTTP traffic (*we will also expose it on port `30443` for HTTPS*). 
+Now we are going to install ingress controller and expose it as [NodePort](https://kubernetes.io/docs/concepts/services-networking/service/#nodeport).
+We will expose it on port `30080` for HTTP traffic (*we will also expose it on port `30443` for HTTPS*).
 
 Modify a version of ingress controller and download YAML configuration:
 <pre>
@@ -73,6 +73,6 @@ spec:
 Apply ingress controller configuration:
 ```bash
 kubectl apply -f ingress-controller-deployment.yaml
-``` 
+```
 
-That's it. Now all HTTP traffic will be load balanced to master nodes on ingress controller's port. 
+That's it. Now all HTTP traffic will be load balanced to master nodes on ingress controller's port.
