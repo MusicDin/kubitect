@@ -45,7 +45,7 @@ We will expose it on port `30080` for HTTP traffic (*we will also expose it on p
 
 Modify a version of ingress controller and download YAML configuration:
 <pre>
-wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v<b>0.35.0</b>/deploy/static/provider/baremetal/deploy.yaml -O ingress-controller-deployment.yaml
+wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v<b>0.41.2</b>/deploy/static/provider/baremetal/deploy.yaml -O ingress-controller-deployment.yaml
 </pre>
 
 Edit downloaded `ingress-controller-deployment.yaml` file:
