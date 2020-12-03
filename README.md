@@ -21,6 +21,13 @@ Set up HA Kubernetes cluster using KVM, Terraform and Kubespray.
 
 If you haven't yet, [install libvirt provider](docs/libvirt-provider-setup.md).
 
+### virtualenv
+
+Install [virtualenv](https://virtualenv.pypa.io/en/latest/index.html) using the following command:
+```bash
+python -m pip install --user virtualenv
+```
+
 ### SSH keys
 
 Generate SSH keys, which will be used to access created VMs:
