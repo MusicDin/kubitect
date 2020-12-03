@@ -37,6 +37,9 @@ network_name = "k8s-network"
 # Network interface #
 network_interface = "ens3"
 
+# Network virtual bridge #
+network_virtual_bridge = "virbr1"
+
 # Network MAC address #
 network_mac = "52:54:00:4f:e3:88"
 

@@ -5,7 +5,7 @@
       <port start='${network_nat_port_start}' end='${network_nat_port_end}'/>
     </nat>
   </forward>
-  <bridge name='virbr1' stp='on' delay='0'/>
+  <bridge name='${network_virtual_bridge}' stp='on' delay='0'/>
   <mac address='${network_mac}'/>
   <ip address='${network_gateway}' netmask='${network_mask}'>
     <dhcp>

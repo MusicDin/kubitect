@@ -14,6 +14,7 @@ module "network_module" {
   network_nat_port_end   = var.network_nat_port_end
   network_dhcp_ip_start  = var.network_dhcp_ip_start
   network_dhcp_ip_end    = var.network_dhcp_ip_end
+  network_virtual_bridge = var.network_virtual_bridge
   vm_lb_macs_ips         = var.vm_lb_macs_ips
   vm_master_macs_ips     = var.vm_master_macs_ips
   vm_worker_macs_ips     = var.vm_worker_macs_ips

@@ -42,6 +42,11 @@ variable "network_dhcp_ip_end" {
   description = "DHCP IP range end"
 }
 
+variable "network_virtual_brdige" {
+  type        = string
+  description = "Network virtual bridge"
+}
+
 # -------------------------- #
 # VM specific variables      #
 # -------------------------- #

@@ -15,6 +15,7 @@ data "template_file" "network-config-tpl" {
     network_nat_port_end   = var.network_nat_port_end
     network_dhcp_ip_start  = var.network_dhcp_ip_start
     network_dhcp_ip_end    = var.network_dhcp_ip_end
+    network_virtual_bridge = var.network_virtual_bridge
   }
 }
 

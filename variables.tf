@@ -35,6 +35,12 @@ variable "network_interface" {
   default     = "ens3"
 }
 
+variable "network_virtual_bridge" {
+  type        = string
+  description = "Network virtual bridge"
+  default     = "virbr1"
+}
+
 variable "network_mac" {
   type        = string
   description = "Network MAC address"
