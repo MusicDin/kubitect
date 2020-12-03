@@ -1,12 +1,12 @@
-#================================  
-# Kubespray templates 
+#================================
+# Kubespray templates
 #================================
 
 # Kubespray all.yml template (Currently supports only 1 load balancer) #
 data "template_file" "kubespray_all" {
-  
+
   template = file("templates/kubespray_all.tpl")
-  
+
   vars = {
     loadbalancer_apiserver = var.vm_lb_vip
   }
@@ -14,9 +14,9 @@ data "template_file" "kubespray_all" {
 
 # Kubespray k8s-cluster.yml template #
 data "template_file" "kubespray_k8s_cluster" {
-  
-  template = file("templates/kubespray_k8s_cluster.tpl")  
-  
+
+  template = file("templates/kubespray_k8s_cluster.tpl")
+
   vars = {
     kube_version        = var.k8s_version
     kube_network_plugin = var.k8s_network_plugin
@@ -110,9 +110,9 @@ data "template_file" "haproxy" {
 
 # HAProxy server backend template #
 data "template_file" "haproxy_backend" {
-  
+
   count = length(var.vm_master_ips)
-   
+
   template = file("templates/haproxy_backend.tpl")
 
   vars = {
@@ -137,7 +137,7 @@ data "template_file" "keepalived_backup" {
   template = file("templates/keepalived_backup.tpl")
 
   vars = {
-    network_interface = var.network_interface 
+    network_interface = var.network_interface
     virtual_ip        = var.vm_lb_vip
   }
 }
@@ -150,7 +150,7 @@ data "template_file" "keepalived_backup" {
 # Create Kubespray all.yml configuration file from template #
 resource "local_file" "kubespray_all" {
   content  = data.template_file.kubespray_all.rendered
-  filename = "config/group_vars/all.yml" 
+  filename = "config/group_vars/all.yml"
 }
 
 # Create Kubespray k8s-cluster.yml configuration file from template #
@@ -204,9 +204,9 @@ resource "null_resource" "config_permissions" {
   }
 
   depends_on = [
-    local_file.kubespray_hosts, 
-    local_file.kubespray_all, 
-    local_file.kubespray_k8s_cluster, 
+    local_file.kubespray_hosts,
+    local_file.kubespray_all,
+    local_file.kubespray_k8s_cluster,
     null_resource.kubespray_download
   ]
 }
@@ -225,7 +225,7 @@ resource "null_resource" "haproxy_install" {
   provisioner "local-exec" {
     command = "cd ansible/haproxy && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} haproxy.yml"
   }
-  
+
   depends_on = [
     local_file.kubespray_hosts,
     local_file.haproxy
@@ -234,17 +234,17 @@ resource "null_resource" "haproxy_install" {
 
 # Create Kubespray Ansible playbook #
 resource "null_resource" "kubespray_create" {
-  
+
   count = var.action == "create" ? 1 : 0
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} cluster.yml"
+    command = "cd ansible/kubespray && virtualenv venv && source venv/bin/activate && pip install -r requirements.txt && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} cluster.yml"
   }
 
   depends_on = [
-    local_file.kubespray_hosts, 
-    local_file.kubespray_all, 
-    local_file.kubespray_k8s_cluster, 
+    local_file.kubespray_hosts,
+    local_file.kubespray_all,
+    local_file.kubespray_k8s_cluster,
     null_resource.haproxy_install,
     null_resource.kubespray_download,
   ]
@@ -255,7 +255,7 @@ resource "null_resource" "kubespray_add" {
   count = var.action == "add_worker" ? 1 : 0
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} scale.yml"
+    command = "cd ansible/kubespray && virtualenv venv && source venv/bin/activate && pip install -r requirements.txt && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} scale.yml"
   }
 
   depends_on = [
@@ -274,18 +274,18 @@ resource "null_resource" "kubespray_upgrade" {
   triggers = {
     ts = "$(timestamp())"
   }
-  
+
   # Deletes old Kubespray and installs new one #
   provisioner "local-exec" {
     command = "cd ansible && rm -rf kubespray && git clone --branch ${var.k8s_kubespray_version} ${var.k8s_kubespray_url}"
   }
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} upgrade-cluster.yml"
+    command = "cd ansible/kubespray && virtualenv venv && source venv/bin/activate && pip install -r requirements.txt && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} upgrade-cluster.yml"
   }
 
   depends_on = [
-    local_file.kubespray_hosts,     
+    local_file.kubespray_hosts,
     local_file.kubespray_all,
     local_file.kubespray_k8s_cluster,
     null_resource.kubespray_download,

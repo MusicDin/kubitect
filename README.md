@@ -2,7 +2,7 @@
 Set up HA Kubernetes cluster using KVM, Terraform and Kubespray.
 
 ## Requirements
-+ [Git](https://git-scm.com/) 
++ [Git](https://git-scm.com/)
 + [Cloud-init](https://cloudinit.readthedocs.io/)
 + [Ansible](https://www.ansible.com/) >= v2.6
 + [Terraform](https://www.terraform.io/) **>= v0.13.x**
@@ -39,11 +39,11 @@ Enter same passphrase again: <b>[2]</b>
 
 **[1]** You will be asked to enter file in which to save the key. Default is `/home/your_username/.ssh/id_rsa`.
 
-**[2]** When asked to enter a password, press `ENTER` twice to skip setting a password. 
+**[2]** When asked to enter a password, press `ENTER` twice to skip setting a password.
 **DO NOT** enter it, otherwise Terraform will fail to initialize a cluster.
 
 Finally, you have to enter a location of SSH private key in `vm_ssh_private_key` field in [terraform.tfvars](terraform.tfvars) file.
- 
+
 
 ### Cluster setup
 
@@ -55,8 +55,8 @@ cd terraform-kvm-kubespray
 ```
 
 Change variables in [terraform.tfvars](terraform.tfvars) file to fit your needs.
-Variables are set to work out of the box. 
-Only required variables that are not set are: 
+Variables are set to work out of the box.
+Only required variables that are not set are:
 + `vm_image_source` URL or path on file system to OS image,
 + `vm_distro` a Linux distribution of OS image.
 
@@ -78,9 +78,9 @@ terraform apply
 
 ### Test cluster
 
-All configuration files will be generated in `config/` directory, 
+All configuration files will be generated in `config/` directory,
 and one of them will be `admin.conf` which is actually a `kubeconfig` file.
- 
+
 Test your cluster by displaying all cluster's nodes:
 ```
 kubectl --kubeconfig=config/admin.conf get nodes
@@ -90,8 +90,8 @@ kubectl --kubeconfig=config/admin.conf get nodes
 
 ### Add worker to the cluster
 
-In [terraform.tfvars](./terraform.tfvars) file add *MAC* and *IP* address for a new VM to `vm_worker_macs_ips`. 
-  
+In [terraform.tfvars](./terraform.tfvars) file add *MAC* and *IP* address for a new VM to `vm_worker_macs_ips`.
+
 Execute terraform script to add a worker:
 ```
 terraform apply -var 'action=add_worker'
@@ -110,8 +110,8 @@ terraform apply -var 'action=remove_worker'
 In [terraform.tfvars](./terraform.tfvars) file modify:
   + `k8s_kubespray_version` and
   + `k8s_version`.
-  
-*Note: Before upgrading make sure [Kubespray](https://github.com/kubernetes-sigs/kubespray#supported-components) supports provided Kubernetes version.* 
+
+*Note: Before upgrading make sure [Kubespray](https://github.com/kubernetes-sigs/kubespray#supported-components) supports provided Kubernetes version.*
 
 Execute terraform script to upgrade a cluster:
 ```
@@ -131,7 +131,7 @@ terraform destroy
 + [Setup libvirt provider](docs/libvirt-provider-setup.md)
 + [Load balancing](docs/load-balancer.md)
 + [Troubleshooting](docs/troubleshooting.md)
-+ Examples: 
++ Examples:
     - [Load balancing to ingress controller](docs/examples/lb-and-ingress-controller.md)
 
 

@@ -47,7 +47,7 @@ module "lb_module" {
   depends_on = [
     libvirt_pool.resource_pool,
     libvirt_volume.base_volume
-  ]  
+  ]
 }
 
 # Creates master nodes #
@@ -129,7 +129,7 @@ module "k8s_cluster" {
   vm_lb_vip          = var.vm_lb_vip
   network_interface  = var.network_interface
 
-  # K8s cluster variables  
+  # K8s cluster variables
   k8s_kubespray_url     = var.k8s_kubespray_url
   k8s_kubespray_version = var.k8s_kubespray_version
   k8s_version           = var.k8s_version
@@ -170,7 +170,7 @@ resource "libvirt_volume" "base_volume" {
   depends_on = [libvirt_pool.resource_pool]
 }
 
-#================================  
+#================================
 # Cloud-init
 #================================
 
@@ -197,7 +197,7 @@ resource "local_file" "cloud_init_network_file" {
 # Cloud-init configuration template #
 data "template_file" "cloud_init_tpl" {
   template = file("templates/cloud_init.tpl")
-  
+
   vars = {
     user           = var.vm_user
     ssh_public_key = data.template_file.public_ssh_key.rendered

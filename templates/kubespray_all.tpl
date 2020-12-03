@@ -44,7 +44,7 @@ docker_dns_servers_strict: false
 ## If set the possible values are either 'gce', 'aws', 'azure', 'openstack', 'vsphere', 'oci', or 'external'
 ## When openstack is used make sure to source in the openstack credentials
 ## like you would do when using nova-client before starting the playbook.
-## Note: The 'external' cloud provider is not supported. 
+## Note: The 'external' cloud provider is not supported.
 ## TODO(riverzhang): https://kubernetes.io/docs/tasks/administer-cluster/running-cloud-controller/#running-cloud-controller-manager
 #cloud_provider:  "external"
 

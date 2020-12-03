@@ -83,4 +83,4 @@ variable "vm_ip" {
   type = string
   description = "The IP address of the virtual machine"
 }
-                                                                                                                                                                                                                                                                               
+

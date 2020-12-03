@@ -12,7 +12,7 @@ Move to created directory:
 cd ~/.local/share/terraform/plugins/registry.terraform.io/dmacvicar/libvirt/<b>0.6.2</b>/linux_amd64
 </pre>
 
-Download libvirt provider `.tar.gz` archive file 
+Download libvirt provider `.tar.gz` archive file
 (all possible assets can be found under their [releases](https://github.com/dmacvicar/terraform-provider-libvirt/releases)):
 <pre>
 wget https://github.com/dmacvicar/terraform-provider-libvirt/releases/download/v<b>0.6.2</b>/terraform-provider-libvirt-<b>0.6.2</b>+git.1585292411.8cbe9ad0.Ubuntu_18.04.amd64.tar.gz

@@ -5,7 +5,7 @@
 # Populate network config template file #
 data "template_file" "network-config-tpl" {
   template = file("templates/network_config.tpl")
-  
+
   vars = {
     network_name           = var.network_name
     network_mac            = var.network_mac
