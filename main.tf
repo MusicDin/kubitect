@@ -1,3 +1,12 @@
+#=====================================================================================
+# Provider specific
+#=====================================================================================
+
+# Sets libvirt provider's uri #
+provider "libvirt" {
+  uri = var.libvirt_provider_uri
+}
+
 #======================================================================================
 # Modules
 #======================================================================================
@@ -6,6 +15,7 @@
 module "network_module" {
   source = "./modules/network/"
 
+  libvirt_provider_uri   = var.libvirt_provider_uri
   network_name           = var.network_name
   network_mac            = var.network_mac
   network_gateway        = var.network_gateway

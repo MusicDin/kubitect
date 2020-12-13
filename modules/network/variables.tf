@@ -1,4 +1,13 @@
 # -------------------------- #
+# Virsh specific variables   #
+# -------------------------- #
+
+variable "libvirt_provider_uri" {
+  type        = string
+  description = "Libvirt provider's URI"
+}
+
+# -------------------------- #
 # Network specific variables #
 # -------------------------- #
 

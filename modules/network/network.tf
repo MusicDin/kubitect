@@ -35,19 +35,20 @@ resource "null_resource" "network" {
 
   # Define triggers for destroy-time provisioners
   triggers = {
-    network_name = var.network_name
+    libvirt_provider_uri = var.libvirt_provider_uri
+    network_name         = var.network_name
   }
 
   # On terraform apply - Create network #
   provisioner "local-exec" {
-    command     = "virsh net-define config/network_config.xml && virsh net-autostart ${var.network_name} && virsh net-start ${var.network_name}"
+    command     = "virsh --connect ${var.libvirt_provider_uri} net-define config/network_config.xml && virsh --connect ${var.libvirt_provider_uri} net-autostart ${var.network_name} && virsh --connect ${var.libvirt_provider_uri} net-start ${var.network_name}"
     interpreter = ["/bin/bash", "-c"]
   }
 
   # On terraform destroy - Destroy and undefine network #
   provisioner "local-exec" {
     when       = destroy
-    command    = "virsh net-destroy ${self.triggers.network_name} && virsh net-undefine ${self.triggers.network_name}"
+    command    = "virsh --connect ${self.triggers.libvirt_provider_uri} net-destroy ${self.triggers.network_name} && virsh --connect ${self.triggers.libvirt_provider_uri} net-undefine ${self.triggers.network_name}"
     on_failure = continue
   }
 
@@ -62,7 +63,7 @@ resource "null_resource" "lb-static-ips" {
 
   # On terraform apply - Add host
   provisioner "local-exec" {
-    command     = "virsh net-update ${var.network_name} add ip-dhcp-host \"<host mac='${each.key}' ip='${each.value}'/>\" --live --config"
+    command     = "virsh --connect ${var.libvirt_provider_uri} net-update ${var.network_name} add ip-dhcp-host \"<host mac='${each.key}' ip='${each.value}'/>\" --live --config"
     interpreter = ["/bin/bash", "-c"]
   }
 
@@ -76,7 +77,7 @@ resource "null_resource" "master-static-ips" {
 
   # On terraform apply - Add hosts
   provisioner "local-exec" {
-    command     = "virsh net-update ${var.network_name} add ip-dhcp-host \"<host mac='${each.key}' ip='${each.value}'/>\" --live --config"
+    command     = "virsh --connect ${var.libvirt_provider_uri} net-update ${var.network_name} add ip-dhcp-host \"<host mac='${each.key}' ip='${each.value}'/>\" --live --config"
     interpreter = ["/bin/bash", "-c"]
   }
 
@@ -90,7 +91,7 @@ resource "null_resource" "worker-static-ips" {
 
   # On terraform apply - Add hosts
   provisioner "local-exec" {
-    command     = "virsh net-update ${var.network_name} add ip-dhcp-host \"<host mac='${each.key}' ip='${each.value}'/>\" --live --config"
+    command     = "virsh --connect ${var.libvirt_provider_uri} net-update ${var.network_name} add ip-dhcp-host \"<host mac='${each.key}' ip='${each.value}'/>\" --live --config"
     interpreter = ["/bin/bash", "-c"]
   }
 

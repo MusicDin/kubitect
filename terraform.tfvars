@@ -2,6 +2,9 @@
 # Libvirt provider configuration
 #======================================================================================
 
+# Provider's URI #
+libvirt_provider_uri = "qemu:///system"
+
 # Resource pool name #
 libvirt_resource_pool_name = "k8s-resource-pool"
 

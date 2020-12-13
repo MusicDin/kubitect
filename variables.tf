@@ -8,6 +8,12 @@ variable "action" {
   default     = "create"
 }
 
+variable "libvirt_provider_uri" {
+  type        = string
+  description = "Libvirt provider's URI"
+  default     = "qemu:///system"
+}
+
 variable "libvirt_resource_pool_name" {
   type        = string
   description = "The libvirt resource pool name"
