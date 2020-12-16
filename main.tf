@@ -130,15 +130,16 @@ module "k8s_cluster" {
   action = var.action
 
   # VM variables
-  vm_distro          = var.vm_distro
-  vm_user            = var.vm_user
-  vm_ssh_private_key = var.vm_ssh_private_key
-  vm_name_prefix     = var.vm_name_prefix
-  vm_worker_ips      = values(var.vm_worker_macs_ips)
-  vm_master_ips      = values(var.vm_master_macs_ips)
-  vm_lb_ips          = values(var.vm_lb_macs_ips)
-  vm_lb_vip          = var.vm_lb_vip
-  network_interface  = var.network_interface
+  vm_distro            = var.vm_distro
+  vm_user              = var.vm_user
+  vm_ssh_private_key   = var.vm_ssh_private_key
+  vm_name_prefix       = var.vm_name_prefix
+  vm_worker_ips        = values(var.vm_worker_macs_ips)
+  vm_worker_node_label = var.vm_worker_node_label
+  vm_master_ips        = values(var.vm_master_macs_ips)
+  vm_lb_ips            = values(var.vm_lb_macs_ips)
+  vm_lb_vip            = var.vm_lb_vip
+  network_interface    = var.network_interface
 
   # K8s cluster variables
   k8s_kubespray_url     = var.k8s_kubespray_url

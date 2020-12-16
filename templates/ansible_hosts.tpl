@@ -1,1 +1,1 @@
-${hostname} ansible_host=${host_ip}
+${hostname} ansible_host=${host_ip} ${node_labels}

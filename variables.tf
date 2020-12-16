@@ -232,6 +232,12 @@ variable "vm_worker_macs_ips" {
   description = "MAC and IP addresses of worker nodes"
 }
 
+variable "vm_worker_node_label" {
+  type        = string
+  description = "Worker node role label"
+  default     = ""
+}
+
 #======================================================================================
 # General kubernetes (k8s) variables
 #======================================================================================

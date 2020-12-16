@@ -1,5 +1,5 @@
 variable "action" {
-  type = string
+  type        = string
   description = "Action that needs to be done on cluster"
 }
 
@@ -10,6 +10,11 @@ variable "action" {
 variable "vm_worker_ips" {
   type        = list
   description = "IP addresses of worker nodes"
+}
+
+variable "vm_worker_node_label" {
+  type        = string
+  description = "Worker node role label"
 }
 
 variable "vm_master_ips" {

@@ -1,4 +1,18 @@
 #================================
+# Local variables
+#================================
+
+# Local variables used in many resources #
+locals {
+  extra_args  = {
+    debian = "-T 3000 -v -e 'ansible_become_method=su'"
+    ubuntu = "-T 3000 -v"
+    centos = "-T 3000 -v"
+  }
+  default_extra_args = "-T 3000 -v"
+}
+
+#================================
 # Kubespray templates
 #================================
 
@@ -32,8 +46,9 @@ data "template_file" "lb_hosts" {
   template = file("templates/ansible_hosts.tpl")
 
   vars = {
-    hostname = "${var.vm_name_prefix}-lb-${count.index}"
-    host_ip  = var.vm_lb_ips[count.index]
+    hostname    = "${var.vm_name_prefix}-lb-${count.index}"
+    host_ip     = var.vm_lb_ips[count.index]
+    node_labels = ""
   }
 }
 
@@ -45,8 +60,9 @@ data "template_file" "master_hosts" {
   template = file("templates/ansible_hosts.tpl")
 
   vars = {
-    hostname = "${var.vm_name_prefix}-master-${count.index}"
-    host_ip  = var.vm_master_ips[count.index]
+    hostname    = "${var.vm_name_prefix}-master-${count.index}"
+    host_ip     = var.vm_master_ips[count.index]
+    node_labels = ""
   }
 }
 
@@ -58,8 +74,9 @@ data "template_file" "worker_hosts" {
   template = file("templates/ansible_hosts.tpl")
 
   vars = {
-    hostname = "${var.vm_name_prefix}-worker-${count.index}"
-    host_ip  = var.vm_worker_ips[count.index]
+    hostname    = "${var.vm_name_prefix}-worker-${count.index}"
+    host_ip     = var.vm_worker_ips[count.index]
+    node_labels = length(var.vm_worker_node_label) > 0 ? "node_labels=\"{'node-role.kubernetes.io/${var.vm_worker_node_label}':''}\"" : ""
   }
 }
 
@@ -186,16 +203,6 @@ resource "local_file" "keepalived_backup" {
 #======================================================================================
 # Null resources - K8s cluster configuration using Kubespray
 #======================================================================================
-
-# Local variables used in many resources #
-locals {
-  extra_args  = {
-    debian    = "-T 3000 -v -e 'ansible_become_method=su'"
-    ubuntu    = "-T 3000 -v"
-    centos    = "-T 3000 -v"
-  }
-  default_extra_args = "-T 3000 -v"
-}
 
 # Modify permissions on config directory #
 resource "null_resource" "config_permissions" {

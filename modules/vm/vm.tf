@@ -1,4 +1,4 @@
-# Creates volume for new virtual machine#
+# Creates volume for new virtual machine #
 resource "libvirt_volume" "vm_volume" {
   name             = "${var.vm_name_prefix}-${var.vm_type}-${var.vm_index}.qcow2"
   pool             = var.resource_pool_name
@@ -7,13 +7,13 @@ resource "libvirt_volume" "vm_volume" {
   format           = "qcow2"
 }
 
-# Creates virtual machine
+# Creates virtual machine #
 resource "libvirt_domain" "vm_domain" {
 
   # General configuration #
-  name   = "${var.vm_name_prefix}-${var.vm_type}-${var.vm_index}"
-  vcpu   = var.vm_cpu
-  memory = var.vm_ram
+  name      = "${var.vm_name_prefix}-${var.vm_type}-${var.vm_index}"
+  vcpu      = var.vm_cpu
+  memory    = var.vm_ram
   autostart = true
 
   cloudinit = var.cloud_init_id
