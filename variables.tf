@@ -171,7 +171,7 @@ variable "vm_lb_storage" {
 }
 
 variable "vm_lb_macs_ips" {
-  type = map(string)
+  type        = map(string)
   description = "MAC (key) and IP (value) addresses of HAProxy load balancer nodes"
 }
 

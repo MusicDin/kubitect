@@ -38,8 +38,8 @@ module "lb_module" {
 
   # Variables from general resources #
   resource_pool_name = libvirt_pool.resource_pool.name
-  base_volume_id = libvirt_volume.base_volume.id
-  cloud_init_id = libvirt_cloudinit_disk.cloud_init.id
+  base_volume_id     = libvirt_volume.base_volume.id
+  cloud_init_id      = libvirt_cloudinit_disk.cloud_init.id
 
   # Load balancer specific variables #
   vm_index           = count.index

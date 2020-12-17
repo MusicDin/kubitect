@@ -4,7 +4,7 @@
 
 # Local variables used in many resources #
 locals {
-  extra_args  = {
+  extra_args = {
     debian = "-T 3000 -v -e 'ansible_become_method=su'"
     ubuntu = "-T 3000 -v"
     centos = "-T 3000 -v"
@@ -227,7 +227,7 @@ resource "null_resource" "kubespray_download" {
 
 # Execute create Kubernetes HAProxy playbook #
 resource "null_resource" "haproxy_install" {
-  count = var.action == "create" ? 1: 0
+  count = var.action == "create" ? 1 : 0
 
   provisioner "local-exec" {
     command = "cd ansible/haproxy && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} haproxy.yml"
@@ -307,13 +307,13 @@ resource "null_resource" "kubectl_configuration" {
     command = "ansible -i ${var.vm_master_ips[0]}, -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} -m fetch -a 'src=/etc/kubernetes/admin.conf dest=config/admin.conf flat=yes' all"
   }
 
-#  provisioner "local-exec" {
-#    command = "sed 's/lb-apiserver.kubernetes.local/${var.vm_lb_vip}/g' config/admin.conf | tee config/admin.conf.new $$ mv config/admin.conf.new config/admin.conf && chmod 700 config/admin.conf"
-#  }
+  #  provisioner "local-exec" {
+  #    command = "sed 's/lb-apiserver.kubernetes.local/${var.vm_lb_vip}/g' config/admin.conf | tee config/admin.conf.new $$ mv config/admin.conf.new config/admin.conf && chmod 700 config/admin.conf"
+  #  }
 
-#  provisioner "local-exec" {
-#    command = "chmod 600 config/admin.conf"
-#  }
+  #  provisioner "local-exec" {
+  #    command = "chmod 600 config/admin.conf"
+  #  }
 
   depends_on = [null_resource.kubespray_create]
 }
