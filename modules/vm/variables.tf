@@ -46,7 +46,7 @@ variable "vm_user" {
 }
 
 variable "vm_ssh_private_key" {
-  type = string
+  type        = string
   description = "Location of private key for VM's SSH user"
 }
 
@@ -75,12 +75,12 @@ variable "vm_storage" {
 }
 
 variable "vm_mac" {
-  type = string
+  type        = string
   description = "The MAC address of the virtual machine"
 }
 
 variable "vm_ip" {
-  type = string
+  type        = string
   description = "The IP address of the virtual machine"
 }
 

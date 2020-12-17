@@ -1,10 +1,10 @@
 # Creates volume for new virtual machine #
 resource "libvirt_volume" "vm_volume" {
-  name             = "${var.vm_name_prefix}-${var.vm_type}-${var.vm_index}.qcow2"
-  pool             = var.resource_pool_name
-  base_volume_id   = var.base_volume_id
-  size             = var.vm_storage
-  format           = "qcow2"
+  name           = "${var.vm_name_prefix}-${var.vm_type}-${var.vm_index}.qcow2"
+  pool           = var.resource_pool_name
+  base_volume_id = var.base_volume_id
+  size           = var.vm_storage
+  format         = "qcow2"
 }
 
 # Creates virtual machine #
@@ -59,7 +59,7 @@ resource "libvirt_domain" "vm_domain" {
     }
 
     inline = [
-       "while ! grep \"Cloud-init .* finished\" /var/log/cloud-init.log; do echo \"$(date -Ins) Waiting for cloud-init to finish\"; sleep 2; done"
+      "while ! grep \"Cloud-init .* finished\" /var/log/cloud-init.log; do echo \"$(date -Ins) Waiting for cloud-init to finish\"; sleep 2; done"
     ]
   }
 
@@ -90,8 +90,8 @@ resource "null_resource" "remove_worker" {
   }
 
   provisioner "local-exec" {
-    when = destroy
-    command = "sed 's/${self.triggers.vm_name_prefix}-worker-{vm_index}$//' config/hosts.ini"
+    when       = destroy
+    command    = "sed 's/${self.triggers.vm_name_prefix}-worker-{vm_index}$//' config/hosts.ini"
     on_failure = continue
   }
 
