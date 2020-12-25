@@ -63,6 +63,10 @@ resource "libvirt_domain" "vm_domain" {
     ]
   }
 
+  provisioner "local-exec" {
+    command = "ssh-keygen -R ${var.vm_ip} && ssh-keyscan -t rsa ${var.vm_ip} | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old"
+  }
+
 }
 
 
@@ -72,6 +76,7 @@ resource "null_resource" "remove_worker" {
   count = var.vm_type == "worker" ? 1 : 0
 
   triggers = {
+    vm_ip              = var.vm_ip
     vm_user            = var.vm_user
     vm_ssh_private_key = var.vm_ssh_private_key
     vm_name_prefix     = var.vm_name_prefix
@@ -91,7 +96,13 @@ resource "null_resource" "remove_worker" {
 
   provisioner "local-exec" {
     when       = destroy
-    command    = "sed 's/${self.triggers.vm_name_prefix}-worker-{vm_index}$//' config/hosts.ini"
+    command    = "sed -i '/${self.triggers.vm_name_prefix}-worker-${self.triggers.vm_index}$/d' config/hosts.ini"
+    on_failure = continue
+  }
+
+  provisioner "local-exec" {
+    when       = destroy
+    command    = "sed -i '/${self.triggers.vm_ip} /d' ~/.ssh/known_hosts"
     on_failure = continue
   }
 
