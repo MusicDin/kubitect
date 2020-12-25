@@ -64,7 +64,7 @@ resource "libvirt_domain" "vm_domain" {
   }
 
   provisioner "local-exec" {
-    command = "ssh-keygen -R ${var.vm_ip} && ssh-keyscan -t rsa ${var.vm_ip} | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old"
+    command = "touch ~/.ssh/known_hosts && ssh-keygen -R ${var.vm_ip} && ssh-keyscan -t rsa ${var.vm_ip} | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old"
   }
 
 }
