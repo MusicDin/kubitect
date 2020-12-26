@@ -46,6 +46,7 @@ module "lb_module" {
   vm_type            = "lb"
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
+  vm_ssh_known_hosts = var.vm_ssh_known_hosts
   vm_network_name    = var.network_name
   vm_name_prefix     = var.vm_name_prefix
   vm_cpu             = var.vm_lb_cpu
@@ -77,6 +78,7 @@ module "master_module" {
   vm_type            = "master"
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
+  vm_ssh_known_hosts = var.vm_ssh_known_hosts
   vm_network_name    = var.network_name
   vm_name_prefix     = var.vm_name_prefix
   vm_cpu             = var.vm_master_cpu
@@ -108,6 +110,7 @@ module "worker_module" {
   vm_type            = "worker"
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
+  vm_ssh_known_hosts = var.vm_ssh_known_hosts
   vm_network_name    = var.network_name
   vm_name_prefix     = var.vm_name_prefix
   vm_cpu             = var.vm_worker_cpu

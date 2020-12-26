@@ -100,6 +100,8 @@ resource "null_resource" "remove_worker" {
 # Adds vm SSH key to known hosts #
 resource "null_resource" "lb_ssh_known_hosts" {
 
+  count = var.vm_ssh_known_hosts == "true" ? 1 : 0
+
   triggers = {
     vm_ip = var.vm_ip
   }

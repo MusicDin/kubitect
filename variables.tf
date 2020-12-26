@@ -131,6 +131,12 @@ variable "vm_ssh_private_key" {
   description = "Location of private ssh key for VMs"
 }
 
+variable "vm_ssh_known_hosts" {
+  type        = string
+  description = "Add virtual machine SSH known hosts"
+  default     = "false"
+}
+
 variable "vm_distro" {
   type        = string
   description = "Linux distribution used on VMs. Possible values: [ubuntu, centos, debian]"

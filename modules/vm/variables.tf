@@ -50,6 +50,11 @@ variable "vm_ssh_private_key" {
   description = "Location of private key for VM's SSH user"
 }
 
+variable "vm_ssh_known_hosts" {
+  type        = string
+  description = "Add virtual machine SSH known hosts"
+}
+
 variable "vm_name_prefix" {
   type        = string
   description = "Prefix added to names of VMs"
