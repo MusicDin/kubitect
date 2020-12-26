@@ -63,10 +63,6 @@ resource "libvirt_domain" "vm_domain" {
     ]
   }
 
-  provisioner "local-exec" {
-    command = "touch ~/.ssh/known_hosts && ssh-keygen -R ${var.vm_ip} && ssh-keyscan -t rsa ${var.vm_ip} | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old"
-  }
-
 }
 
 
@@ -76,7 +72,6 @@ resource "null_resource" "remove_worker" {
   count = var.vm_type == "worker" ? 1 : 0
 
   triggers = {
-    vm_ip              = var.vm_ip
     vm_user            = var.vm_user
     vm_ssh_private_key = var.vm_ssh_private_key
     vm_name_prefix     = var.vm_name_prefix
@@ -100,10 +95,24 @@ resource "null_resource" "remove_worker" {
     on_failure = continue
   }
 
+}
+
+# Adds vm SSH key to known hosts #
+resource "null_resource" "lb_ssh_known_hosts" {
+
+  triggers = {
+    vm_ip = var.vm_ip
+  }
+
+  provisioner "local-exec" {
+    command = "touch ~/.ssh/known_hosts && ssh-keygen -R ${var.vm_ip} && ssh-keyscan -t rsa ${var.vm_ip} | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old"
+  }
+
   provisioner "local-exec" {
     when       = destroy
-    command    = "sed -i '/${self.triggers.vm_ip} /d' ~/.ssh/known_hosts"
+    command    = "ssh-keygen -R ${self.triggers.vm_ip}"
     on_failure = continue
   }
 
+  depends_on = [libvirt_domain.vm_domain]
 }
