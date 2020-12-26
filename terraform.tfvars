@@ -21,6 +21,9 @@ vm_user = "k8s"
 # Private SSH key (for VMs) location (example: ~/.ssh/id_rsa) #
 vm_ssh_private_key = "~/.ssh/id_rsa"
 
+# Adds VM to SSH known hosts (Note: It may result in incorrect addition/deletition) #
+vm_ssh_known_hosts = "false"
+
 # Linux distribution that will be used on VMs. Possible values are: [ubuntu, debian, centos] #
 vm_distro = ""
 
