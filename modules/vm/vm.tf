@@ -97,8 +97,8 @@ resource "null_resource" "remove_worker" {
 
 }
 
-# Adds vm SSH key to known hosts #
-resource "null_resource" "lb_ssh_known_hosts" {
+# Adds VM's SSH key to known hosts #
+resource "null_resource" "ssh_known_hosts" {
 
   count = var.vm_ssh_known_hosts == "true" ? 1 : 0
 
@@ -107,12 +107,12 @@ resource "null_resource" "lb_ssh_known_hosts" {
   }
 
   provisioner "local-exec" {
-    command = "touch ~/.ssh/known_hosts && ssh-keygen -R ${var.vm_ip} && ssh-keyscan -t rsa ${var.vm_ip} | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old"
+    command = "sh ./scripts/filelock-exec.sh \"touch ~/.ssh/known_hosts && ssh-keygen -R ${var.vm_ip} && ssh-keyscan -t rsa ${var.vm_ip} | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old\""
   }
 
   provisioner "local-exec" {
     when       = destroy
-    command    = "ssh-keygen -R ${self.triggers.vm_ip}"
+    command    = "sh ./scripts/filelock-exec.sh \"ssh-keygen -R ${self.triggers.vm_ip}\""
     on_failure = continue
   }
 
