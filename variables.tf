@@ -133,8 +133,8 @@ variable "vm_ssh_private_key" {
 
 variable "vm_ssh_known_hosts" {
   type        = string
-  description = "Add virtual machine SSH known hosts"
-  default     = "false"
+  description = "Add virtual machines to SSH known hosts"
+  default     = "true"
 }
 
 variable "vm_distro" {
