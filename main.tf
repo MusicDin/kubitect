@@ -144,6 +144,9 @@ module "k8s_cluster" {
   vm_lb_vip            = var.vm_lb_vip
   network_interface    = var.network_interface
 
+  # Kubespray addons
+  k8s_dashboard_enabled = var.k8s_dashboard_enabled
+
   # K8s cluster variables
   k8s_kubespray_url     = var.k8s_kubespray_url
   k8s_kubespray_version = var.k8s_kubespray_version

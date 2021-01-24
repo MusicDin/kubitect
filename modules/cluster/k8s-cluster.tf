@@ -38,6 +38,16 @@ data "template_file" "kubespray_k8s_cluster" {
   }
 }
 
+# Kubespray addons.yml template #
+data "template_file" "kubespray_addons" {
+
+  template = file("templates/kubespray_addons.tpl")
+
+  vars = {
+    dashboard_enabled = var.k8s_dashboard_enabled
+  }
+}
+
 # Load balancer hostname and ip list template #
 data "template_file" "lb_hosts" {
 
@@ -167,13 +177,19 @@ data "template_file" "keepalived_backup" {
 # Create Kubespray all.yml configuration file from template #
 resource "local_file" "kubespray_all" {
   content  = data.template_file.kubespray_all.rendered
-  filename = "config/group_vars/all.yml"
+  filename = "config/group_vars/all/all.yml"
 }
 
 # Create Kubespray k8s-cluster.yml configuration file from template #
 resource "local_file" "kubespray_k8s_cluster" {
   content  = data.template_file.kubespray_k8s_cluster.rendered
-  filename = "config/group_vars/k8s-cluster.yml"
+  filename = "config/group_vars/k8s-cluster/k8s-cluster.yml"
+}
+
+# Create Kubespray addons.yml configuration file from template #
+resource "local_file" "kubespray_addons" {
+  content = data.template_file.kubespray_addons.rendered
+  filename = "config/group_vars/k8s-cluster/addons.yml"
 }
 
 # Create Kubespray hosts.ini configuration file from template #
@@ -214,6 +230,7 @@ resource "null_resource" "config_permissions" {
     local_file.kubespray_hosts,
     local_file.kubespray_all,
     local_file.kubespray_k8s_cluster,
+    local_file.kubespray_addons,
     null_resource.kubespray_download
   ]
 }
@@ -257,7 +274,7 @@ resource "null_resource" "kubespray_create" {
   ]
 }
 
-# Execte scale Kubespray Ansible playbook #
+# Execute scale Kubespray Ansible playbook #
 resource "null_resource" "kubespray_add" {
   count = var.action == "add_worker" ? 1 : 0
 
