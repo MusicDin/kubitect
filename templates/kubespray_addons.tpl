@@ -3,7 +3,7 @@
 dashboard_enabled: ${dashboard_enabled}
 
 # Helm deployment
-helm_enabled: false
+helm_enabled: ${helm_enabled}
 
 # Registry deployment
 registry_enabled: false
@@ -128,14 +128,14 @@ cert_manager_enabled: false
 # cert_manager_namespace: "cert-manager"
 
 # MetalLB deployment
-metallb_enabled: false
-# metallb_ip_range:
-#   - "10.5.0.50-10.5.0.99"
-# metallb_version: v0.9.3
-# metallb_protocol: "layer2"
-# metallb_port: "7472"
-# metallb_limits_cpu: "100m"
-# metallb_limits_mem: "100Mi"
+metallb_enabled: ${metallb_enabled}
+metallb_version: "${metallb_version}"
+metallb_port: "${metallb_port}"
+metallb_limits_cpu: "${metallb_cpu_limit}"
+metallb_limits_mem: "${metallb_mem_limit}"
+metallb_protocol: "${metallb_protocol}"
+metallb_ip_range:
+  - "${metallb_ip_range}"
 # metallb_additional_address_pools:
 #   kube_service_pool:
 #     ip_range:

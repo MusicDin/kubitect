@@ -11,6 +11,7 @@ libvirt_resource_pool_name = "k8s-resource-pool"
 # Location where resource pool will be initialized (Path must contain "/" at the end) #
 libvirt_resource_pool_location = "/var/lib/libvirt/pools/"
 
+
 #======================================================================================
 # Global virtual machines parameters
 #======================================================================================
@@ -32,6 +33,7 @@ vm_image_source = ""
 
 # The prefix added to names of VMs #
 vm_name_prefix = "k8s"
+
 
 #======================================================================================
 # KVM network configuration
@@ -79,6 +81,7 @@ network_dhcp_ip_start = "192.168.113.2"
 # DHCP IP end (to IP) #
 network_dhcp_ip_end = "192.168.113.254"
 
+
 #======================================================================================
 # HAProxy load balancer VMs parameters
 #======================================================================================
@@ -124,6 +127,7 @@ vm_master_macs_ips = {
   "52:54:00:00:00:12" = "192.168.113.12"
 }
 
+
 #======================================================================================
 # Worker node VMs parameters
 #======================================================================================
@@ -147,12 +151,6 @@ vm_worker_macs_ips = {
 # Sets worker node's role label #
 vm_worker_node_label = "node"
 
-#======================================================================================
-# Kubespray addons
-#======================================================================================
-
-# Install Kubernetes dashboard #
-k8s_dashboard_enabled = "false"
 
 #======================================================================================
 # Kubernetes (k8s) parameters
@@ -172,3 +170,46 @@ k8s_network_plugin = "calico"
 
 # The DNS service used by Kubernetes cluster (coredns/kubedns)#
 k8s_dns_mode = "coredns"
+
+
+#======================================================================================
+# Kubespray addons
+#======================================================================================
+
+# Use custom addons.yml #
+kubespray_custom_addons_enabled = "false"
+
+# Path to custom addons.yml #
+kubespray_custom_addons_path = ""
+
+#=========================
+# General
+#=========================
+
+# Install Kubernetes dashboard #
+k8s_dashboard_enabled = "false"
+
+# Install helm #
+helm_enabled = "false"
+
+#=========================
+# MetalLB
+#=========================
+
+# Install MetalLB #
+metallb_enabled  = "false"
+
+# MetalLB version #
+metallb_version = "v0.9.5"
+
+# Kubernetes limits (1000m = 1 vCore) #
+metallb_cpu_limit = "100m"
+metallb_mem_limit = "100Mi"
+metallb_port      = 7472
+
+# MetalLB protocol (layer2/bgp) #
+# Note: Only layer2 is currently supported #
+metallb_protocol = "layer2"
+
+# IP range for services of type LoadBalancer #
+metallb_ip_range = "192.168.113.241-192.168.113.254"

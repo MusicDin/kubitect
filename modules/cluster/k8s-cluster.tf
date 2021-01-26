@@ -32,20 +32,39 @@ data "template_file" "kubespray_k8s_cluster" {
   template = file("templates/kubespray_k8s_cluster.tpl")
 
   vars = {
-    kube_version        = var.k8s_version
-    kube_network_plugin = var.k8s_network_plugin
-    dns_mode            = var.k8s_dns_mode
+    kube_version          = var.k8s_version
+    kube_network_plugin   = var.k8s_network_plugin
+    dns_mode              = var.k8s_dns_mode
+    kube_proxy_strict_arp = var.metallb_enabled ? "true" : "false"
   }
 }
 
 # Kubespray addons.yml template #
 data "template_file" "kubespray_addons" {
 
+  count = var.kubespray_custom_addons_enabled == "false" ? 1 : 0
+
   template = file("templates/kubespray_addons.tpl")
 
   vars = {
     dashboard_enabled = var.k8s_dashboard_enabled
+    helm_enabled      = var.helm_enabled
+    metallb_enabled   = var.metallb_enabled
+    metallb_version   = var.metallb_version
+    metallb_port      = var.metallb_port
+    metallb_cpu_limit = var.metallb_cpu_limit
+    metallb_mem_limit = var.metallb_mem_limit
+    metallb_protocol  = var.metallb_protocol
+    metallb_ip_range  = var.metallb_ip_range
   }
+}
+
+# Kubespray custom addons.yml #
+data "template_file" "kubespray_custom_addons" {
+
+  count = var.kubespray_custom_addons_enabled == "true" ? 1 : 0
+
+  template = file(var.kubespray_custom_addons_path)
 }
 
 # Load balancer hostname and ip list template #
@@ -188,7 +207,19 @@ resource "local_file" "kubespray_k8s_cluster" {
 
 # Create Kubespray addons.yml configuration file from template #
 resource "local_file" "kubespray_addons" {
-  content = data.template_file.kubespray_addons.rendered
+
+  count = var.kubespray_custom_addons_enabled == "false" ? 1 : 0
+
+  content = data.template_file.kubespray_addons[count.index].rendered
+  filename = "config/group_vars/k8s-cluster/addons.yml"
+}
+
+# Copy custom Kubespray addons.yml configuration #
+resource "local_file" "kubespray_custom_addons" {
+
+  count = var.kubespray_custom_addons_enabled == "true" ? 1 : 0
+
+  content = data.template_file.kubespray_custom_addons[count.index].rendered
   filename = "config/group_vars/k8s-cluster/addons.yml"
 }
 

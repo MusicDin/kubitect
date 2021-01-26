@@ -106,7 +106,6 @@ variable "network_dhcp_ip_start" {
 }
 
 variable "network_dhcp_ip_end" {
-
   type        = string
   description = "DHCP IP range end"
   default     = "192.168.113.254"
@@ -245,16 +244,6 @@ variable "vm_worker_node_label" {
 }
 
 #======================================================================================
-# Kubespray addons
-#======================================================================================
-
-variable "k8s_dashboard_enabled" {
-  type        = string
-  description = "Sets up Kubernetes dashboard if enabled"
-  default     = "false"
-}
-
-#======================================================================================
 # General kubernetes (k8s) variables
 #======================================================================================
 
@@ -281,4 +270,74 @@ variable "k8s_network_plugin" {
 variable "k8s_dns_mode" {
   type        = string
   description = "The DNS service used by Kubernetes cluster (coredns/kubedns)"
+}
+
+#======================================================================================
+# Kubespray addons
+#======================================================================================
+
+variable "kubespray_custom_addons_enabled" {
+  type        = string
+  description = "If enabled, custom addons.yml will be used"
+  default     = "false"
+}
+
+variable "kubespray_custom_addons_path" {
+  type        = string
+  description = "If enabled, custom addons.yml will be used"
+  default     = ""
+}
+
+variable "k8s_dashboard_enabled" {
+  type        = string
+  description = "Sets up Kubernetes dashboard if enabled"
+  default     = "false"
+}
+
+variable "helm_enabled" {
+  type        = string
+  description = "Sets up Helm if enabled"
+  default     = "false"
+}
+
+variable "metallb_enabled" {
+  type        = string
+  description = "Sets up MetalLB if enabled"
+  default     = "false"
+}
+
+variable "metallb_version" {
+  type        = string
+  description = "MetalLB version"
+  default     = ""
+}
+
+variable "metallb_port" {
+  type        = number
+  description = "Kubernetes MetalLB port"
+  default     = 7472
+}
+
+variable "metallb_cpu_limit" {
+  type        = string
+  description = "MetalLB pod CPU limit"
+  default     = "100m"
+}
+
+variable "metallb_mem_limit" {
+  type        = string
+  description = "MetalLB pod memory (RAM) limit"
+  default     = "100Mi"
+}
+
+variable "metallb_protocol" {
+  type        = string
+  description = "MetalLB protocol (layer2/bgp)"
+  default     = "layer2"
+}
+
+variable "metallb_ip_range" {
+  type        = string
+  description = "IP range that MetalLB will use for services of type LoadBalancer"
+  default     = ""
 }

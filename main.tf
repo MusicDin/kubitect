@@ -144,15 +144,25 @@ module "k8s_cluster" {
   vm_lb_vip            = var.vm_lb_vip
   network_interface    = var.network_interface
 
-  # Kubespray addons
-  k8s_dashboard_enabled = var.k8s_dashboard_enabled
-
   # K8s cluster variables
   k8s_kubespray_url     = var.k8s_kubespray_url
   k8s_kubespray_version = var.k8s_kubespray_version
   k8s_version           = var.k8s_version
   k8s_network_plugin    = var.k8s_network_plugin
   k8s_dns_mode          = var.k8s_dns_mode
+
+  # Kubespray addons
+  kubespray_custom_addons_enabled = var.kubespray_custom_addons_enabled
+  kubespray_custom_addons_path    = var.kubespray_custom_addons_path
+  k8s_dashboard_enabled           = var.k8s_dashboard_enabled
+  helm_enabled                    = var.helm_enabled
+  metallb_enabled                 = var.metallb_enabled
+  metallb_version                 = var.metallb_version
+  metallb_port                    = var.metallb_port
+  metallb_cpu_limit               = var.metallb_cpu_limit
+  metallb_mem_limit               = var.metallb_mem_limit
+  metallb_protocol                = var.metallb_protocol
+  metallb_ip_range                = var.metallb_ip_range
 
   # K8s cluster creation depends on network and all VMs
   depends_on = [

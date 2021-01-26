@@ -58,15 +58,6 @@ variable "network_interface" {
 }
 
 #======================================================================================
-# Kubespray addons
-#======================================================================================
-
-variable "k8s_dashboard_enabled" {
-  type        = string
-  description = "Installs Kubernetes dashboard if enabled"
-}
-
-#======================================================================================
 # General kubernetes (k8s) variables
 #======================================================================================
 
@@ -93,4 +84,63 @@ variable "k8s_network_plugin" {
 variable "k8s_dns_mode" {
   type        = string
   description = "The DNS service used by Kubernetes cluster (coredns/kubedns)"
+}
+
+#======================================================================================
+# Kubespray addons
+#======================================================================================
+
+variable "kubespray_custom_addons_enabled" {
+  type        = string
+  description = "If enabled, custom addons.yml will be used"
+}
+
+variable "kubespray_custom_addons_path" {
+  type        = string
+  description = "If enabled, custom addons.yml will be used"
+}
+
+variable "k8s_dashboard_enabled" {
+  type        = string
+  description = "Sets up Kubernetes dashboard if enabled"
+}
+
+variable "helm_enabled" {
+  type        = string
+  description = "Sets up Helm if enabled"
+}
+
+variable "metallb_enabled" {
+  type        = string
+  description = "Sets up MetalLB if enabled"
+}
+
+variable "metallb_version" {
+  type        = string
+  description = "MetalLB version"
+}
+
+variable "metallb_port" {
+  type        = number
+  description = "Kubernetes MetalLB port"
+}
+
+variable "metallb_cpu_limit" {
+  type        = string
+  description = "MetalLB pod CPU limit"
+}
+
+variable "metallb_mem_limit" {
+  type        = string
+  description = "MetalLB pod memory (RAM) limit"
+}
+
+variable "metallb_protocol" {
+  type        = string
+  description = "MetalLB protocol (layer2/bgp)"
+}
+
+variable "metallb_ip_range" {
+  type        = string
+  description = "IP range that MetalLB will use for services of type LoadBalancer"
 }
