@@ -35,7 +35,7 @@ data "template_file" "kubespray_k8s_cluster" {
     kube_version          = var.k8s_version
     kube_network_plugin   = var.k8s_network_plugin
     dns_mode              = var.k8s_dns_mode
-    kube_proxy_strict_arp = var.metallb_enabled ? "true" : "false"
+    kube_proxy_strict_arp = var.metallb_enabled == "true" ? "true" : "false"
   }
 }
 
