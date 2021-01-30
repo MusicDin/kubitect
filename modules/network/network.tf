@@ -8,14 +8,13 @@ data "template_file" "network-config-tpl" {
 
   vars = {
     network_name           = var.network_name
+    network_forward_mode   = var.network_forward_mode
+    network_virtual_bridge = var.network_virtual_bridge
     network_mac            = var.network_mac
     network_gateway        = var.network_gateway
     network_mask           = var.network_mask
-    network_nat_port_start = var.network_nat_port_start
-    network_nat_port_end   = var.network_nat_port_end
     network_dhcp_ip_start  = var.network_dhcp_ip_start
     network_dhcp_ip_end    = var.network_dhcp_ip_end
-    network_virtual_bridge = var.network_virtual_bridge
   }
 }
 

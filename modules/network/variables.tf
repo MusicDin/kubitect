@@ -16,6 +16,16 @@ variable "network_name" {
   description = "Network name"
 }
 
+variable "network_forward_mode" {
+  type        = string
+  description = "Network forward mode"
+}
+
+variable "network_virtual_bridge" {
+  type        = string
+  description = "Network virtual bridge"
+}
+
 variable "network_mac" {
   type        = string
   description = "Network MAC address"
@@ -31,16 +41,6 @@ variable "network_mask" {
   description = "Network mask"
 }
 
-variable "network_nat_port_start" {
-  type        = string
-  description = "NAT (Network Address Translation) port start (from port)"
-}
-
-variable "network_nat_port_end" {
-  type        = string
-  description = "NAT port end (to port)"
-}
-
 variable "network_dhcp_ip_start" {
   type        = string
   description = "DHCP IP range start"
@@ -49,11 +49,6 @@ variable "network_dhcp_ip_start" {
 variable "network_dhcp_ip_end" {
   type        = string
   description = "DHCP IP range end"
-}
-
-variable "network_virtual_bridge" {
-  type        = string
-  description = "Network virtual bridge"
 }
 
 # -------------------------- #

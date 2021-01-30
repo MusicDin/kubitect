@@ -45,6 +45,9 @@ network_name = "k8s-network"
 # Network interface #
 network_interface = "ens3"
 
+# Network forward mode (nat, route) #
+network_forward_mode = "nat"
+
 # Network virtual bridge #
 network_virtual_bridge = "virbr1"
 

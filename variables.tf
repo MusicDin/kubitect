@@ -41,6 +41,12 @@ variable "network_interface" {
   default     = "ens3"
 }
 
+variable "network_forward_mode" {
+  type        = string
+  description = "Network forward mode"
+  default     = "nat"
+}
+
 variable "network_virtual_bridge" {
   type        = string
   description = "Network virtual bridge"
@@ -74,29 +80,6 @@ variable "network_mask_bits" {
     condition     = var.network_mask_bits > 0 && var.network_mask_bits <= 32
     error_message = "Valid value for bits used for network is between 1 and 32. (Default value is 24)."
   }
-}
-
-variable "network_nat_port_start" {
-  type        = number
-  description = "NAT (Network Address Translation) port start (from port)"
-  default     = 1024
-
-  validation {
-    condition     = var.network_nat_port_start > 0 && var.network_nat_port_start <= 65535
-    error_message = "Valid NAT port value is between 1 and 65535."
-  }
-}
-
-variable "network_nat_port_end" {
-  type        = number
-  description = "NAT port end (to port)"
-  default     = 65535
-
-  validation {
-    condition     = var.network_nat_port_end > 0 && var.network_nat_port_end <= 65535
-    error_message = "Valid NAT port value is between 1 and 65535."
-  }
-
 }
 
 variable "network_dhcp_ip_start" {
