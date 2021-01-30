@@ -35,8 +35,17 @@ data "template_file" "kubespray_k8s_cluster" {
     kube_version          = var.k8s_version
     kube_network_plugin   = var.k8s_network_plugin
     dns_mode              = var.k8s_dns_mode
-    kube_proxy_strict_arp = var.metallb_enabled == "true" ? "true" : "false"
+    kube_proxy_strict_arp = yamldecode( var.kubespray_custom_addons_enabled == "false"
+                                        ? data.template_file.kubespray_addons[0].rendered
+                                        : data.template_file.kubespray_custom_addons[0].rendered )["metallb_enabled"]
   }
+
+  # Correct addons template file has to be created before
+  # 'metallb_enabled' value can be read from it
+  depends_on = [
+    data.template_file.kubespray_addons,
+    data.template_file.kubespray_custom_addons
+  ]
 }
 
 # Kubespray addons.yml template #
