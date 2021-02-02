@@ -170,10 +170,10 @@ k8s_dns_mode = "coredns"
 #======================================================================================
 
 # Use custom addons.yml #
-kubespray_custom_addons_enabled = "false"
+kubespray_custom_addons_enabled = "true"
 
 # Path to custom addons.yml #
-kubespray_custom_addons_path = ""
+kubespray_custom_addons_path = "defaults/addons.yml"
 
 #=========================
 # General
