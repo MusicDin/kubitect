@@ -63,16 +63,6 @@ network_mask = "255.255.255.0"
 # Bits used for network mask (example: 255.255.255.0 uses 24 bits for network) #
 network_mask_bits = 24
 
-
-# --- NAT port range --- #
-
-# NAT (Network Address Translation) port start (from port) #
-network_nat_port_start = 1024
-
-# NAT port end (to port) #
-network_nat_port_end = 65535
-
-
 # --- DHCP IP range --- #
 # DHCP is used as network management protocol.
 # VM's IP address is configured as static IP based on it's MAC.
