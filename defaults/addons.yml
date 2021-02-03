@@ -1,4 +1,9 @@
 ---
+##
+# Kubesprays's source file (v2.15.0):
+# https://github.com/kubernetes-sigs/kubespray/blob/release-2.15/inventory/sample/group_vars/k8s-cluster/addons.yml
+##
+
 # Kubernetes dashboard
 # RBAC required. see docs/getting-started.md for access details.
 dashboard_enabled: false

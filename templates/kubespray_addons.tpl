@@ -1,3 +1,9 @@
+---
+##
+# Kubesprays's source file (v2.15.0):
+# https://github.com/kubernetes-sigs/kubespray/blob/release-2.15/inventory/sample/group_vars/k8s-cluster/addons.yml
+##
+
 # Kubernetes dashboard
 # RBAC required. see docs/getting-started.md for access details.
 dashboard_enabled: ${dashboard_enabled}
@@ -93,10 +99,6 @@ ingress_publish_status_address: ""
 #     operator: "Equal"
 #     value: ""
 #     effect: "NoSchedule"
-#   - key: "node-role.kubernetes.io/control-plane"
-#     operator: "Equal"
-#     value: ""
-#     effect: "NoSchedule"
 # ingress_nginx_namespace: "ingress-nginx"
 # ingress_nginx_insecure_port: 80
 # ingress_nginx_secure_port: 443
@@ -127,6 +129,7 @@ ingress_alb_enabled: false
 cert_manager_enabled: false
 # cert_manager_namespace: "cert-manager"
 
+
 # MetalLB deployment
 metallb_enabled: ${metallb_enabled}
 metallb_version: "${metallb_version}"
@@ -136,17 +139,3 @@ metallb_limits_mem: "${metallb_mem_limit}"
 metallb_protocol: "${metallb_protocol}"
 metallb_ip_range:
   - "${metallb_ip_range}"
-# metallb_additional_address_pools:
-#   kube_service_pool:
-#     ip_range:
-#       - "10.5.1.50-10.5.1.99"
-#     protocol: "layer2"
-#     auto_assign: false
-# metallb_protocol: "bgp"
-# metallb_peers:
-#   - peer_address: 192.0.2.1
-#     peer_asn: 64512
-#     my_asn: 4200000000
-#   - peer_address: 192.0.2.2
-#     peer_asn: 64513
-#     my_asn: 4200000000

@@ -1,3 +1,9 @@
+---
+##
+# Kubesprays's source file (v2.15.0):
+# https://github.com/kubernetes-sigs/kubespray/blob/release-2.15/inventory/sample/group_vars/k8s-cluster/k8s-cluster.yml
+##
+
 # Kubernetes configuration dirs and system namespace.
 # Those are where all the additional config stuff goes
 # the kubernetes normally puts in /srv/kubernetes.
@@ -13,16 +19,10 @@ kube_cert_dir: "{{ kube_config_dir }}/ssl"
 # This is where all of the bearer tokens will be stored
 kube_token_dir: "{{ kube_config_dir }}/tokens"
 
-# This is where to save basic auth file
-kube_users_dir: "{{ kube_config_dir }}/users"
-
 kube_api_anonymous_auth: true
 
 ## Change this to use another Kubernetes version, e.g. a current beta release
 kube_version: ${kube_version}
-
-# kubernetes image repo define
-kube_image_repo: "k8s.gcr.io"
 
 # Where the binaries will be downloaded.
 # Note: ensure that you've enough disk space (about 1G)
@@ -40,19 +40,8 @@ kube_log_level: 2
 # Directory where credentials will be stored
 credentials_dir: "{{ inventory_dir }}/credentials"
 
-# Users to create for basic auth in Kubernetes API via HTTP
-# Optionally add groups for user
-kube_api_pwd: "{{ lookup('password', credentials_dir + '/kube_user.creds length=15 chars=ascii_letters,digits') }}"
-kube_users:
-  kube:
-    pass: "{{kube_api_pwd}}"
-    role: admin
-    groups:
-      - system:masters
-
-## It is possible to activate / deactivate selected authentication methods (basic auth, static token auth)
+## It is possible to activate / deactivate selected authentication methods (oidc, static token auth)
 # kube_oidc_auth: false
-# kube_basic_auth: false
 # kube_token_auth: false
 
 
@@ -68,10 +57,22 @@ kube_users:
 # kube_oidc_groups_claim: groups
 # kube_oidc_groups_prefix: oidc:
 
+## Variables to control webhook authn/authz
+# kube_webhook_token_auth: false
+# kube_webhook_token_auth_url: https://...
+# kube_webhook_token_auth_url_skip_tls_verify: false
 
-# Choose network plugin (cilium, calico, contiv, weave or flannel)
+## For webhook authorization, authorization_modes must include Webhook
+# kube_webhook_authorization: false
+# kube_webhook_authorization_url: https://...
+# kube_webhook_authorization_url_skip_tls_verify: false
+
+# Choose network plugin (cilium, calico, weave or flannel. Use cni for generic cni plugin)
 # Can also be set to 'cloud', which lets the cloud provider setup appropriate routing
 kube_network_plugin: ${kube_network_plugin}
+
+# Setting multi_networking to true will install Multus: https://github.com/intel/multus-cni
+kube_network_plugin_multus: false
 
 # Kubernetes internal network for services, unused block of space.
 kube_service_addresses: 10.233.0.0/18
@@ -82,16 +83,28 @@ kube_service_addresses: 10.233.0.0/18
 kube_pods_subnet: 10.233.64.0/18
 
 # internal network node size allocation (optional). This is the size allocated
-# to each node on your network.  With these defaults you should have
-# room for 4096 nodes with 254 pods per node.
+# to each node for pod IP address allocation. Note that the number of pods per node is
+# also limited by the kubelet_max_pods variable which defaults to 110.
+#
+# Example:
+# Up to 64 nodes and up to 254 or kubelet_max_pods (the lowest of the two) pods per node:
+#  - kube_pods_subnet: 10.233.64.0/18
+#  - kube_network_node_prefix: 24
+#  - kubelet_max_pods: 110
+#
+# Example:
+# Up to 128 nodes and up to 126 or kubelet_max_pods (the lowest of the two) pods per node:
+#  - kube_pods_subnet: 10.233.64.0/18
+#  - kube_network_node_prefix: 25
+#  - kubelet_max_pods: 110
 kube_network_node_prefix: 24
 
 # The port the API Server will be listening on.
 kube_apiserver_ip: "{{ kube_service_addresses|ipaddr('net')|ipaddr(1)|ipaddr('address') }}"
-kube_apiserver_port: 6443 # (https)
-#kube_apiserver_insecure_port: 8080 # (http)
+kube_apiserver_port: 6443  # (https)
+# kube_apiserver_insecure_port: 8080  # (http)
 # Set to 0 to disable insecure port - Requires RBAC in authorization_modes and kube_api_anonymous_auth: true
-kube_apiserver_insecure_port: 0 # (disabled)
+kube_apiserver_insecure_port: 0  # (disabled)
 
 # Kube-proxy proxyMode configuration.
 # Can be ipvs, iptables
@@ -112,6 +125,13 @@ kube_proxy_nodeport_addresses: >-
   []
   {%- endif -%}
 
+# If non-empty, will use this string as identification instead of the actual hostname
+# kube_override_hostname: >-
+#   {%- if cloud_provider is defined and cloud_provider in [ 'aws' ] -%}
+#   {%- else -%}
+#   {{ inventory_hostname }}
+#   {%- endif -%}
+
 ## Encrypting Secret Data at Rest (experimental)
 kube_encrypt_secret_data: false
 
@@ -120,10 +140,32 @@ kube_encrypt_secret_data: false
 cluster_name: cluster.local
 # Subdomains of DNS domain to be resolved via /etc/resolv.conf for hostnet pods
 ndots: 2
-# Can be dnsmasq_kubedns, kubedns, coredns, coredns_dual, manual or none
+# Can be coredns, coredns_dual, manual or none
 dns_mode: ${dns_mode}
 # Set manual server if using a custom cluster DNS server
-#manual_dns_server: 10.x.x.x
+# manual_dns_server: 10.x.x.x
+# Enable nodelocal dns cache
+enable_nodelocaldns: true
+nodelocaldns_ip: 169.254.25.10
+nodelocaldns_health_port: 9254
+# nodelocaldns_external_zones:
+# - zones:
+#   - example.com
+#   - example.io:1053
+#   nameservers:
+#   - 1.1.1.1
+#   - 2.2.2.2
+#   cache: 5
+# - zones:
+#   - https://mycompany.local:4453
+#   nameservers:
+#   - 192.168.0.53
+#   cache: 0
+# Enable k8s_external plugin for CoreDNS
+enable_coredns_k8s_external: false
+coredns_k8s_external_zone: k8s_external.local
+# Enable endpoint_pod_names option for kubernetes plugin
+enable_coredns_k8s_endpoint_pod_names: false
 
 # Can be docker_dns, host_resolvconf or none
 resolvconf_mode: docker_dns
@@ -132,17 +174,42 @@ deploy_netchecker: false
 # Ip address of the kubernetes skydns service
 skydns_server: "{{ kube_service_addresses|ipaddr('net')|ipaddr(3)|ipaddr('address') }}"
 skydns_server_secondary: "{{ kube_service_addresses|ipaddr('net')|ipaddr(4)|ipaddr('address') }}"
-dnsmasq_dns_server: "{{ kube_service_addresses|ipaddr('net')|ipaddr(2)|ipaddr('address') }}"
 dns_domain: "{{ cluster_name }}"
 
 ## Container runtime
-## docker for docker and crio for cri-o.
+## docker for docker, crio for cri-o and containerd for containerd.
 container_manager: docker
 
-## Settings for containerized control plane (etcd/kubelet/secrets)
-etcd_deployment_type: docker
-kubelet_deployment_type: host
-helm_deployment_type: host
+# Additional container runtimes
+kata_containers_enabled: false
+
+## Settings for containerd runtimes (only used when container_manager is set to containerd)
+#
+# Settings for default containerd runtime
+# containerd_default_runtime:
+#   type: io.containerd.runtime.v1.linux
+#   engine: ''
+#   root: ''
+#
+# Settings for additional runtimes for containerd configuration
+# containerd_runtimes:
+#   - name: ""
+#     type: ""
+#     engine: ""
+#     root: ""
+# Example for Kata Containers as additional runtime:
+# containerd_runtimes:
+#   - name: kata
+#     type: io.containerd.kata.v2
+#     engine: ""
+#     root: ""
+#
+# Settings for untrusted containerd runtime
+# containerd_untrusted_runtime_type: ''
+# containerd_untrusted_runtime_engine: ''
+# containerd_untrusted_runtime_root: ''
+
+kubeadm_certificate_key: "{{ lookup('password', credentials_dir + '/kubeadm_certificate_key.creds length=64 chars=hexdigits') | lower }}"
 
 # K8s image pull policy (imagePullPolicy)
 k8s_image_pull_policy: IfNotPresent
@@ -154,29 +221,39 @@ kubernetes_audit: false
 dynamic_kubelet_configuration: false
 
 # define kubelet config dir for dynamic kubelet
-#kubelet_config_dir:
+# kubelet_config_dir:
 default_kubelet_config_dir: "{{ kube_config_dir }}/dynamic_kubelet_dir"
 dynamic_kubelet_configuration_dir: "{{ kubelet_config_dir | default(default_kubelet_config_dir) }}"
 
 # pod security policy (RBAC must be enabled either by having 'RBAC' in authorization_modes or kubeadm enabled)
 podsecuritypolicy_enabled: false
 
+# Custom PodSecurityPolicySpec for restricted policy
+# podsecuritypolicy_restricted_spec: {}
+
+# Custom PodSecurityPolicySpec for privileged policy
+# podsecuritypolicy_privileged_spec: {}
+
 # Make a copy of kubeconfig on the host that runs Ansible in {{ inventory_dir }}/artifacts
 # kubeconfig_localhost: false
 # Download kubectl onto the host that runs Ansible in {{ bin_dir }}
 # kubectl_localhost: false
 
-# dnsmasq
-# dnsmasq_upstream_dns_servers:
-#  - /resolvethiszone.with/10.0.4.250
-#  - 8.8.8.8
-
-#  Enable creation of QoS cgroup hierarchy, if true top level QoS and pod cgroups are created. (default true)
-# kubelet_cgroups_per_qos: true
-
 # A comma separated list of levels of node allocatable enforcement to be enforced by kubelet.
 # Acceptable options are 'pods', 'system-reserved', 'kube-reserved' and ''. Default is "".
 # kubelet_enforce_node_allocatable: pods
+
+## Optionally reserve resources for OS system daemons.
+# system_reserved: true
+## Uncomment to override default values
+# system_memory_reserved: 512Mi
+# system_cpu_reserved: 500m
+## Reservation for master hosts
+# system_master_memory_reserved: 256Mi
+# system_master_cpu_reserved: 250m
+
+# An alternative flexvolume plugin directory
+# kubelet_flexvolumes_plugins_dir: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
 
 ## Supplementary addresses that can be added in kubernetes ssl keys.
 ## That can be useful for example to setup a keepalived virtual IP
@@ -186,7 +263,8 @@ podsecuritypolicy_enabled: false
 ## See https://github.com/kubernetes-sigs/kubespray/issues/2141
 ## Set this variable to true to get rid of this issue
 volume_cross_zone_attachment: false
-# Add Persistent Volumes Storage Class for corresponding cloud provider ( OpenStack is only supported now )
+## Add Persistent Volumes Storage Class for corresponding cloud provider (supported: in-tree OpenStack, Cinder CSI,
+## AWS EBS CSI, Azure Disk CSI, GCP Persistent Disk CSI)
 persistent_volumes_enabled: false
 
 ## Container Engine Acceleration
@@ -194,10 +272,48 @@ persistent_volumes_enabled: false
 # nvidia_accelerator_enabled: true
 ## Nvidia GPU driver install. Install will by done by a (init) pod running as a daemonset.
 ## Important: if you use Ubuntu then you should set in all.yml 'docker_storage_options: -s overlay2'
-## Array with nvida_gpu_nodes, leave empty or comment if you dont't want to install drivers.
+## Array with nvida_gpu_nodes, leave empty or comment if you don't want to install drivers.
 ## Labels and taints won't be set to nodes if they are not in the array.
 # nvidia_gpu_nodes:
 #   - kube-gpu-001
 # nvidia_driver_version: "384.111"
 ## flavor can be tesla or gtx
 # nvidia_gpu_flavor: gtx
+## NVIDIA driver installer images. Change them if you have trouble accessing gcr.io.
+# nvidia_driver_install_centos_container: atzedevries/nvidia-centos-driver-installer:2
+# nvidia_driver_install_ubuntu_container: gcr.io/google-containers/ubuntu-nvidia-driver-installer@sha256:7df76a0f0a17294e86f691c81de6bbb7c04a1b4b3d4ea4e7e2cccdc42e1f6d63
+## NVIDIA GPU device plugin image.
+# nvidia_gpu_device_plugin_container: "k8s.gcr.io/nvidia-gpu-device-plugin@sha256:0842734032018be107fa2490c98156992911e3e1f2a21e059ff0105b07dd8e9e"
+
+## Support tls min version, Possible values: VersionTLS10, VersionTLS11, VersionTLS12, VersionTLS13.
+# tls_min_version: ""
+
+## Support tls cipher suites.
+# tls_cipher_suites: {}
+#   - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+#   - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256
+#   - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+#   - TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
+#   - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+#   - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+#   - TLS_ECDHE_ECDSA_WITH_RC4_128_SHA
+#   - TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA
+#   - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+#   - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+#   - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+#   - TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+#   - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+#   - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+#   - TLS_ECDHE_RSA_WITH_RC4_128_SHA
+#   - TLS_RSA_WITH_3DES_EDE_CBC_SHA
+#   - TLS_RSA_WITH_AES_128_CBC_SHA
+#   - TLS_RSA_WITH_AES_128_CBC_SHA256
+#   - TLS_RSA_WITH_AES_128_GCM_SHA256
+#   - TLS_RSA_WITH_AES_256_CBC_SHA
+#   - TLS_RSA_WITH_AES_256_GCM_SHA384
+#   - TLS_RSA_WITH_RC4_128_SHA
+
+## Amount of time to retain events. (default 1h0m0s)
+event_ttl_duration: "1h0m0s"
+##  Force regeneration of kubernetes control plane certificates without the need of bumping the cluster version
+force_certificate_regeneration: false
