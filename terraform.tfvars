@@ -159,7 +159,7 @@ k8s_kubespray_version = "v2.14.2"
 # The Kubernetes version that will be deployed #
 k8s_version = "v1.19.3"
 
-# The overlay network plugin used by the Kubernetes cluster (flannel/weave/calico/cilium/canal/contiv/kube-router) #
+# The overlay network plugin used by the Kubernetes cluster (flannel/weave/calico/cilium/canal/kube-router) #
 k8s_network_plugin = "calico"
 
 # The DNS service used by Kubernetes cluster (coredns/kubedns)#
