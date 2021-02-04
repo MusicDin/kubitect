@@ -1,4 +1,4 @@
-<network connections='1'>
+<network>
   <name>${network_name}</name>
   <forward mode='${network_forward_mode}'/>
   <bridge name='${network_virtual_bridge}' stp='on' delay='0'/>

@@ -94,8 +94,9 @@ vm_lb_macs_ips = {
   "52:54:00:00:00:06" = "192.168.113.6"
 }
 
-# The floating virtual IP address. #
-# If no load balancers will be installed than vip should point to the master node #
+# Floating IP address. #
+# Note: Floating IP only applies if at least one load balancer is defined, #
+# otherwise IP of the first master node will be used. #
 vm_lb_vip = "192.168.113.200"
 
 

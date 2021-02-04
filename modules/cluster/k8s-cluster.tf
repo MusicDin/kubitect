@@ -22,7 +22,7 @@ data "template_file" "kubespray_all" {
   template = file("templates/kubespray_all.tpl")
 
   vars = {
-    loadbalancer_apiserver = var.vm_lb_vip
+    loadbalancer_apiserver = length(var.vm_lb_ips) > 0 ? var.vm_lb_vip : var.vm_master_ips[0]
   }
 }
 
