@@ -35,6 +35,8 @@ data "template_file" "kubespray_k8s_cluster" {
     kube_version          = var.k8s_version
     kube_network_plugin   = var.k8s_network_plugin
     dns_mode              = var.k8s_dns_mode
+
+    # If MetalLB is enable than strict ARP is set to true in k8s-cluster.yml
     kube_proxy_strict_arp = yamldecode( var.kubespray_custom_addons_enabled == "false"
                                         ? data.template_file.kubespray_addons[0].rendered
                                         : data.template_file.kubespray_custom_addons[0].rendered )["metallb_enabled"]
@@ -145,12 +147,13 @@ data "template_file" "master_hosts_only" {
 # Kubespray worker hostname and ip list template #
 data "template_file" "worker_hosts_only" {
 
-  count = length(var.vm_worker_ips)
+  # If no worker node is specified then all master nodes also become worker nodes
+  count = length(var.vm_worker_ips) > 0 ? length(var.vm_worker_ips) : length(var.vm_master_ips)
 
   template = file("templates/ansible_hosts_list.tpl")
 
   vars = {
-    hostname = "${var.vm_name_prefix}-worker-${count.index}"
+    hostname =  length(var.vm_worker_ips) > 0 ? "${var.vm_name_prefix}-worker-${count.index}" : "${var.vm_name_prefix}-master-${count.index}"
   }
 }
 

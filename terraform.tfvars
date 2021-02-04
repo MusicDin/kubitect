@@ -143,6 +143,7 @@ vm_worker_macs_ips = {
 }
 
 # Sets worker node's role label #
+# Note: Leave empty ("") to not set the label. #
 vm_worker_node_label = "node"
 
 
