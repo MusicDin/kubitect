@@ -9,7 +9,7 @@ If you would like to expose services of type [LoadBalancer](https://kubernetes.i
 If you decide to omit load balancer, all you have to do is to modify [terraform.tfvars](../terraform.tfvars) file.
 
 Remove all load balancers IP and MAC addresses:
-```
+```hcl
 vm_lb_macs_ips = {}
 ```
 
@@ -20,7 +20,7 @@ vm_lb_macs_ips = {}
 *Note: This script supports up to 2 HAProxy load balancers.*
 
 Provide a MAC and IP address for each load balancer in [terraform.tfvars](../terraform.tfvars) file:
-```
+```hcl
 vm_lb_macs_ips = {
   "mac_for_lb_1" = "ip_for_lb_1"
   "mac_for_lb_2" = "ip_for_lb_2"
@@ -28,7 +28,7 @@ vm_lb_macs_ips = {
 ```
 
 Then set a floating IP that should not be taken by any other VM:
-```
+```hcl
 vm_lb_vip = "floating_ip"
 ```
 
