@@ -69,6 +69,8 @@ Only required variables that are not set are:
 
 **IMPORTANT:** Review variables before initializing a cluster, as current configuration will create 8 VMs which are quite resource heavy!
 
+*Note: Script also supports deployment of [single node cluster](docs/examples/single-node-cluster.md).*
+
 Execute terraform script:
 ```bash
 # Initializes terraform project
@@ -140,6 +142,7 @@ terraform destroy
 + [Troubleshooting](docs/troubleshooting.md)
 + Examples:
     - [Load balancing to ingress controller](docs/examples/lb-and-ingress-controller.md)
+    - [Single node cluster deployment](docs/examples/single-node-cluster.md)
 
 
 ## Related projects

@@ -8,22 +8,19 @@ If you would like to expose services of type [LoadBalancer](https://kubernetes.i
 
 If you decide to omit load balancer, all you have to do is to modify [terraform.tfvars](../terraform.tfvars) file.
 
-First remove all load balancer's IP and MAC addresses:
-```
+Remove all load balancers IP and MAC addresses:
+```hcl
 vm_lb_macs_ips = {}
 ```
 
-Then set a floating IP to point on the master node:
-<pre>
-vm_lb_vip = "<b>master_node_IP</b>"
-</pre>
+*Note: If there is more master nodes specified, IP of the first one will be used for a cluster IP.*
 
 ## Cluster with load balancer(s)
 
-*Note: This script supports up to 2 load balancers.*
+*Note: This script supports up to 2 HAProxy load balancers.*
 
-Provide MAC and IP address for your load balancer(s) in [terraform.tfvars](../terraform.tfvars) file:
-```
+Provide a MAC and IP address for each load balancer in [terraform.tfvars](../terraform.tfvars) file:
+```hcl
 vm_lb_macs_ips = {
   "mac_for_lb_1" = "ip_for_lb_1"
   "mac_for_lb_2" = "ip_for_lb_2"
@@ -31,7 +28,7 @@ vm_lb_macs_ips = {
 ```
 
 Then set a floating IP that should not be taken by any other VM:
-```
+```hcl
 vm_lb_vip = "floating_ip"
 ```
 
