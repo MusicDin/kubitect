@@ -4,8 +4,13 @@
 
 variable "action" {
   type        = string
-  description = "Which action have to be done on the cluster (create, add_worker, remove_worker, or upgrade)"
+  description = "Which action has to be done on the cluster (create, upgrade, add_worker, or remove_worker)"
   default     = "create"
+
+  validation {
+    condition     = contains(["create", "upgrade", "add_worker", "remove_worker"], var.action)
+    error_message = "Variable 'action' is invalid.\nDefault value is \"create\".\nPossible values are: [\"create\", \"upgrade\", \"add_worker\", \"remove_worker\"]."
+  }
 }
 
 variable "libvirt_provider_uri" {
@@ -45,6 +50,11 @@ variable "network_forward_mode" {
   type        = string
   description = "Network forward mode"
   default     = "nat"
+
+  validation {
+    condition     = contains(["nat", "route"], var.network_forward_mode)
+    error_message = "Variable 'network_forward_mode' is invalid.\nPossible values are: [\"nat\", \"route\"]."
+  }
 }
 
 variable "network_virtual_bridge" {
@@ -117,6 +127,11 @@ variable "vm_ssh_known_hosts" {
   type        = string
   description = "Add virtual machines to SSH known hosts"
   default     = "true"
+
+  validation {
+    condition     = contains(["true", "false"], var.vm_ssh_known_hosts)
+    error_message = "Variable 'vm_ssh_known_hosts' is invalid.\nPossible values are: [\"true\", \"false\"]."
+  }
 }
 
 variable "vm_distro" {
@@ -193,6 +208,11 @@ variable "vm_master_storage" {
 variable "vm_master_macs_ips" {
   type        = map(string)
   description = "MAC and IP addresses of master nodes"
+
+  validation {
+    condition     = length(var.vm_master_macs_ips) > 0
+    error_message = "Variable 'vm_master_macs_ips' is invalid.\nAt least one master node should be defined."
+  }
 }
 
 #============================#
@@ -248,11 +268,21 @@ variable "k8s_version" {
 variable "k8s_network_plugin" {
   type        = string
   description = "The overlay network plugin used by Kubernetes cluster"
+
+  validation {
+    condition     = contains(["flannel", "weave", "calico", "cilium", "canal", "kube-router"], var.k8s_network_plugin)
+    error_message = "Variable 'k8s_network_plugin' is invalid.\nPossible values are: [\"flannel\", \"weave\", \"calico\", \"cilium\", \"canal\", \"kube-router\"]."
+  }
 }
 
 variable "k8s_dns_mode" {
   type        = string
   description = "The DNS service used by Kubernetes cluster (coredns/kubedns)"
+
+  validation {
+    condition     = contains(["coredns", "kubedns"], var.k8s_dns_mode)
+    error_message = "Variable 'k8s_dns_mode' is invalid.\nPossible values are: [\"coredns\", \"kubedns\"]."
+  }
 }
 
 #======================================================================================
@@ -263,6 +293,11 @@ variable "kubespray_custom_addons_enabled" {
   type        = string
   description = "If enabled, custom addons.yml will be used"
   default     = "false"
+
+  validation {
+    condition     = contains(["true", "false"], var.kubespray_custom_addons_enabled)
+    error_message = "Variable 'kubespray_custom_addons_enabled' is invalid.\nPossible values are: [\"true\", \"false\"]."
+  }
 }
 
 variable "kubespray_custom_addons_path" {
@@ -275,18 +310,33 @@ variable "k8s_dashboard_enabled" {
   type        = string
   description = "Sets up Kubernetes dashboard if enabled"
   default     = "false"
+
+  validation {
+    condition     = contains(["true", "false"], var.k8s_dashboard_enabled)
+    error_message = "Variable 'k8s_dashboard_enabled' is invalid.\nPossible values are: [\"true\", \"false\"]."
+  }
 }
 
 variable "helm_enabled" {
   type        = string
   description = "Sets up Helm if enabled"
   default     = "false"
+
+  validation {
+    condition     = contains(["true", "false"], var.helm_enabled)
+    error_message = "Variable 'helm_enabled' is invalid.\nPossible values are: [\"true\", \"false\"]."
+  }
 }
 
 variable "metallb_enabled" {
   type        = string
   description = "Sets up MetalLB if enabled"
   default     = "false"
+
+  validation {
+    condition     = contains(["true", "false"], var.metallb_enabled)
+    error_message = "Variable 'metallb_enabled' is invalid.\nPossible values are: [\"true\", \"false\"]."
+  }
 }
 
 variable "metallb_version" {
@@ -317,6 +367,11 @@ variable "metallb_protocol" {
   type        = string
   description = "MetalLB protocol (layer2/bgp)"
   default     = "layer2"
+
+  validation {
+    condition     = contains(["layer2", "bgp"], var.metallb_protocol)
+    error_message = "Variable 'metallb_protocol' is invalid.\nPossible values are: [\"layer2\", \"bgp\"]."
+  }
 }
 
 variable "metallb_ip_range" {

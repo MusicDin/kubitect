@@ -28,6 +28,11 @@ variable "cloud_init_id" {
 variable "vm_type" {
   type        = string
   description = "Possible virtual machine types are: [master, worker, lb]"
+
+  validation {
+    condition     = contains(["master", "worker", "lb"], var.vm_type)
+    error_message = "Variable 'vm_type' is invalid.\nPossible values are: [\"master\", \"worker\", \"lb\"]."
+  }
 }
 
 variable "vm_index" {

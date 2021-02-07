@@ -83,7 +83,7 @@ variable "k8s_network_plugin" {
 
 variable "k8s_dns_mode" {
   type        = string
-  description = "The DNS service used by Kubernetes cluster (coredns/kubedns)"
+  description = "The DNS service used by Kubernetes cluster"
 }
 
 #======================================================================================
@@ -137,7 +137,7 @@ variable "metallb_mem_limit" {
 
 variable "metallb_protocol" {
   type        = string
-  description = "MetalLB protocol (layer2/bgp)"
+  description = "MetalLB protocol"
 }
 
 variable "metallb_ip_range" {
