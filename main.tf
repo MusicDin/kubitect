@@ -162,6 +162,7 @@ module "k8s_cluster" {
   metallb_mem_limit               = var.metallb_mem_limit
   metallb_protocol                = var.metallb_protocol
   metallb_ip_range                = var.metallb_ip_range
+  metallb_peers                   = var.metallb_peers
 
   # K8s cluster creation depends on network and all VMs
   depends_on = [

@@ -139,3 +139,4 @@ metallb_limits_mem: "${metallb_mem_limit}"
 metallb_protocol: "${metallb_protocol}"
 metallb_ip_range:
   - "${metallb_ip_range}"
+${metallb_peers}

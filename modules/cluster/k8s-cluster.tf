@@ -67,6 +67,7 @@ data "template_file" "kubespray_addons" {
     metallb_mem_limit = var.metallb_mem_limit
     metallb_protocol  = var.metallb_protocol
     metallb_ip_range  = var.metallb_ip_range
+    metallb_peers     = var.metallb_protocol == "bgp" ? "metallb_peers:\n${join("", data.template_file.metallb_peers.*.rendered)}" : ""
   }
 }
 
@@ -76,6 +77,21 @@ data "template_file" "kubespray_custom_addons" {
   count = var.kubespray_custom_addons_enabled == "true" ? 1 : 0
 
   template = file(var.kubespray_custom_addons_path)
+}
+
+# Kubespray MetalLB peers (BGP mode only) #
+data "template_file" "metallb_peers" {
+
+  # Create MetalLB peers only in BGP mode #
+  count = var.metallb_protocol == "bgp" ? length(var.metallb_peers) : 0
+
+  template = file("templates/kubespray_addons_metallb_peer.tpl")
+
+  vars = {
+    peer_ip  = var.metallb_peers[count.index].peer_ip
+    peer_asn = var.metallb_peers[count.index].peer_asn
+    my_asn   = var.metallb_peers[count.index].my_asn
+  }
 }
 
 # Load balancer hostname and ip list template #

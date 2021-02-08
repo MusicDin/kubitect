@@ -208,3 +208,11 @@ metallb_protocol = "layer2"
 
 # IP range for services of type LoadBalancer #
 metallb_ip_range = "192.168.113.241-192.168.113.254"
+
+# MetalLB peers #
+# Note: This variable will be apply only in 'bgp' mode #
+metallb_peers = [{
+  peer_ip  = "192.168.113.1"
+  peer_asn = 65000
+  my_asn   = 65000
+}]

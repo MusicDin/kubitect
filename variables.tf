@@ -109,7 +109,7 @@ variable "network_dhcp_ip_end" {
 #======================================================================================
 
 #============================#
-# General variables           #
+# General variables          #
 #============================#
 
 variable "vm_user" {
@@ -378,4 +378,13 @@ variable "metallb_ip_range" {
   type        = string
   description = "IP range that MetalLB will use for services of type LoadBalancer"
   default     = ""
+}
+
+variable "metallb_peers" {
+  type        = list(object({
+    peer_ip  = string
+    peer_asn = number
+    my_asn   = number
+  }))
+  description = "List of MetalLB peers"
 }
