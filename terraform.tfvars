@@ -203,7 +203,6 @@ metallb_mem_limit = "100Mi"
 metallb_port      = 7472
 
 # MetalLB protocol (layer2/bgp) #
-# Note: Only layer2 is currently supported #
 metallb_protocol = "layer2"
 
 # IP range for services of type LoadBalancer #
