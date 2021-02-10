@@ -143,7 +143,7 @@ terraform destroy
 + Examples:
     - [Load balancing to ingress controller](docs/examples/lb-and-ingress-controller.md)
     - [Single node cluster deployment](docs/examples/single-node-cluster.md)
-
+    - [MetalLB configuration examples](docs/examples/metallb.md)
 
 ## Related projects
 

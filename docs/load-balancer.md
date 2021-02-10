@@ -2,7 +2,7 @@
 
 HAProxy load balancer is used to load balance traffic between master nodes.
 
-If you would like to expose services of type [LoadBalancer](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer) than check [MetalLB](https://metallb.universe.tf/) project.
+If you would like to expose services of type [LoadBalancer](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer) than check [MetalLB configuration example](examples/metallb.md).
 
 ## Cluster without load balancer
 
