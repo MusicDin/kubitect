@@ -57,9 +57,6 @@ network_mac = "52:54:00:4f:e3:88"
 # Network gateway IP address #
 network_gateway = "192.168.113.1"
 
-# Network mask #
-network_mask = "255.255.255.0"
-
 # Bits used for network mask (example: 255.255.255.0 uses 24 bits for network) #
 network_mask_bits = 24
 

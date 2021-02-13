@@ -36,9 +36,9 @@ variable "network_gateway" {
   description = "Network gateway IP address"
 }
 
-variable "network_mask" {
-  type        = string
-  description = "Network mask"
+variable "network_mask_bits" {
+  type        = number
+  description = "Network mask bits"
 }
 
 variable "network_dhcp_ip_start" {

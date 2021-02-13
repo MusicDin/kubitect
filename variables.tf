@@ -75,12 +75,6 @@ variable "network_gateway" {
   default     = "192.168.113.1"
 }
 
-variable "network_mask" {
-  type        = string
-  description = "Network mask"
-  default     = "255.255.255.0"
-}
-
 variable "network_mask_bits" {
   type        = number
   description = "Bits used for network"

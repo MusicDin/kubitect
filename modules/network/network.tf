@@ -12,7 +12,7 @@ data "template_file" "network-config-tpl" {
     network_virtual_bridge = var.network_virtual_bridge
     network_mac            = var.network_mac
     network_gateway        = var.network_gateway
-    network_mask           = var.network_mask
+    network_mask           = cidrnetmask("${var.network_gateway}/${var.network_mask_bits}")
     network_dhcp_ip_start  = var.network_dhcp_ip_start
     network_dhcp_ip_end    = var.network_dhcp_ip_end
   }
