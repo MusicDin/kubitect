@@ -150,9 +150,24 @@ Remove the running VM:
 virsh undefine <b>your-vm-name</b>
 </pre>
 
+### -> Problem 8
+
+#### Error:
+
+*Error: internal error: Failed to apply firewall rules /sbin/iptables -w --table filter --insert LIBVIRT_INP --in-interface virbr2 --protocol tcp --destination-port 67 --jump ACCEPT: iptables: No chain/target/match by that name.*
+
+#### Explanation:
+Libvirt has already been running when Firewalld was installed, so libvirt needs to be restarted in order to recognize it.
+
+#### Solution:
+Restart Libvirt daemon:
+<pre>
+sudo systemctl restart libvirtd
+</pre>
+
 ## HAProxy load balancer errors
 
-### -> Problem 8
+### -> Problem 9
 
 #### Error:
 
