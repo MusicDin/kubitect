@@ -168,8 +168,15 @@ k8s_dns_mode = "coredns"
 # Kubespray addons
 #======================================================================================
 
+#=========================
+# Custom addons
+#=========================
+
+# Note: If custom addons are enabled, variables from other sections below
+# will be ignored and addons from file path provided will be applied instead.
+
 # Use custom addons.yml #
-kubespray_custom_addons_enabled = "true"
+kubespray_custom_addons_enabled = "false"
 
 # Path to custom addons.yml #
 kubespray_custom_addons_path = "defaults/addons.yml"
