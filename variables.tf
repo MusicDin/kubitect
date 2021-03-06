@@ -280,6 +280,21 @@ variable "k8s_dns_mode" {
 }
 
 #======================================================================================
+# Other
+#======================================================================================
+
+variable "k8s_copy_kubeconfig" {
+  type        = string
+  description = "If enabled, kubeconfig (config/admin.conf) will be copied to ~/.kube directory"
+  default     = "false"
+
+  validation {
+    condition     = contains(["true", "false"], var.k8s_copy_kubeconfig)
+    error_message = "Variable 'k8s_copy_kubeconfig' is invalid.\nPossible values are: [\"true\", \"false\"]."
+  }
+}
+
+#======================================================================================
 # Kubespray addons
 #======================================================================================
 

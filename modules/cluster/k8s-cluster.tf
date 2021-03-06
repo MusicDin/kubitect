@@ -341,6 +341,7 @@ resource "null_resource" "kubespray_create" {
 
 # Execute scale Kubespray Ansible playbook #
 resource "null_resource" "kubespray_add" {
+
   count = var.action == "add_worker" ? 1 : 0
 
   provisioner "local-exec" {
@@ -358,6 +359,7 @@ resource "null_resource" "kubespray_add" {
 
 # Execute upgrade Kubespray Ansible playbook #
 resource "null_resource" "kubespray_upgrade" {
+
   count = var.action == "upgrade" ? 1 : 0
 
   triggers = {
@@ -382,20 +384,26 @@ resource "null_resource" "kubespray_upgrade" {
   ]
 }
 
+# Fetch the local admin.conf kubectl configuration file #
+resource "null_resource" "fetch_kubeconfig" {
 
-# Create the local admin.conf kubectl configuration file #
-resource "null_resource" "kubectl_configuration" {
   provisioner "local-exec" {
     command = "ansible -i ${var.vm_master_ips[0]}, -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} -m fetch -a 'src=/etc/kubernetes/admin.conf dest=config/admin.conf flat=yes' all"
   }
 
-  #  provisioner "local-exec" {
-  #    command = "sed -i 's/lb-apiserver.kubernetes.local/${var.vm_lb_vip}/g' config/admin.conf && chmod 700 config/admin.conf"
-  #  }
-
-  #  provisioner "local-exec" {
-  #    command = "chmod 600 config/admin.conf"
-  #  }
-
+  # Cluster needs to be deployed before kubeconfig can be fetched
   depends_on = [null_resource.kubespray_create]
+}
+
+# Copy kubeconfig into ~/.kube directory #
+resource "null_resource" "copy_kubeconfig" {
+
+  count = var.k8s_copy_kubeconfig == "true" ? 1 : 0
+
+  provisioner "local-exec" {
+    command = "mkdir -p ~/.kube && cp config/admin.conf ~/.kube/"
+  }
+
+  # Kubeconfig needs to be fetched before it can be copied
+  depends_on = [null_resource.fetch_kubeconfig]
 }
