@@ -322,6 +322,52 @@ variable "helm_enabled" {
   }
 }
 
+variable "local_path_provisioner_enabled" {
+  type        = string
+  description = "Sets up Rancher's local path provisioner if enabled"
+  default     = "false"
+
+  validation {
+    condition     = contains(["true", "false"], var.local_path_provisioner_enabled)
+    error_message = "Variable 'local_path_provisioner_enabled' is invalid.\nPossible values are: [\"true\", \"false\"]."
+  }
+}
+
+variable "local_path_provisioner_version" {
+  type        = string
+  description = "Local path provisioner version"
+  default     = ""
+}
+
+variable "local_path_provisioner_namespace" {
+  type        = string
+  description = "Namespace in which local path provisioner will be installed"
+  default     = "local-path-provisioner"
+}
+
+variable "local_path_provisioner_storage_class" {
+  type        = string
+  description = "Local path provisioner storage class"
+  default     = "local-storage"
+}
+
+variable "local_path_provisioner_reclaim_policy" {
+  type        = string
+  description = "Local path provisioner reclaim policy"
+  default     = "Delete"
+
+  validation {
+    condition     = contains(["Delete", "Retain"], var.local_path_provisioner_reclaim_policy)
+    error_message = "Variable 'local_path_provisioner_reclaim_policy' is invalid.\nPossible values are: [\"Delete\", \"Retain\"]."
+  }
+}
+
+variable "local_path_provisioner_claim_root" {
+  type        = string
+  description = "Local path provisioner claim root"
+  default     = "/opt/local-path-provisioner/"
+}
+
 variable "metallb_enabled" {
   type        = string
   description = "Sets up MetalLB if enabled"

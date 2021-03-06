@@ -192,6 +192,30 @@ k8s_dashboard_enabled = "false"
 helm_enabled = "false"
 
 #=========================
+# Local path provisioner
+#=========================
+
+# Note: This is dynamic storage provisioner #
+
+# Install Rancher's local path provisioner #
+local_path_provisioner_enabled = "false"
+
+# Version #
+local_path_provisioner_version = "v0.0.19"
+
+# Namespace in which provisioner will be installed #
+local_path_provisioner_namespace = "local-path-provisioner"
+
+# Storage class #
+local_path_provisioner_storage_class = "local-storage"
+
+# Reclaim policy (Delete/Retain) #
+local_path_provisioner_reclaim_policy = "Delete"
+
+# Claim root #
+local_path_provisioner_claim_root = "/opt/local-path-provisioner/"
+
+#=========================
 # MetalLB
 #=========================
 
@@ -202,8 +226,8 @@ metallb_enabled  = "false"
 metallb_version = "v0.9.5"
 
 # Kubernetes limits (1000m = 1 vCore) #
-metallb_cpu_limit = "100m"
-metallb_mem_limit = "100Mi"
+metallb_cpu_limit = "500m"
+metallb_mem_limit = "500Mi"
 metallb_port      = 7472
 
 # MetalLB protocol (layer2/bgp) #
@@ -213,7 +237,7 @@ metallb_protocol = "layer2"
 metallb_ip_range = "192.168.113.241-192.168.113.254"
 
 # MetalLB peers #
-# Note: This variable will be apply only in 'bgp' mode #
+# Note: This variable will be applied only in 'bgp' mode #
 metallb_peers = [{
   peer_ip  = "192.168.113.1"
   peer_asn = 65000

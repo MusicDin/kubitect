@@ -24,16 +24,16 @@ metrics_server_enabled: false
 # metrics_server_kubelet_preferred_address_types: "InternalIP"
 
 # Rancher Local Path Provisioner
-local_path_provisioner_enabled: false
-# local_path_provisioner_namespace: "local-path-storage"
-# local_path_provisioner_storage_class: "local-path"
-# local_path_provisioner_reclaim_policy: Delete
-# local_path_provisioner_claim_root: /opt/local-path-provisioner/
-# local_path_provisioner_debug: false
-# local_path_provisioner_image_repo: "rancher/local-path-provisioner"
-# local_path_provisioner_image_tag: "v0.0.14"
-# local_path_provisioner_helper_image_repo: "busybox"
-# local_path_provisioner_helper_image_tag: "latest"
+local_path_provisioner_enabled: ${local_path_provisioner_enabled}
+local_path_provisioner_namespace: "${local_path_provisioner_namespace}"
+local_path_provisioner_storage_class: "${local_path_provisioner_storage_class}"
+local_path_provisioner_reclaim_policy: ${local_path_provisioner_reclaim_policy}
+local_path_provisioner_claim_root: ${local_path_provisioner_claim_root}
+local_path_provisioner_debug: false
+local_path_provisioner_image_repo: "rancher/local-path-provisioner"
+local_path_provisioner_image_tag: "${local_path_provisioner_version}"
+local_path_provisioner_helper_image_repo: "busybox"
+local_path_provisioner_helper_image_tag: "latest"
 
 # Local volume provisioner deployment
 local_volume_provisioner_enabled: false

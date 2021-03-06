@@ -58,16 +58,22 @@ data "template_file" "kubespray_addons" {
   template = file("templates/kubespray_addons.tpl")
 
   vars = {
-    dashboard_enabled = var.k8s_dashboard_enabled
-    helm_enabled      = var.helm_enabled
-    metallb_enabled   = var.metallb_enabled
-    metallb_version   = var.metallb_version
-    metallb_port      = var.metallb_port
-    metallb_cpu_limit = var.metallb_cpu_limit
-    metallb_mem_limit = var.metallb_mem_limit
-    metallb_protocol  = var.metallb_protocol
-    metallb_ip_range  = var.metallb_ip_range
-    metallb_peers     = var.metallb_protocol == "bgp" ? "metallb_peers:\n${join("", data.template_file.metallb_peers.*.rendered)}" : ""
+    dashboard_enabled                     = var.k8s_dashboard_enabled
+    helm_enabled                          = var.helm_enabled
+    local_path_provisioner_enabled        = var.local_path_provisioner_enabled
+    local_path_provisioner_version        = var.local_path_provisioner_version
+    local_path_provisioner_namespace      = var.local_path_provisioner_namespace
+    local_path_provisioner_storage_class  = var.local_path_provisioner_storage_class
+    local_path_provisioner_reclaim_policy = var.local_path_provisioner_reclaim_policy
+    local_path_provisioner_claim_root     = var.local_path_provisioner_claim_root
+    metallb_enabled                       = var.metallb_enabled
+    metallb_version                       = var.metallb_version
+    metallb_port                          = var.metallb_port
+    metallb_cpu_limit                     = var.metallb_cpu_limit
+    metallb_mem_limit                     = var.metallb_mem_limit
+    metallb_protocol                      = var.metallb_protocol
+    metallb_ip_range                      = var.metallb_ip_range
+    metallb_peers                         = var.metallb_protocol == "bgp" ? "metallb_peers:\n${join("", data.template_file.metallb_peers.*.rendered)}" : ""
   }
 }
 

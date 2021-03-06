@@ -110,6 +110,36 @@ variable "helm_enabled" {
   description = "Sets up Helm if enabled"
 }
 
+variable "local_path_provisioner_enabled" {
+  type        = string
+  description = "Sets up Rancher's local path provisioner if enabled"
+}
+
+variable "local_path_provisioner_version" {
+  type        = string
+  description = "Local path provisioner version"
+}
+
+variable "local_path_provisioner_namespace" {
+  type        = string
+  description = "Namespace in which local path provisioner will be installed"
+}
+
+variable "local_path_provisioner_storage_class" {
+  type        = string
+  description = "Local path provisioner storage class"
+}
+
+variable "local_path_provisioner_reclaim_policy" {
+  type        = string
+  description = "Local path provisioner reclaim policy"
+}
+
+variable "local_path_provisioner_claim_root" {
+  type        = string
+  description = "Local path provisioner claim root"
+}
+
 variable "metallb_enabled" {
   type        = string
   description = "Sets up MetalLB if enabled"
