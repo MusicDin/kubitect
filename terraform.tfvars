@@ -170,7 +170,11 @@ k8s_dns_mode = "coredns"
 
 # Copies config file to ~/.kube directory #
 # Note: Kubeconfig will be always available in config/admin.conf after installation #
-k8s_copy_kubeconfig = "true"
+k8s_copy_kubeconfig = "false"
+
+# Creates Kubernets dashboard service account (for RBAC) #
+k8s_dashboard_rbac_enabled = "false"
+k8s_dashboard_rbac_user    = "admin"
 
 
 #======================================================================================

@@ -151,7 +151,9 @@ module "k8s_cluster" {
   k8s_dns_mode          = var.k8s_dns_mode
 
   # Other
-  k8s_copy_kubeconfig = var.k8s_copy_kubeconfig
+  k8s_copy_kubeconfig        = var.k8s_copy_kubeconfig
+  k8s_dashboard_rbac_enabled = var.k8s_dashboard_rbac_enabled
+  k8s_dashboard_rbac_user    = var.k8s_dashboard_rbac_user
 
   # Kubespray addons
   kubespray_custom_addons_enabled       = var.kubespray_custom_addons_enabled

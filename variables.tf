@@ -294,6 +294,23 @@ variable "k8s_copy_kubeconfig" {
   }
 }
 
+variable "k8s_dashboard_rbac_enabled" {
+  type        = string
+  description = "If enabled, Kubernetes dashboard service account will be created"
+  default     = "false"
+
+  validation {
+    condition     = contains(["true", "false"], var.k8s_dashboard_rbac_enabled)
+    error_message = "Variable 'k8s_dashboard_rbac_enabled' is invalid.\nPossible values are: [\"true\", \"false\"]."
+  }
+}
+
+variable "k8s_dashboard_rbac_user" {
+  type        = string
+  description = "Kubernetes dashboard service account user"
+  default     = ""
+}
+
 #======================================================================================
 # Kubespray addons
 #======================================================================================
@@ -311,7 +328,7 @@ variable "kubespray_custom_addons_enabled" {
 
 variable "kubespray_custom_addons_path" {
   type        = string
-  description = "If enabled, custom addons.yml will be used"
+  description = "If custom addons are enabled, addons YAML file from this path will be used"
   default     = ""
 }
 

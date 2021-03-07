@@ -407,3 +407,16 @@ resource "null_resource" "copy_kubeconfig" {
   # Kubeconfig needs to be fetched before it can be copied
   depends_on = [null_resource.fetch_kubeconfig]
 }
+
+# Creates Kubernetes dashboard service account #
+resource "null_resource" "k8s_dashboard_rbac" {
+
+  count = var.k8s_dashboard_rbac_enabled == "true" ? 1 : 0
+
+  provisioner "local-exec" {
+    command = "sh scripts/dashboard-rbac.sh ${var.k8s_dashboard_rbac_user} kube-system"
+  }
+
+  # Wait until cluster setup is done
+  depends_on = [null_resource.kubespray_create]
+}
