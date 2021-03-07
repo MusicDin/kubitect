@@ -417,6 +417,6 @@ resource "null_resource" "k8s_dashboard_rbac" {
     command = "sh scripts/dashboard-rbac.sh ${var.k8s_dashboard_rbac_user} kube-system"
   }
 
-  # Wait until cluster setup is done
-  depends_on = [null_resource.kubespray_create]
+  # Kubeconfig needs to be ready when before script for creating service account is executed
+  depends_on = [null_resource.fetch_kubeconfig]
 }
