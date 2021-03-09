@@ -172,10 +172,6 @@ k8s_dns_mode = "coredns"
 # Note: Kubeconfig will be always available in config/admin.conf after installation #
 k8s_copy_kubeconfig = "false"
 
-# Creates Kubernets dashboard service account (for RBAC) #
-k8s_dashboard_rbac_enabled = "false"
-k8s_dashboard_rbac_user    = "admin"
-
 
 #======================================================================================
 # Kubespray addons
@@ -200,6 +196,10 @@ kubespray_custom_addons_path = "defaults/addons.yml"
 
 # Install Kubernetes dashboard #
 k8s_dashboard_enabled = "false"
+
+# Creates Kubernets dashboard RBAC token (dashboard needs to be enabled) #
+k8s_dashboard_rbac_enabled = "false"
+k8s_dashboard_rbac_user    = "admin"
 
 # Install helm #
 helm_enabled = "false"

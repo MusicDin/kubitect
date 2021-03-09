@@ -95,16 +95,6 @@ variable "k8s_copy_kubeconfig" {
   description = "If enabled, kubeconfig (config/admin.conf) will be copied to ~/.kube directory"
 }
 
-variable "k8s_dashboard_rbac_enabled" {
-  type        = string
-  description = "If enabled, Kubernetes dashboard service account will be created"
-}
-
-variable "k8s_dashboard_rbac_user" {
-  type        = string
-  description = "Kubernetes dashboard service account user"
-}
-
 #======================================================================================
 # Kubespray addons
 #======================================================================================
@@ -122,6 +112,16 @@ variable "kubespray_custom_addons_path" {
 variable "k8s_dashboard_enabled" {
   type        = string
   description = "Sets up Kubernetes dashboard if enabled"
+}
+
+variable "k8s_dashboard_rbac_enabled" {
+  type        = string
+  description = "If enabled, Kubernetes dashboard service account will be created"
+}
+
+variable "k8s_dashboard_rbac_user" {
+  type        = string
+  description = "Kubernetes dashboard service account user"
 }
 
 variable "helm_enabled" {

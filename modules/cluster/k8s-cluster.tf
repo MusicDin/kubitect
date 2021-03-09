@@ -411,7 +411,7 @@ resource "null_resource" "copy_kubeconfig" {
 # Creates Kubernetes dashboard service account #
 resource "null_resource" "k8s_dashboard_rbac" {
 
-  count = var.k8s_dashboard_rbac_enabled == "true" ? 1 : 0
+  count = (var.k8s_dashboard_enabled == "true" && var.k8s_dashboard_rbac_enabled == "true") ? 1 : 0
 
   provisioner "local-exec" {
     command = "sh scripts/dashboard-rbac.sh ${var.k8s_dashboard_rbac_user} kube-system"
