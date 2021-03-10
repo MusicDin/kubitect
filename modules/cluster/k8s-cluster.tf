@@ -9,7 +9,8 @@ locals {
     ubuntu = "-T 3000 -v"
     centos = "-T 3000 -v"
   }
-  default_extra_args = "-T 3000 -v"
+  default_extra_args  = "-T 3000 -v"
+  dashboard_namespace = "kube-system"
 }
 
 #================================
@@ -414,7 +415,7 @@ resource "null_resource" "k8s_dashboard_rbac" {
   count = (var.k8s_dashboard_enabled == "true" && var.k8s_dashboard_rbac_enabled == "true") ? 1 : 0
 
   provisioner "local-exec" {
-    command = "sh scripts/dashboard-rbac.sh ${var.k8s_dashboard_rbac_user} kube-system"
+    command = "sh scripts/dashboard-rbac.sh ${var.k8s_dashboard_rbac_user} ${local.dashboard_namespace}"
   }
 
   # Kubeconfig needs to be ready when before script for creating service account is executed
