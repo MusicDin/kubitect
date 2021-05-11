@@ -4,24 +4,30 @@ For up to date installation guide and other informations check [libvirt provider
 
 Create the following directory:
 <pre>
-mkdir -p ~/.local/share/terraform/plugins/registry.terraform.io/dmacvicar/libvirt/<b>0.6.2</b>/linux_amd64
+mkdir -p ~/.local/share/terraform/plugins/registry.terraform.io/dmacvicar/libvirt/<b>0.6.3</b>/linux_amd64
 </pre>
 
 Move to created directory:
 <pre>
-cd ~/.local/share/terraform/plugins/registry.terraform.io/dmacvicar/libvirt/<b>0.6.2</b>/linux_amd64
+cd ~/.local/share/terraform/plugins/registry.terraform.io/dmacvicar/libvirt/<b>0.6.3</b>/linux_amd64
 </pre>
 
-Download libvirt provider `.tar.gz` archive file
-(all possible assets can be found under their [releases](https://github.com/dmacvicar/terraform-provider-libvirt/releases)):
+Download libvirt provider `tar.gz` archive file. 
+All possible assets can be found under their [releases](https://github.com/dmacvicar/terraform-provider-libvirt/releases).
+Example for *Ubuntu 20.04*:
 <pre>
-wget https://github.com/dmacvicar/terraform-provider-libvirt/releases/download/v<b>0.6.2</b>/terraform-provider-libvirt-<b>0.6.2</b>+git.1585292411.8cbe9ad0.Ubuntu_18.04.amd64.tar.gz
+wget -O terraform-provider-libvirt.tar.gz https://github.com/dmacvicar/terraform-provider-libvirt/releases/download/v<b>0.6.3</b>/terraform-provider-libvirt-<b>0.6.3</b>+git.1604843676.67f4f2aa.Ubuntu_20.04.amd64.tar.gz
 </pre>
 
-Unarchive file:
-<pre>
-tar -xzf terraform-provider-libvirt-<b>0.6.2</b>+git.1585292411.8cbe9ad0.Ubuntu_18.04.amd64.tar.gz
-</pre>
+Unarchive downloaded file:
+```
+tar -xzf terraform-libvirt-provider.tar.gz
+```
+
+(Optionally) Remove `tar.gz` archive file:
+```
+rm terraform-libvirt-provider.tar.gz
+```
 
 That's it.
 

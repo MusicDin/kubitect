@@ -152,10 +152,10 @@ vm_worker_node_label = "node"
 k8s_kubespray_url = "https://github.com/kubernetes-sigs/kubespray.git"
 
 # The version of Kubespray that will be used to deploy Kubernetes #
-k8s_kubespray_version = "v2.15.0"
+k8s_kubespray_version = "v2.15.1"
 
 # The Kubernetes version that will be deployed #
-k8s_version = "v1.19.7"
+k8s_version = "v1.19.9"
 
 # The overlay network plugin used by the Kubernetes cluster (flannel/weave/calico/cilium/canal/kube-router) #
 k8s_network_plugin = "calico"
