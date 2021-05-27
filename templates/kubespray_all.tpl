@@ -1,7 +1,7 @@
 ---
 ##
-# Kubesprays's source file (v2.15.0):
-# https://github.com/kubernetes-sigs/kubespray/blob/release-2.15/inventory/sample/group_vars/all/all.yml
+# Kubesprays's source file (v2.16.0):
+# https://github.com/kubernetes-sigs/kubespray/blob/v2.16.0/inventory/sample/group_vars/all/all.yml
 ##
 
 ## Directory where etcd data stored
@@ -31,6 +31,11 @@ loadbalancer_apiserver:
 # loadbalancer_apiserver_localhost: true
 # valid options are "nginx" or "haproxy"
 # loadbalancer_apiserver_type: nginx  # valid values "nginx" or "haproxy"
+
+## If the cilium is going to be used in strict mode, we can use the
+## localhost connection and not use the external LB. If this parameter is
+## not specified, the first node to connect to kubeapi will be used.
+# use_localhost_as_kubeapi_loadbalancer: true
 
 ## Local loadbalancer should use this port
 ## And must be set port 6443
@@ -88,7 +93,7 @@ no_proxy_exclude_workers: false
 ## This setting determines whether certs are generated via scripts.
 ## Chose 'none' if you provide your own certificates.
 ## Option is  "script", "none"
-## note: vault is removed
+
 # cert_management: script
 
 ## Set to true to allow pre-checks to fail and continue deployment

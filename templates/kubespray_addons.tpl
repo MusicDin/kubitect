@@ -1,7 +1,7 @@
 ---
 ##
-# Kubesprays's source file (v2.15.0):
-# https://github.com/kubernetes-sigs/kubespray/blob/release-2.15/inventory/sample/group_vars/k8s-cluster/addons.yml
+# Kubesprays's source file (v2.16.0):
+# https://github.com/kubernetes-sigs/kubespray/blob/v2.16.0/inventory/sample/group_vars/k8s_cluster/addons.yml
 ##
 
 # Kubernetes dashboard
@@ -99,6 +99,10 @@ ingress_publish_status_address: ""
 #     operator: "Equal"
 #     value: ""
 #     effect: "NoSchedule"
+#   - key: "node-role.kubernetes.io/control-plane"
+#     operator: "Equal"
+#     value: ""
+#     effect: "NoSchedule"
 # ingress_nginx_namespace: "ingress-nginx"
 # ingress_nginx_insecure_port: 80
 # ingress_nginx_secure_port: 443
@@ -111,11 +115,13 @@ ingress_publish_status_address: ""
 #   53: "kube-system/coredns:53"
 # ingress_nginx_extra_args:
 #   - --default-ssl-certificate=default/foo-tls
+# ingress_nginx_class: nginx
 
 # ambassador ingress controller deployment
 ingress_ambassador_enabled: false
 # ingress_ambassador_namespace: "ambassador"
 # ingress_ambassador_version: "*"
+# ingress_ambassador_multi_namespaces: false
 
 # ALB ingress controller deployment
 ingress_alb_enabled: false
@@ -132,6 +138,29 @@ cert_manager_enabled: false
 
 # MetalLB deployment
 metallb_enabled: ${metallb_enabled}
+metallb_speaker_enabled: true
+# metallb_speaker_nodeselector:
+#   kubernetes.io/os: "linux"
+# metallb_controller_nodeselector:
+#   kubernetes.io/os: "linux"
+# metallb_speaker_tolerations:
+#   - key: "node-role.kubernetes.io/master"
+#     operator: "Equal"
+#     value: ""
+#     effect: "NoSchedule"
+#   - key: "node-role.kubernetes.io/control-plane"
+#     operator: "Equal"
+#     value: ""
+#     effect: "NoSchedule"
+# metallb_controller_tolerations:
+#   - key: "node-role.kubernetes.io/master"
+#     operator: "Equal"
+#     value: ""
+#     effect: "NoSchedule"
+#   - key: "node-role.kubernetes.io/control-plane"
+#     operator: "Equal"
+#     value: ""
+#     effect: "NoSchedule"
 metallb_version: "${metallb_version}"
 metallb_port: "${metallb_port}"
 metallb_limits_cpu: "${metallb_cpu_limit}"
@@ -140,3 +169,7 @@ metallb_protocol: "${metallb_protocol}"
 metallb_ip_range:
   - "${metallb_ip_range}"
 ${metallb_peers}
+
+# The plugin manager for kubectl
+krew_enabled: false
+krew_root_dir: "/usr/local/krew"

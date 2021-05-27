@@ -51,6 +51,11 @@ data "template_file" "kubespray_k8s_cluster" {
   ]
 }
 
+# Kubespray etcd.yml template #
+data "template_file" "kubespray_etcd" {
+  template = file("templates/kubespray_etcd.tpl")
+}
+
 # Kubespray addons.yml template #
 data "template_file" "kubespray_addons" {
 
@@ -237,7 +242,13 @@ resource "local_file" "kubespray_all" {
 # Create Kubespray k8s-cluster.yml configuration file from template #
 resource "local_file" "kubespray_k8s_cluster" {
   content  = data.template_file.kubespray_k8s_cluster.rendered
-  filename = "config/group_vars/k8s-cluster/k8s-cluster.yml"
+  filename = "config/group_vars/k8s_cluster/k8s-cluster.yml"
+}
+
+# Create Kubespray etcd.yml configuration file from template #
+resource "local_file" "kubespray_etcd" {
+  content  = data.template_file.kubespray_etcd.rendered
+  filename = "config/group_vars/etcd.yml"
 }
 
 # Create Kubespray addons.yml configuration file from template #
@@ -246,7 +257,7 @@ resource "local_file" "kubespray_addons" {
   count = var.kubespray_custom_addons_enabled == "false" ? 1 : 0
 
   content = data.template_file.kubespray_addons[count.index].rendered
-  filename = "config/group_vars/k8s-cluster/addons.yml"
+  filename = "config/group_vars/k8s_cluster/addons.yml"
 }
 
 # Copy custom Kubespray addons.yml configuration #
@@ -255,12 +266,12 @@ resource "local_file" "kubespray_custom_addons" {
   count = var.kubespray_custom_addons_enabled == "true" ? 1 : 0
 
   content = data.template_file.kubespray_custom_addons[count.index].rendered
-  filename = "config/group_vars/k8s-cluster/addons.yml"
+  filename = "config/group_vars/k8s_cluster/addons.yml"
 }
 
 # Create Kubespray hosts.ini configuration file from template #
 resource "local_file" "kubespray_hosts" {
-  content  = "[all]\n${join("", data.template_file.lb_hosts.*.rendered)}${join("", data.template_file.master_hosts.*.rendered)}${join("", data.template_file.worker_hosts.*.rendered)}\n[haproxy]\n${join("", data.template_file.lb_hosts_only.*.rendered)}\n[kube-master]\n${join("", data.template_file.master_hosts_only.*.rendered)}\n[etcd]\n${join("", data.template_file.master_hosts_only.*.rendered)}\n[kube-node]\n${join("", data.template_file.worker_hosts_only.*.rendered)}\n[k8s-cluster:children]\nkube-master\nkube-node"
+  content  = "[all]\n${join("", data.template_file.lb_hosts.*.rendered)}${join("", data.template_file.master_hosts.*.rendered)}${join("", data.template_file.worker_hosts.*.rendered)}\n[haproxy]\n${join("", data.template_file.lb_hosts_only.*.rendered)}\n[kube_control_plane]\n${join("", data.template_file.master_hosts_only.*.rendered)}\n[etcd]\n${join("", data.template_file.master_hosts_only.*.rendered)}\n[kube_node]\n${join("", data.template_file.worker_hosts_only.*.rendered)}\n[k8s_cluster:children]\nkube_control_plane\nkube_node"
   filename = "config/hosts.ini"
 }
 

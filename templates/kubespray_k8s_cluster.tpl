@@ -1,7 +1,7 @@
 ---
 ##
-# Kubesprays's source file (v2.15.0):
-# https://github.com/kubernetes-sigs/kubespray/blob/release-2.15/inventory/sample/group_vars/k8s-cluster/k8s-cluster.yml
+# Kubesprays's source file (v2.16.0):
+# https://github.com/kubernetes-sigs/kubespray/blob/v2.16.0/inventory/sample/group_vars/k8s_cluster/k8s-cluster.yml
 ##
 
 # Kubernetes configuration dirs and system namespace.
@@ -53,9 +53,9 @@ credentials_dir: "{{ inventory_dir }}/credentials"
 ## Optional settings for OIDC
 # kube_oidc_ca_file: "{{ kube_cert_dir }}/ca.pem"
 # kube_oidc_username_claim: sub
-# kube_oidc_username_prefix: oidc:
+# kube_oidc_username_prefix: 'oidc:'
 # kube_oidc_groups_claim: groups
-# kube_oidc_groups_prefix: oidc:
+# kube_oidc_groups_prefix: 'oidc:'
 
 ## Variables to control webhook authn/authz
 # kube_webhook_token_auth: false
@@ -98,6 +98,25 @@ kube_pods_subnet: 10.233.64.0/18
 #  - kube_network_node_prefix: 25
 #  - kubelet_max_pods: 110
 kube_network_node_prefix: 24
+
+# Configure Dual Stack networking (i.e. both IPv4 and IPv6)
+enable_dual_stack_networks: false
+
+# Kubernetes internal network for IPv6 services, unused block of space.
+# This is only used if enable_dual_stack_networks is set to true
+# This provides 4096 IPv6 IPs
+kube_service_addresses_ipv6: fd85:ee78:d8a6:8607::1000/116
+
+# Internal network. When used, it will assign IPv6 addresses from this range to individual pods.
+# This network must not already be in your network infrastructure!
+# This is only used if enable_dual_stack_networks is set to true.
+# This provides room for 256 nodes with 254 pods per node.
+kube_pods_subnet_ipv6: fd85:ee78:d8a6:8607::1:0000/112
+
+# IPv6 subnet size allocated to each for pods.
+# This is only used if enable_dual_stack_networks is set to true
+# This provides room for 254 pods per node.
+kube_network_node_prefix_ipv6: 120
 
 # The port the API Server will be listening on.
 kube_apiserver_ip: "{{ kube_service_addresses|ipaddr('net')|ipaddr(1)|ipaddr('address') }}"
@@ -178,36 +197,10 @@ dns_domain: "{{ cluster_name }}"
 
 ## Container runtime
 ## docker for docker, crio for cri-o and containerd for containerd.
-container_manager: docker
+container_manager: containerd
 
 # Additional container runtimes
 kata_containers_enabled: false
-
-## Settings for containerd runtimes (only used when container_manager is set to containerd)
-#
-# Settings for default containerd runtime
-# containerd_default_runtime:
-#   type: io.containerd.runtime.v1.linux
-#   engine: ''
-#   root: ''
-#
-# Settings for additional runtimes for containerd configuration
-# containerd_runtimes:
-#   - name: ""
-#     type: ""
-#     engine: ""
-#     root: ""
-# Example for Kata Containers as additional runtime:
-# containerd_runtimes:
-#   - name: kata
-#     type: io.containerd.kata.v2
-#     engine: ""
-#     root: ""
-#
-# Settings for untrusted containerd runtime
-# containerd_untrusted_runtime_type: ''
-# containerd_untrusted_runtime_engine: ''
-# containerd_untrusted_runtime_root: ''
 
 kubeadm_certificate_key: "{{ lookup('password', credentials_dir + '/kubeadm_certificate_key.creds length=64 chars=hexdigits') | lower }}"
 
@@ -315,5 +308,9 @@ persistent_volumes_enabled: false
 
 ## Amount of time to retain events. (default 1h0m0s)
 event_ttl_duration: "1h0m0s"
-##  Force regeneration of kubernetes control plane certificates without the need of bumping the cluster version
-force_certificate_regeneration: false
+
+
+## Automatically renew K8S control plane certificates on first Monday of each month
+auto_renew_certificates: false
+# First Monday of each month
+# auto_renew_certificates_systemd_calendar: "Mon *-*-1,2,3,4,5,6,7 03:{{ groups['kube_control_plane'].index(inventory_hostname) }}0:00"
