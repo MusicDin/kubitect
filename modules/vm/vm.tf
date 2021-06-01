@@ -7,6 +7,30 @@ resource "libvirt_volume" "vm_volume" {
   format         = "qcow2"
 }
 
+# Assigns static IP addresses to VM #
+resource "null_resource" "vm_static_ip" {
+
+  # Define triggers for on-destroy provisioner
+  triggers = {
+    libvirt_provider_uri = var.libvirt_provider_uri
+    network_name         = var.network_name
+    vm_mac               = var.vm_mac
+    vm_ip                = var.vm_ip
+  }
+
+  provisioner "local-exec" {
+    command     = "virsh --connect ${var.libvirt_provider_uri} net-update ${var.network_name} add ip-dhcp-host \"<host mac='${var.vm_mac}' ip='${var.vm_ip}'/>\" --live --config"
+    interpreter = ["/bin/bash", "-c"]
+  }
+
+  provisioner "local-exec" {
+    when        = destroy
+    command     = "virsh --connect ${self.triggers.libvirt_provider_uri} net-update ${self.triggers.network_name} delete ip-dhcp-host \"<host mac='${self.triggers.vm_mac}' ip='${self.triggers.vm_ip}'/>\" --live --config"
+    interpreter = ["/bin/bash", "-c"]
+    on_failure  = continue
+  }
+}
+
 # Creates virtual machine #
 resource "libvirt_domain" "vm_domain" {
 
@@ -20,7 +44,7 @@ resource "libvirt_domain" "vm_domain" {
 
   # Network configuration #
   network_interface {
-    network_name   = var.vm_network_name
+    network_name   = var.network_name
     mac            = var.vm_mac
     wait_for_lease = true
   }
@@ -62,7 +86,6 @@ resource "libvirt_domain" "vm_domain" {
       "while ! grep \"Cloud-init .* finished\" /var/log/cloud-init.log; do echo \"$(date -Ins) Waiting for cloud-init to finish\"; sleep 2; done"
     ]
   }
-
 }
 
 

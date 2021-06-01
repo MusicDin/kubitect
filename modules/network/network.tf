@@ -24,7 +24,6 @@ resource "local_file" "network-config-file" {
   filename = "config/network_config.xml"
 }
 
-
 #================================
 # Network
 #================================
@@ -41,7 +40,7 @@ resource "null_resource" "network" {
   # On terraform apply - Create network #
   provisioner "local-exec" {
     command     = "virsh --connect ${var.libvirt_provider_uri} net-define config/network_config.xml && virsh --connect ${var.libvirt_provider_uri} net-autostart ${var.network_name} && virsh --connect ${var.libvirt_provider_uri} net-start ${var.network_name}"
-    interpreter = ["/bin/bash", "-c"]
+    interpreter = [ "/bin/bash", "-c" ]
   }
 
   # On terraform destroy - Destroy and undefine network #
@@ -52,47 +51,5 @@ resource "null_resource" "network" {
   }
 
   # In order to create network configuration, config file must be first created #
-  depends_on = [local_file.network-config-file]
-}
-
-# Assigns static IP addresses to load balancer VM depending on their MAC address #
-resource "null_resource" "lb-static-ips" {
-
-  for_each = var.vm_lb_macs_ips
-
-  # On terraform apply - Add host
-  provisioner "local-exec" {
-    command     = "virsh --connect ${var.libvirt_provider_uri} net-update ${var.network_name} add ip-dhcp-host \"<host mac='${each.key}' ip='${each.value}'/>\" --live --config"
-    interpreter = ["/bin/bash", "-c"]
-  }
-
-  depends_on = [null_resource.network]
-}
-
-# Assigns static IP addresses to master node VMs depending on their MAC address #
-resource "null_resource" "master-static-ips" {
-
-  for_each = var.vm_master_macs_ips
-
-  # On terraform apply - Add hosts
-  provisioner "local-exec" {
-    command     = "virsh --connect ${var.libvirt_provider_uri} net-update ${var.network_name} add ip-dhcp-host \"<host mac='${each.key}' ip='${each.value}'/>\" --live --config"
-    interpreter = ["/bin/bash", "-c"]
-  }
-
-  depends_on = [null_resource.network]
-}
-
-# Assigns static IP addresses to worker node VMs depending on their MAC address #
-resource "null_resource" "worker-static-ips" {
-
-  for_each = var.vm_worker_macs_ips
-
-  # On terraform apply - Add hosts
-  provisioner "local-exec" {
-    command     = "virsh --connect ${var.libvirt_provider_uri} net-update ${var.network_name} add ip-dhcp-host \"<host mac='${each.key}' ip='${each.value}'/>\" --live --config"
-    interpreter = ["/bin/bash", "-c"]
-  }
-
-  depends_on = [null_resource.network]
+  depends_on = [ local_file.network-config-file ]
 }

@@ -2,6 +2,11 @@
 # Variables dependent on parent module #
 # ==================================== #
 
+variable "libvirt_provider_uri" {
+  type        = string
+  description = "Libvirt provider's URI"
+}
+
 variable "resource_pool_name" {
   type        = string
   description = "Resource pool name"
@@ -15,6 +20,11 @@ variable "base_volume_id" {
 variable "cloud_init_id" {
   type        = string
   description = "Cloud init disk ID"
+}
+
+variable "network_name" {
+  type        = string
+  description = "Network name in which VM resides"
 }
 
 # ==================================== #
@@ -38,11 +48,6 @@ variable "vm_type" {
 variable "vm_index" {
   type        = number
   description = "Index of VM. Used to differentiate VMs of the same type."
-}
-
-variable "vm_network_name" {
-  type        = string
-  description = "Network name in which VM resides"
 }
 
 variable "vm_user" {

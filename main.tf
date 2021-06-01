@@ -24,9 +24,6 @@ module "network_module" {
   network_mask_bits      = var.network_mask_bits
   network_dhcp_ip_start  = var.network_dhcp_ip_start
   network_dhcp_ip_end    = var.network_dhcp_ip_end
-  vm_lb_macs_ips         = var.vm_lb_macs_ips
-  vm_master_macs_ips     = var.vm_master_macs_ips
-  vm_worker_macs_ips     = var.vm_worker_macs_ips
 }
 
 # Create HAProxy load balancer #
@@ -36,9 +33,11 @@ module "lb_module" {
   count = length(var.vm_lb_macs_ips)
 
   # Variables from general resources #
-  resource_pool_name = libvirt_pool.resource_pool.name
-  base_volume_id     = libvirt_volume.base_volume.id
-  cloud_init_id      = libvirt_cloudinit_disk.cloud_init.id
+  libvirt_provider_uri = var.libvirt_provider_uri
+  resource_pool_name   = libvirt_pool.resource_pool.name
+  base_volume_id       = libvirt_volume.base_volume.id
+  cloud_init_id        = libvirt_cloudinit_disk.cloud_init.id
+  network_name         = var.network_name
 
   # Load balancer specific variables #
   vm_index           = count.index
@@ -46,7 +45,6 @@ module "lb_module" {
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
-  vm_network_name    = var.network_name
   vm_name_prefix     = var.vm_name_prefix
   vm_cpu             = var.vm_lb_cpu
   vm_ram             = var.vm_lb_ram
@@ -55,7 +53,9 @@ module "lb_module" {
   vm_ip              = values(var.vm_lb_macs_ips)[count.index]
 
   # Dependancy takes care that resource pool is not removed before volumes are #
+  # Also network must be created before VM is initialized #
   depends_on = [
+    module.network_module,
     libvirt_pool.resource_pool,
     libvirt_volume.base_volume
   ]
@@ -68,9 +68,11 @@ module "master_module" {
   count = length(var.vm_master_macs_ips)
 
   # Variables from general resources #
-  resource_pool_name = libvirt_pool.resource_pool.name
-  base_volume_id     = libvirt_volume.base_volume.id
-  cloud_init_id      = libvirt_cloudinit_disk.cloud_init.id
+  libvirt_provider_uri = var.libvirt_provider_uri
+  resource_pool_name   = libvirt_pool.resource_pool.name
+  base_volume_id       = libvirt_volume.base_volume.id
+  cloud_init_id        = libvirt_cloudinit_disk.cloud_init.id
+  network_name         = var.network_name
 
   # Master node specific variables #
   vm_index           = count.index
@@ -78,7 +80,6 @@ module "master_module" {
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
-  vm_network_name    = var.network_name
   vm_name_prefix     = var.vm_name_prefix
   vm_cpu             = var.vm_master_cpu
   vm_ram             = var.vm_master_ram
@@ -87,7 +88,9 @@ module "master_module" {
   vm_ip              = values(var.vm_master_macs_ips)[count.index]
 
   # Dependancy takes care that resource pool is not removed before volumes are #
+  # Also network must be created before VM is initialized #
   depends_on = [
+    module.network_module,
     libvirt_pool.resource_pool,
     libvirt_volume.base_volume
   ]
@@ -100,9 +103,11 @@ module "worker_module" {
   count = length(var.vm_worker_macs_ips)
 
   # Variables from general resources #
-  resource_pool_name = libvirt_pool.resource_pool.name
-  base_volume_id     = libvirt_volume.base_volume.id
-  cloud_init_id      = libvirt_cloudinit_disk.cloud_init.id
+  libvirt_provider_uri = var.libvirt_provider_uri
+  resource_pool_name   = libvirt_pool.resource_pool.name
+  base_volume_id       = libvirt_volume.base_volume.id
+  cloud_init_id        = libvirt_cloudinit_disk.cloud_init.id
+  network_name         = var.network_name
 
   # Worker node specific variables #
   vm_index           = count.index
@@ -110,7 +115,6 @@ module "worker_module" {
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
-  vm_network_name    = var.network_name
   vm_name_prefix     = var.vm_name_prefix
   vm_cpu             = var.vm_worker_cpu
   vm_ram             = var.vm_worker_ram
@@ -119,7 +123,9 @@ module "worker_module" {
   vm_ip              = values(var.vm_worker_macs_ips)[count.index]
 
   # Dependancy takes care that resource pool is not removed before volumes are #
+  # Also network must be created before VM is initialized #
   depends_on = [
+    module.network_module,
     libvirt_pool.resource_pool,
     libvirt_volume.base_volume
   ]
@@ -177,7 +183,6 @@ module "k8s_cluster" {
 
   # K8s cluster creation depends on network and all VMs
   depends_on = [
-    module.network_module,
     module.lb_module,
     module.worker_module,
     module.master_module

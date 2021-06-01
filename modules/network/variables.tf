@@ -50,22 +50,3 @@ variable "network_dhcp_ip_end" {
   type        = string
   description = "DHCP IP range end"
 }
-
-# -------------------------- #
-# VM specific variables      #
-# -------------------------- #
-
-variable "vm_lb_macs_ips" {
-  type        = map(string)
-  description = "Map of MACs and IPs for load balancers"
-}
-
-variable "vm_master_macs_ips" {
-  type        = map(string)
-  description = "Map of MACs and IPs for master nodes"
-}
-
-variable "vm_worker_macs_ips" {
-  type        = map(string)
-  description = "Map of MACs and IPs for worker nodes"
-}
