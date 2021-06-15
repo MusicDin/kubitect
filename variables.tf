@@ -1,5 +1,5 @@
 #======================================================================================
-# Libvirt connection
+# General configuration
 #======================================================================================
 
 variable "action" {
@@ -31,7 +31,56 @@ variable "libvirt_resource_pool_location" {
 }
 
 #======================================================================================
-# Network
+# Global VM configuration
+#======================================================================================
+
+variable "vm_user" {
+  type        = string
+  description = "Username used to SSH to the VM"
+  default     = "user"
+}
+
+variable "vm_ssh_private_key" {
+  type        = string
+  description = "Location of private ssh key for VMs"
+}
+
+variable "vm_ssh_known_hosts" {
+  type        = string
+  description = "Add virtual machines to SSH known hosts"
+  default     = "true"
+
+  validation {
+    condition     = contains(["true", "false"], var.vm_ssh_known_hosts)
+    error_message = "Variable 'vm_ssh_known_hosts' is invalid.\nPossible values are: [\"true\", \"false\"]."
+  }
+}
+
+variable "vm_distro" {
+  type        = string
+  description = "Linux distribution used on VMs. (ubuntu, centos, debian, n/a)"
+  default     = "N/A"
+}
+
+variable "vm_image_source" {
+  type        = string
+  description = "Image source, which can be path on host's filesystem or URL."
+}
+
+variable "vm_name_prefix" {
+  type        = string
+  description = "Prefix added to names of VMs"
+  default     = "vm"
+}
+
+variable "vm_network_interface" {
+  type        = string
+  description = "Network interface used by VMs to connect to the network"
+  default     = "ens3"
+}
+
+#======================================================================================
+# Network configuration
 #======================================================================================
 
 variable "network_name" {
@@ -40,26 +89,20 @@ variable "network_name" {
   default     = "k8s-network"
 }
 
-variable "network_interface" {
+variable "network_mode" {
   type        = string
-  description = "Network interface used for VMs (cloud-init) and Keepalived"
-  default     = "ens3"
-}
-
-variable "network_forward_mode" {
-  type        = string
-  description = "Network forward mode"
+  description = "Network mode"
   default     = "nat"
 
   validation {
-    condition     = contains(["nat", "route"], var.network_forward_mode)
-    error_message = "Variable 'network_forward_mode' is invalid.\nPossible values are: [\"nat\", \"route\"]."
+    condition     = contains(["nat", "route"], var.network_mode)
+    error_message = "Variable 'network_mode' is invalid.\nPossible values are: [\"nat\", \"route\"]."
   }
 }
 
-variable "network_virtual_bridge" {
+variable "network_bridge" {
   type        = string
-  description = "Network virtual bridge"
+  description = "Network (virtual) bridge"
   default     = "virbr1"
 }
 
@@ -99,55 +142,8 @@ variable "network_dhcp_ip_end" {
 }
 
 #======================================================================================
-# Kubernetes infrastructure
+# HAProxy load balancer VMs parameters
 #======================================================================================
-
-#============================#
-# General variables          #
-#============================#
-
-variable "vm_user" {
-  type        = string
-  description = "SSH user for VMs"
-  default     = "user"
-}
-
-variable "vm_ssh_private_key" {
-  type        = string
-  description = "Location of private ssh key for VMs"
-}
-
-variable "vm_ssh_known_hosts" {
-  type        = string
-  description = "Add virtual machines to SSH known hosts"
-  default     = "true"
-
-  validation {
-    condition     = contains(["true", "false"], var.vm_ssh_known_hosts)
-    error_message = "Variable 'vm_ssh_known_hosts' is invalid.\nPossible values are: [\"true\", \"false\"]."
-  }
-}
-
-variable "vm_distro" {
-  type        = string
-  description = "Linux distribution used on VMs. Possible values: [ubuntu, centos, debian]"
-  default     = "N/A"
-}
-
-variable "vm_image_source" {
-  type        = string
-  description = "Image source, which can be path on host's filesystem or URL."
-}
-
-variable "vm_name_prefix" {
-  type        = string
-  description = "Prefix added to names of VMs"
-  default     = "vm"
-}
-
-#============================#
-# Load balancer variables    #
-#============================#
 
 variable "vm_lb_cpu" {
   type        = number
@@ -177,9 +173,9 @@ variable "vm_lb_vip" {
   description = "The IP address of HAProxy load balancer floating VIP"
 }
 
-#============================#
-# Master nodes variables     #
-#============================#
+#======================================================================================
+# Master node VMs parameters
+#======================================================================================
 
 variable "vm_master_cpu" {
   type        = number
@@ -209,9 +205,9 @@ variable "vm_master_macs_ips" {
   }
 }
 
-#============================#
-# Worker nodes variables     #
-#============================#
+#======================================================================================
+# Worker node VMs parameters
+#======================================================================================
 
 variable "vm_worker_cpu" {
   type        = number
@@ -241,7 +237,7 @@ variable "vm_worker_node_label" {
 }
 
 #======================================================================================
-# General kubernetes (k8s) variables
+# General Kubernetes configuration
 #======================================================================================
 
 variable "k8s_kubespray_url" {
@@ -278,10 +274,6 @@ variable "k8s_dns_mode" {
     error_message = "Variable 'k8s_dns_mode' is invalid.\nPossible values are: [\"coredns\", \"kubedns\"]."
   }
 }
-
-#======================================================================================
-# Other
-#======================================================================================
 
 variable "k8s_copy_kubeconfig" {
   type        = string

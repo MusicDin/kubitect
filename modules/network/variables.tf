@@ -16,14 +16,14 @@ variable "network_name" {
   description = "Network name"
 }
 
-variable "network_forward_mode" {
+variable "network_mode" {
   type        = string
-  description = "Network forward mode"
+  description = "Network mode"
 }
 
-variable "network_virtual_bridge" {
+variable "network_bridge" {
   type        = string
-  description = "Network virtual bridge"
+  description = "Network (virtual) bridge"
 }
 
 variable "network_mac" {

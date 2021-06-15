@@ -17,8 +17,8 @@ module "network_module" {
 
   libvirt_provider_uri   = var.libvirt_provider_uri
   network_name           = var.network_name
-  network_forward_mode   = var.network_forward_mode
-  network_virtual_bridge = var.network_virtual_bridge
+  network_mode           = var.network_mode
+  network_bridge         = var.network_bridge
   network_mac            = var.network_mac
   network_gateway        = var.network_gateway
   network_mask_bits      = var.network_mask_bits
@@ -147,7 +147,7 @@ module "k8s_cluster" {
   vm_master_ips        = values(var.vm_master_macs_ips)
   vm_lb_ips            = values(var.vm_lb_macs_ips)
   vm_lb_vip            = var.vm_lb_vip
-  network_interface    = var.network_interface
+  vm_network_interface = var.vm_network_interface
 
   # K8s cluster variables
   k8s_kubespray_url     = var.k8s_kubespray_url
@@ -228,7 +228,7 @@ data "template_file" "cloud_init_network_tpl" {
   template = file("templates/cloud_init_network.tpl")
 
   vars = {
-    network_interface = var.network_interface
+    network_interface = var.vm_network_interface
   }
 }
 

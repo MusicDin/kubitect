@@ -52,9 +52,9 @@ variable "vm_name_prefix" {
   description = "Prefix added to names of VMs"
 }
 
-variable "network_interface" {
+variable "vm_network_interface" {
   type        = string
-  description = "Network interface used for Keepalived"
+  description = "VM network interface used for Keepalived"
 }
 
 #======================================================================================

@@ -213,7 +213,7 @@ data "template_file" "keepalived_master" {
   template = file("templates/keepalived_master.tpl")
 
   vars = {
-    network_interface = var.network_interface
+    network_interface = var.vm_network_interface
     virtual_ip        = var.vm_lb_vip
   }
 }
@@ -223,7 +223,7 @@ data "template_file" "keepalived_backup" {
   template = file("templates/keepalived_backup.tpl")
 
   vars = {
-    network_interface = var.network_interface
+    network_interface = var.vm_network_interface
     virtual_ip        = var.vm_lb_vip
   }
 }

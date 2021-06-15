@@ -1,5 +1,5 @@
 #======================================================================================
-# Libvirt provider configuration
+# General configuration
 #======================================================================================
 
 # Provider's URI #
@@ -13,19 +13,19 @@ libvirt_resource_pool_location = "/var/lib/libvirt/pools/"
 
 
 #======================================================================================
-# Global virtual machines parameters
+# Global VM configuration
 #======================================================================================
 
 # Username used to SSH to the VM #
 vm_user = "k8s"
 
-# Private SSH key (for VMs) location (example: ~/.ssh/id_rsa) #
+# Private SSH key location (for VMs) (example: ~/.ssh/id_rsa) #
 vm_ssh_private_key = "~/.ssh/id_rsa"
 
 # Add VMs to SSH known hosts #
 vm_ssh_known_hosts = "true"
 
-# Linux distribution that will be used on VMs. Possible values are: [ubuntu, debian, centos] #
+# Linux distribution that will be used on VMs (ubuntu, debian, centos, "") #
 vm_distro = ""
 
 # Source of linux image. It can be path to an image on host's filesystem or an URL #
@@ -34,22 +34,22 @@ vm_image_source = ""
 # The prefix added to names of VMs #
 vm_name_prefix = "k8s"
 
+# Network interface used by VMs to connect to the network #
+vm_network_interface = "ens3"
+
 
 #======================================================================================
-# KVM network configuration
+# Network configuration
 #======================================================================================
 
 # Network name #
 network_name = "k8s-network"
 
-# Network interface #
-network_interface = "ens3"
+# Network mode (nat, route) #
+network_mode = "nat"
 
-# Network forward mode (nat, route) #
-network_forward_mode = "nat"
-
-# Network virtual bridge #
-network_virtual_bridge = "virbr1"
+# Network (virtual) bridge #
+network_bridge = "virbr1"
 
 # Network MAC address #
 network_mac = "52:54:00:4f:e3:88"
@@ -145,7 +145,7 @@ vm_worker_node_label = "node"
 
 
 #======================================================================================
-# Kubernetes (k8s) parameters
+# General Kubernetes configuration
 #======================================================================================
 
 # The Git repository to clone Kubespray from #
@@ -163,11 +163,6 @@ k8s_network_plugin = "calico"
 # The DNS service used by Kubernetes cluster (coredns/kubedns)#
 k8s_dns_mode = "coredns"
 
-
-#======================================================================================
-# Other
-#======================================================================================
-
 # Copies config file to ~/.kube directory #
 # Note: Kubeconfig will be always available in config/admin.conf after installation #
 k8s_copy_kubeconfig = "false"
@@ -181,7 +176,7 @@ k8s_copy_kubeconfig = "false"
 # Custom addons
 #=========================
 
-# Note: If custom addons are enabled, variables from other sections below
+# IMPORTANT: If custom addons are enabled, variables from other sections below
 # will be ignored and addons from file path provided will be applied instead.
 
 # Use custom addons.yml #

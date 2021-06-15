@@ -1,7 +1,7 @@
 <network>
   <name>${network_name}</name>
-  <forward mode='${network_forward_mode}'/>
-  <bridge name='${network_virtual_bridge}' stp='on' delay='0'/>
+  <forward mode='${network_mode}'/>
+  <bridge name='${network_bridge}' stp='on' delay='0'/>
   <mac address='${network_mac}'/>
   <ip address='${network_gateway}' netmask='${network_mask}'>
     <dhcp>

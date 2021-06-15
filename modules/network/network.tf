@@ -8,8 +8,8 @@ data "template_file" "network-config-tpl" {
 
   vars = {
     network_name           = var.network_name
-    network_forward_mode   = var.network_forward_mode
-    network_virtual_bridge = var.network_virtual_bridge
+    network_mode           = var.network_mode
+    network_bridge         = var.network_bridge
     network_mac            = var.network_mac
     network_gateway        = var.network_gateway
     network_mask           = cidrnetmask("${var.network_gateway}/${var.network_mask_bits}")
