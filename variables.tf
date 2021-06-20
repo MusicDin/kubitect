@@ -103,42 +103,12 @@ variable "network_mode" {
 variable "network_bridge" {
   type        = string
   description = "Network (virtual) bridge"
-  default     = "virbr1"
+  default     = null
 }
 
-variable "network_mac" {
+variable "network_cidr" {
   type        = string
-  description = "Network MAC address"
-  default     = "52:54:00:4f:e3:88"
-}
-
-variable "network_gateway" {
-  type        = string
-  description = "Network gateway IP address"
-  default     = "192.168.113.1"
-}
-
-variable "network_mask_bits" {
-  type        = number
-  description = "Bits used for network"
-  default     = 24
-
-  validation {
-    condition     = var.network_mask_bits > 0 && var.network_mask_bits <= 32
-    error_message = "Valid value for bits used for network is between 1 and 32. (Default value is 24)."
-  }
-}
-
-variable "network_dhcp_ip_start" {
-  type        = string
-  description = "DHCP IP range start"
-  default     = "192.168.113.2"
-}
-
-variable "network_dhcp_ip_end" {
-  type        = string
-  description = "DHCP IP range end"
-  default     = "192.168.113.254"
+  description = "Network CIDR"
 }
 
 #======================================================================================

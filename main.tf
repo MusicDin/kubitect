@@ -15,15 +15,10 @@ provider "libvirt" {
 module "network_module" {
   source = "./modules/network/"
 
-  libvirt_provider_uri   = var.libvirt_provider_uri
   network_name           = var.network_name
   network_mode           = var.network_mode
   network_bridge         = var.network_bridge
-  network_mac            = var.network_mac
-  network_gateway        = var.network_gateway
-  network_mask_bits      = var.network_mask_bits
-  network_dhcp_ip_start  = var.network_dhcp_ip_start
-  network_dhcp_ip_end    = var.network_dhcp_ip_end
+  network_cidr           = var.network_cidr
 }
 
 # Create HAProxy load balancer #
@@ -37,7 +32,7 @@ module "lb_module" {
   resource_pool_name   = libvirt_pool.resource_pool.name
   base_volume_id       = libvirt_volume.base_volume.id
   cloud_init_id        = libvirt_cloudinit_disk.cloud_init.id
-  network_name         = var.network_name
+  network_id           = module.network_module.network_id
 
   # Load balancer specific variables #
   vm_index           = count.index
@@ -72,7 +67,7 @@ module "master_module" {
   resource_pool_name   = libvirt_pool.resource_pool.name
   base_volume_id       = libvirt_volume.base_volume.id
   cloud_init_id        = libvirt_cloudinit_disk.cloud_init.id
-  network_name         = var.network_name
+  network_id           = module.network_module.network_id
 
   # Master node specific variables #
   vm_index           = count.index
@@ -107,7 +102,7 @@ module "worker_module" {
   resource_pool_name   = libvirt_pool.resource_pool.name
   base_volume_id       = libvirt_volume.base_volume.id
   cloud_init_id        = libvirt_cloudinit_disk.cloud_init.id
-  network_name         = var.network_name
+  network_id           = module.network_module.network_id
 
   # Worker node specific variables #
   vm_index           = count.index
@@ -142,10 +137,10 @@ module "k8s_cluster" {
   vm_user              = var.vm_user
   vm_ssh_private_key   = var.vm_ssh_private_key
   vm_name_prefix       = var.vm_name_prefix
-  vm_worker_ips        = values(var.vm_worker_macs_ips)
+  vm_worker_ips        = tolist(module.worker_module.*.ip)
   vm_worker_node_label = var.vm_worker_node_label
-  vm_master_ips        = values(var.vm_master_macs_ips)
-  vm_lb_ips            = values(var.vm_lb_macs_ips)
+  vm_master_ips        = tolist(module.master_module.*.ip)
+  vm_lb_ips            = tolist(module.lb_module.*.ip)
   vm_lb_vip            = var.vm_lb_vip
   vm_network_interface = var.vm_network_interface
 
@@ -181,7 +176,7 @@ module "k8s_cluster" {
   metallb_ip_range                      = var.metallb_ip_range
   metallb_peers                         = var.metallb_peers
 
-  # K8s cluster creation depends on network and all VMs
+  # K8s cluster creation depends on all VM modules
   depends_on = [
     module.lb_module,
     module.worker_module,

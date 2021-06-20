@@ -51,25 +51,8 @@ network_mode = "nat"
 # Network (virtual) bridge #
 network_bridge = "virbr1"
 
-# Network MAC address #
-network_mac = "52:54:00:4f:e3:88"
-
-# Network gateway IP address #
-network_gateway = "192.168.113.1"
-
-# Bits used for network mask (example: 255.255.255.0 uses 24 bits for network) #
-network_mask_bits = 24
-
-# --- DHCP IP range --- #
-# DHCP is used as network management protocol.
-# VM's IP address is configured as static IP based on it's MAC.
-# IP addresses have to be within DHCP IP range, otherwise IP won't be assigned to VM.
-
-# DHCP IP start (from IP) #
-network_dhcp_ip_start = "192.168.113.2"
-
-# DHCP IP end (to IP) #
-network_dhcp_ip_end = "192.168.113.254"
+# Network CIDR (example: 192.168.113.0/24) #
+network_cidr = "192.168.113.0/24"
 
 
 #======================================================================================

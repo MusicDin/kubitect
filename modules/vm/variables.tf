@@ -1,4 +1,13 @@
 # ==================================== #
+# Outputs                              #
+# ==================================== #
+
+output "ip" {
+  value       = libvirt_domain.vm_domain.network_interface.0.addresses.0
+  description = "IP that has been assigned to the VM"
+}
+
+# ==================================== #
 # Variables dependent on parent module #
 # ==================================== #
 
@@ -22,9 +31,9 @@ variable "cloud_init_id" {
   description = "Cloud init disk ID"
 }
 
-variable "network_name" {
+variable "network_id" {
   type        = string
-  description = "Network name in which VM resides"
+  description = "Id of the network in which VM resides"
 }
 
 # ==================================== #

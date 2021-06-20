@@ -7,30 +7,6 @@ resource "libvirt_volume" "vm_volume" {
   format         = "qcow2"
 }
 
-# Assigns static IP addresses to VM #
-resource "null_resource" "vm_static_ip" {
-
-  # Define triggers for on-destroy provisioner
-  triggers = {
-    libvirt_provider_uri = var.libvirt_provider_uri
-    network_name         = var.network_name
-    vm_mac               = var.vm_mac
-    vm_ip                = var.vm_ip
-  }
-
-  provisioner "local-exec" {
-    command     = "virsh --connect ${var.libvirt_provider_uri} net-update ${var.network_name} add ip-dhcp-host \"<host mac='${var.vm_mac}' ip='${var.vm_ip}'/>\" --live --config"
-    interpreter = ["/bin/bash", "-c"]
-  }
-
-  provisioner "local-exec" {
-    when        = destroy
-    command     = "virsh --connect ${self.triggers.libvirt_provider_uri} net-update ${self.triggers.network_name} delete ip-dhcp-host \"<host mac='${self.triggers.vm_mac}' ip='${self.triggers.vm_ip}'/>\" --live --config"
-    interpreter = ["/bin/bash", "-c"]
-    on_failure  = continue
-  }
-}
-
 # Creates virtual machine #
 resource "libvirt_domain" "vm_domain" {
 
@@ -44,8 +20,9 @@ resource "libvirt_domain" "vm_domain" {
 
   # Network configuration #
   network_interface {
-    network_name   = var.network_name
+    network_id     = var.network_id
     mac            = var.vm_mac
+    addresses      = var.vm_ip == null ? null : [ var.vm_ip ]
     wait_for_lease = true
   }
 
@@ -88,7 +65,6 @@ resource "libvirt_domain" "vm_domain" {
   }
 }
 
-
 # Takes care of removing worker from cluster's configuration #
 resource "null_resource" "remove_worker" {
 
@@ -117,7 +93,25 @@ resource "null_resource" "remove_worker" {
     command    = "sed -i '/${self.triggers.vm_name_prefix}-worker-${self.triggers.vm_index}$/d' config/hosts.ini"
     on_failure = continue
   }
+}
 
+# Remove static IP address from network after destruction #
+resource "null_resource" "remove_static_ip" {
+
+  # Define triggers for on-destroy provisioner
+  triggers = {
+    libvirt_provider_uri = var.libvirt_provider_uri
+    network_id           = libvirt_domain.vm_domain.network_interface.0.network_id
+    vm_mac               = libvirt_domain.vm_domain.network_interface.0.mac
+    vm_ip                = libvirt_domain.vm_domain.network_interface.0.addresses.0
+  }
+
+  provisioner "local-exec" {
+    when        = destroy
+    command     = "virsh --connect ${self.triggers.libvirt_provider_uri} net-update ${self.triggers.network_id} delete ip-dhcp-host \"<host mac='${self.triggers.vm_mac}' ip='${self.triggers.vm_ip}'/>\" --live --config"
+    interpreter = ["/bin/bash", "-c"]
+    on_failure  = continue
+  }
 }
 
 # Adds VM's SSH key to known hosts #
@@ -126,11 +120,11 @@ resource "null_resource" "ssh_known_hosts" {
   count = var.vm_ssh_known_hosts == "true" ? 1 : 0
 
   triggers = {
-    vm_ip = var.vm_ip
+    vm_ip = libvirt_domain.vm_domain.network_interface.0.addresses.0
   }
 
   provisioner "local-exec" {
-    command = "sh ./scripts/filelock-exec.sh \"touch ~/.ssh/known_hosts && ssh-keygen -R ${var.vm_ip} && ssh-keyscan -t rsa ${var.vm_ip} | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old\""
+    command = "sh ./scripts/filelock-exec.sh \"touch ~/.ssh/known_hosts && ssh-keygen -R ${libvirt_domain.vm_domain.network_interface.0.addresses.0} && ssh-keyscan -t rsa ${libvirt_domain.vm_domain.network_interface.0.addresses.0} | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old\""
   }
 
   provisioner "local-exec" {
@@ -138,6 +132,4 @@ resource "null_resource" "ssh_known_hosts" {
     command    = "sh ./scripts/filelock-exec.sh \"ssh-keygen -R ${self.triggers.vm_ip}\""
     on_failure = continue
   }
-
-  depends_on = [libvirt_domain.vm_domain]
 }
