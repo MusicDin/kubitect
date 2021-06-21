@@ -60,7 +60,7 @@ resource "libvirt_domain" "vm_domain" {
     }
 
     inline = [
-      "while ! grep \"Cloud-init .* finished\" /var/log/cloud-init.log; do echo \"$(date -Ins) Waiting for cloud-init to finish\"; sleep 2; done"
+      "while ! sudo grep \"Cloud-init .* finished\" /var/log/cloud-init.log; do echo \"$(date -Ins) Waiting for cloud-init to finish\"; sleep 2; done"
     ]
   }
 }
@@ -79,10 +79,23 @@ resource "null_resource" "remove_worker" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "cd ansible/kubespray && virtualenv venv && . venv/bin/activate && pip install -r requirements.txt && ansible-playbook -i ../../config/hosts.ini -b --user=${self.triggers.vm_user} --private-key=${self.triggers.vm_ssh_private_key} -e \"node=$VM_NAME delete_nodes_confirmation=yes\" -v remove-node.yml"
+    command = <<-EOF
+    cd ansible/kubespray
+    virtualenv venv && . venv/bin/activate && pip install -r requirements.txt
+    ansible-playbook \
+      --inventory ../../config/hosts.ini \
+      --become \
+      --user=$SSH_USER \
+      --private-key=$SSH_PRIVATE_KEY \
+      --extra-vars \"node=$VM_NAME delete_nodes_confirmation=yes\" \
+      --verbose \
+      remove-node.yml
+    EOF
 
     environment = {
-      VM_NAME = "${self.triggers.vm_name_prefix}-worker-${self.triggers.vm_id}"
+      SSH_PRIVATE_KEY = self.triggers.vm_ssh_private_key
+      SSH_USER        = self.triggers.vm_user
+      VM_NAME         = "${self.triggers.vm_name_prefix}-worker-${self.triggers.vm_id}"
     }
 
     on_failure = continue
@@ -90,7 +103,7 @@ resource "null_resource" "remove_worker" {
 
   provisioner "local-exec" {
     when       = destroy
-    command    = "sed -i '/${self.triggers.vm_name_prefix}-worker-${self.triggers.vm_id}$/d' config/hosts.ini"
+    command    = "sh ./scripts/filelock-exec.sh \"sed -i '/${self.triggers.vm_name_prefix}-worker-${self.triggers.vm_id}$/d' config/hosts.ini\""
     on_failure = continue
   }
 }

@@ -5,11 +5,11 @@
 # Local variables used in many resources #
 locals {
   extra_args = {
-    debian = "-T 3000 -v -e 'ansible_become_method=su'"
-    ubuntu = "-T 3000 -v"
-    centos = "-T 3000 -v"
+    debian = "--timeout 3000 --verbose --extra-vars 'ansible_become_method=su'"
+    ubuntu = "--timeout 3000 --verbose"
+    centos = "--timeout 3000 --verbose"
   }
-  default_extra_args  = "-T 3000 -v"
+  default_extra_args  = "--timeout 3000 --verbose"
   dashboard_namespace = "kube-system"
 }
 
@@ -24,8 +24,7 @@ data "template_file" "kubespray_all" {
 
   vars = {
     loadbalancer_apiserver = (
-      length(
-      var.vm_lb_ips) > 0
+      length(var.vm_lb_ips) > 0
       ? var.vm_lb_vip
       : var.vm_master_ips[0]
     )
@@ -340,7 +339,11 @@ resource "null_resource" "config_permissions" {
 # Clone Kubespray repository #
 resource "null_resource" "kubespray_download" {
   provisioner "local-exec" {
-    command = "cd ansible && rm -rf kubespray && git clone --branch ${var.k8s_kubespray_version} ${var.k8s_kubespray_url}"
+    command = <<-EOF
+              cd ansible
+              rm -rf kubespray
+              git clone --branch ${var.k8s_kubespray_version} ${var.k8s_kubespray_url}
+              EOF
   }
 }
 
@@ -349,7 +352,23 @@ resource "null_resource" "haproxy_install" {
   count = var.action == "create" ? 1 : 0
 
   provisioner "local-exec" {
-    command = "cd ansible/haproxy && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} haproxy.yml"
+    command = <<-EOF
+              cd ansible/haproxy
+              ansible-playbook \
+                --inventory ../../config/hosts.ini \
+                --become \
+                --user=$SSH_USER \
+                --private-key=$SSH_PRIVATE_KEY \
+                --extra-vars \"kube_version=$K8S_VERSION\" \
+                haproxy.yml
+              EOF
+
+    environment = {
+      SSH_USER        = var.vm_user
+      SSH_PRIVATE_KEY = var.vm_ssh_private_key
+      K8S_VERSION     = var.k8s_version
+      EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
+    }
   }
 
   depends_on = [
@@ -364,7 +383,25 @@ resource "null_resource" "kubespray_create" {
   count = var.action == "create" ? 1 : 0
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && virtualenv venv && . venv/bin/activate && pip install -r requirements.txt && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} cluster.yml"
+    command = <<-EOF
+              cd ansible/kubespray
+              virtualenv venv && . venv/bin/activate && pip install -r requirements.txt
+              ansible-playbook \
+                --inventory ../../config/hosts.ini \
+                --become \
+                --user=$SSH_USER \
+                --private-key=$SSH_PRIVATE_KEY \
+                --extra-vars \"kube_version=$K8S_VERSION\" \
+                $EXTRA_ARGS \
+                cluster.yml
+              EOF
+
+    environment = {
+      SSH_USER        = var.vm_user
+      SSH_PRIVATE_KEY = var.vm_ssh_private_key
+      K8S_VERSION     = var.k8s_version
+      EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
+    }
   }
 
   depends_on = [
@@ -382,7 +419,25 @@ resource "null_resource" "kubespray_add" {
   count = var.action == "add_worker" ? 1 : 0
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && virtualenv venv && . venv/bin/activate && pip install -r requirements.txt && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} scale.yml"
+    command = <<-EOF
+              cd ansible/kubespray
+              virtualenv venv && . venv/bin/activate && pip install -r requirements.txt
+              ansible-playbook \
+                --inventory ../../config/hosts.ini \
+                --become \
+                --user=$SSH_USER \
+                --private-key=$SSH_PRIVATE_KEY \
+                --extra-vars \"kube_version=$K8S_VERSION\" \
+                $EXTRA_ARGS \
+                scale.yml
+              EOF
+
+    environment = {
+      SSH_USER        = var.vm_user
+      SSH_PRIVATE_KEY = var.vm_ssh_private_key
+      K8S_VERSION     = var.k8s_version
+      EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
+    }
   }
 
   depends_on = [
@@ -405,11 +460,33 @@ resource "null_resource" "kubespray_upgrade" {
 
   # Deletes old Kubespray and installs new one #
   provisioner "local-exec" {
-    command = "cd ansible && rm -rf kubespray && git clone --branch ${var.k8s_kubespray_version} ${var.k8s_kubespray_url}"
+    command = <<-EOF
+              cd ansible
+              rm -rf kubespray
+              git clone --branch ${var.k8s_kubespray_version} ${var.k8s_kubespray_url}
+              EOF
   }
 
   provisioner "local-exec" {
-    command = "cd ansible/kubespray && virtualenv venv && . venv/bin/activate && pip install -r requirements.txt && ansible-playbook -i ../../config/hosts.ini -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} -e \"kube_version=${var.k8s_version}\" ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} upgrade-cluster.yml"
+    command = <<-EOF
+              cd ansible/kubespray
+              virtualenv venv && . venv/bin/activate && pip install -r requirements.txt
+              ansible-playbook \
+                --inventory ../../config/hosts.ini \
+                --become \
+                --user=$SSH_USER \
+                --private-key=$SSH_PRIVATE_KEY \
+                --extra-vars \"kube_version=$K8S_VERSION\" \
+                $EXTRA_ARGS \
+                upgrade-cluster.yml
+              EOF
+
+    environment = {
+      SSH_USER        = var.vm_user
+      SSH_PRIVATE_KEY = var.vm_ssh_private_key
+      K8S_VERSION     = var.k8s_version
+      EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
+    }
   }
 
   depends_on = [
@@ -425,7 +502,24 @@ resource "null_resource" "kubespray_upgrade" {
 resource "null_resource" "fetch_kubeconfig" {
 
   provisioner "local-exec" {
-    command = "ansible -i ${var.vm_master_ips[0]}, -b --user=${var.vm_user} --private-key=${var.vm_ssh_private_key} ${lookup(local.extra_args, var.vm_distro, local.default_extra_args)} -m fetch -a 'src=/etc/kubernetes/admin.conf dest=config/admin.conf flat=yes' all"
+    command = <<-EOF
+              ansible \
+                --inventory $MASTER_NODE_IP \
+                --become \
+                --user=$SSH_USER \
+                --private-key=$SSH_PRIVATE_KEY \
+                --module-name fetch \
+                --args 'src=/etc/kubernetes/admin.conf dest=config/admin.conf flat=yes' \
+                $EXTRA_ARGS \
+                all
+              EOF
+
+    environment = {
+      MASTER_NODE_IP  = var.vm_master_ips[0]
+      SSH_USER        = var.vm_user
+      SSH_PRIVATE_KEY = var.vm_ssh_private_key
+      EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
+    }
   }
 
   # Cluster needs to be deployed before kubeconfig can be fetched
