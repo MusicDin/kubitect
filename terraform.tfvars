@@ -59,72 +59,106 @@ network_cidr = "192.168.113.0/24"
 # HAProxy load balancer VMs parameters
 #======================================================================================
 
-# The number of vCPU allocated to the load balancer VM #
-vm_lb_cpu = 1
+# The default number of vCPU allocated to the load balancer VM #
+lb_default_cpu = 1
 
-# The amount of RAM allocated to the load balancer VM (in Megabytes - MB) #
-vm_lb_ram = 2048
+# The default amount of RAM allocated to the load balancer VM (in Megabytes - MB) #
+lb_default_ram = 2048
 
-# The amount of disk allocated to the load balancer VM (in Bytes - B) #
-vm_lb_storage = 16106127360
+# The default amount of disk allocated to the load balancer VM (in Bytes - B) #
+lb_default_storage = 16106127360
 
-# MAC and IP addresses for load balancer VMs. #
-vm_lb_macs_ips = {
-  "52:54:00:00:00:05" = "192.168.113.5"
-  "52:54:00:00:00:06" = "192.168.113.6"
-}
+# HAProxy load balancer nodes configuration #
+lb_nodes = [
+  {
+    id  = 1
+    ip  = "192.168.113.5"
+    mac = "52:54:00:00:00:05"
+  },
+  {
+    id  = 2
+    ip  = "192.168.113.6"
+    mac = "52:54:00:00:00:06"
+  }
+]
 
 # Floating IP address. #
 # Note: Floating IP only applies if at least one load balancer is defined, #
 # otherwise IP of the first master node will be used. #
-vm_lb_vip = "192.168.113.200"
+lb_vip = "192.168.113.200"
 
 
 #======================================================================================
 # Master node VMs parameters
 #======================================================================================
 
-# The number of vCPU allocated to the master VM #
-vm_master_cpu = 2
+# The default number of vCPU allocated to the master VM #
+master_default_cpu = 2
 
-# The amount of RAM allocated to the master VM (in Megabytes - MB) #
-vm_master_ram = 2048
+# The default amount of RAM allocated to the master VM (in Megabytes - MB) #
+master_default_ram = 2048
 
-# The amount of disk allocated to the master VM (in Bytes - B) #
-vm_master_storage = 16106127360
+# The default amount of disk allocated to the master VM (in Bytes - B) #
+master_default_storage = 16106127360
 
-# MAC and IP addresses for master VMs. It is recommended to have at least 3 masters. #
-# Also note that number of masters cannot be divisible by 2. #
-vm_master_macs_ips = {
-  "52:54:00:00:00:10" = "192.168.113.10"
-  "52:54:00:00:00:11" = "192.168.113.11"
-  "52:54:00:00:00:12" = "192.168.113.12"
-}
+# Master nodes configuration #
+# Note that number of masters cannot be divisible by 2. #
+master_nodes = [
+  {
+    id  = 1
+    ip  = "192.168.113.10"
+    mac = "52:54:00:00:00:10"
+  },
+  {
+    id  = 2
+    ip  = "192.168.113.11"
+    mac = "52:54:00:00:00:11"
+  },
+  {
+    id  = 3
+    ip  = "192.168.113.12"
+    mac = "52:54:00:00:00:12"
+  }
+]
 
 
 #======================================================================================
 # Worker node VMs parameters
 #======================================================================================
 
-# The number of vCPU allocated to the worker VM #
-vm_worker_cpu = 4
+# The default number of vCPU allocated to the worker VM #
+worker_default_cpu = 4
 
-# The amount of RAM allocated to the worker VM (in Megabytes - MB) #
-vm_worker_ram = 8192
+# The default amount of RAM allocated to the worker VM (in Megabytes - MB) #
+worker_default_ram = 8192
 
-# The amount of disk allocated to the worker VM (in Bytes - B) #
-vm_worker_storage = 32212254720
-
-# MAC and IP addresses for worker VMs. #
-vm_worker_macs_ips = {
-  "52:54:00:00:00:40" = "192.168.113.100"
-  "52:54:00:00:00:41" = "192.168.113.101"
-  "52:54:00:00:00:42" = "192.168.113.102"
-}
+# The default amount of disk allocated to the worker VM (in Bytes - B) #
+worker_default_storage = 32212254720
 
 # Sets worker node's role label #
 # Note: Leave empty ("") to not set the label. #
-vm_worker_node_label = "node"
+worker_node_label = "node"
+
+# Worker nodes configuration #
+worker_nodes = [
+  {
+    id  = 1
+    ip  = "192.168.113.100"
+    mac = "52:54:00:00:00:40"
+  },
+  {
+    # Example of optional MAC address
+    id  = 2
+    ip  = "192.168.113.101"
+    mac = null
+  },
+  {
+    # Example of optional IP and MAC addresses
+    id  = 3
+    ip  = null
+    mac = null
+  }
+]
 
 
 #======================================================================================
@@ -211,7 +245,7 @@ local_path_provisioner_claim_root = "/opt/local-path-provisioner/"
 #=========================
 
 # Install MetalLB #
-metallb_enabled  = "false"
+metallb_enabled = "false"
 
 # MetalLB version #
 metallb_version = "v0.9.5"
@@ -229,8 +263,10 @@ metallb_ip_range = "192.168.113.241-192.168.113.254"
 
 # MetalLB peers #
 # Note: This variable will be applied only in 'bgp' mode #
-metallb_peers = [{
-  peer_ip  = "192.168.113.1"
-  peer_asn = 65000
-  my_asn   = 65000
-}]
+metallb_peers = [
+  {
+    peer_ip  = "192.168.113.1"
+    peer_asn = 65000
+    my_asn   = 65000
+  }
+]

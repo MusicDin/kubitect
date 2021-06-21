@@ -109,69 +109,114 @@ variable "network_bridge" {
 variable "network_cidr" {
   type        = string
   description = "Network CIDR"
+
+  validation {
+    condition     = can(regex("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}/([1-9]|[1-2][0-9]|3[0-2])$", var.network_cidr))
+    error_message = "Invalid network CIDR."
+  }
 }
 
 #======================================================================================
 # HAProxy load balancer VMs parameters
 #======================================================================================
 
-variable "vm_lb_cpu" {
+variable "lb_default_cpu" {
   type        = number
-  description = "The number of vCPU allocated to the HAProxy load balancer"
+  description = "The default number of vCPU allocated to the HAProxy load balancer"
   default     = 1
 }
 
-variable "vm_lb_ram" {
+variable "lb_default_ram" {
   type        = number
-  description = "The amount of RAM allocated to the HAProxy load balancer"
+  description = "The default amount of RAM allocated to the HAProxy load balancer"
   default     = 4096
 }
 
-variable "vm_lb_storage" {
+variable "lb_default_storage" {
   type        = number
-  description = "The amount of disk (in Bytes) allocated to the HAProxy load balancer. Default: 15GB"
+  description = "The default amount of disk (in Bytes) allocated to the HAProxy load balancer. Default: 15GB"
   default     = 16106127360
 }
 
-variable "vm_lb_macs_ips" {
-  type        = map(string)
-  description = "MAC (key) and IP (value) addresses of HAProxy load balancer nodes"
-}
-
-variable "vm_lb_vip" {
+variable "lb_vip" {
   type        = string
   description = "The IP address of HAProxy load balancer floating VIP"
+  /*
+  validation {
+    condition = can(regex("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}/([1-9]|[1-2][0-9]|3[0-2])$", var.vm_ip))
+    error_message = "Invalid load balancer virtual IP address (VIP)."
+  }
+  */
+}
+
+variable "lb_nodes" {
+  type = list(object({
+    id  = number
+    mac = string
+    ip  = string
+    # Waiting non-experimental release of optional function #
+    #mac     = optional(string)
+    #ip      = optional(string)
+    #cpu     = optional(number)
+    #ram     = optional(number)
+    #storage = optional(number)
+  }))
+  description = "HAProxy load balancer nodes configuration"
+
+  validation {
+    condition = (
+      compact(tolist([for node in var.lb_nodes : node.id])) == distinct(compact(tolist([for node in var.lb_nodes : node.id])))
+      && compact(tolist([for node in var.lb_nodes : node.mac])) == distinct(compact(tolist([for node in var.lb_nodes : node.mac])))
+      && compact(tolist([for node in var.lb_nodes : node.ip])) == distinct(compact(tolist([for node in var.lb_nodes : node.ip])))
+    )
+    error_message = "HAProxy load balancer nodes configuration is incorrect. Make sure that:\n - every ID is unique,\n - every MAC and IP address is unique or null."
+  }
 }
 
 #======================================================================================
 # Master node VMs parameters
 #======================================================================================
 
-variable "vm_master_cpu" {
+variable "master_default_cpu" {
   type        = number
-  description = "The number of vCPU allocated to the master node"
+  description = "The default number of vCPU allocated to the master node"
   default     = 1
 }
 
-variable "vm_master_ram" {
+variable "master_default_ram" {
   type        = number
-  description = "The amount of RAM allocated to the master node"
+  description = "The default amount of RAM allocated to the master node"
   default     = 4096
 }
 
-variable "vm_master_storage" {
+variable "master_default_storage" {
   type        = number
-  description = "The amount of disk (in Bytes) allocated to the master node. Default: 15GB"
+  description = "The default amount of disk (in Bytes) allocated to the master node. Default: 15GB"
   default     = 16106127360
 }
 
-variable "vm_master_macs_ips" {
-  type        = map(string)
-  description = "MAC and IP addresses of master nodes"
+variable "master_nodes" {
+  type = list(object({
+    id  = number
+    mac = string
+    ip  = string
+    # Waiting non-experimental release of optional function #
+    #mac     = optional(string)
+    #ip      = optional(string)
+    #cpu     = optional(number)
+    #ram     = optional(number)
+    #storage = optional(number)
+  }))
+  description = "Master nodes configuration"
 
   validation {
-    condition     = length(var.vm_master_macs_ips) > 0
-    error_message = "Variable 'vm_master_macs_ips' is invalid.\nAt least one master node should be defined."
+    condition = (
+      length(var.master_nodes) % 2 != 0
+      && compact(tolist([for node in var.master_nodes : node.id])) == distinct(compact(tolist([for node in var.master_nodes : node.id])))
+      && compact(tolist([for node in var.master_nodes : node.mac])) == distinct(compact(tolist([for node in var.master_nodes : node.mac])))
+      && compact(tolist([for node in var.master_nodes : node.ip])) == distinct(compact(tolist([for node in var.master_nodes : node.ip])))
+    )
+    error_message = "Master nodes configuration is incorrect. Make sure that: \n - number of master nodes is odd (not divisible by 2),\n - every ID is unique,\n - every MAC and IP address is unique or null."
   }
 }
 
@@ -179,31 +224,52 @@ variable "vm_master_macs_ips" {
 # Worker node VMs parameters
 #======================================================================================
 
-variable "vm_worker_cpu" {
+variable "worker_default_cpu" {
   type        = number
-  description = "The number of vCPU allocated to the worker node"
+  description = "The default number of vCPU allocated to the worker node"
   default     = 2
 }
 
-variable "vm_worker_ram" {
+variable "worker_default_ram" {
   type        = number
-  description = "The amount of RAM allocated to the worker node"
+  description = "The default amount of RAM allocated to the worker node"
   default     = 8192
 }
-variable "vm_worker_storage" {
+
+variable "worker_default_storage" {
   type        = number
-  description = "The amount of disk (in Bytes) allocated to the worker node. Default: 30GB"
+  description = "The default amount of disk (in Bytes) allocated to the worker node. Default: 30GB"
   default     = 32212254720
 }
-variable "vm_worker_macs_ips" {
-  type        = map(string)
-  description = "MAC and IP addresses of worker nodes"
-}
 
-variable "vm_worker_node_label" {
+variable "worker_node_label" {
   type        = string
   description = "Worker node role label"
   default     = ""
+}
+
+variable "worker_nodes" {
+  type = list(object({
+    id  = number
+    mac = string
+    ip  = string
+    # Waiting non-experimental release of optional function #
+    #mac     = optional(string)
+    #ip      = optional(string)
+    #cpu     = optional(number)
+    #ram     = optional(number)
+    #storage = optional(number)
+  }))
+  description = "Worker nodes configuration"
+
+  validation {
+    condition = (
+      compact(tolist([for node in var.worker_nodes : node.id])) == distinct(compact(tolist([for node in var.worker_nodes : node.id])))
+      && compact(tolist([for node in var.worker_nodes : node.mac])) == distinct(compact(tolist([for node in var.worker_nodes : node.mac])))
+      && compact(tolist([for node in var.worker_nodes : node.ip])) == distinct(compact(tolist([for node in var.worker_nodes : node.ip])))
+    )
+    error_message = "Worker nodes configuration is incorrect. Make sure that:\n - every ID is unique,\n - every MAC and IP address is unique or null."
+  }
 }
 
 #======================================================================================
@@ -415,7 +481,7 @@ variable "metallb_ip_range" {
 }
 
 variable "metallb_peers" {
-  type        = list(object({
+  type = list(object({
     peer_ip  = string
     peer_asn = number
     my_asn   = number

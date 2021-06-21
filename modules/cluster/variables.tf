@@ -8,7 +8,7 @@ variable "action" {
 #======================================================================================
 
 variable "vm_worker_ips" {
-  type        = list
+  type        = list(string)
   description = "IP addresses of worker nodes"
 }
 
@@ -18,12 +18,12 @@ variable "vm_worker_node_label" {
 }
 
 variable "vm_master_ips" {
-  type        = list
+  type        = list(string)
   description = "IP addresses of master nodes"
 }
 
 variable "vm_lb_ips" {
-  type        = list
+  type        = list(string)
   description = "IP addresses of load balancer VMs"
 }
 
@@ -195,7 +195,7 @@ variable "metallb_ip_range" {
 }
 
 variable "metallb_peers" {
-  type        = list(object({
+  type = list(object({
     peer_ip  = string
     peer_asn = number
     my_asn   = number

@@ -23,7 +23,12 @@ data "template_file" "kubespray_all" {
   template = file("templates/kubespray_all.tpl")
 
   vars = {
-    loadbalancer_apiserver = length(var.vm_lb_ips) > 0 ? var.vm_lb_vip : var.vm_master_ips[0]
+    loadbalancer_apiserver = (
+      length(
+      var.vm_lb_ips) > 0
+      ? var.vm_lb_vip
+      : var.vm_master_ips[0]
+    )
   }
 }
 
@@ -33,14 +38,18 @@ data "template_file" "kubespray_k8s_cluster" {
   template = file("templates/kubespray_k8s_cluster.tpl")
 
   vars = {
-    kube_version          = var.k8s_version
-    kube_network_plugin   = var.k8s_network_plugin
-    dns_mode              = var.k8s_dns_mode
+    kube_version        = var.k8s_version
+    kube_network_plugin = var.k8s_network_plugin
+    dns_mode            = var.k8s_dns_mode
 
     # If MetalLB is enable than strict ARP is set to true in k8s-cluster.yml
-    kube_proxy_strict_arp = yamldecode( var.kubespray_custom_addons_enabled == "false"
-                                        ? data.template_file.kubespray_addons[0].rendered
-                                        : data.template_file.kubespray_custom_addons[0].rendered )["metallb_enabled"]
+    kube_proxy_strict_arp = (
+      yamldecode(
+        var.kubespray_custom_addons_enabled == "false"
+        ? data.template_file.kubespray_addons[0].rendered
+        : data.template_file.kubespray_custom_addons[0].rendered
+      )["metallb_enabled"]
+    )
   }
 
   # Correct addons template file has to be created before
@@ -79,7 +88,11 @@ data "template_file" "kubespray_addons" {
     metallb_mem_limit                     = var.metallb_mem_limit
     metallb_protocol                      = var.metallb_protocol
     metallb_ip_range                      = var.metallb_ip_range
-    metallb_peers                         = var.metallb_protocol == "bgp" ? "metallb_peers:\n${join("", data.template_file.metallb_peers.*.rendered)}" : ""
+    metallb_peers = (
+      var.metallb_protocol == "bgp"
+      ? "metallb_peers:\n${join("", data.template_file.metallb_peers.*.rendered)}"
+      : ""
+    )
   }
 }
 
@@ -142,9 +155,13 @@ data "template_file" "worker_hosts" {
   template = file("templates/ansible_hosts.tpl")
 
   vars = {
-    hostname    = "${var.vm_name_prefix}-worker-${count.index}"
-    host_ip     = var.vm_worker_ips[count.index]
-    node_labels = length(var.vm_worker_node_label) > 0 ? "node_labels=\"{'node-role.kubernetes.io/${var.vm_worker_node_label}':''}\"" : ""
+    hostname = "${var.vm_name_prefix}-worker-${count.index}"
+    host_ip  = var.vm_worker_ips[count.index]
+    node_labels = (
+      length(var.vm_worker_node_label) > 0
+      ? "node_labels=\"{'node-role.kubernetes.io/${var.vm_worker_node_label}':''}\""
+      : ""
+    )
   }
 }
 
@@ -176,12 +193,20 @@ data "template_file" "master_hosts_only" {
 data "template_file" "worker_hosts_only" {
 
   # If no worker node is specified then all master nodes also become worker nodes
-  count = length(var.vm_worker_ips) > 0 ? length(var.vm_worker_ips) : length(var.vm_master_ips)
+  count = (
+    length(var.vm_worker_ips) > 0
+    ? length(var.vm_worker_ips)
+    : length(var.vm_master_ips)
+  )
 
   template = file("templates/ansible_hosts_list.tpl")
 
   vars = {
-    hostname =  length(var.vm_worker_ips) > 0 ? "${var.vm_name_prefix}-worker-${count.index}" : "${var.vm_name_prefix}-master-${count.index}"
+    hostname = (
+      length(var.vm_worker_ips) > 0
+      ? "${var.vm_name_prefix}-worker-${count.index}"
+      : "${var.vm_name_prefix}-master-${count.index}"
+    )
   }
 }
 
@@ -256,7 +281,7 @@ resource "local_file" "kubespray_addons" {
 
   count = var.kubespray_custom_addons_enabled == "false" ? 1 : 0
 
-  content = data.template_file.kubespray_addons[count.index].rendered
+  content  = data.template_file.kubespray_addons[count.index].rendered
   filename = "config/group_vars/k8s_cluster/addons.yml"
 }
 
@@ -265,7 +290,7 @@ resource "local_file" "kubespray_custom_addons" {
 
   count = var.kubespray_custom_addons_enabled == "true" ? 1 : 0
 
-  content = data.template_file.kubespray_custom_addons[count.index].rendered
+  content  = data.template_file.kubespray_custom_addons[count.index].rendered
   filename = "config/group_vars/k8s_cluster/addons.yml"
 }
 

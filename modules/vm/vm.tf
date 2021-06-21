@@ -1,6 +1,6 @@
 # Creates volume for new virtual machine #
 resource "libvirt_volume" "vm_volume" {
-  name           = "${var.vm_name_prefix}-${var.vm_type}-${var.vm_index}.qcow2"
+  name           = "${var.vm_name_prefix}-${var.vm_type}-${var.vm_id}.qcow2"
   pool           = var.resource_pool_name
   base_volume_id = var.base_volume_id
   size           = var.vm_storage
@@ -11,7 +11,7 @@ resource "libvirt_volume" "vm_volume" {
 resource "libvirt_domain" "vm_domain" {
 
   # General configuration #
-  name      = "${var.vm_name_prefix}-${var.vm_type}-${var.vm_index}"
+  name      = "${var.vm_name_prefix}-${var.vm_type}-${var.vm_id}"
   vcpu      = var.vm_cpu
   memory    = var.vm_ram
   autostart = true
@@ -22,7 +22,7 @@ resource "libvirt_domain" "vm_domain" {
   network_interface {
     network_id     = var.network_id
     mac            = var.vm_mac
-    addresses      = var.vm_ip == null ? null : [ var.vm_ip ]
+    addresses      = var.vm_ip == null ? null : [var.vm_ip]
     wait_for_lease = true
   }
 
@@ -74,7 +74,7 @@ resource "null_resource" "remove_worker" {
     vm_user            = var.vm_user
     vm_ssh_private_key = var.vm_ssh_private_key
     vm_name_prefix     = var.vm_name_prefix
-    vm_index           = var.vm_index
+    vm_id              = var.vm_id
   }
 
   provisioner "local-exec" {
@@ -82,7 +82,7 @@ resource "null_resource" "remove_worker" {
     command = "cd ansible/kubespray && virtualenv venv && . venv/bin/activate && pip install -r requirements.txt && ansible-playbook -i ../../config/hosts.ini -b --user=${self.triggers.vm_user} --private-key=${self.triggers.vm_ssh_private_key} -e \"node=$VM_NAME delete_nodes_confirmation=yes\" -v remove-node.yml"
 
     environment = {
-      VM_NAME = "${self.triggers.vm_name_prefix}-worker-${count.index}"
+      VM_NAME = "${self.triggers.vm_name_prefix}-worker-${self.triggers.vm_id}"
     }
 
     on_failure = continue
@@ -90,7 +90,7 @@ resource "null_resource" "remove_worker" {
 
   provisioner "local-exec" {
     when       = destroy
-    command    = "sed -i '/${self.triggers.vm_name_prefix}-worker-${self.triggers.vm_index}$/d' config/hosts.ini"
+    command    = "sed -i '/${self.triggers.vm_name_prefix}-worker-${self.triggers.vm_id}$/d' config/hosts.ini"
     on_failure = continue
   }
 }
@@ -98,7 +98,6 @@ resource "null_resource" "remove_worker" {
 # Remove static IP address from network after destruction #
 resource "null_resource" "remove_static_ip" {
 
-  # Define triggers for on-destroy provisioner
   triggers = {
     libvirt_provider_uri = var.libvirt_provider_uri
     network_id           = libvirt_domain.vm_domain.network_interface.0.network_id

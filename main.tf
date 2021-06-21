@@ -15,17 +15,17 @@ provider "libvirt" {
 module "network_module" {
   source = "./modules/network/"
 
-  network_name           = var.network_name
-  network_mode           = var.network_mode
-  network_bridge         = var.network_bridge
-  network_cidr           = var.network_cidr
+  network_name   = var.network_name
+  network_mode   = var.network_mode
+  network_bridge = var.network_bridge
+  network_cidr   = var.network_cidr
 }
 
 # Create HAProxy load balancer #
 module "lb_module" {
   source = "./modules/vm"
 
-  count = length(var.vm_lb_macs_ips)
+  for_each = { for node in var.lb_nodes : node.id => node }
 
   # Variables from general resources #
   libvirt_provider_uri = var.libvirt_provider_uri
@@ -35,17 +35,17 @@ module "lb_module" {
   network_id           = module.network_module.network_id
 
   # Load balancer specific variables #
-  vm_index           = count.index
   vm_type            = "lb"
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
   vm_name_prefix     = var.vm_name_prefix
-  vm_cpu             = var.vm_lb_cpu
-  vm_ram             = var.vm_lb_ram
-  vm_storage         = var.vm_lb_storage
-  vm_mac             = keys(var.vm_lb_macs_ips)[count.index]
-  vm_ip              = values(var.vm_lb_macs_ips)[count.index]
+  vm_id              = each.value.id
+  vm_mac             = each.value.mac
+  vm_ip              = each.value.ip
+  vm_cpu             = var.lb_default_cpu     #each.value.cpu != null ? each.value.cpu : var.lb_default_cpu
+  vm_ram             = var.lb_default_ram     #each.value.ram != null ? each.value.ram : var.lb_default_ram
+  vm_storage         = var.lb_default_storage #each.value.storage != null ? each.value.storage : var.lb_default_storage
 
   # Dependancy takes care that resource pool is not removed before volumes are #
   # Also network must be created before VM is initialized #
@@ -60,7 +60,7 @@ module "lb_module" {
 module "master_module" {
   source = "./modules/vm"
 
-  count = length(var.vm_master_macs_ips)
+  for_each = { for node in var.master_nodes : node.id => node }
 
   # Variables from general resources #
   libvirt_provider_uri = var.libvirt_provider_uri
@@ -70,17 +70,17 @@ module "master_module" {
   network_id           = module.network_module.network_id
 
   # Master node specific variables #
-  vm_index           = count.index
   vm_type            = "master"
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
   vm_name_prefix     = var.vm_name_prefix
-  vm_cpu             = var.vm_master_cpu
-  vm_ram             = var.vm_master_ram
-  vm_storage         = var.vm_master_storage
-  vm_mac             = keys(var.vm_master_macs_ips)[count.index]
-  vm_ip              = values(var.vm_master_macs_ips)[count.index]
+  vm_id              = each.value.id
+  vm_mac             = each.value.mac
+  vm_ip              = each.value.ip
+  vm_cpu             = var.master_default_cpu     #each.value.cpu != null ? each.value.cpu : var.master_default_cpu
+  vm_ram             = var.master_default_ram     #each.value.ram != null ? each.value.ram : var.master_default_ram
+  vm_storage         = var.master_default_storage #each.value.storage != null ? each.value.storage : var.master_default_storage
 
   # Dependancy takes care that resource pool is not removed before volumes are #
   # Also network must be created before VM is initialized #
@@ -95,7 +95,7 @@ module "master_module" {
 module "worker_module" {
   source = "./modules/vm"
 
-  count = length(var.vm_worker_macs_ips)
+  for_each = { for node in var.worker_nodes : node.id => node }
 
   # Variables from general resources #
   libvirt_provider_uri = var.libvirt_provider_uri
@@ -105,17 +105,18 @@ module "worker_module" {
   network_id           = module.network_module.network_id
 
   # Worker node specific variables #
-  vm_index           = count.index
   vm_type            = "worker"
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
   vm_name_prefix     = var.vm_name_prefix
-  vm_cpu             = var.vm_worker_cpu
-  vm_ram             = var.vm_worker_ram
-  vm_storage         = var.vm_worker_storage
-  vm_mac             = keys(var.vm_worker_macs_ips)[count.index]
-  vm_ip              = values(var.vm_worker_macs_ips)[count.index]
+  vm_id              = each.value.id
+  vm_mac             = each.value.mac
+  vm_ip              = each.value.ip
+  vm_cpu             = var.worker_default_cpu     #each.value.cpu != null ? each.value.cpu : var.worker_default_cpu
+  vm_ram             = var.worker_default_ram     #each.value.ram != null ? each.value.ram : var.worker_default_ram
+  vm_storage         = var.worker_default_storage #each.value.storage != null ? each.value.storage : var.worker_default_storage
+
 
   # Dependancy takes care that resource pool is not removed before volumes are #
   # Also network must be created before VM is initialized #
@@ -137,12 +138,12 @@ module "k8s_cluster" {
   vm_user              = var.vm_user
   vm_ssh_private_key   = var.vm_ssh_private_key
   vm_name_prefix       = var.vm_name_prefix
-  vm_worker_ips        = tolist(module.worker_module.*.ip)
-  vm_worker_node_label = var.vm_worker_node_label
-  vm_master_ips        = tolist(module.master_module.*.ip)
-  vm_lb_ips            = tolist(module.lb_module.*.ip)
-  vm_lb_vip            = var.vm_lb_vip
   vm_network_interface = var.vm_network_interface
+  vm_worker_node_label = var.worker_node_label
+  vm_lb_vip            = var.lb_vip
+  vm_lb_ips            = tolist([for node in module.lb_module : node.ip])
+  vm_master_ips        = tolist([for node in module.master_module : node.ip])
+  vm_worker_ips        = tolist([for node in module.worker_module : node.ip])
 
   # K8s cluster variables
   k8s_kubespray_url     = var.k8s_kubespray_url
