@@ -23,7 +23,7 @@ vm_user = "k8s"
 vm_ssh_private_key = "~/.ssh/id_rsa"
 
 # Add VMs to SSH known hosts #
-vm_ssh_known_hosts = "true"
+vm_ssh_known_hosts = true
 
 # Linux distribution that will be used on VMs (ubuntu, debian, centos, "") #
 vm_distro = ""
@@ -182,7 +182,7 @@ k8s_dns_mode = "coredns"
 
 # Copies config file to ~/.kube directory #
 # Note: Kubeconfig will be always available in config/admin.conf after installation #
-k8s_copy_kubeconfig = "false"
+k8s_copy_kubeconfig = false
 
 
 #======================================================================================
@@ -197,7 +197,7 @@ k8s_copy_kubeconfig = "false"
 # will be ignored and addons from file path provided will be applied instead.
 
 # Use custom addons.yml #
-kubespray_custom_addons_enabled = "false"
+kubespray_custom_addons_enabled = false
 
 # Path to custom addons.yml #
 kubespray_custom_addons_path = "defaults/addons.yml"
@@ -207,14 +207,14 @@ kubespray_custom_addons_path = "defaults/addons.yml"
 #=========================
 
 # Install Kubernetes dashboard #
-k8s_dashboard_enabled = "false"
+k8s_dashboard_enabled = false
 
 # Creates Kubernets dashboard RBAC token (dashboard needs to be enabled) #
-k8s_dashboard_rbac_enabled = "false"
+k8s_dashboard_rbac_enabled = false
 k8s_dashboard_rbac_user    = "admin"
 
 # Install helm #
-helm_enabled = "false"
+helm_enabled = false
 
 #=========================
 # Local path provisioner
@@ -223,7 +223,7 @@ helm_enabled = "false"
 # Note: This is dynamic storage provisioner #
 
 # Install Rancher's local path provisioner #
-local_path_provisioner_enabled = "false"
+local_path_provisioner_enabled = false
 
 # Version #
 local_path_provisioner_version = "v0.0.19"
@@ -245,7 +245,7 @@ local_path_provisioner_claim_root = "/opt/local-path-provisioner/"
 #=========================
 
 # Install MetalLB #
-metallb_enabled = "false"
+metallb_enabled = false
 
 # MetalLB version #
 metallb_version = "v0.9.5"

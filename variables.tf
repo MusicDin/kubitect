@@ -46,14 +46,9 @@ variable "vm_ssh_private_key" {
 }
 
 variable "vm_ssh_known_hosts" {
-  type        = string
+  type        = bool
   description = "Add virtual machines to SSH known hosts"
-  default     = "true"
-
-  validation {
-    condition     = contains(["true", "false"], var.vm_ssh_known_hosts)
-    error_message = "Variable 'vm_ssh_known_hosts' is invalid.\nPossible values are: [\"true\", \"false\"]."
-  }
+  default     = true
 }
 
 variable "vm_distro" {
@@ -109,11 +104,6 @@ variable "network_bridge" {
 variable "network_cidr" {
   type        = string
   description = "Network CIDR"
-
-  validation {
-    condition     = can(regex("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}/([1-9]|[1-2][0-9]|3[0-2])$", var.network_cidr))
-    error_message = "Invalid network CIDR."
-  }
 }
 
 #======================================================================================
@@ -312,14 +302,9 @@ variable "k8s_dns_mode" {
 }
 
 variable "k8s_copy_kubeconfig" {
-  type        = string
+  type        = bool
   description = "If enabled, kubeconfig (config/admin.conf) will be copied to ~/.kube directory"
-  default     = "false"
-
-  validation {
-    condition     = contains(["true", "false"], var.k8s_copy_kubeconfig)
-    error_message = "Variable 'k8s_copy_kubeconfig' is invalid.\nPossible values are: [\"true\", \"false\"]."
-  }
+  default     = false
 }
 
 #======================================================================================
@@ -327,14 +312,9 @@ variable "k8s_copy_kubeconfig" {
 #======================================================================================
 
 variable "kubespray_custom_addons_enabled" {
-  type        = string
+  type        = bool
   description = "If enabled, custom addons.yml will be used"
-  default     = "false"
-
-  validation {
-    condition     = contains(["true", "false"], var.kubespray_custom_addons_enabled)
-    error_message = "Variable 'kubespray_custom_addons_enabled' is invalid.\nPossible values are: [\"true\", \"false\"]."
-  }
+  default     = false
 }
 
 variable "kubespray_custom_addons_path" {
@@ -344,25 +324,15 @@ variable "kubespray_custom_addons_path" {
 }
 
 variable "k8s_dashboard_enabled" {
-  type        = string
+  type        = bool
   description = "Sets up Kubernetes dashboard if enabled"
-  default     = "false"
-
-  validation {
-    condition     = contains(["true", "false"], var.k8s_dashboard_enabled)
-    error_message = "Variable 'k8s_dashboard_enabled' is invalid.\nPossible values are: [\"true\", \"false\"]."
-  }
+  default     = false
 }
 
 variable "k8s_dashboard_rbac_enabled" {
-  type        = string
+  type        = bool
   description = "If enabled, Kubernetes dashboard service account will be created"
-  default     = "false"
-
-  validation {
-    condition     = contains(["true", "false"], var.k8s_dashboard_rbac_enabled)
-    error_message = "Variable 'k8s_dashboard_rbac_enabled' is invalid.\nPossible values are: [\"true\", \"false\"]."
-  }
+  default     = false
 }
 
 variable "k8s_dashboard_rbac_user" {
@@ -372,25 +342,15 @@ variable "k8s_dashboard_rbac_user" {
 }
 
 variable "helm_enabled" {
-  type        = string
+  type        = bool
   description = "Sets up Helm if enabled"
-  default     = "false"
-
-  validation {
-    condition     = contains(["true", "false"], var.helm_enabled)
-    error_message = "Variable 'helm_enabled' is invalid.\nPossible values are: [\"true\", \"false\"]."
-  }
+  default     = false
 }
 
 variable "local_path_provisioner_enabled" {
-  type        = string
+  type        = bool
   description = "Sets up Rancher's local path provisioner if enabled"
-  default     = "false"
-
-  validation {
-    condition     = contains(["true", "false"], var.local_path_provisioner_enabled)
-    error_message = "Variable 'local_path_provisioner_enabled' is invalid.\nPossible values are: [\"true\", \"false\"]."
-  }
+  default     = false
 }
 
 variable "local_path_provisioner_version" {
@@ -429,14 +389,9 @@ variable "local_path_provisioner_claim_root" {
 }
 
 variable "metallb_enabled" {
-  type        = string
+  type        = bool
   description = "Sets up MetalLB if enabled"
-  default     = "false"
-
-  validation {
-    condition     = contains(["true", "false"], var.metallb_enabled)
-    error_message = "Variable 'metallb_enabled' is invalid.\nPossible values are: [\"true\", \"false\"]."
-  }
+  default     = false
 }
 
 variable "metallb_version" {
