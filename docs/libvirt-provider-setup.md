@@ -21,12 +21,12 @@ wget -O terraform-provider-libvirt.tar.gz https://github.com/dmacvicar/terraform
 
 Unarchive downloaded file:
 ```
-tar -xzf terraform-libvirt-provider.tar.gz
+tar -xzf terraform-provider-libvirt.tar.gz
 ```
 
 (Optionally) Remove `tar.gz` archive file:
 ```
-rm terraform-libvirt-provider.tar.gz
+rm terraform-provider-libvirt.tar.gz
 ```
 
 That's it.
