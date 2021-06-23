@@ -1,6 +1,6 @@
 # Creates volume for new virtual machine #
 resource "libvirt_volume" "vm_volume" {
-  name           = "${var.vm_name_prefix}-${var.vm_type}-${var.vm_id}.qcow2"
+  name           = "${var.vm_name}.qcow2"
   pool           = var.resource_pool_name
   base_volume_id = var.base_volume_id
   size           = var.vm_storage
@@ -11,7 +11,7 @@ resource "libvirt_volume" "vm_volume" {
 resource "libvirt_domain" "vm_domain" {
 
   # General configuration #
-  name      = "${var.vm_name_prefix}-${var.vm_type}-${var.vm_id}"
+  name      = var.vm_name
   vcpu      = var.vm_cpu
   memory    = var.vm_ram
   autostart = true
@@ -65,49 +65,6 @@ resource "libvirt_domain" "vm_domain" {
   }
 }
 
-# Takes care of removing worker from cluster's configuration #
-resource "null_resource" "remove_worker" {
-
-  count = var.vm_type == "worker" ? 1 : 0
-
-  triggers = {
-    vm_user            = var.vm_user
-    vm_ssh_private_key = var.vm_ssh_private_key
-    vm_name_prefix     = var.vm_name_prefix
-    vm_id              = var.vm_id
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<-EOF
-    cd ansible/kubespray
-    virtualenv venv && . venv/bin/activate && pip install -r requirements.txt
-    ansible-playbook \
-      --inventory ../../config/hosts.ini \
-      --become \
-      --user=$SSH_USER \
-      --private-key=$SSH_PRIVATE_KEY \
-      --extra-vars \"node=$VM_NAME delete_nodes_confirmation=yes\" \
-      --verbose \
-      remove-node.yml
-    EOF
-
-    environment = {
-      SSH_PRIVATE_KEY = self.triggers.vm_ssh_private_key
-      SSH_USER        = self.triggers.vm_user
-      VM_NAME         = "${self.triggers.vm_name_prefix}-worker-${self.triggers.vm_id}"
-    }
-
-    on_failure = continue
-  }
-
-  provisioner "local-exec" {
-    when       = destroy
-    command    = "sh ./scripts/filelock-exec.sh \"sed -i '/${self.triggers.vm_name_prefix}-worker-${self.triggers.vm_id}$/d' config/hosts.ini\""
-    on_failure = continue
-  }
-}
-
 # Remove static IP address from network after destruction #
 resource "null_resource" "remove_static_ip" {
 
@@ -119,17 +76,32 @@ resource "null_resource" "remove_static_ip" {
   }
 
   provisioner "local-exec" {
-    when        = destroy
-    command     = "virsh --connect ${self.triggers.libvirt_provider_uri} net-update ${self.triggers.network_id} delete ip-dhcp-host \"<host mac='${self.triggers.vm_mac}' ip='${self.triggers.vm_ip}'/>\" --live --config"
-    interpreter = ["/bin/bash", "-c"]
-    on_failure  = continue
+    when    = destroy
+    command = <<-EOF
+              virsh \
+              --connect $URI \
+              net-update $NETWORK_ID \
+              delete ip-dhcp-host "<host mac='$VM_MAC' ip='$VM_IP'/>" \
+              --live \
+              --config \
+              --parent-index 0
+              EOF
+
+    environment = {
+      URI        = self.triggers.libvirt_provider_uri
+      NETWORK_ID = self.triggers.network_id
+      VM_MAC     = self.triggers.vm_mac
+      VM_IP      = self.triggers.vm_ip
+    }
+
+    on_failure = continue
   }
 }
 
 # Adds VM's SSH key to known hosts #
 resource "null_resource" "ssh_known_hosts" {
 
-  count = var.vm_ssh_known_hosts == "true" ? 1 : 0
+  count = var.vm_ssh_known_hosts ? 1 : 0
 
   triggers = {
     vm_ip = libvirt_domain.vm_domain.network_interface.0.addresses.0

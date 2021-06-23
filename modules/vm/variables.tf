@@ -2,9 +2,12 @@
 # Outputs                              #
 # ==================================== #
 
-output "ip" {
-  value       = libvirt_domain.vm_domain.network_interface.0.addresses.0
-  description = "IP that has been assigned to the VM"
+output "vm_info" {
+  value = {
+    name = libvirt_domain.vm_domain.name,
+    ip   = libvirt_domain.vm_domain.network_interface.0.addresses.0
+  }
+  description = "VM's info containing it's name and an IP address"
 }
 
 # ==================================== #
@@ -65,18 +68,18 @@ variable "vm_ssh_private_key" {
 }
 
 variable "vm_ssh_known_hosts" {
-  type        = string
+  type        = bool
   description = "Add virtual machine SSH known hosts"
-}
-
-variable "vm_name_prefix" {
-  type        = string
-  description = "Prefix added to names of VMs"
 }
 
 #============================#
 # Specific                   #
 #============================#
+
+variable "vm_name" {
+  type        = string
+  description = "VM name"
+}
 
 variable "vm_id" {
   type        = number

@@ -13,9 +13,10 @@ locals {
   dashboard_namespace = "kube-system"
 }
 
-#================================
-# Kubespray templates
-#================================
+
+#======================================================================================
+# Template files
+#======================================================================================
 
 # Kubespray all.yml template (Currently supports only 1 load balancer) #
 data "template_file" "kubespray_all" {
@@ -24,9 +25,9 @@ data "template_file" "kubespray_all" {
 
   vars = {
     loadbalancer_apiserver = (
-      length(var.vm_lb_ips) > 0
-      ? var.vm_lb_vip
-      : var.vm_master_ips[0]
+      length(var.lb_nodes) > 0
+      ? var.lb_vip
+      : var.master_nodes[0].ip
     )
   }
 }
@@ -44,9 +45,9 @@ data "template_file" "kubespray_k8s_cluster" {
     # If MetalLB is enable than strict ARP is set to true in k8s-cluster.yml
     kube_proxy_strict_arp = (
       yamldecode(
-        var.kubespray_custom_addons_enabled == "false"
-        ? data.template_file.kubespray_addons[0].rendered
-        : data.template_file.kubespray_custom_addons[0].rendered
+        var.kubespray_custom_addons_enabled
+        ? data.template_file.kubespray_custom_addons[0].rendered
+        : data.template_file.kubespray_addons[0].rendered
       )["metallb_enabled"]
     )
   }
@@ -67,7 +68,7 @@ data "template_file" "kubespray_etcd" {
 # Kubespray addons.yml template #
 data "template_file" "kubespray_addons" {
 
-  count = var.kubespray_custom_addons_enabled == "false" ? 1 : 0
+  count = !var.kubespray_custom_addons_enabled ? 1 : 0
 
   template = file("templates/kubespray_addons.tpl")
 
@@ -98,7 +99,7 @@ data "template_file" "kubespray_addons" {
 # Kubespray custom addons.yml #
 data "template_file" "kubespray_custom_addons" {
 
-  count = var.kubespray_custom_addons_enabled == "true" ? 1 : 0
+  count = var.kubespray_custom_addons_enabled ? 1 : 0
 
   template = file(var.kubespray_custom_addons_path)
 }
@@ -121,13 +122,13 @@ data "template_file" "metallb_peers" {
 # Load balancer hostname and ip list template #
 data "template_file" "lb_hosts" {
 
-  count = length(var.vm_lb_ips)
+  for_each = { for node in var.lb_nodes : node.name => node }
 
   template = file("templates/ansible_hosts.tpl")
 
   vars = {
-    hostname    = "${var.vm_name_prefix}-lb-${count.index}"
-    host_ip     = var.vm_lb_ips[count.index]
+    hostname    = each.value.name
+    host_ip     = each.value.ip
     node_labels = ""
   }
 }
@@ -135,13 +136,13 @@ data "template_file" "lb_hosts" {
 # Master hostname and ip list template #
 data "template_file" "master_hosts" {
 
-  count = length(var.vm_master_ips)
+  for_each = { for node in var.master_nodes : node.name => node }
 
   template = file("templates/ansible_hosts.tpl")
 
   vars = {
-    hostname    = "${var.vm_name_prefix}-master-${count.index}"
-    host_ip     = var.vm_master_ips[count.index]
+    hostname    = each.value.name
+    host_ip     = each.value.ip
     node_labels = ""
   }
 }
@@ -149,62 +150,35 @@ data "template_file" "master_hosts" {
 # Worker hostname and ip list template #
 data "template_file" "worker_hosts" {
 
-  count = length(var.vm_worker_ips)
+  for_each = { for node in var.worker_nodes : node.name => node }
 
   template = file("templates/ansible_hosts.tpl")
 
   vars = {
-    hostname = "${var.vm_name_prefix}-worker-${count.index}"
-    host_ip  = var.vm_worker_ips[count.index]
+    hostname = each.value.name
+    host_ip  = each.value.ip
     node_labels = (
-      length(var.vm_worker_node_label) > 0
-      ? "node_labels=\"{'node-role.kubernetes.io/${var.vm_worker_node_label}':''}\""
+      length(var.worker_node_label) > 0
+      ? "node_labels=\"{'node-role.kubernetes.io/${var.worker_node_label}':''}\""
       : ""
     )
   }
 }
 
-# Load balancer hostname list template #
-data "template_file" "lb_hosts_only" {
-
-  count = length(var.vm_lb_ips)
-
+# Template for hosts.ini file #
+data "template_file" "kubespray_hosts" {
   template = file("templates/ansible_hosts_list.tpl")
 
   vars = {
-    hostname = "${var.vm_name_prefix}-lb-${count.index}"
-  }
-}
-
-# Kubespray master hostname list template #
-data "template_file" "master_hosts_only" {
-
-  count = length(var.vm_master_ips)
-
-  template = file("templates/ansible_hosts_list.tpl")
-
-  vars = {
-    hostname = "${var.vm_name_prefix}-master-${count.index}"
-  }
-}
-
-# Kubespray worker hostname and ip list template #
-data "template_file" "worker_hosts_only" {
-
-  # If no worker node is specified then all master nodes also become worker nodes
-  count = (
-    length(var.vm_worker_ips) > 0
-    ? length(var.vm_worker_ips)
-    : length(var.vm_master_ips)
-  )
-
-  template = file("templates/ansible_hosts_list.tpl")
-
-  vars = {
-    hostname = (
-      length(var.vm_worker_ips) > 0
-      ? "${var.vm_name_prefix}-worker-${count.index}"
-      : "${var.vm_name_prefix}-master-${count.index}"
+    lb_hosts     = chomp(join("", [for tpl in data.template_file.lb_hosts : tpl.rendered]))
+    master_hosts = chomp(join("", [for tpl in data.template_file.master_hosts : tpl.rendered]))
+    worker_hosts = chomp(join("", [for tpl in data.template_file.worker_hosts : tpl.rendered]))
+    lb_nodes     = join("\n", [for node in var.lb_nodes : node.name])
+    master_nodes = join("\n", [for node in var.master_nodes : node.name])
+    worker_nodes = (
+      length(var.worker_nodes) > 0
+      ? join("\n", [for node in var.worker_nodes : node.name])
+      : join("\n", [for node in var.master_nodes : node.name])
     )
   }
 }
@@ -214,21 +188,20 @@ data "template_file" "haproxy" {
   template = file("templates/haproxy.tpl")
 
   vars = {
-    bind_ip = var.vm_lb_vip
+    bind_ip = var.lb_vip
   }
 }
 
 # HAProxy server backend template #
 data "template_file" "haproxy_backend" {
 
-  count = length(var.vm_master_ips)
+  for_each = { for node in var.master_nodes : node.name => node }
 
   template = file("templates/haproxy_backend.tpl")
 
   vars = {
-    prefix_server     = var.vm_name_prefix
-    backend_server_ip = var.vm_master_ips[count.index]
-    count             = count.index
+    server_name = each.value.name
+    server_ip   = each.value.ip
   }
 }
 
@@ -238,7 +211,7 @@ data "template_file" "keepalived_master" {
 
   vars = {
     network_interface = var.vm_network_interface
-    virtual_ip        = var.vm_lb_vip
+    virtual_ip        = var.lb_vip
   }
 }
 
@@ -248,7 +221,7 @@ data "template_file" "keepalived_backup" {
 
   vars = {
     network_interface = var.vm_network_interface
-    virtual_ip        = var.vm_lb_vip
+    virtual_ip        = var.lb_vip
   }
 }
 
@@ -278,30 +251,36 @@ resource "local_file" "kubespray_etcd" {
 # Create Kubespray addons.yml configuration file from template #
 resource "local_file" "kubespray_addons" {
 
-  count = var.kubespray_custom_addons_enabled == "false" ? 1 : 0
+  count = !var.kubespray_custom_addons_enabled ? 1 : 0
 
-  content  = data.template_file.kubespray_addons[count.index].rendered
+  content  = data.template_file.kubespray_addons[0].rendered
   filename = "config/group_vars/k8s_cluster/addons.yml"
 }
 
-# Copy custom Kubespray addons.yml configuration #
+# Create a copy of custom Kubespray addons.yml configuration #
 resource "local_file" "kubespray_custom_addons" {
 
-  count = var.kubespray_custom_addons_enabled == "true" ? 1 : 0
+  count = var.kubespray_custom_addons_enabled ? 1 : 0
 
-  content  = data.template_file.kubespray_custom_addons[count.index].rendered
+  content  = data.template_file.kubespray_custom_addons[0].rendered
   filename = "config/group_vars/k8s_cluster/addons.yml"
 }
 
-# Create Kubespray hosts.ini configuration file from template #
+# Create hosts.ini file from template #
 resource "local_file" "kubespray_hosts" {
-  content  = "[all]\n${join("", data.template_file.lb_hosts.*.rendered)}${join("", data.template_file.master_hosts.*.rendered)}${join("", data.template_file.worker_hosts.*.rendered)}\n[haproxy]\n${join("", data.template_file.lb_hosts_only.*.rendered)}\n[kube_control_plane]\n${join("", data.template_file.master_hosts_only.*.rendered)}\n[etcd]\n${join("", data.template_file.master_hosts_only.*.rendered)}\n[kube_node]\n${join("", data.template_file.worker_hosts_only.*.rendered)}\n[k8s_cluster:children]\nkube_control_plane\nkube_node"
+  content  = data.template_file.kubespray_hosts.rendered
   filename = "config/hosts.ini"
 }
 
 # Create HAProxy configuration file from template #
 resource "local_file" "haproxy" {
-  content  = "${data.template_file.haproxy.rendered}${join("", data.template_file.haproxy_backend.*.rendered)}"
+  content = join("",
+    concat(
+      [data.template_file.haproxy.rendered],
+      [for tpl in data.template_file.haproxy_backend : tpl.rendered]
+    )
+  )
+
   filename = "config/haproxy.cfg"
 }
 
@@ -317,6 +296,7 @@ resource "local_file" "keepalived_backup" {
   filename = "config/keepalived-backup.cfg"
 }
 
+
 #======================================================================================
 # Null resources - K8s cluster configuration using Kubespray
 #======================================================================================
@@ -326,14 +306,6 @@ resource "null_resource" "config_permissions" {
   provisioner "local-exec" {
     command = "chmod -R 700 config"
   }
-
-  depends_on = [
-    local_file.kubespray_hosts,
-    local_file.kubespray_all,
-    local_file.kubespray_k8s_cluster,
-    local_file.kubespray_addons,
-    null_resource.kubespray_download
-  ]
 }
 
 # Clone Kubespray repository #
@@ -349,6 +321,7 @@ resource "null_resource" "kubespray_download" {
 
 # Execute create Kubernetes HAProxy playbook #
 resource "null_resource" "haproxy_install" {
+
   count = var.action == "create" ? 1 : 0
 
   provisioner "local-exec" {
@@ -359,7 +332,7 @@ resource "null_resource" "haproxy_install" {
                 --become \
                 --user=$SSH_USER \
                 --private-key=$SSH_PRIVATE_KEY \
-                --extra-vars \"kube_version=$K8S_VERSION\" \
+                --extra-vars "kube_version=$K8S_VERSION" \
                 haproxy.yml
               EOF
 
@@ -391,7 +364,7 @@ resource "null_resource" "kubespray_create" {
                 --become \
                 --user=$SSH_USER \
                 --private-key=$SSH_PRIVATE_KEY \
-                --extra-vars \"kube_version=$K8S_VERSION\" \
+                --extra-vars "kube_version=$K8S_VERSION" \
                 $EXTRA_ARGS \
                 cluster.yml
               EOF
@@ -408,8 +381,8 @@ resource "null_resource" "kubespray_create" {
     local_file.kubespray_hosts,
     local_file.kubespray_all,
     local_file.kubespray_k8s_cluster,
-    null_resource.haproxy_install,
     null_resource.kubespray_download,
+    null_resource.haproxy_install
   ]
 }
 
@@ -427,7 +400,7 @@ resource "null_resource" "kubespray_add" {
                 --become \
                 --user=$SSH_USER \
                 --private-key=$SSH_PRIVATE_KEY \
-                --extra-vars \"kube_version=$K8S_VERSION\" \
+                --extra-vars "kube_version=$K8S_VERSION" \
                 $EXTRA_ARGS \
                 scale.yml
               EOF
@@ -446,6 +419,48 @@ resource "null_resource" "kubespray_add" {
     local_file.kubespray_k8s_cluster,
     null_resource.kubespray_download,
     null_resource.haproxy_install
+  ]
+}
+
+# Takes care of removing worker from cluster's configuration #
+resource "null_resource" "kubespray_remove" {
+
+  for_each = { for node in var.worker_nodes : node.name => node }
+
+  triggers = {
+    vm_name            = each.value.name
+    vm_user            = var.vm_user
+    vm_ssh_private_key = var.vm_ssh_private_key
+    extra_args         = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<-EOF
+              cd ansible/kubespray
+              virtualenv venv && . venv/bin/activate && pip install -r requirements.txt
+              ansible-playbook \
+                --inventory ../../config/hosts.ini \
+                --become \
+                --user=$SSH_USER \
+                --private-key=$SSH_PRIVATE_KEY \
+                --extra-vars "node=$VM_NAME delete_nodes_confirmation=yes" \
+                $EXTRA_ARGS \
+                remove-node.yml
+              EOF
+
+    environment = {
+      VM_NAME         = self.triggers.vm_name
+      SSH_USER        = self.triggers.vm_user
+      SSH_PRIVATE_KEY = self.triggers.vm_ssh_private_key
+      EXTRA_ARGS      = self.triggers.extra_args
+    }
+    on_failure = continue
+  }
+
+  # Prevents node to be removed from inventory before it's removed from cluster #
+  depends_on = [
+    local_file.kubespray_hosts
   ]
 }
 
@@ -476,7 +491,7 @@ resource "null_resource" "kubespray_upgrade" {
                 --become \
                 --user=$SSH_USER \
                 --private-key=$SSH_PRIVATE_KEY \
-                --extra-vars \"kube_version=$K8S_VERSION\" \
+                --extra-vars "kube_version=$K8S_VERSION" \
                 $EXTRA_ARGS \
                 upgrade-cluster.yml
               EOF
@@ -504,21 +519,21 @@ resource "null_resource" "fetch_kubeconfig" {
   provisioner "local-exec" {
     command = <<-EOF
               ansible \
-                --inventory $MASTER_NODE_IP \
+                --inventory config/hosts.ini \
                 --become \
                 --user=$SSH_USER \
                 --private-key=$SSH_PRIVATE_KEY \
                 --module-name fetch \
-                --args 'src=/etc/kubernetes/admin.conf dest=config/admin.conf flat=yes' \
+                --args "src=/etc/kubernetes/admin.conf dest=config/admin.conf flat=yes" \
                 $EXTRA_ARGS \
-                all
+                $MASTER_NODE_NAME
               EOF
 
     environment = {
-      MASTER_NODE_IP  = var.vm_master_ips[0]
-      SSH_USER        = var.vm_user
-      SSH_PRIVATE_KEY = var.vm_ssh_private_key
-      EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
+      MASTER_NODE_NAME = var.master_nodes[0].name
+      SSH_USER         = var.vm_user
+      SSH_PRIVATE_KEY  = var.vm_ssh_private_key
+      EXTRA_ARGS       = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
     }
   }
 
@@ -529,7 +544,7 @@ resource "null_resource" "fetch_kubeconfig" {
 # Copy kubeconfig into ~/.kube directory #
 resource "null_resource" "copy_kubeconfig" {
 
-  count = var.k8s_copy_kubeconfig == "true" ? 1 : 0
+  count = var.k8s_copy_kubeconfig ? 1 : 0
 
   provisioner "local-exec" {
     command = "mkdir -p ~/.kube && cp config/admin.conf ~/.kube/"
@@ -542,7 +557,7 @@ resource "null_resource" "copy_kubeconfig" {
 # Creates Kubernetes dashboard service account #
 resource "null_resource" "k8s_dashboard_rbac" {
 
-  count = (var.k8s_dashboard_enabled == "true" && var.k8s_dashboard_rbac_enabled == "true") ? 1 : 0
+  count = (var.k8s_dashboard_enabled && var.k8s_dashboard_rbac_enabled) ? 1 : 0
 
   provisioner "local-exec" {
     command = "sh scripts/dashboard-rbac.sh ${var.k8s_dashboard_rbac_user} ${local.dashboard_namespace}"

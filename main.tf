@@ -1,3 +1,16 @@
+#================================
+# Local variables
+#================================
+
+# Local variables used in many resources #
+locals {
+  vm_type = {
+    load_balancer = "lb"
+    master        = "master"
+    worker        = "worker"
+  }
+}
+
 #=====================================================================================
 # Provider specific
 #=====================================================================================
@@ -35,11 +48,11 @@ module "lb_module" {
   network_id           = module.network_module.network_id
 
   # Load balancer specific variables #
-  vm_type            = "lb"
+  vm_name            = "${var.vm_name_prefix}-${local.vm_type.load_balancer}-${each.value.id}"
+  vm_type            = local.vm_type.load_balancer
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
-  vm_name_prefix     = var.vm_name_prefix
   vm_id              = each.value.id
   vm_mac             = each.value.mac
   vm_ip              = each.value.ip
@@ -70,11 +83,11 @@ module "master_module" {
   network_id           = module.network_module.network_id
 
   # Master node specific variables #
-  vm_type            = "master"
+  vm_name            = "${var.vm_name_prefix}-${local.vm_type.master}-${each.value.id}"
+  vm_type            = local.vm_type.master
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
-  vm_name_prefix     = var.vm_name_prefix
   vm_id              = each.value.id
   vm_mac             = each.value.mac
   vm_ip              = each.value.ip
@@ -105,11 +118,11 @@ module "worker_module" {
   network_id           = module.network_module.network_id
 
   # Worker node specific variables #
-  vm_type            = "worker"
+  vm_name            = "${var.vm_name_prefix}-${local.vm_type.worker}-${each.value.id}"
+  vm_type            = local.vm_type.worker
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
-  vm_name_prefix     = var.vm_name_prefix
   vm_id              = each.value.id
   vm_mac             = each.value.mac
   vm_ip              = each.value.ip
@@ -139,11 +152,11 @@ module "k8s_cluster" {
   vm_ssh_private_key   = var.vm_ssh_private_key
   vm_name_prefix       = var.vm_name_prefix
   vm_network_interface = var.vm_network_interface
-  vm_worker_node_label = var.worker_node_label
-  vm_lb_vip            = var.lb_vip
-  vm_lb_ips            = tolist([for node in module.lb_module : node.ip])
-  vm_master_ips        = tolist([for node in module.master_module : node.ip])
-  vm_worker_ips        = tolist([for node in module.worker_module : node.ip])
+  worker_node_label    = var.worker_node_label
+  lb_vip               = var.lb_vip
+  lb_nodes             = [for node in module.lb_module : node.vm_info]
+  master_nodes         = [for node in module.master_module : node.vm_info]
+  worker_nodes         = [for node in module.worker_module : node.vm_info]
 
   # K8s cluster variables
   k8s_kubespray_url     = var.k8s_kubespray_url

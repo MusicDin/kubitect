@@ -7,29 +7,38 @@ variable "action" {
 # Virtual machine variables
 #======================================================================================
 
-variable "vm_worker_ips" {
-  type        = list(string)
-  description = "IP addresses of worker nodes"
+variable "worker_nodes" {
+  type = list(object({
+    name = string
+    ip   = string
+  }))
+  description = "Worker nodes info"
 }
 
-variable "vm_worker_node_label" {
+variable "worker_node_label" {
   type        = string
   description = "Worker node role label"
 }
 
-variable "vm_master_ips" {
-  type        = list(string)
-  description = "IP addresses of master nodes"
+variable "master_nodes" {
+  type = list(object({
+    name = string
+    ip   = string
+  }))
+  description = "Master nodes info"
 }
 
-variable "vm_lb_ips" {
-  type        = list(string)
-  description = "IP addresses of load balancer VMs"
+variable "lb_nodes" {
+  type = list(object({
+    name = string
+    ip   = string
+  }))
+  description = "Load balancers info"
 }
 
-variable "vm_lb_vip" {
+variable "lb_vip" {
   type        = string
-  description = "Floating virtual IP of the load balancer"
+  description = "Floating virtual IP for load balancers"
 }
 
 variable "vm_distro" {
@@ -100,7 +109,7 @@ variable "k8s_copy_kubeconfig" {
 #======================================================================================
 
 variable "kubespray_custom_addons_enabled" {
-  type        = string
+  type        = bool
   description = "If enabled, custom addons.yml will be used"
 }
 
@@ -110,12 +119,12 @@ variable "kubespray_custom_addons_path" {
 }
 
 variable "k8s_dashboard_enabled" {
-  type        = string
+  type        = bool
   description = "Sets up Kubernetes dashboard if enabled"
 }
 
 variable "k8s_dashboard_rbac_enabled" {
-  type        = string
+  type        = bool
   description = "If enabled, Kubernetes dashboard service account will be created"
 }
 
@@ -125,12 +134,12 @@ variable "k8s_dashboard_rbac_user" {
 }
 
 variable "helm_enabled" {
-  type        = string
+  type        = bool
   description = "Sets up Helm if enabled"
 }
 
 variable "local_path_provisioner_enabled" {
-  type        = string
+  type        = bool
   description = "Sets up Rancher's local path provisioner if enabled"
 }
 
@@ -160,7 +169,7 @@ variable "local_path_provisioner_claim_root" {
 }
 
 variable "metallb_enabled" {
-  type        = string
+  type        = bool
   description = "Sets up MetalLB if enabled"
 }
 
