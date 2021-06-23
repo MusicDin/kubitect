@@ -95,7 +95,7 @@ kubectl --kubeconfig=config/admin.conf get nodes
 
 ### Add worker to the cluster
 
-In [terraform.tfvars](./terraform.tfvars) file add new worker nodes in `worker_nodes` list.
+In [terraform.tfvars](./terraform.tfvars) file add new worker node(s) in `worker_nodes` list.
 
 Execute terraform script to add a worker (workers):
 ```
@@ -104,7 +104,7 @@ terraform apply -var 'action=add_worker'
 
 ### Remove worker from the cluster
 
-In [terraform.tfvars](./terraform.tfvars) file remove worker nodes from `worker_nodes` list.
+In [terraform.tfvars](./terraform.tfvars) file remove worker node(s) from `worker_nodes` list.
 
 Execute terraform script to remove a worker (workers):
 ```
