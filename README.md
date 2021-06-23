@@ -60,11 +60,10 @@ cd terraform-kvm-kubespray
 
 Change variables in [terraform.tfvars](terraform.tfvars) file to fit your needs.
 Variables are set to work out of the box.
-Only required variables that are not set are:
-+ `vm_image_source` URL or path on file system to OS image,
-+ `vm_distro` a Linux distribution of OS image.
+Only unset required variable is:
++ `vm_image_source` URL or path on file system to OS image
 
-**IMPORTANT:** Review variables before initializing a cluster, as current configuration will create 8 VMs which are quite resource heavy!
+**IMPORTANT:** Review variables before initializing a cluster.
 
 *Note: Script also supports deployment of [single node cluster](docs/examples/single-node-cluster.md).*
 
@@ -87,7 +86,7 @@ terraform apply
 All configuration files will be generated in `config/` directory,
 and one of them will be `admin.conf` which is actually a `kubeconfig` file.
 
-Test your cluster by displaying all cluster's nodes:
+Test if cluster is working by displaying all cluster nodes:
 ```
 kubectl --kubeconfig=config/admin.conf get nodes
 ```
@@ -96,18 +95,18 @@ kubectl --kubeconfig=config/admin.conf get nodes
 
 ### Add worker to the cluster
 
-In [terraform.tfvars](./terraform.tfvars) file add *MAC* and *IP* address for a new VM to `vm_worker_macs_ips`.
+In [terraform.tfvars](./terraform.tfvars) file add new worker nodes in `worker_nodes` list.
 
-Execute terraform script to add a worker:
+Execute terraform script to add a worker (workers):
 ```
 terraform apply -var 'action=add_worker'
 ```
 
 ### Remove worker from the cluster
 
-In [terraform.tfvars](./terraform.tfvars) file remove *MAC* and *IP* address of VM that is going to be deleted from `vm_worker_macs_ips`.
+In [terraform.tfvars](./terraform.tfvars) file remove worker nodes from `worker_nodes` list.
 
-Execute terraform script to remove a worker:
+Execute terraform script to remove a worker (workers):
 ```
 terraform apply -var 'action=remove_worker'
 ```

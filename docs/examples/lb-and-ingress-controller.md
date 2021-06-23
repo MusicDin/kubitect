@@ -4,7 +4,7 @@ This example will show how to set up load balancer to route all traffic coming o
 
 [Kubernetes nginx ingress controller](https://github.com/kubernetes/ingress-nginx) is used in this example.
 
-**IMPORTANT:** This example shows neither best practices nor secure configuration! It's meant to be simplistic and straightforward.
+**IMPORTANT:** This example shows neither best practices nor secure configuration! It's meant to be simple and straightforward.
 
 ## Configuring load balancer
 

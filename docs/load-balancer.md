@@ -10,7 +10,7 @@ If you decide to omit load balancer, all you have to do is to modify [terraform.
 
 Remove all load balancers IP and MAC addresses:
 ```hcl
-vm_lb_macs_ips = {}
+lb_nodes = []
 ```
 
 *Note: If there is more master nodes specified, IP of the first one will be used for a cluster IP.*
@@ -21,15 +21,23 @@ vm_lb_macs_ips = {}
 
 Provide a MAC and IP address for each load balancer in [terraform.tfvars](../terraform.tfvars) file:
 ```hcl
-vm_lb_macs_ips = {
-  "mac_for_lb_1" = "ip_for_lb_1"
-  "mac_for_lb_2" = "ip_for_lb_2"
-}
+lb_nodes = [
+  {
+    id  = 1
+    ip  = null  # Specific IP or null to auto generate it
+    mac = null  # Specific MAC or null to auto generate it
+  },
+  {
+    id  = 2
+    ip  = "192.168.113.6"
+    mac = "52:54:00:00:00:06"
+  }
+]
 ```
 
 Then set a floating IP that should not be taken by any other VM:
 ```hcl
-vm_lb_vip = "floating_ip"
+lb_vip = "floating_ip"
 ```
 
 ## Modifying load balancer's configuration BEFORE cluster initialization
@@ -45,7 +53,7 @@ comment `Place custom configurations here` is located.
 After the cluster is all set up, SSH into it and modify it's configuration:
 ```bash
 # SSH into load balancer
-ssh <vm_user>@<vm_lb_ip>
+ssh <vm_user>@<lb_ip>
 
 # Modify LB's configuration file (use your favorite editor)
 nano /etc/haproxy/haproxy.cfg
