@@ -358,7 +358,7 @@ resource "null_resource" "kubespray_create" {
   provisioner "local-exec" {
     command = <<-EOF
               cd ansible/kubespray
-              virtualenv venv && . venv/bin/activate && pip install -r requirements.txt
+              virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
               ansible-playbook \
                 --inventory ../../config/hosts.ini \
                 --become \
@@ -394,7 +394,7 @@ resource "null_resource" "kubespray_add" {
   provisioner "local-exec" {
     command = <<-EOF
               cd ansible/kubespray
-              virtualenv venv && . venv/bin/activate && pip install -r requirements.txt
+              virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
               ansible-playbook \
                 --inventory ../../config/hosts.ini \
                 --become \
@@ -438,7 +438,7 @@ resource "null_resource" "kubespray_remove" {
     when    = destroy
     command = <<-EOF
               cd ansible/kubespray
-              virtualenv venv && . venv/bin/activate && pip install -r requirements.txt
+              virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
               ansible-playbook \
                 --inventory ../../config/hosts.ini \
                 --become \
@@ -485,7 +485,7 @@ resource "null_resource" "kubespray_upgrade" {
   provisioner "local-exec" {
     command = <<-EOF
               cd ansible/kubespray
-              virtualenv venv && . venv/bin/activate && pip install -r requirements.txt
+              virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
               ansible-playbook \
                 --inventory ../../config/hosts.ini \
                 --become \

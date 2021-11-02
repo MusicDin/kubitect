@@ -4,7 +4,7 @@ Set up HA Kubernetes cluster using KVM, Terraform and Kubespray.
 ## Requirements
 + [Git](https://git-scm.com/)
 + [Cloud-init](https://cloudinit.readthedocs.io/)
-+ [Ansible](https://www.ansible.com/) >= v2.6
++ [Ansible](https://www.ansible.com/) >= 2.9
 + [Terraform](https://www.terraform.io/) >= 1.0.0
 + [KVM - Kernel Virtual Machine](https://www.linux-kvm.org/)
 + [Libvirt provider](https://github.com/dmacvicar/terraform-provider-libvirt) >= 0.6.11
@@ -13,13 +13,6 @@ Set up HA Kubernetes cluster using KVM, Terraform and Kubespray.
 ## Getting Started
 
 *If you run into any troubles during installation process, please check [troubleshooting](docs/troubleshooting.md) page first.*
-
-### virtualenv
-
-Install [virtualenv](https://virtualenv.pypa.io/en/latest/index.html) using the following command:
-```bash
-python -m pip install --user virtualenv
-```
 
 ### SSH keys
 
