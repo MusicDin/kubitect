@@ -35,7 +35,7 @@
 
     - name: Configure Keepalived master
       copy:
-        src: ../../config/keepalived-master.cfg
+        src: ../../config/keepalived/keepalived-master.cfg
         dest: /etc/keepalived/keepalived.conf
         owner: root
         group: root
@@ -45,7 +45,7 @@
 
     - name: Configure Keepalived backup
       copy:
-        src: ../../config/keepalived-backup.cfg
+        src: ../../config/keepalived/keepalived-backup.cfg
         dest: /etc/keepalived/keepalived.conf
         owner: root
         group: root
@@ -61,7 +61,7 @@
 
     - name: Configure HAProxy
       copy:
-        src: ../../config/haproxy.cfg
+        src: ../../config/haproxy/haproxy.cfg
         dest: /etc/haproxy/haproxy.cfg
         owner: root
         group: root

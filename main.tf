@@ -234,33 +234,21 @@ data "template_file" "public_ssh_key" {
 
 # Network bridge configuration (for cloud-init) #
 data "template_file" "cloud_init_network_tpl" {
-  template = file("templates/cloud_init_network.tpl")
+  template = file("templates/cloud_init/cloud_init_network_nat.tpl")
 
   vars = {
     network_interface = var.vm_network_interface
   }
 }
 
-# Creates network bridge configuration file from template #
-resource "local_file" "cloud_init_network_file" {
-  content  = data.template_file.cloud_init_network_tpl.rendered
-  filename = "config/cloud_init_network.cfg"
-}
-
 # Cloud-init configuration template #
 data "template_file" "cloud_init_tpl" {
-  template = file("templates/cloud_init.tpl")
+  template = file("templates/cloud_init/cloud_init.tpl")
 
   vars = {
     user           = var.vm_user
     ssh_public_key = data.template_file.public_ssh_key.rendered
   }
-}
-
-# Creates cloud-init configuration file from template #
-resource "local_file" "cloud_init_file" {
-  content  = data.template_file.cloud_init_tpl.rendered
-  filename = "config/cloud_init.cfg"
 }
 
 # Initializes cloud-init disk for user data#

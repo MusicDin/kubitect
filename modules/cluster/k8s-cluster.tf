@@ -21,7 +21,7 @@ locals {
 # Kubespray all.yml template (Currently supports only 1 load balancer) #
 data "template_file" "kubespray_all" {
 
-  template = file("templates/kubespray_all.tpl")
+  template = file("templates/kubespray/kubespray_all.tpl")
 
   vars = {
     loadbalancer_apiserver = (
@@ -35,7 +35,7 @@ data "template_file" "kubespray_all" {
 # Kubespray k8s-cluster.yml template #
 data "template_file" "kubespray_k8s_cluster" {
 
-  template = file("templates/kubespray_k8s_cluster.tpl")
+  template = file("templates/kubespray/kubespray_k8s_cluster.tpl")
 
   vars = {
     kube_version        = var.k8s_version
@@ -62,7 +62,7 @@ data "template_file" "kubespray_k8s_cluster" {
 
 # Kubespray etcd.yml template #
 data "template_file" "kubespray_etcd" {
-  template = file("templates/kubespray_etcd.tpl")
+  template = file("templates/kubespray/kubespray_etcd.tpl")
 }
 
 # Kubespray addons.yml template #
@@ -70,7 +70,7 @@ data "template_file" "kubespray_addons" {
 
   count = !var.kubespray_custom_addons_enabled ? 1 : 0
 
-  template = file("templates/kubespray_addons.tpl")
+  template = file("templates/kubespray/kubespray_addons.tpl")
 
   vars = {
     dashboard_enabled                     = var.k8s_dashboard_enabled
@@ -110,7 +110,7 @@ data "template_file" "metallb_peers" {
   # Create MetalLB peers only in BGP mode #
   count = var.metallb_protocol == "bgp" ? length(var.metallb_peers) : 0
 
-  template = file("templates/kubespray_addons_metallb_peer.tpl")
+  template = file("templates/kubespray/kubespray_addons_metallb_peer.tpl")
 
   vars = {
     peer_ip  = var.metallb_peers[count.index].peer_ip
@@ -124,7 +124,7 @@ data "template_file" "lb_hosts" {
 
   for_each = { for node in var.lb_nodes : node.name => node }
 
-  template = file("templates/ansible_hosts.tpl")
+  template = file("templates/ansible/ansible_hosts.tpl")
 
   vars = {
     hostname    = each.value.name
@@ -138,7 +138,7 @@ data "template_file" "master_hosts" {
 
   for_each = { for node in var.master_nodes : node.name => node }
 
-  template = file("templates/ansible_hosts.tpl")
+  template = file("templates/ansible/ansible_hosts.tpl")
 
   vars = {
     hostname    = each.value.name
@@ -152,7 +152,7 @@ data "template_file" "worker_hosts" {
 
   for_each = { for node in var.worker_nodes : node.name => node }
 
-  template = file("templates/ansible_hosts.tpl")
+  template = file("templates/ansible/ansible_hosts.tpl")
 
   vars = {
     hostname = each.value.name
@@ -167,7 +167,7 @@ data "template_file" "worker_hosts" {
 
 # Template for hosts.ini file #
 data "template_file" "kubespray_hosts" {
-  template = file("templates/ansible_hosts_list.tpl")
+  template = file("templates/ansible/ansible_hosts_list.tpl")
 
   vars = {
     lb_hosts     = chomp(join("", [for tpl in data.template_file.lb_hosts : tpl.rendered]))
@@ -185,7 +185,7 @@ data "template_file" "kubespray_hosts" {
 
 # HAProxy template #
 data "template_file" "haproxy" {
-  template = file("templates/haproxy.tpl")
+  template = file("templates/haproxy/haproxy.tpl")
 
   vars = {
     bind_ip = var.lb_vip
@@ -197,7 +197,7 @@ data "template_file" "haproxy_backend" {
 
   for_each = { for node in var.master_nodes : node.name => node }
 
-  template = file("templates/haproxy_backend.tpl")
+  template = file("templates/haproxy/haproxy_backend.tpl")
 
   vars = {
     server_name = each.value.name
@@ -207,7 +207,7 @@ data "template_file" "haproxy_backend" {
 
 # Keepalived master template #
 data "template_file" "keepalived_master" {
-  template = file("templates/keepalived_master.tpl")
+  template = file("templates/keepalived/keepalived_master.tpl")
 
   vars = {
     network_interface = var.vm_network_interface
@@ -217,7 +217,7 @@ data "template_file" "keepalived_master" {
 
 # Keepalived backup template #
 data "template_file" "keepalived_backup" {
-  template = file("templates/keepalived_backup.tpl")
+  template = file("templates/keepalived/keepalived_backup.tpl")
 
   vars = {
     network_interface = var.vm_network_interface
@@ -281,19 +281,19 @@ resource "local_file" "haproxy" {
     )
   )
 
-  filename = "config/haproxy.cfg"
+  filename = "config/haproxy/haproxy.cfg"
 }
 
 # Create keepalived master configuration file from template #
 resource "local_file" "keepalived_master" {
   content  = data.template_file.keepalived_master.rendered
-  filename = "config/keepalived-master.cfg"
+  filename = "config/keepalived/keepalived-master.cfg"
 }
 
 # Create keepalived backup configuration file from template #
 resource "local_file" "keepalived_backup" {
   content  = data.template_file.keepalived_backup.rendered
-  filename = "config/keepalived-backup.cfg"
+  filename = "config/keepalived/keepalived-backup.cfg"
 }
 
 
