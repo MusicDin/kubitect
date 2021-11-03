@@ -65,8 +65,8 @@ resource "libvirt_domain" "vm_domain" {
   }
 }
 
-# Remove static IP address from network after destruction #
-resource "null_resource" "remove_static_ip" {
+# Remove DHCP lease from network after VM destruction #
+resource "null_resource" "remove_dhcp_lease" {
 
   triggers = {
     libvirt_provider_uri = var.libvirt_provider_uri
