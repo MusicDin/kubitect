@@ -29,11 +29,6 @@ variable "base_volume_id" {
   description = "Base image voulme ID"
 }
 
-variable "cloud_init_id" {
-  type        = string
-  description = "Cloud init disk ID"
-}
-
 variable "network_id" {
   type        = string
   description = "Id of the network in which VM resides"
@@ -47,14 +42,37 @@ variable "network_id" {
 # General                    #
 #============================#
 
-variable "vm_type" {
+variable "is_bridge" {
+  type        = bool
+  description = "Is network mode 'bridge'?"
+}
+
+variable "network_bridge" {
   type        = string
-  description = "Possible virtual machine types are: [master, worker, lb]"
+  description = "Network bridge (used only when network mode is 'bridge')"
+}
+
+variable "network_gateway" {
+  type        = string
+  description = "Network gateway (used only when network mode is 'bridge')"
 
   validation {
-    condition     = contains(["master", "worker", "lb"], var.vm_type)
-    error_message = "Variable 'vm_type' is invalid.\nPossible values are: [\"master\", \"worker\", \"lb\"]."
+    condition = (
+      var.network_gateway == null
+      || can(regex("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}$", var.network_gateway))
+    )
+    error_message = "Invalid network gateway IPv4 address."
   }
+}
+
+variable "network_cidr" {
+  type        = string
+  description = "Network CIDR"
+}
+
+variable "vm_network_interface" {
+  type        = string
+  description = "Network interface"
 }
 
 variable "vm_user" {
@@ -112,7 +130,6 @@ variable "vm_mac" {
     )
     error_message = "Invalid MAC address provided to VM.\nPlease check the following variables:\n - 'lb_nodes',\n - 'master_nodes',\n - 'worker_nodes'.\n\nNote that setting MAC to 'null' causes random valid MAC to be generated."
   }
-
 }
 
 variable "vm_ip" {
@@ -127,4 +144,3 @@ variable "vm_ip" {
     error_message = "Invalid IP address provided to VM.\nPlease check the following variables:\n - 'lb_nodes',\n - 'master_nodes',\n - 'worker_nodes'.\n\nNote that setting IP to 'null' causes random valid IP to be generated."
   }
 }
-

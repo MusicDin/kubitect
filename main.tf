@@ -9,6 +9,7 @@ locals {
     master        = "master"
     worker        = "worker"
   }
+  is_bridge = var.network_mode == "bridge"
 }
 
 #=====================================================================================
@@ -21,11 +22,43 @@ provider "libvirt" {
 }
 
 #======================================================================================
+# General Resources
+#======================================================================================
+
+#================================
+# Resource pool and base volume
+#================================
+
+# Creates a resource pool for Kubernetes VM volumes #
+resource "libvirt_pool" "resource_pool" {
+  name = var.libvirt_resource_pool_name
+  type = "dir"
+  path = "${var.libvirt_resource_pool_location}${var.libvirt_resource_pool_name}"
+}
+
+# Creates base OS image for nodes in a cluster #
+resource "libvirt_volume" "base_volume" {
+  name   = "base_volume"
+  pool   = var.libvirt_resource_pool_name
+  source = var.vm_image_source
+
+  # Requires resource pool to be initialized #
+  depends_on = [libvirt_pool.resource_pool]
+}
+
+#======================================================================================
 # Modules
 #======================================================================================
 
+#================================
+# Network
+#================================
+
 # Creates network #
 module "network_module" {
+
+  count = local.is_bridge ? 0 : 1
+
   source = "./modules/network/"
 
   network_name   = var.network_name
@@ -33,6 +66,10 @@ module "network_module" {
   network_bridge = var.network_bridge
   network_cidr   = var.network_cidr
 }
+
+#================================
+# Virtual machines
+#================================
 
 # Create HAProxy load balancer #
 module "lb_module" {
@@ -44,12 +81,16 @@ module "lb_module" {
   libvirt_provider_uri = var.libvirt_provider_uri
   resource_pool_name   = libvirt_pool.resource_pool.name
   base_volume_id       = libvirt_volume.base_volume.id
-  cloud_init_id        = libvirt_cloudinit_disk.cloud_init.id
-  network_id           = module.network_module.network_id
+  network_id           = local.is_bridge ? null : module.network_module.0.network_id
+
+  is_bridge            = local.is_bridge
+  network_bridge       = var.network_bridge
+  network_gateway      = var.network_gateway != null ? var.network_gateway : cidrhost(var.network_cidr, 1)
+  network_cidr         = var.network_cidr
+  vm_network_interface = var.vm_network_interface
 
   # Load balancer specific variables #
   vm_name            = "${var.vm_name_prefix}-${local.vm_type.load_balancer}-${each.value.id}"
-  vm_type            = local.vm_type.load_balancer
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
@@ -79,12 +120,16 @@ module "master_module" {
   libvirt_provider_uri = var.libvirt_provider_uri
   resource_pool_name   = libvirt_pool.resource_pool.name
   base_volume_id       = libvirt_volume.base_volume.id
-  cloud_init_id        = libvirt_cloudinit_disk.cloud_init.id
-  network_id           = module.network_module.network_id
+  network_id           = local.is_bridge ? null : module.network_module.0.network_id
+
+  is_bridge            = local.is_bridge
+  network_bridge       = var.network_bridge
+  network_gateway      = var.network_gateway != null ? var.network_gateway : cidrhost(var.network_cidr, 1)
+  network_cidr         = var.network_cidr
+  vm_network_interface = var.vm_network_interface
 
   # Master node specific variables #
   vm_name            = "${var.vm_name_prefix}-${local.vm_type.master}-${each.value.id}"
-  vm_type            = local.vm_type.master
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
@@ -114,12 +159,16 @@ module "worker_module" {
   libvirt_provider_uri = var.libvirt_provider_uri
   resource_pool_name   = libvirt_pool.resource_pool.name
   base_volume_id       = libvirt_volume.base_volume.id
-  cloud_init_id        = libvirt_cloudinit_disk.cloud_init.id
-  network_id           = module.network_module.network_id
+  network_id           = local.is_bridge ? null : module.network_module.0.network_id
+
+  is_bridge            = local.is_bridge
+  network_bridge       = var.network_bridge
+  network_gateway      = var.network_gateway != null ? var.network_gateway : cidrhost(var.network_cidr, 1)
+  network_cidr         = var.network_cidr
+  vm_network_interface = var.vm_network_interface
 
   # Worker node specific variables #
   vm_name            = "${var.vm_name_prefix}-${local.vm_type.worker}-${each.value.id}"
-  vm_type            = local.vm_type.worker
   vm_user            = var.vm_user
   vm_ssh_private_key = var.vm_ssh_private_key
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
@@ -130,7 +179,6 @@ module "worker_module" {
   vm_ram             = var.worker_default_ram     #each.value.ram != null ? each.value.ram : var.worker_default_ram
   vm_storage         = var.worker_default_storage #each.value.storage != null ? each.value.storage : var.worker_default_storage
 
-
   # Dependancy takes care that resource pool is not removed before volumes are #
   # Also network must be created before VM is initialized #
   depends_on = [
@@ -140,37 +188,41 @@ module "worker_module" {
   ]
 }
 
+#================================
+# Cluster
+#================================
+
 # Configures k8s cluster using Kubespray #
 module "k8s_cluster" {
   source = "./modules/cluster"
 
   action = var.action
 
-  # VM variables
+  # VM variables #
   vm_distro            = var.vm_distro
   vm_user              = var.vm_user
   vm_ssh_private_key   = var.vm_ssh_private_key
   vm_name_prefix       = var.vm_name_prefix
-  vm_network_interface = var.vm_network_interface
+  vm_network_interface = local.is_bridge ? var.network_bridge : var.vm_network_interface
   worker_node_label    = var.worker_node_label
   lb_vip               = var.lb_vip
   lb_nodes             = [for node in module.lb_module : node.vm_info]
   master_nodes         = [for node in module.master_module : node.vm_info]
   worker_nodes         = [for node in module.worker_module : node.vm_info]
 
-  # K8s cluster variables
+  # K8s cluster variables #
   k8s_kubespray_url     = var.k8s_kubespray_url
   k8s_kubespray_version = var.k8s_kubespray_version
   k8s_version           = var.k8s_version
   k8s_network_plugin    = var.k8s_network_plugin
   k8s_dns_mode          = var.k8s_dns_mode
 
-  # Other
+  # Other #
   k8s_copy_kubeconfig        = var.k8s_copy_kubeconfig
   k8s_dashboard_rbac_enabled = var.k8s_dashboard_rbac_enabled
   k8s_dashboard_rbac_user    = var.k8s_dashboard_rbac_user
 
-  # Kubespray addons
+  # Kubespray addons #
   kubespray_custom_addons_enabled       = var.kubespray_custom_addons_enabled
   kubespray_custom_addons_path          = var.kubespray_custom_addons_path
   k8s_dashboard_enabled                 = var.k8s_dashboard_enabled
@@ -190,71 +242,10 @@ module "k8s_cluster" {
   metallb_ip_range                      = var.metallb_ip_range
   metallb_peers                         = var.metallb_peers
 
-  # K8s cluster creation depends on all VM modules
+  # K8s cluster creation depends on all VM modules #
   depends_on = [
     module.lb_module,
     module.worker_module,
     module.master_module
   ]
-}
-
-
-#======================================================================================
-# General Resources
-#======================================================================================
-
-#================================
-# Resource pool and base volume
-#================================
-
-# Creates a resource pool for Kubernetes VM volumes #
-resource "libvirt_pool" "resource_pool" {
-  name = var.libvirt_resource_pool_name
-  type = "dir"
-  path = "${var.libvirt_resource_pool_location}${var.libvirt_resource_pool_name}"
-}
-
-# Creates base OS image for nodes in a cluster #
-resource "libvirt_volume" "base_volume" {
-  name   = "base_volume"
-  pool   = var.libvirt_resource_pool_name
-  source = var.vm_image_source
-
-  depends_on = [libvirt_pool.resource_pool]
-}
-
-#================================
-# Cloud-init
-#================================
-
-# Public ssh key for vm (it is directly injected in cloud-init configuration) #
-data "template_file" "public_ssh_key" {
-  template = file("${var.vm_ssh_private_key}.pub")
-}
-
-# Network bridge configuration (for cloud-init) #
-data "template_file" "cloud_init_network_tpl" {
-  template = file("templates/cloud_init/cloud_init_network_nat.tpl")
-
-  vars = {
-    network_interface = var.vm_network_interface
-  }
-}
-
-# Cloud-init configuration template #
-data "template_file" "cloud_init_tpl" {
-  template = file("templates/cloud_init/cloud_init.tpl")
-
-  vars = {
-    user           = var.vm_user
-    ssh_public_key = data.template_file.public_ssh_key.rendered
-  }
-}
-
-# Initializes cloud-init disk for user data#
-resource "libvirt_cloudinit_disk" "cloud_init" {
-  name           = "cloud-init.iso"
-  pool           = libvirt_pool.resource_pool.name
-  user_data      = data.template_file.cloud_init_tpl.rendered
-  network_config = data.template_file.cloud_init_network_tpl.rendered
 }
