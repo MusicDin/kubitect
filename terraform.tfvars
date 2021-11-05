@@ -45,14 +45,20 @@ vm_network_interface = "ens3"
 # Network name #
 network_name = "k8s-network"
 
-# Network mode (nat, route) #
+# Network mode (nat, route, bridge) #
 network_mode = "nat"
-
-# Network (virtual) bridge #
-network_bridge = "virbr1"
 
 # Network CIDR (example: 192.168.113.0/24) #
 network_cidr = "192.168.113.0/24"
+
+# Network (virtual) bridge #
+# Note: For network mode 'bridge', bridge on host needs to preconfigured (example: br0) #
+network_bridge = "virbr1"
+
+# Network gateway (example: 192.168.113.1) #
+# Note: If not provided, it will be calculated as first host in network CIDR. #
+#       +-> first host of 192.168.113.0/24 is 192.168.113.1 #
+#network_gateway = "192.168.113.1"
 
 
 #======================================================================================
@@ -68,7 +74,7 @@ lb_default_ram = 2048
 # The default amount of disk allocated to the load balancer VM (in Bytes - B) #
 lb_default_storage = 16106127360
 
-# HAProxy load balancer nodes configuration #
+# HAProxy internal load balancer (iLB) nodes configuration #
 lb_nodes = [
   {
     id  = 1
@@ -82,9 +88,9 @@ lb_nodes = [
   }
 ]
 
-# Floating IP address. #
+# Virtual/Floating IP address. #
 # Note: Floating IP only applies if at least one load balancer is defined, #
-# otherwise IP of the first master node will be used. #
+# otherwise IP of the first master node will be used as control plane endpoint. #
 lb_vip = "192.168.113.200"
 
 
