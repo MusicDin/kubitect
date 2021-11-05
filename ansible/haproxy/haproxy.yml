@@ -41,7 +41,7 @@
         group: root
         mode: 0644
       notify: Restart Keepalived
-      when: "'lb-0' in inventory_hostname"
+      when: "'lb-1' in inventory_hostname"
 
     - name: Configure Keepalived backup
       copy:
@@ -51,7 +51,7 @@
         group: root
         mode: 0644
       notify: Restart Keepalived
-      when: "'lb-1' in inventory_hostname"
+      when: "'lb-2' in inventory_hostname"
 
     - name: Start and enable Keepalived
       service: name=keepalived state=started enabled=yes
