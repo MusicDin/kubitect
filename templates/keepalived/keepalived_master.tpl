@@ -1,9 +1,10 @@
 global_defs {
-    lvs_id haproxy_DH
+    enable_script_security
+    script_user root
 }
 
 vrrp_script check_haproxy {
-    script "killall -0 haproxy"
+    script "/usr/bin/killall -0 haproxy"
     interval 2
     weight 2
 }

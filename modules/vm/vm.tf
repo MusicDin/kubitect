@@ -1,3 +1,53 @@
+#================================
+# Cloud-init
+#================================
+
+# Public ssh key for vm (it is directly injected in cloud-init configuration) #
+data "template_file" "public_ssh_key" {
+  template = file("${var.vm_ssh_private_key}.pub")
+}
+
+# Network bridge configuration (for cloud-init) #
+data "template_file" "cloud_init_network_tpl" {
+  template = file(!var.is_bridge
+    ? "templates/cloud_init/cloud_init_network_nat.tpl"
+    : (var.vm_ip != null
+      ? "templates/cloud_init/cloud_init_network_bridge_static.tpl"
+      : "templates/cloud_init/cloud_init_network_bridge_dhcp.tpl"
+    )
+  )
+
+  vars = {
+    network_interface = var.vm_network_interface
+    network_bridge    = var.network_bridge
+    network_gateway   = var.network_gateway
+    vm_cidr           = var.vm_ip == null ? "" : "${var.vm_ip}/${split("/", var.network_cidr)[1]}"
+  }
+
+}
+
+# Cloud-init configuration template #
+data "template_file" "cloud_init_tpl" {
+  template = file("templates/cloud_init/cloud_init.tpl")
+
+  vars = {
+    user           = var.vm_user
+    ssh_public_key = data.template_file.public_ssh_key.rendered
+  }
+}
+
+# Initializes cloud-init disk for user data #
+resource "libvirt_cloudinit_disk" "cloud_init" {
+  name           = "${var.vm_name}-cloud-init.iso"
+  pool           = var.resource_pool_name
+  user_data      = data.template_file.cloud_init_tpl.rendered
+  network_config = data.template_file.cloud_init_network_tpl.rendered
+}
+
+#================================
+# VM
+#================================
+
 # Creates volume for new virtual machine #
 resource "libvirt_volume" "vm_volume" {
   name           = "${var.vm_name}.qcow2"
@@ -16,13 +66,16 @@ resource "libvirt_domain" "vm_domain" {
   memory    = var.vm_ram
   autostart = true
 
-  cloudinit = var.cloud_init_id
+  cloudinit = libvirt_cloudinit_disk.cloud_init.id
+
+  qemu_agent = var.is_bridge
 
   # Network configuration #
   network_interface {
     network_id     = var.network_id
     mac            = var.vm_mac
-    addresses      = var.vm_ip == null ? null : [var.vm_ip]
+    addresses      = var.vm_ip != null ? [var.vm_ip] : null
+    bridge         = var.is_bridge ? var.network_bridge: null
     wait_for_lease = true
   }
 
@@ -65,8 +118,10 @@ resource "libvirt_domain" "vm_domain" {
   }
 }
 
-# Remove static IP address from network after destruction #
-resource "null_resource" "remove_static_ip" {
+# Remove DHCP lease from network after VM destruction #
+resource "null_resource" "remove_dhcp_lease" {
+
+  count = !var.is_bridge ? 1 : 0
 
   triggers = {
     libvirt_provider_uri = var.libvirt_provider_uri
@@ -98,6 +153,10 @@ resource "null_resource" "remove_static_ip" {
   }
 }
 
+#================================
+# SSH known hosts
+#================================
+
 # Adds VM's SSH key to known hosts #
 resource "null_resource" "ssh_known_hosts" {
 
@@ -108,7 +167,15 @@ resource "null_resource" "ssh_known_hosts" {
   }
 
   provisioner "local-exec" {
-    command = "sh ./scripts/filelock-exec.sh \"touch ~/.ssh/known_hosts && ssh-keygen -R ${libvirt_domain.vm_domain.network_interface.0.addresses.0} && ssh-keyscan -t rsa ${libvirt_domain.vm_domain.network_interface.0.addresses.0} | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old\""
+    command = <<-EOF
+              sh ./scripts/filelock-exec.sh \
+                "touch ~/.ssh/known_hosts && ssh-keygen -R $VM_IP && ssh-keyscan -t rsa $VM_IP \
+                | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old"
+              EOF
+
+    environment = {
+      VM_IP = libvirt_domain.vm_domain.network_interface.0.addresses.0
+    }
   }
 
   provisioner "local-exec" {

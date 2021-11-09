@@ -90,8 +90,8 @@ variable "network_mode" {
   default     = "nat"
 
   validation {
-    condition     = contains(["nat", "route"], var.network_mode)
-    error_message = "Variable 'network_mode' is invalid.\nPossible values are: [\"nat\", \"route\"]."
+    condition     = contains(["nat", "route", "bridge"], var.network_mode)
+    error_message = "Variable 'network_mode' is invalid.\nPossible values are: [\"nat\", \"route\", \"bridge\"]."
   }
 }
 
@@ -104,6 +104,16 @@ variable "network_bridge" {
 variable "network_cidr" {
   type        = string
   description = "Network CIDR"
+  validation {
+    condition     = can(regex("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}/([1-9]|[1-2][0-9]|3[0-2])$", var.network_cidr))
+    error_message = "Invalid network CIDR."
+  }
+}
+
+variable "network_gateway" {
+  type        = string
+  description = "Network gateway"
+  default     = null
 }
 
 #======================================================================================
