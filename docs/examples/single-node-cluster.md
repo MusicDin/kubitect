@@ -21,4 +21,4 @@ worker_nodes = []
 
 Your master node will now also become a worker node.
 
-*Note: If you don't specify any worker nodes then all master nodes will also become worker nodes.*
+*Note: If you do not specify worker nodes, all master nodes will also become worker nodes.*
