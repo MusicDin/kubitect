@@ -332,21 +332,23 @@ resource "null_resource" "haproxy_install" {
                 --become \
                 --user=$SSH_USER \
                 --private-key=$SSH_PRIVATE_KEY \
-                --extra-vars "kube_version=$K8S_VERSION" \
+                $EXTRA_ARGS \
                 haproxy.yml
               EOF
 
     environment = {
       SSH_USER        = var.vm_user
       SSH_PRIVATE_KEY = var.vm_ssh_private_key
-      K8S_VERSION     = var.k8s_version
       EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
     }
   }
 
+  # Requires hosts.ini, HAProxy and Keepalive configuration files created #
   depends_on = [
     local_file.kubespray_hosts,
-    local_file.haproxy
+    local_file.haproxy,
+    local_file.keepalived_backup,
+    local_file.keepalived_master
   ]
 }
 
