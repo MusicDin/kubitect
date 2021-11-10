@@ -1,8 +1,8 @@
 # MetalLB configuration examples
 
-MetalLB allows you to expose your service as a type of `LoadBalancer`.
+MetalLB allows you to expose services of type 'LoadBalancer'.
 
-Official MetalLB documentation is available [here](https://www.metallb.org).
+The official MetalLB documentation can be found [here](https://www.metallb.org).
 
 MetalLB can be configured in two modes:
 - [Layer2](#layer2)
@@ -10,7 +10,8 @@ MetalLB can be configured in two modes:
 
 # Layer2
 
-`layer2` mode is easier to configure. All you have to do is just configure the MetalLB section in [terraform.tfvar](/terraform.tfvars):
+`layer2` mode is easier to configure. 
+You only need to configure the MetalLB section in [terraform.tfvar](/terraform.tfvars):
 ```hcl
 metallb_enabled  = "true"
 metallb_protocol = "layer2"
@@ -20,25 +21,27 @@ metallb_ip_range = "192.168.113.241-192.168.113.254"
 
 # BGP
 
-To configure MetalLB in BGP mode, you will need BGP enabled router on your host.
+To configure MetalLB in BGP mode, you need a BGP-capable router 
+(virtual routers also work).
 
-Let's assume the following cluster configuration:
-- Cluster's network: `192.168.113.1/24`
+Let us assume the following cluster configuration:
+- Cluster network: `192.168.113.0/24`
+- Network gateway: `192.168.113.1/32` 
 - Master node: `192.168.113.10/32`
 - Worker node: `192.168.113.40/32`
 
 ### Routing - FRR
 
-This example will show how to configure [FRR](https://frrouting.org/) on your host.
+This example shows you how to configure [FRR](https://frrouting.org/) on your host.
 
-First [install FRR](http://docs.frrouting.org/en/latest/installation.html) on the host machine.
+First, [install FRR](http://docs.frrouting.org/en/latest/installation.html) on the host machine.
 
-Then enable BGP daemon in `/etc/frr/daemons` by setting `bgpd` from *no* to *yes*:
+Then enable the BGP daemon by setting `bgpd` to *yes* in `/etc/frr/daemons`:
 ```
 bgpd=yes
 ```
 
-Edit FRR configuration file `/etc/frr/frr.conf`:
+Edit the FRR configuration file `/etc/frr/frr.conf`:
 ```
 !
 frr defaults traditional
@@ -55,7 +58,7 @@ line vty
 !
 ```
 
-*Note: It's recommended to use [vty shell](http://docs.frrouting.org/en/latest/vtysh.html) for editing FRR configuration.*
+*Note: It is recommended to use the [vty shell](http://docs.frrouting.org/en/latest/vtysh.html) to edit the FRR configuration.*
 
 Now enable FRR on your host:
 ```
@@ -66,20 +69,20 @@ systemctl --now enable frr
 
 This example shows how to configure [firewalld](https://firewalld.org/) to allow BGP traffic.
 
-To allow our FRR router to communicate with cluster nodes, allow BGP in firewall:
+To allow our FRR router to communicate with the cluster nodes, allow BGP in the firewall:
 ```
 firewall-cmd --permanent --add-service=bgp
 firewall-cmd --reload
 ```
 
-Alternatively you can also specify a zone on which BGP will be enabled:
+Alternatively, you can specify a zone in which to allow BGP:
 ```
 firewall-cmd --permanent --zone=<ZONE> --add-service=bgp
 ```
 
-### Configuring MetalLB
+### Configure MetalLB
 
-In [terraform.tfvars](/terraform.tfvars) configure MetalLB section:
+In the [terraform.tfvars](/terraform.tfvars) file, configure the MetalLB section:
 ```hcl
 metallb_enabled  = "true"
 metallb_protocol = "bgp"

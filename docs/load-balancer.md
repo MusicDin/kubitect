@@ -1,30 +1,19 @@
-# Load balancing
+# Internal load balancing (iLB)
 
-HAProxy load balancer is used to load balance traffic between master nodes.
+HAProxy load balancers are used to load balance traffic between master nodes.
 
-If you would like to expose services of type [LoadBalancer](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer) than check [MetalLB configuration example](examples/metallb.md).
+If you want to deploy [LoadBalancer](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer) type services, see the [MetalLB configuration example](examples/metallb.md) configuration example.
 
-## Cluster without load balancer
+---
 
-If you decide to omit load balancer, all you have to do is to modify [terraform.tfvars](../terraform.tfvars) file.
+*Note: This script currently supports up to 2 HAProxy load balancers.*
 
-Remove all load balancers IP and MAC addresses:
-```hcl
-lb_nodes = []
-```
-
-*Note: If there is more master nodes specified, IP of the first one will be used for a cluster IP.*
-
-## Cluster with load balancer(s)
-
-*Note: This script supports up to 2 HAProxy load balancers.*
-
-Provide a MAC and IP address for each load balancer in [terraform.tfvars](../terraform.tfvars) file:
+Specify load balancers in [terraform.tfvars](../terraform.tfvars) file:
 ```hcl
 lb_nodes = [
   {
     id  = 1
-    ip  = null  # Specific IP or null to auto generate it
+    ip  = null  # Specific IP or null to retrieve it from router
     mac = null  # Specific MAC or null to auto generate it
   },
   {
@@ -34,28 +23,40 @@ lb_nodes = [
   }
 ]
 ```
+*Note: Only load balancers with ids 1 and 2 are initialized.*
 
 Then set a floating IP that should not be taken by any other VM:
 ```hcl
 lb_vip = "floating_ip"
 ```
 
-## Modifying load balancer's configuration BEFORE cluster initialization
+## Cluster without internal load balancers
 
-In order to have the same configuration on all of your load balancers,
-HAProxy configuration has to be modified before initialization.
+If you have only one master node, the internal load balancers are redundant.
+In this case, remove all load balancer nodes in the [terraform.tfvars](../terraform.tfvars) file:
+```hcl
+lb_nodes = []
+```
 
-To accomplish that, modify [haproxy.cfg](../templates/haproxy.tpl) file and put your custom configuration where
+*Note: If multiple master nodes are specified, the IP of the first one is used as the cluster IP.*
+
+## Changing the load balancer configuration BEFORE cluster initialization
+
+To have the same configuration on all your load balancers,
+HAProxy configuration has to be changed before initialization.
+
+To do this, modify the [haproxy.tpl](../templates/haproxy/haproxy.tpl) file and insert your custom configuration where the
 comment `Place custom configurations here` is located.
 
-## Modifying load balancer's configuration over SSH
 
-After the cluster is all set up, SSH into it and modify it's configuration:
+## Changing the load balancer configuration via SSH
+
+After the cluster is set up, log in via SSH and change the configuration of the load balancer:
 ```bash
 # SSH into load balancer
 ssh <vm_user>@<lb_ip>
 
-# Modify LB's configuration file (use your favorite editor)
+# Modify HAProxy configuration file (use your favorite editor)
 nano /etc/haproxy/haproxy.cfg
 
 # Test configuration
@@ -65,4 +66,4 @@ haproxy -f /etc/haproxy/haproxy.cfg -c
 sudo systemctl restart haproxy
 ```
 
-*For more information check [HAProxy documentation](https://cbonte.github.io/haproxy-dconv/)*.
+*For more information, see the [HAProxy documentation](https://cbonte.github.io/haproxy-dconv/).*

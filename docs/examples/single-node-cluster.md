@@ -1,6 +1,7 @@
 # Single node cluster
 
-If you would like to initialize a cluster with only one node than specify only one master node in [terraform.tfvars](../../terraform.tfvars):
+If you want to initialize a cluster with only one node,
+specify only one master node in [terraform.tfvars](../../terraform.tfvars):
 ```hcl
 master_nodes = [
   {
@@ -11,7 +12,7 @@ master_nodes = [
 ]
 ```
 
-Don't forget to remove (or comment out) worker and load balancer nodes:
+Do not forget to remove (or comment out) the worker and load balancer nodes:
 ```hcl
 lb_nodes = []
 ...
@@ -19,6 +20,6 @@ lb_nodes = []
 worker_nodes = []
 ```
 
-Your master node will now also become a worker node.
+Your master node now also becomes a worker node.
 
-*Note: If you do not specify worker nodes, all master nodes will also become worker nodes.*
+*Note: If you do not specify worker nodes, all master nodes also become worker nodes.*

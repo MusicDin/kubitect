@@ -4,7 +4,9 @@ Content:
 1. [KVM/Libvirt errors](#kvmlibvirt-errors)
 2. [HAProxy load balancer errors](#haproxy-load-balancer-errors)
 
+
 ## KVM/Libvirt errors
+
 
 ### -> Problem 1
 
@@ -13,23 +15,24 @@ Content:
 *Error: virError(Code=38, Domain=7, Message='Failed to connect socket to '/var/run/libvirt/libvirt-sock': No such file or directory') on libvirt.tf line 1, in provider "libvirt”": 1: provider "libvirt" {...*
 
 #### Explanation:
-The problem can arise when libvirt is not started.
+The problem may occur when libvirt is not started.
 
 #### Solution:
-Verify that `libvirt` service is running:
-```bash
+Make sure that the `libvirt` service is running:
+```sh
 sudo systemctl status libvirtd
 ```
 
-If `libvirt` service is not running, you need to start it:
-```bash
+If the `libvirt` service is not running, start it:
+```sh
 sudo systemctl start libvirtd
 ```
 
-*Optional:* Automatically start `libvirt` service at boot time:
+*Optional:* Start the `libvirt` service automatically at boot time:
 ```bash
 sudo systemctl enable libvirtd
 ```
+
 
 ### -> Problem 2
 
@@ -38,10 +41,29 @@ sudo systemctl enable libvirtd
 *Error: virError(Code=38, Domain=7, Message='Failed to connect socket to '/var/run/libvirt/libvirt-sock': Permission denied')*
 
 #### Explanation and Possible Solution:
-Check following:
-+ Is libvirt running?
-+ Is your user in the libvirt group?
-+ If on a virtual machine and you just installed libvirt for the first time, make sure to restart the machine and try again.
+Make sure:
++ the `libvirtd` service is running and
++ the current user is in the `libvirt` and `kvm` groups.
+
+#### Solution
+
+If the `libvirtd` service is not running, start it:
+```sh
+sudo systemctl start libvirtd
+```
+
+Add the current user to the `libvirt` and `kvm` groups if needed:
+```sh
+# Add current user to groups
+sudo usermod -aG libvirt,kvm `id -un`
+
+# Verify groups are added
+id -nG
+
+# Reload user session
+su - `id -un`
+```
+
 
 ### -> Problem 3
 
@@ -50,13 +72,14 @@ Check following:
 *Error: Error creating libvirt domain: … Could not open '/tmp/terraform_libvirt_provider_images/image.qcow2': Permission denied')*
 
 #### Explanation:
-This problem can occur when applying the Terraform plan on Libvirt provider.
-+ Is the directory existing?
-+ Make sure the directory of the file that is denied has user permissions.
+This problem can occur when you apply the Terraform plan.
++ Make sure that the directory exists.
++ Make sure that the directory of the file that is being denied has appropriate user permissions.
++ Optionally qemu security driver can be disabled. 
 
 #### Solution:
 Make sure the `security_driver` in `/etc/libvirt/qemu.conf` is set to `none` instead of `selinux`.
-This line is by default commented, so if needed uncomment it:
+This line is commented out by default, so you should uncomment it if needed:
 ```bash
 # /etc/libvirt/qemu.conf
 
@@ -65,10 +88,11 @@ security_driver = "none"
 ...
 ```
 
-Don't forget to restart `libvirt` service after making changes:
+Do not forget to restart the `libvirt` service after making the changes:
 ```bash
 sudo systemctl restart libvirtd
 ```
+
 
 ### -> Problem 4
 
@@ -77,24 +101,26 @@ sudo systemctl restart libvirtd
 *Error: Error defining libvirt domain: virError(Code=9, Domain=20, Message='operation failed: domain '**your-domain**' already exists with uuid '...')*
 
 #### Explanation:
-This problem can occur when applying the Terraform plan on Libvirt provider.
+This problem can occur when you apply the Terraform plan.
 
 #### Solution:
-Resource that you are trying to create, already exists. Make sure to destroy the resource:
+The resource you are trying to create already exists. 
+Make sure you destroy the resource:
 <pre>
 virsh destroy <b>your-domain</b>
 virsh undefine <b>your-domain</b>
 </pre>
 
-You can verify that the domain is successfully removed with:
+You can verify that the domain was successfully removed:
 <pre>
 virsh dominfo --domain <b>your-domain</b>
 </pre>
 
-If domain has been removed successfully, output should be something like:
+If the domain was successfully removed, the output should look something like this:
 <pre>
 error: failed to get domain '<b>your-domain</b>'
 </pre>
+
 
 ### -> Problem 5
 
@@ -107,11 +133,11 @@ and / or
 *Error:Error creating libvirt volume for cloudinit device <b>cloud-init</b>.iso: virError(Code=90, Domain=18, Message='storage volume '<b>cloud-init</b>.iso' exists already')*
 
 #### Explanation:
-This error can occur when trying to remove a faulty Terraform plan.
+This error can occur if you try to remove a faulty Terraform plan.
 
 #### Solution:
-Volumes created by Libvirt are still attached to the images, which prevents a new volume from being applied with the same name.
-Therefore, removal of these volumes is required:
+Volumes created by Libvirt are still attached to the images, which prevents a new volume from being created with the same name.
+Therefore, these volumes must be removed:
 <pre>
 virsh vol-delete <b>cloud-init</b>.iso --pool <b>your_resource_pool</b>
 
@@ -120,6 +146,7 @@ virsh vol-delete <b>cloud-init</b>.iso --pool <b>your_resource_pool</b>
 virsh vol-delete <b>your-volume</b>.qcow2 --pool <b>your_resource_pool</b>
 </pre>
 
+
 ### -> Problem 6
 
 #### Error:
@@ -127,13 +154,14 @@ virsh vol-delete <b>your-volume</b>.qcow2 --pool <b>your_resource_pool</b>
 *Error: Error storage pool '**your-pool**' already exists*
 
 #### Explanation:
-Make sure you delete the created pool as well, first by halting it and removing it afterwards.
+Make sure you delete the created pool by first stopping it and then removing it.
 
 #### Solution:
 Remove the libvirt pool that was created during the Terraform process:
 <pre>
 virsh pool-destroy <b>your-pool</b> && virsh pool-undefine <b>your-pool</b>
 </pre>
+
 
 ### -> Problem 7
 
@@ -142,13 +170,14 @@ virsh pool-destroy <b>your-pool</b> && virsh pool-undefine <b>your-pool</b>
 *Error: Error **your-vm-name** already exists*
 
 #### Explanation:
-Your VM has been halted but not removed completely.
+Your VM was stopped but not completely removed.
 
 #### Solution:
-Remove the running VM:
+Remove the stopped VM:
 <pre>
 virsh undefine <b>your-vm-name</b>
 </pre>
+
 
 ### -> Problem 8
 
@@ -157,29 +186,48 @@ virsh undefine <b>your-vm-name</b>
 *Error: internal error: Failed to apply firewall rules /sbin/iptables -w --table filter --insert LIBVIRT_INP --in-interface virbr2 --protocol tcp --destination-port 67 --jump ACCEPT: iptables: No chain/target/match by that name.*
 
 #### Explanation:
-Libvirt has already been running when Firewalld was installed, so libvirt needs to be restarted in order to recognize it.
+Libvirt was already running when Firewalld was installed.
+Therefore, `libvirtd` service must be restarted to detect the changes.
 
 #### Solution:
-Restart Libvirt daemon:
-<pre>
+Restart `libvirtd` service:
+```sh
 sudo systemctl restart libvirtd
-</pre>
+```
 
-## HAProxy load balancer errors
 
 ### -> Problem 9
 
 #### Error:
+*Error creating libvirt network: virError(Code=89, Domain=47, Message='COMMAND_FAILED: '/usr/sbin/iptables -w10 -w --table filter --insert LIBVIRT_INP --in-interface virbr1 --protocol tcp --destination-port 67 --jump ACCEPT' failed: iptables: No chain/target/match by that name.*
 
-HAProxy returns random *HTTP 503 (Bad gateway)* error.
+#### Explanation:
+Libvirt was already running when iptables was set up.
+Therefore, `libvirtd` service must be restarted to detect the changes.
+
+#### Solution:
+Restart `libvirtd` service:
+```sh
+sudo systemctl restart libvirtd
+```
+
+
+## HAProxy load balancer errors
+
+
+### -> Problem 10
+
+#### Error:
+
+HAProxy returns a random *HTTP 503 (Bad gateway)* error.
 
 #### Explanation:
 
-More than 1 haproxy processes are listening on the same port.
+More than one HAProxy processes are listening on the same port.
 
 #### Solution 1:
 
-For example if an error is thrown when accessing port `80`, check which processes are listening on port `80` on load balancer VM:
+For example, if an error is thrown when accessing port `80`, check which processes are listening on port `80` on the load balancer VM:
 <pre>
 netstat -lnput | grep <b>80</b>
 </pre>
@@ -190,13 +238,13 @@ tcp        0      0 192.168.113.200:<b>80</b>      0.0.0.0:*         LISTEN     
 tcp        0      0 192.168.113.200:<b>80</b>      0.0.0.0:*         LISTEN      <b>1897</b>/haproxy
 </pre>
 
-If you see more than one process, kill the unnecessary one:
+If you see more than one process, kill the unnecessary process:
 <pre>
 kill <b>1976</b>
 </pre>
 
-*Note: You can kill all of them and one will be recreated by HAProxy.*
+*Note: You can kill all HAProxy processes and only one will be automatically recreated.*
 
 #### Solution 2:
 
-Check HAProxy configuration file (`haproxy.cfg`) that it doesn't contain 2 frontends bound on the same port.
+Check the HAProxy configuration file (`haproxy.cfg`) that it does not contain 2 frontends bound to the same port.
