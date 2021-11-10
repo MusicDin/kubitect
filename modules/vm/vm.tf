@@ -31,6 +31,7 @@ data "template_file" "cloud_init_tpl" {
   template = file("templates/cloud_init/cloud_init.tpl")
 
   vars = {
+    hostname       = var.vm_name
     user           = var.vm_user
     ssh_public_key = data.template_file.public_ssh_key.rendered
   }
