@@ -9,7 +9,8 @@ In order to use the bridged network, bridge needs to be preconfigured on the hos
 
 Create the bridge interface (`br0` in our case) by creating the file `/etc/systemd/network/br0.netdev` 
 with the following content:
-```
+
+```editorconfig
 [NetDev]
 Name=br0
 Kind=bridge
@@ -17,7 +18,8 @@ Kind=bridge
 
 Bind the ethernet interface (`eno1` in our case) to the bridge interface (`br0` in our case) 
 by creating the file `/etc/systemd/network/br0-bind.network` with the following content:
-```
+
+```editorconfig
 [Match]
 Name=eno1
 
@@ -29,7 +31,8 @@ Bridge=br0
 
 To use router's DHCP, instruct `systemd-networkd` to obtain an IPv4 DHCP lease through the bridge interface 
 by creating the file `/etc/systemd/network/br0-dhcp.network` with the following content:
-```
+
+```editorconfig
 [Match]
 Name=br0
 
@@ -59,13 +62,14 @@ and the IP of the router (gateway) is `192.168.0.1`.
 ---
 
 After that, restart `systemd-networkd` and the bridge should be configured:
-```
+```sh
 systemctl restart systemd-networkd
 ```
 
 The final step is to disable netfilter on the bridge
 (More information can be found [here](https://wiki.libvirt.org/page/Net.bridge.bridge-nf-call_and_sysctl.conf)):
-```bash
+
+```sh
  cat >> /etc/sysctl.conf <<EOF
  net.bridge.bridge-nf-call-ip6tables = 0
  net.bridge.bridge-nf-call-iptables = 0
