@@ -328,7 +328,7 @@ resource "null_resource" "haproxy_install" {
     command = <<-EOF
               virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
               ansible-playbook \
-                --inventory ../../config/hosts.ini \
+                --inventory config/hosts.ini \
                 --become \
                 --user=$SSH_USER \
                 --private-key=$SSH_PRIVATE_KEY \
