@@ -13,7 +13,8 @@ vrrp_instance VI_01 {
     state BACKUP
     interface ${network_interface}
     virtual_router_id 51
-    priority 100
+    priority ${priority}
+    advert_int 1
 
     virtual_ipaddress {
         ${virtual_ip}

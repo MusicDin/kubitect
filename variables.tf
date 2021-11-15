@@ -165,11 +165,12 @@ variable "lb_nodes" {
 
   validation {
     condition = (
-      compact(tolist([for node in var.lb_nodes : node.id])) == distinct(compact(tolist([for node in var.lb_nodes : node.id])))
+      alltrue([for node in var.lb_nodes : (node.id >= 0 && node.id <= 200)])
+      && compact(tolist([for node in var.lb_nodes : node.id])) == distinct(compact(tolist([for node in var.lb_nodes : node.id])))
       && compact(tolist([for node in var.lb_nodes : node.mac])) == distinct(compact(tolist([for node in var.lb_nodes : node.mac])))
       && compact(tolist([for node in var.lb_nodes : node.ip])) == distinct(compact(tolist([for node in var.lb_nodes : node.ip])))
     )
-    error_message = "HAProxy load balancer nodes configuration is incorrect. Make sure that:\n - every ID is unique,\n - every MAC and IP address is unique or null."
+    error_message = "HAProxy load balancer nodes configuration is incorrect. Make sure that:\n - every ID is unique and that it's value is between 0 and 200,\n - every MAC and IP address is unique or null."
   }
 }
 

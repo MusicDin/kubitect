@@ -33,25 +33,14 @@
     - name: Install Keepalived
       package: name=keepalived state=present
 
-    - name: Configure Keepalived master
+    - name: Configure Keepalived
       copy:
-        src: ../../config/keepalived/keepalived-master.cfg
+        src: ../../config/keepalived/keepalived-{{ inventory_hostname }}.cfg
         dest: /etc/keepalived/keepalived.conf
         owner: root
         group: root
         mode: 0644
       notify: Restart Keepalived
-      when: "'lb-1' in inventory_hostname"
-
-    - name: Configure Keepalived backup
-      copy:
-        src: ../../config/keepalived/keepalived-backup.cfg
-        dest: /etc/keepalived/keepalived.conf
-        owner: root
-        group: root
-        mode: 0644
-      notify: Restart Keepalived
-      when: "'lb-2' in inventory_hostname"
 
     - name: Start and enable Keepalived
       service: name=keepalived state=started enabled=yes

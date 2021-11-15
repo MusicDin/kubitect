@@ -30,6 +30,7 @@ variable "master_nodes" {
 
 variable "lb_nodes" {
   type = list(object({
+    id   = number
     name = string
     ip   = string
   }))

@@ -9,8 +9,9 @@ locals {
     ubuntu = "--timeout 3000 --verbose"
     centos = "--timeout 3000 --verbose"
   }
-  default_extra_args  = "--timeout 3000 --verbose"
-  dashboard_namespace = "kube-system"
+  default_extra_args    = "--timeout 3000 --verbose"
+  dashboard_namespace   = "kube-system"
+  initial_vrrp_priority = 201
 }
 
 
@@ -205,26 +206,6 @@ data "template_file" "haproxy_backend" {
   }
 }
 
-# Keepalived master template #
-data "template_file" "keepalived_master" {
-  template = file("templates/keepalived/keepalived_master.tpl")
-
-  vars = {
-    network_interface = var.vm_network_interface
-    virtual_ip        = var.lb_vip
-  }
-}
-
-# Keepalived backup template #
-data "template_file" "keepalived_backup" {
-  template = file("templates/keepalived/keepalived_backup.tpl")
-
-  vars = {
-    network_interface = var.vm_network_interface
-    virtual_ip        = var.lb_vip
-  }
-}
-
 
 #======================================================================================
 # Local files
@@ -284,16 +265,19 @@ resource "local_file" "haproxy" {
   filename = "config/haproxy/haproxy.cfg"
 }
 
-# Create keepalived master configuration file from template #
-resource "local_file" "keepalived_master" {
-  content  = data.template_file.keepalived_master.rendered
-  filename = "config/keepalived/keepalived-master.cfg"
-}
+# Create Keepalived configuration file from template #
+resource "local_file" "keepalived" {
 
-# Create keepalived backup configuration file from template #
-resource "local_file" "keepalived_backup" {
-  content  = data.template_file.keepalived_backup.rendered
-  filename = "config/keepalived/keepalived-backup.cfg"
+  for_each = { for node in var.lb_nodes : node.id => node }
+
+  content  = templatefile("templates/keepalived/keepalived.tpl",
+    {
+      network_interface = var.vm_network_interface
+      virtual_ip        = var.lb_vip
+      priority          = local.initial_vrrp_priority - each.value.id
+    }
+  )
+  filename = "config/keepalived/keepalived-${each.value.name}.cfg"
 }
 
 
@@ -347,8 +331,7 @@ resource "null_resource" "haproxy_install" {
   depends_on = [
     local_file.kubespray_hosts,
     local_file.haproxy,
-    local_file.keepalived_backup,
-    local_file.keepalived_master
+    local_file.keepalived
   ]
 }
 
