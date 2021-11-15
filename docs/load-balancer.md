@@ -6,8 +6,6 @@ If you want to deploy [LoadBalancer](https://kubernetes.io/docs/concepts/service
 
 ---
 
-*Note: This script currently supports up to 2 HAProxy load balancers.*
-
 Specify load balancers in [terraform.tfvars](../terraform.tfvars) file:
 ```hcl
 lb_nodes = [
@@ -23,7 +21,7 @@ lb_nodes = [
   }
 ]
 ```
-*Note: Only load balancers with ids 1 and 2 are initialized.*
+*Note: Load balancer IDs must be between 0 and 200, because priority is calculated from ID.*
 
 Then set a floating IP that should not be taken by any other VM:
 ```hcl
