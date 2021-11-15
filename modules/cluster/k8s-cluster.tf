@@ -326,14 +326,14 @@ resource "null_resource" "haproxy_install" {
 
   provisioner "local-exec" {
     command = <<-EOF
-              cd ansible/haproxy
+              virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
               ansible-playbook \
                 --inventory ../../config/hosts.ini \
                 --become \
                 --user=$SSH_USER \
                 --private-key=$SSH_PRIVATE_KEY \
                 $EXTRA_ARGS \
-                haproxy.yml
+                ansible/haproxy/haproxy.yml
               EOF
 
     environment = {
@@ -520,6 +520,7 @@ resource "null_resource" "fetch_kubeconfig" {
 
   provisioner "local-exec" {
     command = <<-EOF
+              virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
               ansible \
                 --inventory config/hosts.ini \
                 --become \
