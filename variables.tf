@@ -140,13 +140,14 @@ variable "lb_default_storage" {
 
 variable "lb_vip" {
   type        = string
-  description = "The IP address of HAProxy load balancer floating VIP"
-  /*
-  validation {
-    condition = can(regex("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}/([1-9]|[1-2][0-9]|3[0-2])$", var.vm_ip))
-    error_message = "Invalid load balancer virtual IP address (VIP)."
-  }
-  */
+  description = "HAProxy load balancer virtual IP address (VIP)"
+
+  /*validation {
+    condition = (
+      cidrhost(var.network_cidr, 0) == cidrhost("${var.lb_vip}/${split("/", var.network_cidr)[1]}", 0)
+    )
+    error_message = "HAProxy load balancer virtual IP address (VIP) has to be within network CIDR."
+  }*/
 }
 
 variable "lb_nodes" {

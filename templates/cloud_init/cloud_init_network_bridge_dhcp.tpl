@@ -1,3 +1,4 @@
+renderer: networkd
 version: 2
 ethernets:
   ${network_interface}:
@@ -8,6 +9,3 @@ bridges:
     interfaces: [${network_interface}]
     dhcp4: true
     dhcp6: false
-    parameters:
-      # STP - Spanning Tree Protocol
-      stp: false

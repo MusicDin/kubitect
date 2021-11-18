@@ -39,7 +39,7 @@ variable "lb_nodes" {
 
 variable "lb_vip" {
   type        = string
-  description = "Floating virtual IP for load balancers"
+  description = "Load balancer virtual IP address (VIP)"
 }
 
 variable "vm_distro" {
