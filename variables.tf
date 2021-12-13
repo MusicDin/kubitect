@@ -28,6 +28,11 @@ variable "libvirt_resource_pool_location" {
   type        = string
   description = "Location where resource pool will be initialized"
   default     = "/var/lib/libvirt/pools/"
+
+  validation {
+    condition     = length(var.libvirt_resource_pool_location) != 0
+    error_message = "Libvirt resource pool location cannot be empty."
+  }
 }
 
 #======================================================================================
@@ -43,6 +48,11 @@ variable "vm_user" {
 variable "vm_ssh_private_key" {
   type        = string
   description = "Location of private ssh key for VMs"
+
+  validation {
+    condition     = fileexists(var.vm_ssh_private_key) && fileexists("${var.vm_ssh_private_key}.pub")
+    error_message = "Invalid path to private and/or public SSH key. \nPrivate key should be on path 'var.vm_ssh_private_key' and public key should be on the same path with suffix '.pub'."
+  }
 }
 
 variable "vm_ssh_known_hosts" {
@@ -60,12 +70,22 @@ variable "vm_distro" {
 variable "vm_image_source" {
   type        = string
   description = "Image source, which can be path on host's filesystem or URL."
+
+  validation {
+    condition     = length(var.vm_image_source) != 0
+    error_message = "Virtual machine (VM) image source is missing. Please specify local path or URL to the image."
+  }
 }
 
 variable "vm_name_prefix" {
   type        = string
   description = "Prefix added to names of VMs"
   default     = "vm"
+
+  validation {
+    condition     = length(var.vm_name_prefix) != 0
+    error_message = "Virtual machine (VM) name prefix cannot be empty."
+  }
 }
 
 variable "vm_network_interface" {

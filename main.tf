@@ -33,7 +33,7 @@ provider "libvirt" {
 resource "libvirt_pool" "resource_pool" {
   name = var.libvirt_resource_pool_name
   type = "dir"
-  path = "${var.libvirt_resource_pool_location}${var.libvirt_resource_pool_name}"
+  path = "${trimsuffix(var.libvirt_resource_pool_location, "/")}/${var.libvirt_resource_pool_name}"
 }
 
 # Creates base OS image for nodes in a cluster #

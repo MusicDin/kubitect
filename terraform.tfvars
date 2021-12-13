@@ -8,7 +8,7 @@ libvirt_provider_uri = "qemu:///system"
 # Resource pool name #
 libvirt_resource_pool_name = "k8s-resource-pool"
 
-# Location where resource pool will be initialized (Path must contain "/" at the end) #
+# Location where resource pool will be initialized #
 libvirt_resource_pool_location = "/var/lib/libvirt/pools/"
 
 
