@@ -7,15 +7,8 @@ Set up HA Kubernetes cluster using KVM, Terraform and Kubespray.
 + [Ansible](https://www.ansible.com/) >= 2.9
 + [Terraform](https://www.terraform.io/) >= 1.0.0
 + [KVM - Kernel Virtual Machine](https://www.linux-kvm.org/)
-+ [Libvirt provider](https://github.com/dmacvicar/terraform-provider-libvirt) >= 0.6.3
++ [Libvirt provider](https://github.com/dmacvicar/terraform-provider-libvirt) >= 0.6.12
 + Internet connection
-
-### Libvirt provider
-
-**IMPORTANT**:
-+ Bridging VMs with the LAN network only works with libvirt provider `0.6.3` due to the missing implementation of `qemu-agent` in higher versions.
-  Version `0.6.3` is not included in the Terraform registry and therefore requires manual installation of the provider.
-  ([Setup libvirt provider](docs/libvirt-provider-setup.md)).
 
 
 ## Getting Started
@@ -133,7 +126,6 @@ terraform destroy
 ```
 
 ## More documentation
-+ [Setup libvirt provider](docs/libvirt-provider-setup.md)
 + [Load balancing](docs/load-balancer.md)
 + [Troubleshooting](docs/troubleshooting.md)
 + Examples:
