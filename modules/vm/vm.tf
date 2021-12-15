@@ -54,7 +54,8 @@ resource "libvirt_volume" "vm_volume" {
   name           = "${var.vm_name}.qcow2"
   pool           = var.resource_pool_name
   base_volume_id = var.base_volume_id
-  size           = var.vm_storage
+  # GiB -> B
+  size           = var.vm_storage * pow(1024, 3)
   format         = "qcow2"
 }
 
@@ -64,7 +65,8 @@ resource "libvirt_domain" "vm_domain" {
   # General configuration #
   name      = var.vm_name
   vcpu      = var.vm_cpu
-  memory    = var.vm_ram
+  # GiB -> MiB
+  memory    = var.vm_ram * 1024
   autostart = true
 
   cloudinit = libvirt_cloudinit_disk.cloud_init.id

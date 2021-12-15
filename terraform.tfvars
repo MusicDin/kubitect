@@ -68,11 +68,11 @@ network_bridge = "virbr1"
 # The default number of vCPU allocated to the load balancer VM #
 lb_default_cpu = 1
 
-# The default amount of RAM allocated to the load balancer VM (in Megabytes - MB) #
-lb_default_ram = 2048
+# The default amount of RAM allocated to the load balancer VM [GiB] #
+lb_default_ram = 2
 
-# The default amount of disk allocated to the load balancer VM (in Bytes - B) #
-lb_default_storage = 16106127360
+# The default amount of disk allocated to the load balancer VM [GiB] #
+lb_default_storage = 16
 
 # HAProxy internal load balancer (iLB) nodes configuration #
 lb_nodes = [
@@ -101,11 +101,11 @@ lb_vip = "192.168.113.200"
 # The default number of vCPU allocated to the master VM #
 master_default_cpu = 2
 
-# The default amount of RAM allocated to the master VM (in Megabytes - MB) #
-master_default_ram = 2048
+# The default amount of RAM allocated to the master VM [GiB]] #
+master_default_ram = 2
 
-# The default amount of disk allocated to the master VM (in Bytes - B) #
-master_default_storage = 16106127360
+# The default amount of disk allocated to the master VM [GiB] #
+master_default_storage = 16
 
 # Master nodes configuration #
 # Note that number of masters cannot be divisible by 2. #
@@ -135,11 +135,11 @@ master_nodes = [
 # The default number of vCPU allocated to the worker VM #
 worker_default_cpu = 4
 
-# The default amount of RAM allocated to the worker VM (in Megabytes - MB) #
-worker_default_ram = 8192
+# The default amount of RAM allocated to the worker VM [GiB] #
+worker_default_ram = 8
 
-# The default amount of disk allocated to the worker VM (in Bytes - B) #
-worker_default_storage = 32212254720
+# The default amount of disk allocated to the worker VM [GiB] #
+worker_default_storage = 32
 
 # Sets worker node's role label #
 # Note: Leave empty ("") to not set the label. #
