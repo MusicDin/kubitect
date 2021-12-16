@@ -1,7 +1,7 @@
 ---
 ##
-# Kubesprays's source file (v2.16.0):
-# https://github.com/kubernetes-sigs/kubespray/blob/v2.16.0/inventory/sample/group_vars/all/all.yml
+# Kubesprays's source file (v2.17.1):
+# https://github.com/kubernetes-sigs/kubespray/blob/v2.17.1/inventory/sample/group_vars/all/all.yml
 ##
 
 ## Directory where etcd data stored
@@ -93,7 +93,6 @@ no_proxy_exclude_workers: false
 ## This setting determines whether certs are generated via scripts.
 ## Chose 'none' if you provide your own certificates.
 ## Option is  "script", "none"
-
 # cert_management: script
 
 ## Set to true to allow pre-checks to fail and continue deployment
@@ -122,4 +121,3 @@ no_proxy_exclude_workers: false
 
 ## Check if access_ip responds to ping. Set false if your firewall blocks ICMP.
 # ping_access_ip: true
-

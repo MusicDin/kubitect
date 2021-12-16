@@ -1,7 +1,7 @@
 ---
 ##
-# Kubesprays's source file (v2.16.0):
-# https://github.com/kubernetes-sigs/kubespray/blob/v2.16.0/inventory/sample/group_vars/etcd.yml
+# Kubesprays's source file (v2.17.1):
+# https://github.com/kubernetes-sigs/kubespray/blob/v2.17.1/inventory/sample/group_vars/etcd.yml
 ##
 
 ## Etcd auto compaction retention for mvcc key value store in hour

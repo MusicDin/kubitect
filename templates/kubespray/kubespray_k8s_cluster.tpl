@@ -1,13 +1,13 @@
 ---
 ##
-# Kubesprays's source file (v2.16.0):
-# https://github.com/kubernetes-sigs/kubespray/blob/v2.16.0/inventory/sample/group_vars/k8s_cluster/k8s-cluster.yml
+# Kubesprays's source file (v2.17.1):
+# https://github.com/kubernetes-sigs/kubespray/blob/v2.17.1/inventory/sample/group_vars/k8s_cluster/k8s-cluster.yml
 ##
 
 # Kubernetes configuration dirs and system namespace.
 # Those are where all the additional config stuff goes
 # the kubernetes normally puts in /srv/kubernetes.
-# This puts them in a sane location and namespace.
+# This puts them in a same location and namespace.
 # Editing those values will almost surely break something.
 kube_config_dir: /etc/kubernetes
 kube_script_dir: "{{ bin_dir }}/kubernetes-scripts"
@@ -154,6 +154,10 @@ kube_proxy_nodeport_addresses: >-
 ## Encrypting Secret Data at Rest (experimental)
 kube_encrypt_secret_data: false
 
+# Graceful Node Shutdown (Kubernetes >= 1.21.0), see https://kubernetes.io/blog/2021/04/21/graceful-node-shutdown-beta/
+# kubelet_shutdown_grace_period: 60s
+# kubelet_shutdown_grace_period_critical_pods: 20s
+
 # DNS configuration.
 # Kubernetes cluster name, also will be used as DNS domain
 cluster_name: cluster.local
@@ -167,6 +171,7 @@ dns_mode: ${dns_mode}
 enable_nodelocaldns: true
 nodelocaldns_ip: 169.254.25.10
 nodelocaldns_health_port: 9254
+nodelocaldns_bind_metrics_host_ip: false
 # nodelocaldns_external_zones:
 # - zones:
 #   - example.com
@@ -211,6 +216,9 @@ k8s_image_pull_policy: IfNotPresent
 kubernetes_audit: false
 
 # dynamic kubelet configuration
+# Note: Feature DynamicKubeletConfig is deprecated in 1.22 and will not move to GA.
+# It is planned to be removed from Kubernetes in the version 1.23.
+# Please use alternative ways to update kubelet configuration.
 dynamic_kubelet_configuration: false
 
 # define kubelet config dir for dynamic kubelet
@@ -308,7 +316,6 @@ persistent_volumes_enabled: false
 
 ## Amount of time to retain events. (default 1h0m0s)
 event_ttl_duration: "1h0m0s"
-
 
 ## Automatically renew K8S control plane certificates on first Monday of each month
 auto_renew_certificates: false
