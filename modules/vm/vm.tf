@@ -2,11 +2,6 @@
 # Cloud-init
 #================================
 
-# Public ssh key for vm (it is directly injected in cloud-init configuration) #
-data "template_file" "public_ssh_key" {
-  template = file("${var.vm_ssh_private_key}.pub")
-}
-
 # Network bridge configuration (for cloud-init) #
 data "template_file" "cloud_init_network_tpl" {
   template = file(!var.is_bridge
@@ -33,7 +28,7 @@ data "template_file" "cloud_init_tpl" {
   vars = {
     hostname       = var.vm_name
     user           = var.vm_user
-    ssh_public_key = data.template_file.public_ssh_key.rendered
+    ssh_public_key = templatefile("${var.vm_ssh_private_key}.pub", {})
   }
 }
 

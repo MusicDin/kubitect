@@ -33,14 +33,14 @@ provider "libvirt" {
 resource "libvirt_pool" "resource_pool" {
   name = var.libvirt_resource_pool_name
   type = "dir"
-  path = "${trimsuffix(var.libvirt_resource_pool_location, "/")}/${var.libvirt_resource_pool_name}"
+  path = pathexpand("${trimsuffix(var.libvirt_resource_pool_location, "/")}/${var.libvirt_resource_pool_name}")
 }
 
 # Creates base OS image for nodes in a cluster #
 resource "libvirt_volume" "base_volume" {
   name   = "base_volume"
   pool   = var.libvirt_resource_pool_name
-  source = var.vm_image_source
+  source = pathexpand(var.vm_image_source)
 
   # Requires resource pool to be initialized #
   depends_on = [libvirt_pool.resource_pool]
@@ -93,7 +93,7 @@ module "lb_module" {
   # Load balancer specific variables #
   vm_name            = "${var.vm_name_prefix}-${local.vm_type.load_balancer}-${each.value.id}"
   vm_user            = var.vm_user
-  vm_ssh_private_key = var.vm_ssh_private_key
+  vm_ssh_private_key = pathexpand(var.vm_ssh_private_key)
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
   vm_id              = each.value.id
   vm_mac             = each.value.mac
@@ -133,7 +133,7 @@ module "master_module" {
   # Master node specific variables #
   vm_name            = "${var.vm_name_prefix}-${local.vm_type.master}-${each.value.id}"
   vm_user            = var.vm_user
-  vm_ssh_private_key = var.vm_ssh_private_key
+  vm_ssh_private_key = pathexpand(var.vm_ssh_private_key)
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
   vm_id              = each.value.id
   vm_mac             = each.value.mac
@@ -173,7 +173,7 @@ module "worker_module" {
   # Worker node specific variables #
   vm_name            = "${var.vm_name_prefix}-${local.vm_type.worker}-${each.value.id}"
   vm_user            = var.vm_user
-  vm_ssh_private_key = var.vm_ssh_private_key
+  vm_ssh_private_key = pathexpand(var.vm_ssh_private_key)
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
   vm_id              = each.value.id
   vm_mac             = each.value.mac
@@ -204,7 +204,7 @@ module "k8s_cluster" {
   # VM variables #
   vm_distro            = var.vm_distro
   vm_user              = var.vm_user
-  vm_ssh_private_key   = var.vm_ssh_private_key
+  vm_ssh_private_key   = pathexpand(var.vm_ssh_private_key)
   vm_name_prefix       = var.vm_name_prefix
   vm_network_interface = local.is_bridge ? var.network_bridge : var.vm_network_interface
   worker_node_label    = var.worker_node_label
