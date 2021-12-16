@@ -28,6 +28,7 @@ data "template_file" "cloud_init_tpl" {
   vars = {
     hostname       = var.vm_name
     user           = var.vm_user
+    update         = var.vm_update
     ssh_public_key = templatefile("${var.vm_ssh_private_key}.pub", {})
   }
 }

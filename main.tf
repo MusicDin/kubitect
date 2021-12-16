@@ -93,6 +93,7 @@ module "lb_module" {
   # Load balancer specific variables #
   vm_name            = "${var.vm_name_prefix}-${local.vm_type.load_balancer}-${each.value.id}"
   vm_user            = var.vm_user
+  vm_update          = var.vm_update
   vm_ssh_private_key = pathexpand(var.vm_ssh_private_key)
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
   vm_id              = each.value.id
@@ -133,6 +134,7 @@ module "master_module" {
   # Master node specific variables #
   vm_name            = "${var.vm_name_prefix}-${local.vm_type.master}-${each.value.id}"
   vm_user            = var.vm_user
+  vm_update          = var.vm_update
   vm_ssh_private_key = pathexpand(var.vm_ssh_private_key)
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
   vm_id              = each.value.id
@@ -173,6 +175,7 @@ module "worker_module" {
   # Worker node specific variables #
   vm_name            = "${var.vm_name_prefix}-${local.vm_type.worker}-${each.value.id}"
   vm_user            = var.vm_user
+  vm_update          = var.vm_update
   vm_ssh_private_key = pathexpand(var.vm_ssh_private_key)
   vm_ssh_known_hosts = var.vm_ssh_known_hosts
   vm_id              = each.value.id

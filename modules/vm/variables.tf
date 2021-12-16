@@ -96,6 +96,11 @@ variable "vm_ssh_known_hosts" {
   description = "Add virtual machine SSH known hosts"
 }
 
+variable "vm_update" {
+  type        = bool
+  description = "Update system when ready"
+}
+
 #============================#
 # Specific                   #
 #============================#

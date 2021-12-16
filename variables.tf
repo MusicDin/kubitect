@@ -94,6 +94,12 @@ variable "vm_network_interface" {
   default     = "ens3"
 }
 
+variable "vm_update" {
+  type        = bool
+  description = "Update system when ready"
+  default     = true
+}
+
 #======================================================================================
 # Network configuration
 #======================================================================================

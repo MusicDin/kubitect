@@ -37,6 +37,8 @@ vm_name_prefix = "k8s"
 # Network interface used by VMs to connect to the network #
 vm_network_interface = "ens3"
 
+# If true, system will be updated and upgraded #
+vm_update = false
 
 #======================================================================================
 # Network configuration
