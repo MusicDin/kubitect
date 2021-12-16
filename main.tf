@@ -87,6 +87,7 @@ module "lb_module" {
   network_bridge       = var.network_bridge
   network_gateway      = var.network_gateway != null ? var.network_gateway : cidrhost(var.network_cidr, 1)
   network_cidr         = var.network_cidr
+  network_dns_list     = var.network_dns_list
   vm_network_interface = var.vm_network_interface
 
   # Load balancer specific variables #
@@ -126,6 +127,7 @@ module "master_module" {
   network_bridge       = var.network_bridge
   network_gateway      = var.network_gateway != null ? var.network_gateway : cidrhost(var.network_cidr, 1)
   network_cidr         = var.network_cidr
+  network_dns_list     = var.network_dns_list
   vm_network_interface = var.vm_network_interface
 
   # Master node specific variables #
@@ -165,6 +167,7 @@ module "worker_module" {
   network_bridge       = var.network_bridge
   network_gateway      = var.network_gateway != null ? var.network_gateway : cidrhost(var.network_cidr, 1)
   network_cidr         = var.network_cidr
+  network_dns_list     = var.network_dns_list
   vm_network_interface = var.vm_network_interface
 
   # Worker node specific variables #

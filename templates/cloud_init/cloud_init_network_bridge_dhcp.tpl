@@ -7,5 +7,7 @@ ethernets:
 bridges:
   ${network_bridge}:
     interfaces: [${network_interface}]
+    nameservers:
+      addresses: [${network_dns_list}]
     dhcp4: true
     dhcp6: false

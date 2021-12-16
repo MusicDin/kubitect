@@ -66,6 +66,11 @@ variable "network_gateway" {
   }
 }
 
+variable "network_dns_list" {
+  type        = list(string)
+  description = "List of DNS servers used by VMs"
+}
+
 variable "network_cidr" {
   type        = string
   description = "Network CIDR"

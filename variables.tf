@@ -136,6 +136,12 @@ variable "network_gateway" {
   default     = null
 }
 
+variable "network_dns_list" {
+  type        = list(string)
+  description = "List of DNS servers used by VMs"
+  default     = []
+}
+
 #======================================================================================
 # HAProxy load balancer VMs parameters
 #======================================================================================

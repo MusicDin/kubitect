@@ -60,6 +60,11 @@ network_bridge = "virbr1"
 #       +-> first host of 192.168.113.0/24 is 192.168.113.1 #
 #network_gateway = "192.168.113.1"
 
+# Network DNS list (if empty, network gateway is set as a DNS) #
+network_dns_list = [
+  "1.1.1.1",
+  "1.0.0.1"
+]
 
 #======================================================================================
 # HAProxy load balancer VMs parameters
