@@ -270,7 +270,7 @@ resource "local_file" "keepalived" {
 
   for_each = { for node in var.lb_nodes : node.id => node }
 
-  content  = templatefile("templates/keepalived/keepalived.tpl",
+  content = templatefile("templates/keepalived/keepalived.tpl",
     {
       network_interface = var.vm_network_interface
       virtual_ip        = var.lb_vip

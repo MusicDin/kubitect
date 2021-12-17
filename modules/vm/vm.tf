@@ -50,8 +50,7 @@ resource "libvirt_volume" "vm_volume" {
   name           = "${var.vm_name}.qcow2"
   pool           = var.resource_pool_name
   base_volume_id = var.base_volume_id
-  # GiB -> B
-  size           = var.vm_storage * pow(1024, 3)
+  size           = var.vm_storage * pow(1024, 3) # GiB -> B
   format         = "qcow2"
 }
 
@@ -61,8 +60,7 @@ resource "libvirt_domain" "vm_domain" {
   # General configuration #
   name      = var.vm_name
   vcpu      = var.vm_cpu
-  # GiB -> MiB
-  memory    = var.vm_ram * 1024
+  memory    = var.vm_ram * 1024 # GiB -> MiB
   autostart = true
 
   cloudinit = libvirt_cloudinit_disk.cloud_init.id
@@ -74,7 +72,7 @@ resource "libvirt_domain" "vm_domain" {
     network_id     = var.network_id
     mac            = var.vm_mac
     addresses      = var.vm_ip != null ? [var.vm_ip] : null
-    bridge         = var.is_bridge ? var.network_bridge: null
+    bridge         = var.is_bridge ? var.network_bridge : null
     wait_for_lease = true
   }
 
