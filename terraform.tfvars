@@ -5,9 +5,6 @@
 # Provider's URI #
 libvirt_provider_uri = "qemu:///system"
 
-# Resource pool name #
-libvirt_resource_pool_name = "k8s-resource-pool"
-
 # Location where resource pool will be initialized #
 libvirt_resource_pool_location = "/var/lib/libvirt/pools/"
 
@@ -26,10 +23,10 @@ vm_ssh_private_key = "~/.ssh/id_rsa"
 vm_ssh_known_hosts = true
 
 # Linux distribution that will be used on VMs (ubuntu, debian, centos, "") #
-vm_distro = ""
+vm_distro = "ubuntu"
 
 # Source of linux image. It can be path to an image on host's filesystem or an URL #
-vm_image_source = ""
+vm_image_source = "https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img"
 
 # The prefix added to names of VMs #
 vm_name_prefix = "k8s"
@@ -43,9 +40,6 @@ vm_update = false
 #======================================================================================
 # Network configuration
 #======================================================================================
-
-# Network name #
-network_name = "k8s-network"
 
 # Network mode (nat, route, bridge) #
 network_mode = "nat"

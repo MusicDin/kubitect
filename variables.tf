@@ -19,11 +19,6 @@ variable "libvirt_provider_uri" {
   default     = "qemu:///system"
 }
 
-variable "libvirt_resource_pool_name" {
-  type        = string
-  description = "The libvirt resource pool name"
-}
-
 variable "libvirt_resource_pool_location" {
   type        = string
   description = "Location where resource pool will be initialized"
@@ -103,12 +98,6 @@ variable "vm_update" {
 #======================================================================================
 # Network configuration
 #======================================================================================
-
-variable "network_name" {
-  type        = string
-  description = "Network name"
-  default     = "k8s-network"
-}
 
 variable "network_mode" {
   type        = string

@@ -50,8 +50,6 @@ Finally, you have to enter a location of SSH private key in the `vm_ssh_private_
 
 Change variables in [terraform.tfvars](terraform.tfvars) file to fit your needs.
 Variables are set to work out of the box.
-Only unset required variable is:
-+ `vm_image_source` URL or path on the file system to OS image
 
 **IMPORTANT:**
 Review variables before initializing a cluster.

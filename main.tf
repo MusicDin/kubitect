@@ -9,7 +9,9 @@ locals {
     master        = "master"
     worker        = "worker"
   }
-  is_bridge = var.network_mode == "bridge"
+  resource_pool_name = "${var.vm_name_prefix}-resource-pool"
+  network_name       = "${var.vm_name_prefix}-network"
+  is_bridge          = (var.network_mode == "bridge")
 }
 
 #=====================================================================================
@@ -31,15 +33,15 @@ provider "libvirt" {
 
 # Creates a resource pool for Kubernetes VM volumes #
 resource "libvirt_pool" "resource_pool" {
-  name = var.libvirt_resource_pool_name
+  name = local.resource_pool_name
   type = "dir"
-  path = pathexpand("${trimsuffix(var.libvirt_resource_pool_location, "/")}/${var.libvirt_resource_pool_name}")
+  path = pathexpand("${trimsuffix(var.libvirt_resource_pool_location, "/")}/${local.resource_pool_name}")
 }
 
 # Creates base OS image for nodes in a cluster #
 resource "libvirt_volume" "base_volume" {
   name   = "base_volume"
-  pool   = var.libvirt_resource_pool_name
+  pool   = local.resource_pool_name
   source = pathexpand(var.vm_image_source)
 
   # Requires resource pool to be initialized #
@@ -61,7 +63,7 @@ module "network_module" {
 
   source = "./modules/network/"
 
-  network_name   = var.network_name
+  network_name   = local.network_name
   network_mode   = var.network_mode
   network_bridge = var.network_bridge
   network_cidr   = var.network_cidr
