@@ -39,9 +39,9 @@ data "template_file" "kubespray_k8s_cluster" {
   template = file("templates/kubespray/kubespray_k8s_cluster.tpl")
 
   vars = {
-    kube_version        = var.k8s_version
-    kube_network_plugin = var.k8s_network_plugin
-    dns_mode            = var.k8s_dns_mode
+    kube_version        = var.kubernetes_version
+    kube_network_plugin = var.kubernetes_networkPlugin
+    dns_mode            = var.kubernetes_dnsMode
 
     # If MetalLB is enable than strict ARP is set to true in k8s-cluster.yml
     kube_proxy_strict_arp = (
@@ -298,7 +298,7 @@ resource "null_resource" "kubespray_download" {
     command = <<-EOF
               cd ansible
               rm -rf kubespray
-              git clone --branch ${var.k8s_kubespray_version} ${var.k8s_kubespray_url}
+              git clone --branch ${var.kubernetes_kubespray_version} ${var.kubernetes_kubespray_url}
               EOF
   }
 }
@@ -357,7 +357,7 @@ resource "null_resource" "kubespray_create" {
     environment = {
       SSH_USER        = var.vm_user
       SSH_PRIVATE_KEY = var.vm_ssh_private_key
-      K8S_VERSION     = var.k8s_version
+      K8S_VERSION     = var.kubernetes_version
       EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
     }
   }
@@ -393,7 +393,7 @@ resource "null_resource" "kubespray_add" {
     environment = {
       SSH_USER        = var.vm_user
       SSH_PRIVATE_KEY = var.vm_ssh_private_key
-      K8S_VERSION     = var.k8s_version
+      K8S_VERSION     = var.kubernetes_version
       EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
     }
   }
@@ -463,7 +463,7 @@ resource "null_resource" "kubespray_upgrade" {
     command = <<-EOF
               cd ansible
               rm -rf kubespray
-              git clone --branch ${var.k8s_kubespray_version} ${var.k8s_kubespray_url}
+              git clone --branch ${var.kubernetes_kubespray_version} ${var.kubernetes_kubespray_url}
               EOF
   }
 
@@ -484,7 +484,7 @@ resource "null_resource" "kubespray_upgrade" {
     environment = {
       SSH_USER        = var.vm_user
       SSH_PRIVATE_KEY = var.vm_ssh_private_key
-      K8S_VERSION     = var.k8s_version
+      K8S_VERSION     = var.kubernetes_version
       EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
     }
   }
@@ -530,7 +530,7 @@ resource "null_resource" "fetch_kubeconfig" {
 # Copy kubeconfig into ~/.kube directory #
 resource "null_resource" "copy_kubeconfig" {
 
-  count = var.k8s_copy_kubeconfig ? 1 : 0
+  count = var.kubernetes_other_copyKubeconfig ? 1 : 0
 
   provisioner "local-exec" {
     command = "mkdir -p ~/.kube && cp config/admin.conf ~/.kube/"

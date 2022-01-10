@@ -4,7 +4,36 @@ variable "action" {
 }
 
 #======================================================================================
-# Virtual machine variables
+# Virtual machine configuration
+#======================================================================================
+
+variable "lb_vip" {
+  type        = string
+  description = "Load balancer virtual IP address (VIP)"
+}
+
+variable "vm_distro" {
+  type        = string
+  description = "Linux distribution used for VMs"
+}
+
+variable "vm_user" {
+  type        = string
+  description = "SSH user for VMs"
+}
+
+variable "vm_ssh_private_key" {
+  type        = string
+  description = "Location of private ssh key for VMs"
+}
+
+variable "vm_network_interface" {
+  type        = string
+  description = "VM network interface used for Keepalived"
+}
+
+#======================================================================================
+# Virtual machine instances
 #======================================================================================
 
 variable "worker_nodes" {
@@ -37,70 +66,48 @@ variable "lb_nodes" {
   description = "Load balancers info"
 }
 
-variable "lb_vip" {
-  type        = string
-  description = "Load balancer virtual IP address (VIP)"
-}
-
-variable "vm_distro" {
-  type        = string
-  description = "Linux distribution used for VMs"
-}
-
-variable "vm_user" {
-  type        = string
-  description = "SSH user for VMs"
-}
-
-variable "vm_ssh_private_key" {
-  type        = string
-  description = "Location of private ssh key for VMs"
-}
-
-variable "vm_name_prefix" {
-  type        = string
-  description = "Prefix added to names of VMs"
-}
-
-variable "vm_network_interface" {
-  type        = string
-  description = "VM network interface used for Keepalived"
-}
-
 #======================================================================================
-# General kubernetes (k8s) variables
+# Kubernetes and Kubespray variables
 #======================================================================================
 
-variable "k8s_kubespray_url" {
-  type        = string
-  description = "The Git repository URL to clone Kubespray from"
-}
-
-variable "k8s_kubespray_version" {
-  type        = string
-  description = "The version of Kubespray that will be used to deploy Kubernetes"
-}
-
-variable "k8s_version" {
+variable "kubernetes_version" {
   type        = string
   description = "The version of Kuberenetes that will be deployed"
 }
 
-variable "k8s_network_plugin" {
+variable "kubernetes_networkPlugin" {
   type        = string
   description = "The overlay network plugin used by Kubernetes cluster"
 }
 
-variable "k8s_dns_mode" {
+variable "kubernetes_dnsMode" {
   type        = string
   description = "The DNS service used by Kubernetes cluster"
 }
 
-#======================================================================================
-# Other
-#======================================================================================
+variable "kubernetes_kubespray_url" {
+  type        = string
+  description = "The Git repository URL to clone Kubespray from"
+}
 
-variable "k8s_copy_kubeconfig" {
+variable "kubernetes_kubespray_version" {
+  type        = string
+  description = "The version of Kubespray that will be used to deploy Kubernetes"
+}
+
+variable "kubernetes_kubespray_addons_enabled" {
+  type        = bool
+  description = "If enabled, configured Kubespray addons will be applied."
+  default     = false
+}
+
+variable "kubernetes_kubespray_addons_configPath" {
+  type        = string
+  description = "If Kubespray addons are enabled, addons configuration file on this path will be used."
+  default     = ""
+}
+
+variable "kubernetes_other_copyKubeconfig" {
   type        = string
   description = "If enabled, kubeconfig (config/admin.conf) will be copied to ~/.kube directory"
 }
@@ -112,11 +119,13 @@ variable "k8s_copy_kubeconfig" {
 variable "kubespray_custom_addons_enabled" {
   type        = bool
   description = "If enabled, custom addons.yml will be used"
+  default     = false
 }
 
 variable "kubespray_custom_addons_path" {
   type        = string
   description = "If custom addons are enabled, addons YAML file from this path will be used"
+  default     = ""
 }
 
 variable "k8s_dashboard_enabled" {

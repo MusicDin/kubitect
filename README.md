@@ -5,7 +5,7 @@ Set up HA Kubernetes cluster using KVM, Terraform and Kubespray.
 + [Git](https://git-scm.com/)
 + [Cloud-init](https://cloudinit.readthedocs.io/)
 + [Ansible](https://www.ansible.com/) >= 2.9
-+ [Terraform](https://www.terraform.io/) >= 1.0.0
++ [Terraform](https://www.terraform.io/) >= 1.1.0
 + [KVM - Kernel Virtual Machine](https://www.linux-kvm.org/)
 + [Libvirt provider](https://github.com/dmacvicar/terraform-provider-libvirt) >= 0.6.12
 + Internet connection
