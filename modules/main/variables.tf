@@ -209,15 +209,12 @@ variable "cluster_nodes_loadBalancer_default_storage" {
 
 variable "cluster_nodes_loadBalancer_instances" {
   type = list(object({
-    id  = number
-    mac = string
-    ip  = string
-    # Waiting non-experimental release of optional function #
-    #mac     = optional(string)
-    #ip      = optional(string)
-    #cpu     = optional(number)
-    #ram     = optional(number)
-    #storage = optional(number)
+    id      = number
+    mac     = optional(string)
+    ip      = optional(string)
+    cpu     = optional(number)
+    ram     = optional(number)
+    storage = optional(number)
   }))
   description = "HAProxy load balancer node instances."
 
@@ -262,15 +259,12 @@ variable "cluster_nodes_master_default_storage" {
 
 variable "cluster_nodes_master_instances" {
   type = list(object({
-    id  = number
-    mac = string
-    ip  = string
-    # Waiting non-experimental release of optional function #
-    #mac     = optional(string)
-    #ip      = optional(string)
-    #cpu     = optional(number)
-    #ram     = optional(number)
-    #storage = optional(number)
+    id      = number
+    mac     = optional(string)
+    ip      = optional(string)
+    cpu     = optional(number)
+    ram     = optional(number)
+    storage = optional(number)
   }))
   description = "Master node instances (control plane)"
 
@@ -322,15 +316,12 @@ variable "cluster_nodes_worker_default_label" {
 
 variable "cluster_nodes_worker_instances" {
   type = list(object({
-    id  = number
-    mac = string
-    ip  = string
-    # Waiting non-experimental release of optional function #
-    #mac     = optional(string)
-    #ip      = optional(string)
-    #cpu     = optional(number)
-    #ram     = optional(number)
-    #storage = optional(number)
+    id      = number
+    mac     = optional(string)
+    ip      = optional(string)
+    cpu     = optional(number)
+    ram     = optional(number)
+    storage = optional(number)
     #label   = optional(string)
   }))
   description = "Worker node instances."

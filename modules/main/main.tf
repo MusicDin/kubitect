@@ -19,9 +19,9 @@ locals {
 #=====================================================================================
 
 # Sets libvirt provider's uri #
-provider "libvirt" {
-  uri = var.libvirt_provider_uri
-}
+#provider "libvirt" {
+#  uri = var.libvirt_provider_uri
+#}
 
 #======================================================================================
 # General Resources
@@ -98,9 +98,9 @@ module "lb_module" {
   vm_ssh_private_key   = pathexpand(var.cluster_nodeTemplate_ssh_privateKeyPath)
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
   vm_network_interface = var.cluster_nodeTemplate_networkInterface
-  vm_cpu               = var.cluster_nodes_loadBalancer_default_cpu     #each.value.cpu != null ? each.value.cpu : var.cluster_nodes_loadBalancer_default_cpu
-  vm_ram               = var.cluster_nodes_loadBalancer_default_ram     #each.value.ram != null ? each.value.ram : var.lb_default_ram
-  vm_storage           = var.cluster_nodes_loadBalancer_default_storage #each.value.storage != null ? each.value.storage : var.lb_default_storage
+  vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_loadBalancer_default_cpu
+  vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_loadBalancer_default_ram
+  vm_storage           = each.value.storage != null ? each.value.storage : var.cluster_nodes_loadBalancer_default_storage
   vm_id                = each.value.id
   vm_mac               = each.value.mac
   vm_ip                = each.value.ip
@@ -139,9 +139,9 @@ module "master_module" {
   vm_ssh_private_key   = pathexpand(var.cluster_nodeTemplate_ssh_privateKeyPath)
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
   vm_network_interface = var.cluster_nodeTemplate_networkInterface
-  vm_cpu               = var.cluster_nodes_master_default_cpu     #each.value.cpu != null ? each.value.cpu : var.cluster_nodes_master_default_cpu
-  vm_ram               = var.cluster_nodes_master_default_ram     #each.value.ram != null ? each.value.ram : var.cluster_nodes_master_default_ram
-  vm_storage           = var.cluster_nodes_master_default_storage #each.value.storage != null ? each.value.storage : var.cluster_nodes_master_default_storage
+  vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_master_default_cpu
+  vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_master_default_ram
+  vm_storage           = each.value.storage != null ? each.value.storage : var.cluster_nodes_master_default_storage
   vm_id                = each.value.id
   vm_mac               = each.value.mac
   vm_ip                = each.value.ip
@@ -180,9 +180,9 @@ module "worker_module" {
   vm_ssh_private_key   = pathexpand(var.cluster_nodeTemplate_ssh_privateKeyPath)
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
   vm_network_interface = var.cluster_nodeTemplate_networkInterface
-  vm_cpu               = var.cluster_nodes_worker_default_cpu     #each.value.cpu != null ? each.value.cpu : var.cluster_nodes_worker_default_cpu
-  vm_ram               = var.cluster_nodes_worker_default_ram     #each.value.ram != null ? each.value.ram : var.cluster_nodes_worker_default_ram
-  vm_storage           = var.cluster_nodes_worker_default_storage #each.value.storage != null ? each.value.storage : var.cluster_nodes_worker_default_storage
+  vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_worker_default_cpu
+  vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_worker_default_ram
+  vm_storage           = each.value.storage != null ? each.value.storage : var.cluster_nodes_worker_default_storage
   vm_id                = each.value.id
   vm_mac               = each.value.mac
   vm_ip                = each.value.ip
@@ -207,34 +207,34 @@ module "k8s_cluster" {
   action = var.action
 
   # VM variables #
-  vm_user            = var.cluster_nodeTemplate_user
-  vm_ssh_private_key = pathexpand(var.cluster_nodeTemplate_ssh_privateKeyPath)
-  vm_distro          = var.cluster_nodeTemplate_image_distro
+  vm_user              = var.cluster_nodeTemplate_user
+  vm_ssh_private_key   = pathexpand(var.cluster_nodeTemplate_ssh_privateKeyPath)
+  vm_distro            = var.cluster_nodeTemplate_image_distro
   vm_network_interface = local.is_bridge ? var.cluster_network_bridge : var.cluster_nodeTemplate_networkInterface
-  
-  worker_node_label    = var.cluster_nodes_worker_default_label
-  lb_vip               = var.cluster_nodes_loadBalancer_vip
-  lb_nodes             = [for node in module.lb_module : node.vm_info]
-  master_nodes         = [for node in module.master_module : node.vm_info]
-  worker_nodes         = [for node in module.worker_module : node.vm_info]
+
+  worker_node_label = var.cluster_nodes_worker_default_label
+  lb_vip            = var.cluster_nodes_loadBalancer_vip
+  lb_nodes          = [for node in module.lb_module : node.vm_info]
+  master_nodes      = [for node in module.master_module : node.vm_info]
+  worker_nodes      = [for node in module.worker_module : node.vm_info]
 
   # K8s cluster variables #
-  kubernetes_version           = var.kubernetes_version
-  kubernetes_networkPlugin    = var.kubernetes_networkPlugin
-  kubernetes_dnsMode          = var.kubernetes_dnsMode
-  kubernetes_kubespray_url     = var.kubernetes_kubespray_url
-  kubernetes_kubespray_version = var.kubernetes_kubespray_version
-  kubernetes_kubespray_addons_enabled       = false
-  kubernetes_kubespray_addons_configPath          = ""
+  kubernetes_version                     = var.kubernetes_version
+  kubernetes_networkPlugin               = var.kubernetes_networkPlugin
+  kubernetes_dnsMode                     = var.kubernetes_dnsMode
+  kubernetes_kubespray_url               = var.kubernetes_kubespray_url
+  kubernetes_kubespray_version           = var.kubernetes_kubespray_version
+  kubernetes_kubespray_addons_enabled    = false
+  kubernetes_kubespray_addons_configPath = ""
   kubernetes_other_copyKubeconfig        = var.kubernetes_other_copyKubeconfig
 
   # Other #
-  
+
   k8s_dashboard_rbac_enabled = var.k8s_dashboard_rbac_enabled
   k8s_dashboard_rbac_user    = var.k8s_dashboard_rbac_user
 
   # Kubespray addons #
-  
+
   k8s_dashboard_enabled                 = var.k8s_dashboard_enabled
   helm_enabled                          = var.helm_enabled
   local_path_provisioner_enabled        = var.local_path_provisioner_enabled

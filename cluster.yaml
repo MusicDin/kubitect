@@ -54,11 +54,11 @@ cluster:
         cpu: 8                   # Overrides default CPU value for this node
         server: z820             # If ommited first server from the list is taken
       - id: 2
-        ip: "192.168.113.6"
+        ip: "10.10.64.6"
         mac: "52:54:00:00:00:41"
         server: ml350
       - id: 3
-        ip: "192.168.113.7"
+        ip: "10.10.64.7"
         mac: "52:54:00:00:00:42"
     master:
       default:
