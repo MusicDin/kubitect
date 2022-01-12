@@ -114,7 +114,7 @@ variable "vm_ram" {
 
 variable "vm_storage" {
   type        = number
-  description = "The amount of disk (in Bytes) allocated to the virtual machine"
+  description = "The amount of disk allocated to the virtual machine"
 }
 
 variable "vm_mac" {

@@ -149,14 +149,14 @@ variable "lb_default_cpu" {
 
 variable "lb_default_ram" {
   type        = number
-  description = "The default amount of RAM allocated to the HAProxy load balancer"
-  default     = 4096
+  description = "The default amount of RAM (in GiB) allocated to the HAProxy load balancer"
+  default     = 4
 }
 
 variable "lb_default_storage" {
   type        = number
-  description = "The default amount of disk (in Bytes) allocated to the HAProxy load balancer. Default: 15GB"
-  default     = 16106127360
+  description = "The default amount of disk (in GiB) allocated to the HAProxy load balancer."
+  default     = 16
 }
 
 variable "lb_vip" {
@@ -208,14 +208,14 @@ variable "master_default_cpu" {
 
 variable "master_default_ram" {
   type        = number
-  description = "The default amount of RAM allocated to the master node"
-  default     = 4096
+  description = "The default amount of RAM (in GiB) allocated to the master node"
+  default     = 4
 }
 
 variable "master_default_storage" {
   type        = number
-  description = "The default amount of disk (in Bytes) allocated to the master node. Default: 15GB"
-  default     = 16106127360
+  description = "The default amount of disk (in GiB) allocated to the master node."
+  default     = 16
 }
 
 variable "master_nodes" {
@@ -255,14 +255,14 @@ variable "worker_default_cpu" {
 
 variable "worker_default_ram" {
   type        = number
-  description = "The default amount of RAM allocated to the worker node"
-  default     = 8192
+  description = "The default amount of RAM (in GiB) allocated to the worker node"
+  default     = 8
 }
 
 variable "worker_default_storage" {
   type        = number
-  description = "The default amount of disk (in Bytes) allocated to the worker node. Default: 30GB"
-  default     = 32212254720
+  description = "The default amount of disk (in GiB) allocated to the worker node."
+  default     = 32
 }
 
 variable "worker_node_label" {

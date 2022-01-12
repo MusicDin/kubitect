@@ -26,7 +26,7 @@ vm_ssh_known_hosts = true
 vm_distro = "ubuntu"
 
 # Source of linux image. It can be path to an image on host's filesystem or an URL #
-vm_image_source = "https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img"
+vm_image_source = "https://cloud-images.ubuntu.com/releases/focal/release-20220111/ubuntu-20.04-server-cloudimg-amd64.img"
 
 # The prefix added to names of VMs #
 vm_name_prefix = "k8s"
