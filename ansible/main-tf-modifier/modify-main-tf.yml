@@ -1,0 +1,9 @@
+- hosts: localhost
+  any_errors_fatal: yes
+  gather_facts: no
+  
+  roles:
+    - verify-cluster-config
+    - generate-main-tf
+
+

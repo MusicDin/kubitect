@@ -11,8 +11,8 @@ variable "config_type" {
 
 variable "config_path" {
   type        = string
-  description = "Configuration type used by the project. [\"yaml\", \"tf\"]"
-  default     = "cluster.yaml"
+  description = "Path to YAML configuration."
+  default     = "cluster.yml"
 
   validation {
     condition     = fileexists(var.config_path)

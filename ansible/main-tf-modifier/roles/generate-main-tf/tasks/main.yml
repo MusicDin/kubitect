@@ -1,0 +1,18 @@
+---
+# Pass config path as variable
+- name: Read config file
+  include_vars:
+    file: ../../cluster.yml
+    name: config
+
+- name: Create main.tf from template file
+  template:
+    src: ./template.tf
+    dest: ./test.tf
+  vars:
+    server_list: "{{ config.servers }}"
+
+- name: Print servers
+  debug:
+    var: "{{ item }}"
+  loop: "{{ config.servers }}"

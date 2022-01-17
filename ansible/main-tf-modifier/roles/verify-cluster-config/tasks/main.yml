@@ -1,0 +1,49 @@
+---
+# Pass config path as variable
+- name: Read config file
+  include_vars:
+    file: ../../cluster.yml
+    name: config
+
+- name: Verify servers are defined
+  assert:
+    that: config.servers is defined
+    fail_msg: |
+      Target 'servers' are missing in the configuration. 
+      {{ config_example_servers }}
+
+- name: Verify each server has a name
+  assert:
+    that: "{{ config.servers | selectattr('name', 'undefined') | length == 0 }}"
+    fail_msg: |
+      One of the servers is missing a 'name' argument. 
+      {{ config_example_servers }}
+
+- name: Verify server names are unique
+  assert:
+    that: "{{ config.servers | map(attribute='name') | unique | length | string == server_count }}"
+    fail_msg: |
+      Server names must be unique. 
+      {{ config_example_servers }}
+  vars:
+    server_count: "{{ config.servers | length }}"
+
+- name: Verify each server has a connection type
+  assert:
+    that: "{{ config.servers | selectattr('connection.type', 'undefined') | length == 0 }}"
+    fail_msg: |
+      The following servers are missing a 'connection.type' argument:
+      {{ config.servers | selectattr('connection.type', 'undefined') | map(attribute='name') }}
+      {{ config_example_servers }}
+
+- name: Verify there is only one servers with connection type 'local' or 'localhost'
+  assert:
+    that: "{{ config.servers | selectattr('connection.type', 'in', ('localhost', 'local')) | length <= 1 }}"
+    fail_msg: |
+      Only one server can have 'connection.type' set to 'localhost' or 'local'.
+
+- name: Configuration is valid
+  debug:
+    msg: "Provided cluster configuration is valid."
+
+

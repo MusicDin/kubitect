@@ -1,0 +1,3 @@
+---
+resource_pool_path: "/var/lib/libvirt/pools/"
+keyfile_path: "~/.ssh/id_rsa"

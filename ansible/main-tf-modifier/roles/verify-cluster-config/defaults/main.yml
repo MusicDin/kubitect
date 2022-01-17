@@ -1,0 +1,18 @@
+---
+config_example_servers: |
+  Please see the following example:
+  ---
+  servers:
+    - name: localhost_example
+      connection:
+        type: localhost
+    - name: remote_server_example
+      connection:
+        type: remote
+        user: k8s
+        ip: 10.10.13.1
+        ssh:
+          port: 1234
+          keyfile: "~/.ssh/id_rsa"
+      resourcePoolPath: "/var/lib/libvirt/pools/"
+  ---
