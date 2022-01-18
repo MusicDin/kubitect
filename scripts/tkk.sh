@@ -1,14 +1,18 @@
+#!/bin/sh
+
 #======================================================================================
 # terraform-kubespray-kvm (tkk) helper script
 #======================================================================================
 
-# See 'tkk.sh -h' for help
+# See 'tkk.sh --help' for help
 
 VERSION="0.0.1"
 
+BASEDIR="$(dirname $0)/.."
+
 #CONFIG_PATH="./cluster.yml"
 
-MAIN_TF_MODIFIER_PATH="./ansible/main-tf-modifier"
+MAIN_TF_MODIFIER_PATH="$BASEDIR/ansible/main-tf-modifier"
 MAIN_TF_MODIFIER_INVENTORY_PATH="$MAIN_TF_MODIFIER_PATH/hosts.ini"
 MAIN_TF_MODIFIER_PLAYBOOK_PATH="$MAIN_TF_MODIFIER_PATH/modify-main-tf.yml"
 
@@ -22,14 +26,14 @@ modifyMainTf() {
 apply() {
     shift
     modifyMainTf
-    terraform apply $@
+    terraform -chdir=$BASEDIR apply $@
 }
 
 # Modify and plan configuration
 plan() {
     shift
     modifyMainTf
-    terraform plan $@
+    terraform -chdir=$BASEDIR plan $@
 }
 
 version() {
