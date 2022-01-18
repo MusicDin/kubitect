@@ -6,34 +6,43 @@
 
 # See 'tkk.sh --help' for help
 
+
 VERSION="0.0.1"
 
-BASEDIR="$(dirname $0)/.."
+ROOTDIR="$(cd $(dirname $0)/.. && pwd)"
 
-#CONFIG_PATH="./cluster.yml"
+MAIN_TF_MODIFIER_PATH="$ROOTDIR/ansible/main-tf-modifier"
+MAIN_TF_MODIFIER_PLAYBOOK_FILE="modify-main-tf.yml"
+MAIN_TF_MODIFIER_INVENTORY_FILE="hosts.ini"
 
-MAIN_TF_MODIFIER_PATH="$BASEDIR/ansible/main-tf-modifier"
-MAIN_TF_MODIFIER_INVENTORY_PATH="$MAIN_TF_MODIFIER_PATH/hosts.ini"
-MAIN_TF_MODIFIER_PLAYBOOK_PATH="$MAIN_TF_MODIFIER_PATH/modify-main-tf.yml"
+
+err() {
+	echo "Error: $1"
+	exit 1
+}
 
 # Trigger main.tf file modification
 modifyMainTf() {
-    ansible-playbook $MAIN_TF_MODIFIER_PLAYBOOK_PATH \
-        --inventory $MAIN_TF_MODIFIER_INVENTORY_PATH
+	cd $MAIN_TF_MODIFIER_PATH
+	ansible-playbook $MAIN_TF_MODIFIER_PLAYBOOK_FILE \
+		--inventory $MAIN_TF_MODIFIER_INVENTORY_FILE \
+		|| err "An error has occured during main.tf modification."
 }
 
 # Modify and apply configuration
 apply() {
-    shift
-    modifyMainTf
-    terraform -chdir=$BASEDIR apply $@
+	shift
+	modifyMainTf
+	terraform -chdir=$ROOTDIR init -upgrade
+	terraform -chdir=$ROOTDIR apply $@
 }
 
 # Modify and plan configuration
 plan() {
-    shift
-    modifyMainTf
-    terraform -chdir=$BASEDIR plan $@
+	shift
+	modifyMainTf
+	terraform -chdir=$ROOTDIR init -upgrade
+	terraform -chdir=$ROOTDIR plan $@
 }
 
 version() {
@@ -46,7 +55,7 @@ help() {
 	cat <<-EOF
 
 		> tkk.sh - $VERSION
-        
+
 		  Script is useful when deploying Kubernetes cluster on 
 		  multiple physical servers.
 
@@ -66,19 +75,19 @@ help() {
 
 		> Other commands:
 		  -h, --help      - Shows help.
-          -v, --version   - Show script version
+		  -v, --version   - Show script version
 	EOF
 }
 
-# Apply 
+
 if [ "$1" = "apply" ]; then
-    apply $@
+	apply $@
 elif [ "$1" = "plan" ]; then
-    plan $@
+	plan $@
 elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-    help
+	help
 elif [ "$1" = "-v" ] || [ "$1" = "--version" ]; then
-    version
+	version
 else
 	help
 fi

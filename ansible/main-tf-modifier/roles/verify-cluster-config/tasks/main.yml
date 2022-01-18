@@ -2,7 +2,7 @@
 # Pass config path as variable
 - name: Read config file
   include_vars:
-    file: ../../cluster.yml
+    file: "{{ config_path }}"
     name: config
 
 - name: Verify servers are defined
@@ -45,5 +45,3 @@
 - name: Configuration is valid
   debug:
     msg: "Provided cluster configuration is valid."
-
-

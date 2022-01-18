@@ -17,7 +17,8 @@ locals {
 #}
 {% for item in server_list %}
 
-provider "libvirt_{{ item.name }}" {
+provider "libvirt" {
+  alias = "{{ item.name }}"
 {% if item.providerUri is defined %}
   uri = "{{ item.providerUri }}"
 {% elif item.connection.type | string == "localhost" %}
@@ -104,7 +105,7 @@ module "main_{{ server_name }}" {
   kubernetes_other_copyKubeconfig        = try(local.config.kubernetes.other.copyKubeconfig, null)
 
   providers = {
-    libvirt = libvirt_{{ server_name }}
+    libvirt = libvirt.{{ server_name }}
   }
 
 }
@@ -168,7 +169,7 @@ module "main_tf_{{ server_name }}" {
   kubernetes_other_copyKubeconfig        = var.kubernetes_other_copyKubeconfig
 
   providers = {
-    libvirt = libvirt_{{ server_name }}
+    libvirt = libvirt.{{ server_name }}
   }
 
 }

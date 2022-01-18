@@ -1,9 +1,11 @@
 - hosts: localhost
-  any_errors_fatal: yes
   gather_facts: no
+  any_errors_fatal: yes
+  vars:
+    config_path: ../../cluster.yml
+    main_tf_path: ../../main.tf
+    main_tf_template_path: ./template.tf
   
   roles:
     - verify-cluster-config
     - generate-main-tf
-
-
