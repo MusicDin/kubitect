@@ -6,7 +6,6 @@
 
 # See 'tkk.sh --help' for help
 
-
 VERSION="0.0.1"
 
 ROOTDIR="$(cd $(dirname $0)/.. && pwd)"
@@ -27,6 +26,15 @@ modifyMainTf() {
 	ansible-playbook $MAIN_TF_MODIFIER_PLAYBOOK_FILE \
 		--inventory $MAIN_TF_MODIFIER_INVENTORY_FILE \
 		|| err "An error has occured during main.tf modification."
+}
+
+# Sets main.tf to default (localhost only) configuration
+reset() {
+	cd $MAIN_TF_MODIFIER_PATH
+	ansible-playbook $MAIN_TF_MODIFIER_PLAYBOOK_FILE \
+		--inventory $MAIN_TF_MODIFIER_INVENTORY_FILE \
+		--extra-vars 'action_type=reset' \
+		|| err "An error has occured during the reset of main.tf file."
 }
 
 # Modify and apply configuration
@@ -66,12 +74,15 @@ help() {
 		  Enjoy.
 
 		> How to use:
-		  1.) Modify servers in cluster.yml 
-		  2.) Run 'tkk.sh apply' or 'tkk.sh plan'
+		  1.) Modify servers section in cluster.yml file.
+		  2.) Run 'sh tkk.sh apply' or 'sh tkk.sh plan'.
 
 		> Main commands:
-		  apply    - Modify main.tf and apply configuration
-		  plan     - Modify main.tf and plan configuration.
+		  apply    - Modify main.tf and apply new configuration.
+		  plan     - Modify main.tf and plan new configuration.
+		  generate - Only generate main.tf.
+		  reset    - Resets main.tf to default (localhost only) 
+		             configuration.
 
 		> Other commands:
 		  -h, --help      - Shows help.
@@ -84,6 +95,10 @@ if [ "$1" = "apply" ]; then
 	apply $@
 elif [ "$1" = "plan" ]; then
 	plan $@
+elif [ "$1" = "generate" ]; then
+	modifyMainTf
+elif [ "$1" = "reset" ]; then
+	reset
 elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 	help
 elif [ "$1" = "-v" ] || [ "$1" = "--version" ]; then

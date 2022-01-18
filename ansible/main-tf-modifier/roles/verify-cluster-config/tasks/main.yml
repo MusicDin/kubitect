@@ -1,5 +1,6 @@
+# TODO:
+#   - Verify ip and user are passed when connection type is 'remote'
 ---
-# Pass config path as variable
 - name: Read config file
   include_vars:
     file: "{{ config_path }}"

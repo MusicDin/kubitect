@@ -21,7 +21,7 @@ provider "libvirt" {
   alias = "{{ item.name }}"
 {% if item.providerUri is defined %}
   uri = "{{ item.providerUri }}"
-{% elif item.connection.type | string == "localhost" %}
+{% elif item.connection.type in ["localhost", "local"] %}
   uri = "qemu:///system"
 {% else %}
   {% set provider_uri=[

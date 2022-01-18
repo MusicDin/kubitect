@@ -2,10 +2,11 @@
   gather_facts: no
   any_errors_fatal: yes
   vars:
+    action_type: "modify"
     config_path: ../../cluster.yml
     main_tf_path: ../../main.tf
     main_tf_template_path: ./template.tf
   
   roles:
-    - verify-cluster-config
-    - generate-main-tf
+    - { role: verify-cluster-config, when: action_type == "modify" }
+    - { role: generate-main-tf }

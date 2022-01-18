@@ -1,5 +1,4 @@
 ---
-# Pass config path as variable
 - name: Read config file
   include_vars:
     file: "{{ config_path }}"
@@ -10,4 +9,4 @@
     src: "{{ main_tf_template_path }}"
     dest: "{{ main_tf_path }}"
   vars:
-    server_list: "{{ config.servers }}"
+    server_list: "{{ config.servers if action_type == 'modify' else default_config.servers }}"
