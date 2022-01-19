@@ -1,7 +1,17 @@
 # TODO:
 #   - Verify ip and user are passed when connection type is 'remote'
 ---
-- name: Read config file
+- name: Check that the config file exists
+  stat:
+    path: "{{ config_path }}"
+  register: config_check_result
+
+- name: Verify that the configuration file exists
+  assert:
+    that: config_check_result.stat.exists
+    fail_msg: Cluster configuration file ({{ config_path }}) does not exist.
+
+- name: Read the config file
   include_vars:
     file: "{{ config_path }}"
     name: config
@@ -45,4 +55,4 @@
 
 - name: Configuration is valid
   debug:
-    msg: "Provided cluster configuration is valid."
+    msg: "OK: 'servers' seciton of provided cluster configuration is valid."
