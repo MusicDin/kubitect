@@ -1,6 +1,9 @@
 # TODO:
 #   - Verify ip and user are passed when connection type is 'remote'
 ---
+
+# Verify that provided configuration exists
+
 - name: Check that the config file exists
   stat:
     path: "{{ config_path }}"
@@ -16,12 +19,16 @@
     file: "{{ config_path }}"
     name: config
 
+# Verify servers are present
+
 - name: Verify servers are defined
   assert:
     that: config.servers is defined
     fail_msg: |
       Target 'servers' are missing in the configuration. 
       {{ config_example_servers }}
+
+# Verify server names
 
 - name: Verify each server has a name
   assert:
@@ -39,6 +46,8 @@
   vars:
     server_count: "{{ config.servers | length }}"
 
+# Verify connection type
+
 - name: Verify each server has a connection type
   assert:
     that: "{{ config.servers | selectattr('connection.type', 'undefined') | length == 0 }}"
@@ -47,11 +56,36 @@
       {{ config.servers | selectattr('connection.type', 'undefined') | map(attribute='name') }}
       {{ config_example_servers }}
 
+- name: Verify each connection type has a valid value
+  assert:
+    that: "{{ config.servers | rejectattr('connection.type', 'in', ('localhost', 'local', 'remote')) | length == 0 }}"
+    fail_msg: |
+      One of the servers has an invalid value set for 'connection.type'.
+      Valid values are ['localhost', 'local', 'remote'].
+
 - name: Verify there is only one servers with connection type 'local' or 'localhost'
   assert:
     that: "{{ config.servers | selectattr('connection.type', 'in', ('localhost', 'local')) | length <= 1 }}"
     fail_msg: |
       Only one server can have 'connection.type' set to 'localhost' or 'local'.
+
+- name: Verify user is set for 'remote' connections
+  assert:
+    that: "{{ config.servers | selectattr('connection.type', 'eq', 'remote') | selectattr('connection.user', 'undefined') | length == 0 }}"
+    fail_msg: |
+      One of the servers with 'connection.type' set to 'remote', is missing a 'connection.user' attribute.
+      User attribute is mandatory in order to SSH into a remote machine.
+      {{ config_example_servers }}
+
+- name: Verify ip is set for 'remote' connections
+  assert:
+    that: "{{ config.servers | selectattr('connection.type', 'eq', 'remote') | selectattr('connection.ip', 'undefined') | length == 0 }}"
+    fail_msg: |
+      One of the servers with 'connection.type' set to 'remote', is missing a 'connection.ip' attribute.
+      IP attribute is mandatory in order to SSH into a remote machine.
+      {{ config_example_servers }}
+
+# Print successful message
 
 - name: Configuration is valid
   debug:
