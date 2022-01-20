@@ -9,4 +9,4 @@
   
   roles:
     - { role: verify-cluster-config, when: action_type == "modify" }
-    #- { role: generate-main-tf }
+    - { role: generate-main-tf }

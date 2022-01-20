@@ -97,7 +97,10 @@ __reset() {
 __apply() {
 	__modify_main_tf
 	terraform -chdir=$ROOTDIR init -upgrade
-	terraform -chdir=$ROOTDIR apply $@
+	terraform -chdir=$ROOTDIR apply \
+		-var "config_type=yaml" \
+		-var "config_path=$CONFIG_PATH" \
+		$@
 }
 
 #
@@ -106,7 +109,10 @@ __apply() {
 __plan() {
 	__modify_main_tf
 	terraform -chdir=$ROOTDIR init -upgrade
-	terraform -chdir=$ROOTDIR plan $@ # -var config_path
+		terraform -chdir=$ROOTDIR plan \
+		-var "config_type=yaml" \
+		-var "config_path=$CONFIG_PATH" \
+		$@
 }
 
 #
