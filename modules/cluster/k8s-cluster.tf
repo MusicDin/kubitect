@@ -44,80 +44,19 @@ data "template_file" "kubespray_k8s_cluster" {
     dns_mode            = var.kubernetes_dnsMode
 
     # If MetalLB is enable than strict ARP is set to true in k8s-cluster.yml
-    kube_proxy_strict_arp = (
-      yamldecode(
-        var.kubespray_custom_addons_enabled
-        ? data.template_file.kubespray_custom_addons[0].rendered
-        : data.template_file.kubespray_addons[0].rendered
+    kube_proxy_strict_arp = (var.kubernetes_kubespray_addons_enabled
+      ? yamldecode(
+        templatefile(var.kubernetes_kubespray_addons_configPath, {})
       )["metallb_enabled"]
+      : false
     )
-  }
 
-  # Correct addons template file has to be created before
-  # 'metallb_enabled' value can be read from it
-  depends_on = [
-    data.template_file.kubespray_addons,
-    data.template_file.kubespray_custom_addons
-  ]
+  }
 }
 
 # Kubespray etcd.yml template #
 data "template_file" "kubespray_etcd" {
   template = file("templates/kubespray/kubespray_etcd.tpl")
-}
-
-# Kubespray addons.yml template #
-data "template_file" "kubespray_addons" {
-
-  count = !var.kubespray_custom_addons_enabled ? 1 : 0
-
-  template = file("templates/kubespray/kubespray_addons.tpl")
-
-  vars = {
-    dashboard_enabled                     = var.k8s_dashboard_enabled
-    helm_enabled                          = var.helm_enabled
-    local_path_provisioner_enabled        = var.local_path_provisioner_enabled
-    local_path_provisioner_version        = var.local_path_provisioner_version
-    local_path_provisioner_namespace      = var.local_path_provisioner_namespace
-    local_path_provisioner_storage_class  = var.local_path_provisioner_storage_class
-    local_path_provisioner_reclaim_policy = var.local_path_provisioner_reclaim_policy
-    local_path_provisioner_claim_root     = var.local_path_provisioner_claim_root
-    metallb_enabled                       = var.metallb_enabled
-    metallb_version                       = var.metallb_version
-    metallb_port                          = var.metallb_port
-    metallb_cpu_limit                     = var.metallb_cpu_limit
-    metallb_mem_limit                     = var.metallb_mem_limit
-    metallb_protocol                      = var.metallb_protocol
-    metallb_ip_range                      = var.metallb_ip_range
-    metallb_peers = (
-      var.metallb_protocol == "bgp"
-      ? "metallb_peers:\n${join("", data.template_file.metallb_peers.*.rendered)}"
-      : ""
-    )
-  }
-}
-
-# Kubespray custom addons.yml #
-data "template_file" "kubespray_custom_addons" {
-
-  count = var.kubespray_custom_addons_enabled ? 1 : 0
-
-  template = file(var.kubespray_custom_addons_path)
-}
-
-# Kubespray MetalLB peers (BGP mode only) #
-data "template_file" "metallb_peers" {
-
-  # Create MetalLB peers only in BGP mode #
-  count = var.metallb_protocol == "bgp" ? length(var.metallb_peers) : 0
-
-  template = file("templates/kubespray/kubespray_addons_metallb_peer.tpl")
-
-  vars = {
-    peer_ip  = var.metallb_peers[count.index].peer_ip
-    peer_asn = var.metallb_peers[count.index].peer_asn
-    my_asn   = var.metallb_peers[count.index].my_asn
-  }
 }
 
 # Load balancer hostname and ip list template #
@@ -232,18 +171,9 @@ resource "local_file" "kubespray_etcd" {
 # Create Kubespray addons.yml configuration file from template #
 resource "local_file" "kubespray_addons" {
 
-  count = !var.kubespray_custom_addons_enabled ? 1 : 0
+  count = var.kubernetes_kubespray_addons_enabled ? 1 : 0
 
-  content  = data.template_file.kubespray_addons[0].rendered
-  filename = "config/group_vars/k8s_cluster/addons.yml"
-}
-
-# Create a copy of custom Kubespray addons.yml configuration #
-resource "local_file" "kubespray_custom_addons" {
-
-  count = var.kubespray_custom_addons_enabled ? 1 : 0
-
-  content  = data.template_file.kubespray_custom_addons[0].rendered
+  content  = templatefile(var.kubernetes_kubespray_addons_configPath, {})
   filename = "config/group_vars/k8s_cluster/addons.yml"
 }
 
@@ -366,6 +296,7 @@ resource "null_resource" "kubespray_create" {
     local_file.kubespray_hosts,
     local_file.kubespray_all,
     local_file.kubespray_k8s_cluster,
+    local_file.kubespray_addons,
     null_resource.kubespray_download,
     null_resource.haproxy_install
   ]
@@ -541,14 +472,14 @@ resource "null_resource" "copy_kubeconfig" {
 }
 
 # Creates Kubernetes dashboard service account #
-resource "null_resource" "k8s_dashboard_rbac" {
-
-  count = (var.k8s_dashboard_enabled && var.k8s_dashboard_rbac_enabled) ? 1 : 0
-
-  provisioner "local-exec" {
-    command = "sh scripts/dashboard-rbac.sh ${var.k8s_dashboard_rbac_user} ${local.dashboard_namespace}"
-  }
-
-  # Kubeconfig needs to be ready when before script for creating service account is executed
-  depends_on = [null_resource.fetch_kubeconfig]
-}
+#resource "null_resource" "k8s_dashboard_rbac" {
+#
+#  count = (var.k8s_dashboard_enabled && var.k8s_dashboard_rbac_enabled) ? 1 : 0
+#
+#  provisioner "local-exec" {
+#    command = "sh scripts/dashboard-rbac.sh ${var.k8s_dashboard_rbac_user} ${local.dashboard_namespace}"
+#  }
+#
+#  # Kubeconfig needs to be ready when before script for creating service account is executed
+#  depends_on = [null_resource.fetch_kubeconfig]
+#}

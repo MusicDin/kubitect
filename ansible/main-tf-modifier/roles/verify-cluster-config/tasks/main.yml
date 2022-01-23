@@ -1,5 +1,3 @@
-# TODO:
-#   - Verify ip and user are passed when connection type is 'remote'
 ---
 
 # Verify that provided configuration exists
@@ -83,6 +81,15 @@
     fail_msg: |
       One of the servers with 'connection.type' set to 'remote', is missing a 'connection.ip' attribute.
       IP attribute is mandatory in order to SSH into a remote machine.
+      {{ config_example_servers }}
+
+# Verify default
+
+- name: Verify there is maximum one default server
+  assert:
+    that: "{{ config.servers | selectattr('default', 'defined') | selectattr('default', 'eq', true) | length <= 1 }}"
+    fail_msg: |
+      Only one server can be tagged as a default server.
       {{ config_example_servers }}
 
 # Print successful message

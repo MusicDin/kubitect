@@ -30,6 +30,11 @@ variable "network_id" {
 # General                    #
 #============================#
 
+variable "vm_type" {
+  type        = string
+  description = "Vitual machine type."
+}
+
 variable "is_bridge" {
   type        = bool
   description = "Is network mode 'bridge'?"

@@ -8,6 +8,7 @@ config_example_servers: |
       connection:
         type: localhost
     - name: remote_server_example
+      default: true
       connection:
         type: remote
         user: k8s

@@ -1,26 +1,26 @@
 servers:
   - name: localhost
+    default: true
     connection:
-      type: localhost
-  - name: z820
-  #  providerUri: "qemu+ssh://k8s@10.10.40.143:1234/system?keyfile=private_key_location"
+      type: local
+  - name: remote-server-1
+    #providerUri: "qemu+ssh://k8s@10.10.40.143:1234/system?keyfile=private_key_location"
     connection:
       type: remote
-      user: dinmusic
+      user: myuser
       ip: 10.10.40.143
       ssh:
         port: 1234
-        keyfile: "~/.ssh/id_rsa_z820"
+        keyfile: "~/.ssh/id_rsa_server1"
     resourcePoolPath: "/var/lib/libvirt/pools/"
-  - name: ml350
+  - name: remote-server-2
     connection:
       type: remote
-      user: dinmusic
+      user: myuser
       ip: 10.10.40.144
       ssh:
         #port: 22 # default
-        #keyfile: "~/.ssh/id_rsa_ml350"
-    resourcePoolPath: "/var/lib/libvirt/pools/"
+        keyfile: "~/.ssh/id_rsa_server2"
 
 cluster:
   name: "my-k8s-cluster"
@@ -55,14 +55,15 @@ cluster:
           mac: "52:54:00:00:00:40" # If omitted MAC address is generated
           ram: 8                   # Overrides default RAM value for this node
           cpu: 8                   # Overrides default CPU value for this node
-          server: z820             # If ommited first server from the list is taken
+          server: server1          # If ommited first server from the list is taken
         - id: 2
           ip: "10.10.64.6"
           mac: "52:54:00:00:00:41"
-          server: ml350
+          server: server2
         - id: 3
           ip: "10.10.64.7"
           mac: "52:54:00:00:00:42"
+          #If server is not specifed, VM will be installed on the default server
     master:
       default:
         ram: 8
@@ -70,11 +71,11 @@ cluster:
         storage: 256
       instances:
         - id: 1 # Node with generated MAC, DHCP lease and default RAM and CPU
-          server: z820
+          server: server1
         - id: 2
-          server: z820
+          server: server2
         - id: 3
-          server: ml350
+          server: localhost
     worker:
       default:
         ram: 16
@@ -86,7 +87,7 @@ cluster:
           cpu: 8
           ram: 64
           label: "compute"
-          server: z820
+          server: server1
         - id: 2
           ip: "10.10.64.102"
         - id: 3
@@ -94,9 +95,8 @@ cluster:
           ram: 64
           label: "mem"
         - id: 4
-          server: ml350
+          server: server2
         - id: 5
-          server: ml350
 
 kubernetes:
   version: "v1.21.6"

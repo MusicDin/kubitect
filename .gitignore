@@ -17,6 +17,7 @@ downloads/
 venv/
 
 ## Other
+dev/
 dashboard/
 utils/
 tests/

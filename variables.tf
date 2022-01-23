@@ -32,7 +32,7 @@ variable "config_path" {
 
 variable "action" {
   type    = string
-  default = null
+  default = "create"
 }
 
 variable "libvirt_provider_uri" {
@@ -148,9 +148,10 @@ variable "cluster_nodes_loadBalancer_default_storage" {
 
 variable "cluster_nodes_loadBalancer_instances" {
   type = list(object({
-    id  = number
-    mac = string
-    ip  = string
+    id     = number
+    mac    = string
+    ip     = string
+    server = optional(string)
   }))
   default = null
 }
@@ -176,9 +177,10 @@ variable "cluster_nodes_master_default_storage" {
 
 variable "cluster_nodes_master_instances" {
   type = list(object({
-    id  = number
-    mac = string
-    ip  = string
+    id     = number
+    mac    = string
+    ip     = string
+    server = optional(string)
   }))
   default = null
 }
@@ -209,9 +211,10 @@ variable "cluster_nodes_worker_default_label" {
 
 variable "cluster_nodes_worker_instances" {
   type = list(object({
-    id  = number
-    mac = string
-    ip  = string
+    id     = number
+    mac    = string
+    ip     = string
+    server = optional(string)
   }))
   default = null
 }

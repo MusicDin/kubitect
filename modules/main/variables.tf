@@ -139,7 +139,6 @@ variable "cluster_network_mode" {
   */
 }
 
-
 variable "cluster_network_cidr" {
   type        = string
   description = "Network CIDR."
@@ -159,7 +158,8 @@ variable "cluster_network_gateway" {
 variable "cluster_network_bridge" {
   type        = string
   description = "Network (virtual) bridge."
-  default     = null
+  default     = "virbr0"
+  nullable    = false
 }
 
 
@@ -215,6 +215,7 @@ variable "cluster_nodes_loadBalancer_instances" {
     cpu     = optional(number)
     ram     = optional(number)
     storage = optional(number)
+    server  = optional(string)
   }))
   description = "HAProxy load balancer node instances."
 
@@ -265,6 +266,7 @@ variable "cluster_nodes_master_instances" {
     cpu     = optional(number)
     ram     = optional(number)
     storage = optional(number)
+    server  = optional(string)
   }))
   description = "Master node instances (control plane)"
 
@@ -322,6 +324,7 @@ variable "cluster_nodes_worker_instances" {
     cpu     = optional(number)
     ram     = optional(number)
     storage = optional(number)
+    server  = optional(string)
     #label   = optional(string)
   }))
   description = "Worker node instances."
@@ -415,134 +418,39 @@ variable "kubernetes_other_copyKubeconfig" {
 # Further work required on these variables:
 #
 
-variable "k8s_dashboard_enabled" {
-  type        = bool
-  description = "Sets up Kubernetes dashboard if enabled"
-  default     = false
-  nullable    = false
-}
+#variable "k8s_dashboard_enabled" {
+#  type        = bool
+#  description = "Sets up Kubernetes dashboard if enabled"
+#  default     = false
+#  nullable    = false
+#}
 
-variable "k8s_dashboard_rbac_enabled" {
-  type        = bool
-  description = "If enabled, Kubernetes dashboard service account will be created"
-  default     = false
-  nullable    = false
-}
+#variable "k8s_dashboard_rbac_enabled" {
+#  type        = bool
+#  description = "If enabled, Kubernetes dashboard service account will be created"
+#  default     = false
+#  nullable    = false
+#}
 
-variable "k8s_dashboard_rbac_user" {
-  type        = string
-  description = "Kubernetes dashboard service account user"
-  default     = "admin"
-  nullable    = false
-}
+#variable "k8s_dashboard_rbac_user" {
+#  type        = string
+#  description = "Kubernetes dashboard service account user"
+#  default     = "admin"
+#  nullable    = false
+#}
 
 #======================================================================================
-# [To be removed!!] Kubespray addons
+# Other internal variables
 #======================================================================================
 
-variable "helm_enabled" {
-  type        = bool
-  description = "Sets up Helm if enabled"
-  default     = false
-  nullable    = false
-}
-
-variable "local_path_provisioner_enabled" {
-  type        = bool
-  description = "Sets up Rancher's local path provisioner if enabled"
-  default     = false
-  nullable    = false
-}
-
-variable "local_path_provisioner_version" {
-  type        = string
-  description = "Local path provisioner version"
-  default     = ""
-}
-
-variable "local_path_provisioner_namespace" {
-  type        = string
-  description = "Namespace in which local path provisioner will be installed"
-  default     = "local-path-provisioner"
-}
-
-variable "local_path_provisioner_storage_class" {
-  type        = string
-  description = "Local path provisioner storage class"
-  default     = "local-storage"
-}
-
-variable "local_path_provisioner_reclaim_policy" {
-  type        = string
-  description = "Local path provisioner reclaim policy"
-  default     = "Delete"
-
-  validation {
-    condition     = contains(["Delete", "Retain"], var.local_path_provisioner_reclaim_policy)
-    error_message = "Variable 'local_path_provisioner_reclaim_policy' is invalid.\nPossible values are: [\"Delete\", \"Retain\"]."
-  }
-}
-
-variable "local_path_provisioner_claim_root" {
-  type        = string
-  description = "Local path provisioner claim root"
-  default     = "/opt/local-path-provisioner/"
-}
-
-variable "metallb_enabled" {
-  type        = bool
-  description = "Sets up MetalLB if enabled"
-  default     = false
-  nullable    = false
-}
-
-variable "metallb_version" {
-  type        = string
-  description = "MetalLB version"
-  default     = ""
-}
-
-variable "metallb_port" {
-  type        = number
-  description = "Kubernetes MetalLB port"
-  default     = 7472
-}
-
-variable "metallb_cpu_limit" {
-  type        = string
-  description = "MetalLB pod CPU limit"
-  default     = "100m"
-}
-
-variable "metallb_mem_limit" {
-  type        = string
-  description = "MetalLB pod memory (RAM) limit"
-  default     = "100Mi"
-}
-
-variable "metallb_protocol" {
-  type        = string
-  description = "MetalLB protocol (layer2/bgp)"
-  default     = "layer2"
-
-  validation {
-    condition     = contains(["layer2", "bgp"], var.metallb_protocol)
-    error_message = "Variable 'metallb_protocol' is invalid.\nPossible values are: [\"layer2\", \"bgp\"]."
-  }
-}
-
-variable "metallb_ip_range" {
-  type        = string
-  description = "IP range that MetalLB will use for services of type LoadBalancer"
-  default     = ""
-}
-
-variable "metallb_peers" {
-  type = list(object({
-    peer_ip  = string
-    peer_asn = number
-    my_asn   = number
-  }))
-  description = "List of MetalLB peers"
-  default     = []
+variable "internal" {
+  type = object({
+    is_bridge = string
+    vm_types  = object({
+      load_balancer = string
+      master        = string
+      worker        = string
+    })
+  })
+  description = "Internal variables passed from parent module."
 }

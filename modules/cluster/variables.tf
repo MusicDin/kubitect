@@ -113,111 +113,20 @@ variable "kubernetes_other_copyKubeconfig" {
 }
 
 #======================================================================================
-# Kubespray addons
+# Kubernetes dashboard
 #======================================================================================
 
-variable "kubespray_custom_addons_enabled" {
-  type        = bool
-  description = "If enabled, custom addons.yml will be used"
-  default     = false
-}
+#variable "k8s_dashboard_enabled" {
+#  type        = bool
+#  description = "Sets up Kubernetes dashboard if enabled"
+#}
 
-variable "kubespray_custom_addons_path" {
-  type        = string
-  description = "If custom addons are enabled, addons YAML file from this path will be used"
-  default     = ""
-}
+#variable "k8s_dashboard_rbac_enabled" {
+#  type        = bool
+#  description = "If enabled, Kubernetes dashboard service account will be created"
+#}
 
-variable "k8s_dashboard_enabled" {
-  type        = bool
-  description = "Sets up Kubernetes dashboard if enabled"
-}
-
-variable "k8s_dashboard_rbac_enabled" {
-  type        = bool
-  description = "If enabled, Kubernetes dashboard service account will be created"
-}
-
-variable "k8s_dashboard_rbac_user" {
-  type        = string
-  description = "Kubernetes dashboard service account user"
-}
-
-variable "helm_enabled" {
-  type        = bool
-  description = "Sets up Helm if enabled"
-}
-
-variable "local_path_provisioner_enabled" {
-  type        = bool
-  description = "Sets up Rancher's local path provisioner if enabled"
-}
-
-variable "local_path_provisioner_version" {
-  type        = string
-  description = "Local path provisioner version"
-}
-
-variable "local_path_provisioner_namespace" {
-  type        = string
-  description = "Namespace in which local path provisioner will be installed"
-}
-
-variable "local_path_provisioner_storage_class" {
-  type        = string
-  description = "Local path provisioner storage class"
-}
-
-variable "local_path_provisioner_reclaim_policy" {
-  type        = string
-  description = "Local path provisioner reclaim policy"
-}
-
-variable "local_path_provisioner_claim_root" {
-  type        = string
-  description = "Local path provisioner claim root"
-}
-
-variable "metallb_enabled" {
-  type        = bool
-  description = "Sets up MetalLB if enabled"
-}
-
-variable "metallb_version" {
-  type        = string
-  description = "MetalLB version"
-}
-
-variable "metallb_port" {
-  type        = number
-  description = "Kubernetes MetalLB port"
-}
-
-variable "metallb_cpu_limit" {
-  type        = string
-  description = "MetalLB pod CPU limit"
-}
-
-variable "metallb_mem_limit" {
-  type        = string
-  description = "MetalLB pod memory (RAM) limit"
-}
-
-variable "metallb_protocol" {
-  type        = string
-  description = "MetalLB protocol"
-}
-
-variable "metallb_ip_range" {
-  type        = string
-  description = "IP range that MetalLB will use for services of type LoadBalancer"
-}
-
-variable "metallb_peers" {
-  type = list(object({
-    peer_ip  = string
-    peer_asn = number
-    my_asn   = number
-  }))
-  description = "List of MetalLB peers"
-}
+#variable "k8s_dashboard_rbac_user" {
+#  type        = string
+#  description = "Kubernetes dashboard service account user"
+#}
