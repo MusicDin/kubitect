@@ -15,14 +15,11 @@ variable "action" {
   description = "Action (create, upgrade)."
   default     = "create"
   nullable    = false
-
-  /*
-  # Validates null
+  
   validation {
     condition     = contains(["create", "upgrade"], var.action)
     error_message = "Variable 'action' is invalid. Possible values are: ['create', 'upgrade']."
   }
-  */
 }
 
 variable "libvirt_provider_uri" {
@@ -38,13 +35,10 @@ variable "libvirt_resource_pool_location" {
   default     = "/var/lib/libvirt/pools/"
   nullable    = false
 
-  /*
-  # Validates null
   validation {
     condition     = length(var.libvirt_resource_pool_location) != 0
     error_message = "Libvirt resource pool location cannot be empty."
   }
-  */
 }
 
 #======================================================================================
@@ -73,13 +67,10 @@ variable "cluster_nodeTemplate_ssh_privateKeyPath" {
   type        = string
   description = "Location of private SSH key that will be used for virtual machines."
 
-  /*
-  # Validates null
   validation {
     condition     = fileexists(var.cluster_nodeTemplate_ssh_privateKeyPath) && fileexists("${var.cluster_nodeTemplate_ssh_privateKeyPath}.pub")
     error_message = "Invalid path to private and/or public SSH key. \nPrivate key should be on path 'var.vm_ssh_private_key' and public key should be on the same path with suffix '.pub'."
   }
-  */
 }
 
 variable "cluster_nodeTemplate_ssh_addToKnownHosts" {
@@ -130,13 +121,10 @@ variable "cluster_network_mode" {
   default     = "nat"
   nullable    = false
 
-  /*
-  # Validates null
   validation {
     condition     = contains(["nat", "route", "bridge"], var.cluster_network_mode)
     error_message = "Variable 'network_mode' is invalid.\nPossible values are: [\"nat\", \"route\", \"bridge\"]."
   }
-  */
 }
 
 variable "cluster_network_cidr" {
@@ -178,12 +166,14 @@ variable "cluster_nodes_loadBalancer_vip" {
   type        = string
   description = "HAProxy load balancer virtual IP address (VIP)."
 
-  /*validation {
+  /*
+  validation {
     condition = (
       cidrhost(var.network_cidr, 0) == cidrhost("${var.lb_vip}/${split("/", var.network_cidr)[1]}", 0)
     )
     error_message = "HAProxy load balancer virtual IP address (VIP) has to be within network CIDR."
-  }*/
+  }
+  */
 }
 
 variable "cluster_nodes_loadBalancer_default_cpu" {
@@ -219,8 +209,6 @@ variable "cluster_nodes_loadBalancer_instances" {
   }))
   description = "HAProxy load balancer node instances."
 
-  /*
-  # Validates null
   validation {
     condition = (
       alltrue([for node in var.cluster_nodes_loadBalancer_instances : (node.id >= 0 && node.id <= 200)])
@@ -230,7 +218,6 @@ variable "cluster_nodes_loadBalancer_instances" {
     )
     error_message = "HAProxy load balancer nodes configuration is incorrect. Make sure that:\n - every ID is unique and that it's value is between 0 and 200,\n - every MAC and IP address is unique or null."
   }
-  */
 }
 
 #======================================================================================
@@ -270,18 +257,15 @@ variable "cluster_nodes_master_instances" {
   }))
   description = "Master node instances (control plane)"
 
-  /*
-  # Validates null
   validation {
     condition = (
-      length(var.cluster_nodes_master_instances) % 2 != 0
-      && compact(tolist([for node in var.cluster_nodes_master_instances : node.id])) == distinct(compact(tolist([for node in var.cluster_nodes_master_instances : node.id])))
+      #length(var.cluster_nodes_master_instances) % 2 != 0 &&
+      compact(tolist([for node in var.cluster_nodes_master_instances : node.id])) == distinct(compact(tolist([for node in var.cluster_nodes_master_instances : node.id])))
       && compact(tolist([for node in var.cluster_nodes_master_instances : node.mac])) == distinct(compact(tolist([for node in var.cluster_nodes_master_instances : node.mac])))
       && compact(tolist([for node in var.cluster_nodes_master_instances : node.ip])) == distinct(compact(tolist([for node in var.cluster_nodes_master_instances : node.ip])))
     )
     error_message = "Master nodes configuration is incorrect. Make sure that: \n - number of master nodes is odd (not divisible by 2),\n - every ID is unique,\n - every MAC and IP address is unique or null."
   }
-  */
 }
 
 #======================================================================================
@@ -329,8 +313,6 @@ variable "cluster_nodes_worker_instances" {
   }))
   description = "Worker node instances."
 
-  /*
-  # Validates null
   validation {
     condition = (
       compact(tolist([for node in var.cluster_nodes_worker_instances : node.id])) == distinct(compact(tolist([for node in var.cluster_nodes_worker_instances : node.id])))
@@ -339,7 +321,6 @@ variable "cluster_nodes_worker_instances" {
     )
     error_message = "Worker nodes configuration is incorrect. Make sure that:\n - every ID is unique,\n - every MAC and IP address is unique or null."
   }
-  */
 }
 
 #======================================================================================
@@ -357,13 +338,10 @@ variable "kubernetes_networkPlugin" {
   default     = "calico"
   nullable    = false
 
-  /*
-  # Validates null
   validation {
     condition     = contains(["flannel", "weave", "calico", "cilium", "canal", "kube-router"], var.kubernetes_networkPlugin)
     error_message = "Variable 'k8s_network_plugin' is invalid.\nPossible values are: [\"flannel\", \"weave\", \"calico\", \"cilium\", \"canal\", \"kube-router\"]."
   }
-  */
 }
 
 variable "kubernetes_dnsMode" {
@@ -372,13 +350,10 @@ variable "kubernetes_dnsMode" {
   default     = "coredns"
   nullable    = false
 
-  /*
-  # Validates null
   validation {
     condition     = contains(["coredns", "kubedns"], var.kubernetes_dnsMode)
     error_message = "Variable 'k8s_dns_mode' is invalid.\nPossible values are: [\"coredns\", \"kubedns\"]."
   }
-  */
 }
 
 variable "kubernetes_kubespray_url" {

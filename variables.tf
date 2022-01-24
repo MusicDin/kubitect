@@ -32,7 +32,7 @@ variable "config_path" {
 
 variable "action" {
   type    = string
-  default = "create"
+  default = null
 }
 
 variable "libvirt_provider_uri" {
