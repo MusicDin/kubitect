@@ -1,11 +1,3 @@
-
-#
-# IMPORTANT:
-#
-# Validation on variables with argument 'nullable = null' is disabled due to a bug in Terraform
-# https://github.com/hashicorp/terraform/issues/30307
-#
-
 #======================================================================================
 # General configuration
 #======================================================================================
@@ -15,7 +7,7 @@ variable "action" {
   description = "Action (create, upgrade)."
   default     = "create"
   nullable    = false
-  
+
   validation {
     condition     = contains(["create", "upgrade"], var.action)
     error_message = "Variable 'action' is invalid. Possible values are: ['create', 'upgrade']."
@@ -421,7 +413,7 @@ variable "kubernetes_other_copyKubeconfig" {
 variable "internal" {
   type = object({
     is_bridge = string
-    vm_types  = object({
+    vm_types = object({
       load_balancer = string
       master        = string
       worker        = string

@@ -1,13 +1,17 @@
+#
+# Configuration generated on: {{ now() }}
+#
+
 #================================
 # Local variables
 #================================
 
 # Local variables used in many resources #
 locals {
-  config   = (var.config_type == "yaml") ? yamldecode(file(pathexpand(var.config_path))) : null
+  config = (var.config_type == "yaml") ? yamldecode(file(pathexpand(var.config_path))) : null
   internal = {
     is_bridge = (local.config.cluster.network.mode == "bridge")
-    vm_types  = {
+    vm_types = {
       load_balancer = "lb"
       master        = "master"
       worker        = "worker"
@@ -28,9 +32,9 @@ locals {
 provider "libvirt" {
   alias = "{{ item.name }}"
 {% if item.providerUri is defined %}
-  uri = "{{ item.providerUri }}"
+  uri   = "{{ item.providerUri }}"
 {% elif item.connection.type in ["localhost", "local"] %}
-  uri = "qemu:///system"
+  uri   = "qemu:///system"
 {% else %}
   {% set provider_uri=[
     "qemu+ssh://",
@@ -41,7 +45,7 @@ provider "libvirt" {
     "/system",
     "?keyfile=" ~ (item.connection.ssh.keyfile if item.connection.ssh.keyfile is defined else keyfile_path)
   ]-%} 
-  uri = "{{ provider_uri | join('') }}"
+  uri   = "{{ provider_uri | join('') }}"
 {% endif %}
 }
 {% endfor %}
@@ -50,10 +54,19 @@ provider "libvirt" {
 #======================================================================================
 # Modules
 #======================================================================================
+
+{# Check if default server is defined #}
+{% set is_default_server_defined = [] -%}
+{% for item in server_list -%}
+  {%- if item.default is defined and item.default == true -%}
+    {{ is_default_server_defined.append(true) }}
+  {%- endif -%}
+{% endfor %}
 {% for item in server_list %}
 {% set server_name = item.name %}
 {% set resource_pool_path = item.resourcePoolPath if item.resourcePoolPath is defined else resource_pool_path %}
-{% set default_selector = " || try(node.server, null) == null" if item.default is defined and item.default == true else "" %}
+{% set is_default_server = item.default is defined and item.default == true or is_default_server_defined|length == 0 and loop.first == true %}
+{% set default_selector = " || try(node.server, null) == null" if is_default_server else "" %}
 
 module "main_{{ server_name }}" {
 
@@ -88,20 +101,29 @@ module "main_{{ server_name }}" {
   cluster_nodes_loadBalancer_default_cpu     = try(local.config.cluster.nodes.loadBalancer.default.cpu, null)
   cluster_nodes_loadBalancer_default_ram     = try(local.config.cluster.nodes.loadBalancer.default.ram, null)
   cluster_nodes_loadBalancer_default_storage = try(local.config.cluster.nodes.loadBalancer.default.storage, null)
-  cluster_nodes_loadBalancer_instances       = [for node in try(local.config.cluster.nodes.loadBalancer.instances, []) : node if try(node.server, null) == "{{ server_name }}"{{ default_selector }}]
+  cluster_nodes_loadBalancer_instances = [
+    for node in try(local.config.cluster.nodes.loadBalancer.instances, []) :
+    node if try(node.server, null) == "{{ server_name }}"{{ default_selector }}
+  ]
 
   # Master node VMs parameters
   cluster_nodes_master_default_cpu     = try(local.config.cluster.nodes.master.default.cpu, null)
   cluster_nodes_master_default_ram     = try(local.config.cluster.nodes.master.default.ram, null)
   cluster_nodes_master_default_storage = try(local.config.cluster.nodes.master.default.storage, null)
-  cluster_nodes_master_instances       = [for node in try(local.config.cluster.nodes.master.instances, []) : node if try(node.server, null) == "{{ server_name }}"{{ default_selector }}]
+  cluster_nodes_master_instances = [
+    for node in try(local.config.cluster.nodes.master.instances, []) :
+    node if try(node.server, null) == "{{ server_name }}"{{ default_selector }}
+  ]
 
   # Worker node VMs parameters
   cluster_nodes_worker_default_cpu     = try(local.config.cluster.nodes.worker.default.cpu, null)
   cluster_nodes_worker_default_ram     = try(local.config.cluster.nodes.worker.default.ram, null)
   cluster_nodes_worker_default_storage = try(local.config.cluster.nodes.worker.default.storage, null)
   cluster_nodes_worker_default_label   = try(local.config.cluster.nodes.worker.default.label, null)
-  cluster_nodes_worker_instances       = [for node in try(local.config.cluster.nodes.worker.instances, []) : node if try(node.server, null) == "{{ server_name }}"{{ default_selector }}]
+  cluster_nodes_worker_instances = [
+    for node in try(local.config.cluster.nodes.worker.instances, []) :
+    node if try(node.server, null) == "{{ server_name }}"{{ default_selector }}
+  ]
 
   # Kubernetes & Kubespray
   kubernetes_version                     = try(local.config.kubernetes.version, null)
@@ -193,12 +215,11 @@ module "main_tf_{{ server_name }}" {
 #================================
 # Cluster
 #================================
-
-{# Creates a list of server modules. #}
+{# Creates a list of server modules. -#}
 {% set server_name_list = [] -%}
 {% for item in server_list -%}
   {{ server_name_list.append("module.main_"~item.name~".0.nodes") }}
-{% endfor %}
+{% endfor -%}
 {% set server_name_list = server_name_list | join(', ') -%}
 
 # Configures k8s cluster using Kubespray #
@@ -208,16 +229,28 @@ module "k8s_cluster" {
   action = var.action
 
   # VM variables #
-  vm_user              = try(local.config.cluster.nodeTemplate.user, null)
-  vm_ssh_private_key   = pathexpand(try(local.config.cluster.nodeTemplate.ssh.privateKeyPath, null))
-  vm_distro            = try(local.config.cluster.nodeTemplate.image.distro, null)
-  vm_network_interface = local.internal.is_bridge ? local.config.cluster.network.bridge : var.cluster_nodeTemplate_networkInterface
+  vm_user            = try(local.config.cluster.nodeTemplate.user, null)
+  vm_ssh_private_key = pathexpand(try(local.config.cluster.nodeTemplate.ssh.privateKeyPath, null))
+  vm_distro          = try(local.config.cluster.nodeTemplate.image.distro, null)
+  vm_network_interface = (local.internal.is_bridge
+    ? local.config.cluster.network.bridge
+    : var.cluster_nodeTemplate_networkInterface
+  )
 
   worker_node_label = try(local.config.cluster.nodes.worker.default.label, null)
   lb_vip            = try(local.config.cluster.nodes.loadBalancer.vip, null)
-  lb_nodes          = [for node in flatten([{{ server_name_list }}]) : node if node.type == local.internal.vm_types.load_balancer]
-  master_nodes      = [for node in flatten([{{ server_name_list }}]) : node if node.type == local.internal.vm_types.master]
-  worker_nodes      = [for node in flatten([{{ server_name_list }}]) : node if node.type == local.internal.vm_types.worker]
+  lb_nodes = [
+    for node in flatten([{{ server_name_list }}]) :
+    node if node.type == local.internal.vm_types.load_balancer
+  ]
+  master_nodes = [
+    for node in flatten([{{ server_name_list }}]) :
+    node if node.type == local.internal.vm_types.master
+  ]
+  worker_nodes = [
+    for node in flatten([{{ server_name_list }}]) :
+    node if node.type == local.internal.vm_types.worker
+  ]
 
   # Kubernetes & Kubespray
   kubernetes_version                     = try(local.config.kubernetes.version, null)

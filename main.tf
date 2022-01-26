@@ -1,13 +1,17 @@
+#
+# Configuration generated on: 2022-01-26 15:06:41.160677
+#
+
 #================================
 # Local variables
 #================================
 
 # Local variables used in many resources #
 locals {
-  config   = (var.config_type == "yaml") ? yamldecode(file(pathexpand(var.config_path))) : null
+  config = (var.config_type == "yaml") ? yamldecode(file(pathexpand(var.config_path))) : null
   internal = {
     is_bridge = (local.config.cluster.network.mode == "bridge")
-    vm_types  = {
+    vm_types = {
       load_balancer = "lb"
       master        = "master"
       worker        = "worker"
@@ -22,13 +26,14 @@ locals {
 
 provider "libvirt" {
   alias = "localhost"
-  uri = "qemu:///system"
+  uri   = "qemu:///system"
 }
 
 
 #======================================================================================
 # Modules
 #======================================================================================
+
 
 module "main_localhost" {
 
@@ -63,20 +68,29 @@ module "main_localhost" {
   cluster_nodes_loadBalancer_default_cpu     = try(local.config.cluster.nodes.loadBalancer.default.cpu, null)
   cluster_nodes_loadBalancer_default_ram     = try(local.config.cluster.nodes.loadBalancer.default.ram, null)
   cluster_nodes_loadBalancer_default_storage = try(local.config.cluster.nodes.loadBalancer.default.storage, null)
-  cluster_nodes_loadBalancer_instances       = [for node in try(local.config.cluster.nodes.loadBalancer.instances, []) : node if try(node.server, null) == "localhost"]
+  cluster_nodes_loadBalancer_instances = [
+    for node in try(local.config.cluster.nodes.loadBalancer.instances, []) :
+    node if try(node.server, null) == "localhost" || try(node.server, null) == null
+  ]
 
   # Master node VMs parameters
   cluster_nodes_master_default_cpu     = try(local.config.cluster.nodes.master.default.cpu, null)
   cluster_nodes_master_default_ram     = try(local.config.cluster.nodes.master.default.ram, null)
   cluster_nodes_master_default_storage = try(local.config.cluster.nodes.master.default.storage, null)
-  cluster_nodes_master_instances       = [for node in try(local.config.cluster.nodes.master.instances, []) : node if try(node.server, null) == "localhost"]
+  cluster_nodes_master_instances = [
+    for node in try(local.config.cluster.nodes.master.instances, []) :
+    node if try(node.server, null) == "localhost" || try(node.server, null) == null
+  ]
 
   # Worker node VMs parameters
   cluster_nodes_worker_default_cpu     = try(local.config.cluster.nodes.worker.default.cpu, null)
   cluster_nodes_worker_default_ram     = try(local.config.cluster.nodes.worker.default.ram, null)
   cluster_nodes_worker_default_storage = try(local.config.cluster.nodes.worker.default.storage, null)
   cluster_nodes_worker_default_label   = try(local.config.cluster.nodes.worker.default.label, null)
-  cluster_nodes_worker_instances       = [for node in try(local.config.cluster.nodes.worker.instances, []) : node if try(node.server, null) == "localhost"]
+  cluster_nodes_worker_instances = [
+    for node in try(local.config.cluster.nodes.worker.instances, []) :
+    node if try(node.server, null) == "localhost" || try(node.server, null) == null
+  ]
 
   # Kubernetes & Kubespray
   kubernetes_version                     = try(local.config.kubernetes.version, null)
@@ -168,7 +182,6 @@ module "main_tf_localhost" {
 # Cluster
 #================================
 
-
 # Configures k8s cluster using Kubespray #
 module "k8s_cluster" {
   source = "./modules/cluster"
@@ -176,16 +189,28 @@ module "k8s_cluster" {
   action = var.action
 
   # VM variables #
-  vm_user              = try(local.config.cluster.nodeTemplate.user, null)
-  vm_ssh_private_key   = pathexpand(try(local.config.cluster.nodeTemplate.ssh.privateKeyPath, null))
-  vm_distro            = try(local.config.cluster.nodeTemplate.image.distro, null)
-  vm_network_interface = local.internal.is_bridge ? local.config.cluster.network.bridge : var.cluster_nodeTemplate_networkInterface
+  vm_user            = try(local.config.cluster.nodeTemplate.user, null)
+  vm_ssh_private_key = pathexpand(try(local.config.cluster.nodeTemplate.ssh.privateKeyPath, null))
+  vm_distro          = try(local.config.cluster.nodeTemplate.image.distro, null)
+  vm_network_interface = (local.internal.is_bridge
+    ? local.config.cluster.network.bridge
+    : var.cluster_nodeTemplate_networkInterface
+  )
 
   worker_node_label = try(local.config.cluster.nodes.worker.default.label, null)
   lb_vip            = try(local.config.cluster.nodes.loadBalancer.vip, null)
-  lb_nodes          = [for node in flatten([module.main_localhost.0.nodes]) : node if node.type == local.internal.vm_types.load_balancer]
-  master_nodes      = [for node in flatten([module.main_localhost.0.nodes]) : node if node.type == local.internal.vm_types.master]
-  worker_nodes      = [for node in flatten([module.main_localhost.0.nodes]) : node if node.type == local.internal.vm_types.worker]
+  lb_nodes = [
+    for node in flatten([module.main_localhost.0.nodes]) :
+    node if node.type == local.internal.vm_types.load_balancer
+  ]
+  master_nodes = [
+    for node in flatten([module.main_localhost.0.nodes]) :
+    node if node.type == local.internal.vm_types.master
+  ]
+  worker_nodes = [
+    for node in flatten([module.main_localhost.0.nodes]) :
+    node if node.type == local.internal.vm_types.worker
+  ]
 
   # Kubernetes & Kubespray
   kubernetes_version                     = try(local.config.kubernetes.version, null)
