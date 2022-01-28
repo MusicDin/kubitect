@@ -55,6 +55,13 @@ variable "master_nodes" {
     ip   = string
   }))
   description = "Master nodes info"
+
+  validation {
+    condition = (
+      length(var.master_nodes) % 2 != 0
+    )
+    error_message = "Master nodes configuration is incorrect. Make sure that: \n - number of master nodes is odd (not divisible by 2)."
+  }
 }
 
 variable "lb_nodes" {

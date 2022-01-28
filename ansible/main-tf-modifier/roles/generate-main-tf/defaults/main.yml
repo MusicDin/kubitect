@@ -4,6 +4,7 @@ keyfile_path: "~/.ssh/id_rsa"
 
 main_tf_path: ../../main.tf
 vars_tf_path: ../../variables.tf
+terraform_tfvars_path: ../../terraform.tfvars
 template:
   base_path: ../../templates/terraform/
   type:
@@ -12,3 +13,4 @@ template:
   suffix:
     main: _main.tf.tpl
     vars: _variables.tf.tpl
+    tfvars: _terraform.tfvars.tpl
