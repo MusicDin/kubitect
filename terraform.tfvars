@@ -1,3 +1,15 @@
+#
+# These variables are ignored by default, because currently the cluster.yml
+# configuration is used. To use terraform.tfvars as an input, generate appropriate
+# main.tf file by running:
+#
+#   "sh scripts/tkk.sh generate-tf"
+#
+# The limitation of this approach is that it is not possible to deploy
+# Kubernetes cluster on multiple physical machines (servers) and is therefor
+# only possible to setup the cluster on a local or a single remote machine.
+#
+
 #======================================================================================
 # General configuration
 #======================================================================================

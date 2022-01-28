@@ -1,8 +1,14 @@
 ---
 resource_pool_path: "/var/lib/libvirt/pools/"
 keyfile_path: "~/.ssh/id_rsa"
-default_config:
-  servers:
-    - name: localhost
-      connection:
-        type: local
+
+main_tf_path: ../../main.tf
+vars_tf_path: ../../variables.tf
+template:
+  base_path: ../../templates/terraform/
+  type:
+    default: default
+    custom: custom
+  suffix:
+    main: _main.tf.tpl
+    vars: _variables.tf.tpl

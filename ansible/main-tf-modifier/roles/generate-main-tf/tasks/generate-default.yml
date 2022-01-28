@@ -1,0 +1,10 @@
+---
+- name: Generate default main.tf
+  template:
+    src: "{{ template.base_path }}{{ template.type.default }}{{ template.suffix.main }}"
+    dest: "{{ main_tf_path }}"
+
+- name: Generate default variables.tf
+  template:
+    src: "{{ template.base_path }}{{ template.type.default }}{{ template.suffix.vars }}"
+    dest: "{{ vars_tf_path }}"

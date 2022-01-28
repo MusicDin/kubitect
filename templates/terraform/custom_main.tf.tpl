@@ -8,7 +8,7 @@
 
 # Local variables used in many resources #
 locals {
-  config = (var.config_type == "yaml") ? yamldecode(file(pathexpand(var.config_path))) : null
+  config = yamldecode(file(pathexpand("{{ config_path }}")))
   internal = {
     is_bridge = (local.config.cluster.network.mode == "bridge")
     vm_types = {
@@ -71,7 +71,6 @@ provider "libvirt" {
 module "main_{{ server_name }}" {
 
   source = "./modules/main"
-  count  = var.config_type == "yaml" ? 1 : 0
 
   # General
   action = var.action
@@ -143,74 +142,8 @@ module "main_{{ server_name }}" {
   }
 
 }
-
-module "main_tf_{{ server_name }}" {
-
-  source = "./modules/main"
-  count  = var.config_type == "tf" ? 1 : 0
-
-  # General
-  action = var.action
-
-  # Libvirt
-  libvirt_resource_pool_location = "{{ resource_pool_path }}"
-
-  # Global VM configuration
-  cluster_name                             = var.cluster_name
-  cluster_nodeTemplate_user                = var.cluster_nodeTemplate_user
-  cluster_nodeTemplate_ssh_privateKeyPath  = var.cluster_nodeTemplate_ssh_privateKeyPath
-  cluster_nodeTemplate_ssh_addToKnownHosts = var.cluster_nodeTemplate_ssh_addToKnownHosts
-  cluster_nodeTemplate_image_distro        = var.cluster_nodeTemplate_image_distro
-  cluster_nodeTemplate_image_source        = var.cluster_nodeTemplate_image_source
-  cluster_nodeTemplate_networkInterface    = var.cluster_nodeTemplate_networkInterface
-  cluster_nodeTemplate_updateOnBoot        = var.cluster_nodeTemplate_updateOnBoot
-
-  # Network configuration
-  cluster_network_mode    = var.cluster_network_mode
-  cluster_network_cidr    = var.cluster_network_cidr
-  cluster_network_gateway = var.cluster_network_gateway
-  cluster_network_bridge  = var.cluster_network_bridge
-  cluster_network_dns     = var.cluster_network_dns
-
-  # HAProxy load balancer VMs parameters
-  cluster_nodes_loadBalancer_vip             = var.cluster_nodes_loadBalancer_vip
-  cluster_nodes_loadBalancer_default_cpu     = var.cluster_nodes_loadBalancer_default_cpu
-  cluster_nodes_loadBalancer_default_ram     = var.cluster_nodes_loadBalancer_default_ram
-  cluster_nodes_loadBalancer_default_storage = var.cluster_nodes_loadBalancer_default_storage
-  cluster_nodes_loadBalancer_instances       = var.cluster_nodes_loadBalancer_instances
-
-  # Master node VMs parameters
-  cluster_nodes_master_default_cpu     = var.cluster_nodes_master_default_cpu
-  cluster_nodes_master_default_ram     = var.cluster_nodes_master_default_ram
-  cluster_nodes_master_default_storage = var.cluster_nodes_master_default_storage
-  cluster_nodes_master_instances       = var.cluster_nodes_master_instances
-
-  # Worker node VMs parameters
-  cluster_nodes_worker_default_cpu     = var.cluster_nodes_worker_default_cpu
-  cluster_nodes_worker_default_ram     = var.cluster_nodes_worker_default_ram
-  cluster_nodes_worker_default_storage = var.cluster_nodes_worker_default_storage
-  cluster_nodes_worker_default_label   = var.cluster_nodes_worker_default_label
-  cluster_nodes_worker_instances       = var.cluster_nodes_worker_instances
-
-  # Kubernetes & Kubespray
-  kubernetes_version                     = var.kubernetes_version
-  kubernetes_networkPlugin               = var.kubernetes_networkPlugin
-  kubernetes_dnsMode                     = var.kubernetes_dnsMode
-  kubernetes_kubespray_url               = var.kubernetes_kubespray_url
-  kubernetes_kubespray_version           = var.kubernetes_kubespray_version
-  kubernetes_kubespray_addons_enabled    = false # var.kubernetes_kubespray_addons_enabled
-  kubernetes_kubespray_addons_configPath = ""    # var.kubernetes_kubespray_addons_configPath
-  kubernetes_other_copyKubeconfig        = var.kubernetes_other_copyKubeconfig
-
-  # Other
-  internal = local.internal
-
-  providers = {
-    libvirt = libvirt.{{ server_name }}
-  }
-
-}
 {% endfor %}
+
 
 #================================
 # Cluster
@@ -218,12 +151,13 @@ module "main_tf_{{ server_name }}" {
 {# Creates a list of server modules. -#}
 {% set server_name_list = [] -%}
 {% for item in server_list -%}
-  {{ server_name_list.append("module.main_"~item.name~".0.nodes") }}
+  {{ server_name_list.append("module.main_"~item.name~".nodes") }}
 {% endfor -%}
 {% set server_name_list = server_name_list | join(', ') -%}
 
 # Configures k8s cluster using Kubespray #
 module "k8s_cluster" {
+
   source = "./modules/cluster"
 
   action = var.action
@@ -234,7 +168,7 @@ module "k8s_cluster" {
   vm_distro          = try(local.config.cluster.nodeTemplate.image.distro, null)
   vm_network_interface = (local.internal.is_bridge
     ? local.config.cluster.network.bridge
-    : var.cluster_nodeTemplate_networkInterface
+    : local.config.cluster.nodeTemplate.networkInterface
   )
 
   worker_node_label = try(local.config.cluster.nodes.worker.default.label, null)
@@ -270,7 +204,6 @@ module "k8s_cluster" {
   depends_on = [
 {% for item in server_list %}
     module.main_{{ item.name }},
-    module.main_tf_{{ item.name }},
 {% endfor %}
   ]
 }

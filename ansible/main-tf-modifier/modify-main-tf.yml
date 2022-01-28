@@ -4,8 +4,6 @@
   vars:
     action_type: "modify"
     config_path: ../../cluster.yml
-    main_tf_path: ../../main.tf
-    main_tf_template_path: ../../templates/terraform/main.tf.tpl
   
   roles:
     - { role: verify-cluster-config, when: action_type == "modify" }

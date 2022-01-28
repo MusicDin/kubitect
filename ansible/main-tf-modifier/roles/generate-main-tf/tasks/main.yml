@@ -4,9 +4,10 @@
     file: "{{ config_path }}"
     name: config
 
-- name: Create main.tf from template file
-  template:
-    src: "{{ main_tf_template_path }}"
-    dest: "{{ main_tf_path }}"
-  vars:
-    server_list: "{{ config.servers if action_type == 'modify' else default_config.servers }}"
+- name: Generate custom main.tf file that supports deployment on multiple servers
+  include_tasks: generate-custom.yml
+  when: action_type == "modify"
+
+- name: Generate main.tf file that accepts Terraform variables or yaml config files
+  include_tasks: generate-default.yml
+  when: action_type == "generate-tf"

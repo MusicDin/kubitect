@@ -69,6 +69,7 @@ module "network_module" {
 
 # Create HAProxy load balancer #
 module "lb_module" {
+
   source = "../vm"
 
   for_each = { for node in var.cluster_nodes_loadBalancer_instances : node.id => node }
@@ -111,6 +112,7 @@ module "lb_module" {
 
 # Creates master nodes #
 module "master_module" {
+
   source = "../vm"
 
   for_each = { for node in var.cluster_nodes_master_instances : node.id => node }
@@ -153,6 +155,7 @@ module "master_module" {
 
 # Creates worker nodes #
 module "worker_module" {
+
   source = "../vm"
 
   for_each = { for node in var.cluster_nodes_worker_instances : node.id => node }
