@@ -70,36 +70,38 @@ __activate_virtual_env() {
 #
 # Trigger main.tf file modification.
 #
-__modify_main_tf() {
+__generate() {
 	cd $MAIN_TF_MODIFIER_PATH
 	__activate_virtual_env
 	ansible-playbook $MAIN_TF_MODIFIER_PLAYBOOK_FILE \
 		--inventory $MAIN_TF_MODIFIER_INVENTORY_FILE \
 		--extra-vars "config_path=$CONFIG_PATH" \
 		|| __err "An error has occured during main.tf modification."
+	terraform -chdir=$ROOTDIR init -upgrade
 }
 
 #
-# Reset main.tf to default (localhost only) configuration.
+# Generate main.tf file that read Terraform variables (terraform.tfvars)
+# as an input instead of YAML configuration.
 #
-__reset() {
+__generate_tf() {
 	cd $MAIN_TF_MODIFIER_PATH
 	__activate_virtual_env
 	ansible-playbook $MAIN_TF_MODIFIER_PLAYBOOK_FILE \
 		--inventory $MAIN_TF_MODIFIER_INVENTORY_FILE \
-		--extra-vars "action_type=reset" \
+		--extra-vars "action_type=generate-tf" \
 		|| __err "An error has occured during the reset of the main.tf file."
+	terraform -chdir=$ROOTDIR init -upgrade
 }
 
 #
 # Modify and apply the configuration.
 #
 __apply() {
-	__modify_main_tf
-	terraform -chdir=$ROOTDIR init -upgrade
+	__generate
 	terraform -chdir=$ROOTDIR apply \
-		-var "config_type=yaml" \
 		-var "config_path=$CONFIG_PATH" \
+		-compact-warnings \
 		$@
 }
 
@@ -107,11 +109,10 @@ __apply() {
 # Modify and plan the configuration.
 #
 __plan() {
-	__modify_main_tf
-	terraform -chdir=$ROOTDIR init -upgrade
+	__generate
 	terraform -chdir=$ROOTDIR plan \
-		-var "config_type=yaml" \
 		-var "config_path=$CONFIG_PATH" \
+		-compact-warnings \
 		$@
 }
 
@@ -146,11 +147,12 @@ __help() {
 		  2.) Run 'sh tkk.sh apply' or 'sh tkk.sh plan'.
 
 		> Commands:
-		  apply    - Modify main.tf and apply new configuration.
-		  plan     - Modify main.tf and plan new configuration.
-		  generate - Only generate main.tf.
-		  reset    - Resets main.tf to default (localhost only) 
-		             configuration.
+		  apply       - Modify main.tf and apply new configuration.
+		  plan        - Modify main.tf and plan new configuration.
+		  generate    - Only generate main.tf.
+		  generate-tf - Generate main.tf file that uses Terraform
+		                variables (terraform.tfvars) as an input
+		                instead of YAML configuration.
 
 		> Other options:
 		  -c, --config  - Path to cluster configuration.
@@ -226,11 +228,11 @@ case $cmd in
 		;;
 
 	"generate")
-		__modify_main_tf
+		__generate
 		;;
 
-	"reset")
-		__reset
+	"generate-tf")
+		__generate_tf
 		;;
 
 	*)
