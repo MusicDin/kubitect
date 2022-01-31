@@ -12,6 +12,7 @@ servers:
       ssh:
         port: 1234
         keyfile: "~/.ssh/id_rsa_server1"
+        verify: false # default: true, if set to false it skips verification in known_hosts
     resourcePoolPath: "/var/lib/libvirt/pools/"
   - name: remote-server-2
     connection:

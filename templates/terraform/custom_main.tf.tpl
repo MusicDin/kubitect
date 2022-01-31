@@ -28,6 +28,8 @@ locals {
   Provider uri (remote): "qemu+ssh://<USER>@<IP>:<PORT>/system?keyfile=<PK_PATH>"
 #}
 {% for item in server_list %}
+{% set ssh_pk_path = item.connection.ssh.keyfile if item.connection.ssh.keyfile is defined else keyfile_path %}
+{% set ssh_pk_path = ssh_pk_path | replace("~", lookup('env', 'HOME')) %}
 
 provider "libvirt" {
   alias = "{{ item.name }}"
@@ -43,7 +45,8 @@ provider "libvirt" {
     item.connection.ip,
     ":" ~ item.connection.ssh.port if item.connection.ssh.port is defined else "",
     "/system",
-    "?keyfile=" ~ (item.connection.ssh.keyfile if item.connection.ssh.keyfile is defined else keyfile_path)
+    "?keyfile=" ~ ssh_pk_path,
+    "&no_verify=1" if item.connection.ssh.verify is defined and not item.connection.ssh.verify else ""
   ]-%} 
   uri   = "{{ provider_uri | join('') }}"
 {% endif %}
