@@ -9,6 +9,10 @@
 # Local variables used in many resources #
 locals {
   config = yamldecode(file(pathexpand("{{ config_path }}")))
+  ssh_pk_path = (try(local.config.cluster_nodeTemplate_ssh_privateKeyPath, null) != null
+    ? pathexpand(local.config.cluster_nodeTemplate_ssh_privateKeyPath)
+    : pathexpand("${path.module}/config/.ssh/id_rsa")
+  )
   internal = {
     is_bridge = (local.config.cluster.network.mode == "bridge")
     vm_types = {
@@ -17,6 +21,32 @@ locals {
       worker        = "worker"
     }
   }
+}
+
+
+#=====================================================================================
+# SSH Keys
+#=====================================================================================
+
+# Generates SSH keys if path to private key is not provided. #
+resource "null_resource" "generate_ssh_keys" {
+
+  count = try(local.config.cluster.nodeTemplate.ssh.privateKeyPath, null) == null ? 1 : 0
+
+  provisioner "local-exec" {
+
+    command = <<-EOF
+              dirname $SSH_PK_PATH | xargs mkdir -p
+              if [ ! -e $SSH_PK_PATH ] && [ ! -e $\{SSH_PK_PATH\}.pub ]; then \
+                ssh-keygen -f $SSH_PK_PATH -q -N ""; \
+              fi
+              EOF
+
+    environment = {
+      SSH_PK_PATH = local.ssh_pk_path
+    }
+  }
+
 }
 
 
@@ -84,7 +114,7 @@ module "main_{{ server_name }}" {
   # General
   cluster_name                             = try(local.config.cluster.name, null)
   cluster_nodeTemplate_user                = try(local.config.cluster.nodeTemplate.user, null)
-  cluster_nodeTemplate_ssh_privateKeyPath  = try(local.config.cluster.nodeTemplate.ssh.privateKeyPath, null)
+  cluster_nodeTemplate_ssh_privateKeyPath  = local.ssh_pk_path
   cluster_nodeTemplate_ssh_addToKnownHosts = try(local.config.cluster.nodeTemplate.ssh.addToKnownHosts, null)
   cluster_nodeTemplate_image_distro        = try(local.config.cluster.nodeTemplate.image.distro, null)
   cluster_nodeTemplate_image_source        = try(local.config.cluster.nodeTemplate.image.source, null)
@@ -167,7 +197,7 @@ module "k8s_cluster" {
 
   # VM variables #
   vm_user            = try(local.config.cluster.nodeTemplate.user, null)
-  vm_ssh_private_key = pathexpand(try(local.config.cluster.nodeTemplate.ssh.privateKeyPath, null))
+  vm_ssh_private_key = local.ssh_pk_path
   vm_distro          = try(local.config.cluster.nodeTemplate.image.distro, null)
   vm_network_interface = (local.internal.is_bridge
     ? local.config.cluster.network.bridge

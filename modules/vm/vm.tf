@@ -21,6 +21,12 @@ data "template_file" "cloud_init_network_tpl" {
   }
 }
 
+# Read SSH public key #
+# This is required if SSH keys are generated during the Terraform execution. #
+data "local_file" "ssh_public_key" {
+  filename = "${var.vm_ssh_private_key}.pub"
+}
+
 # Cloud-init configuration template #
 data "template_file" "cloud_init_tpl" {
   template = file("templates/cloud_init/cloud_init.tpl")
@@ -29,7 +35,7 @@ data "template_file" "cloud_init_tpl" {
     hostname       = var.vm_name
     user           = var.vm_user
     update         = var.vm_update
-    ssh_public_key = templatefile("${var.vm_ssh_private_key}.pub", {})
+    ssh_public_key = data.local_file.ssh_public_key.content
   }
 }
 

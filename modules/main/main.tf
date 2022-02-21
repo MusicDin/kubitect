@@ -91,7 +91,7 @@ module "lb_module" {
   vm_type              = var.internal.vm_types.load_balancer
   vm_user              = var.cluster_nodeTemplate_user
   vm_update            = var.cluster_nodeTemplate_updateOnBoot
-  vm_ssh_private_key   = pathexpand(var.cluster_nodeTemplate_ssh_privateKeyPath)
+  vm_ssh_private_key   = var.cluster_nodeTemplate_ssh_privateKeyPath
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
   vm_network_interface = var.cluster_nodeTemplate_networkInterface
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_loadBalancer_default_cpu
@@ -134,7 +134,7 @@ module "master_module" {
   vm_type              = var.internal.vm_types.master
   vm_user              = var.cluster_nodeTemplate_user
   vm_update            = var.cluster_nodeTemplate_updateOnBoot
-  vm_ssh_private_key   = pathexpand(var.cluster_nodeTemplate_ssh_privateKeyPath)
+  vm_ssh_private_key   = var.cluster_nodeTemplate_ssh_privateKeyPath
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
   vm_network_interface = var.cluster_nodeTemplate_networkInterface
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_master_default_cpu
@@ -177,7 +177,7 @@ module "worker_module" {
   vm_type              = var.internal.vm_types.worker
   vm_user              = var.cluster_nodeTemplate_user
   vm_update            = var.cluster_nodeTemplate_updateOnBoot
-  vm_ssh_private_key   = pathexpand(var.cluster_nodeTemplate_ssh_privateKeyPath)
+  vm_ssh_private_key   = var.cluster_nodeTemplate_ssh_privateKeyPath
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
   vm_network_interface = var.cluster_nodeTemplate_networkInterface
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_worker_default_cpu

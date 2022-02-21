@@ -59,10 +59,10 @@ variable "cluster_nodeTemplate_ssh_privateKeyPath" {
   type        = string
   description = "Location of private SSH key that will be used for virtual machines."
 
-  validation {
-    condition     = fileexists(var.cluster_nodeTemplate_ssh_privateKeyPath) && fileexists("${var.cluster_nodeTemplate_ssh_privateKeyPath}.pub")
-    error_message = "Invalid path to private and/or public SSH key. \nPrivate key should be on path 'var.vm_ssh_private_key' and public key should be on the same path with suffix '.pub'."
-  }
+  #validation {
+  #  condition     = fileexists(var.cluster_nodeTemplate_ssh_privateKeyPath) && fileexists("${var.cluster_nodeTemplate_ssh_privateKeyPath}.pub")
+  #  error_message = "Invalid path to private and/or public SSH key. \n\nPrivate and public key must both exist. Public key should be on the same path as the private key, but with '.pub' suffix."
+  #}
 }
 
 variable "cluster_nodeTemplate_ssh_addToKnownHosts" {
