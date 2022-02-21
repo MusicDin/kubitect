@@ -28,6 +28,10 @@ COLOR_RED='\033[0;31m'
 COLOR_GREEN='\033[0;32m'
 COLOR_CLEAR='\033[0m'
 
+# Options
+TKK_OPTIONS_SHORT=c:,h,v
+TKK_OPTIONS_LONG=config:,help,version
+
 #
 # Prints green ok status message.
 #
@@ -162,81 +166,74 @@ __help() {
 }
 
 
-cmd="$1"
-flag=""
+#
+# Read options.
+#
+OPTS=$(getopt \
+	--unquoted \
+	--options $TKK_OPTIONS_SHORT \
+	--longoptions $TKK_OPTIONS_LONG \
+	-- "$@") \
+	|| __err "Error reading options."
+
+eval set -- "$OPTS"
 
 #
-# Shift first argument (cmd) if it exists.
+# Set global options.
 #
-if [ "$#" -gt 0 ]; then
-	shift
-fi
-
-#
-# Check whether custom path (--config) is set.
-#
-for arg in "$@"; do
-
-	shift
-
-	if [ "$flag" = "--config" ]; then
-		__set_config_path $arg
-		flag=""
-		continue
-	fi
-
-	case $arg in
-		"-c"|"--config")
-			flag="--config"
+while :; do
+	case "$1" in
+		-v | --version )
+			__version
+			exit 0
+			shift
 			;;
 
-		"-c="*|"--config="*)
-			__set_config_path $(echo "$arg" | cut -d'=' -f 2)
+		-h | --help )
+			__help
+			exit 0
+			shift
+			;;
+
+		-c | --config)
+			__set_config_path $arg
+			shift 2
+			;;
+
+		--)
+			shift
+			break
 			;;
 
 		*)
-			set -- "$@" $arg
+			__err "Unexpected option: $1"
+			exit 41
+			;;
 	esac
 done
 
 #
-# Throw an error if the --config flag is present,
-# but the path has not been provided.
-#
-if [ ! -z "$flag" ]; then
-	__err "Option '$flag' requires an argument."
-fi
-
-#
 # Commands.
 #
-case $cmd in
-	"-h"|"--help")
-		__help
+case $1 in
+
+	apply)
+		__apply
 		;;
 
-	"-v"|"--version")
-		__version
+	plan)
+		__plan
 		;;
 
-	"apply")
-		__apply $@
-		;;
-
-	"plan")
-		__plan $@
-		;;
-
-	"generate")
+	generate)
 		__generate
 		;;
 
-	"generate-tf")
+	generate-tf)
 		__generate_tf
 		;;
 
 	*)
 		__help
+		;;
 esac
-
-exit 0
