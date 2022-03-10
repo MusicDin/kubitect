@@ -197,7 +197,7 @@ variable "cluster_nodes_loadBalancer_instances" {
     cpu     = optional(number)
     ram     = optional(number)
     storage = optional(number)
-    server  = optional(string)
+    host    = optional(string)
   }))
   description = "HAProxy load balancer node instances."
 
@@ -245,7 +245,7 @@ variable "cluster_nodes_master_instances" {
     cpu     = optional(number)
     ram     = optional(number)
     storage = optional(number)
-    server  = optional(string)
+    host  = optional(string)
   }))
   description = "Master node instances (control plane)"
 
@@ -300,7 +300,7 @@ variable "cluster_nodes_worker_instances" {
     cpu     = optional(number)
     ram     = optional(number)
     storage = optional(number)
-    server  = optional(string)
+    host  = optional(string)
     #label   = optional(string)
   }))
   description = "Worker node instances."

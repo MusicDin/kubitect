@@ -1,9 +1,9 @@
-servers:
+hosts:
   - name: localhost
     default: true
     connection:
       type: local
-  - name: remote-server-1
+  - name: remote-host-1
     #providerUri: "qemu+ssh://k8s@10.10.40.143:1234/system?keyfile=private_key_location"
     connection:
       type: remote
@@ -11,17 +11,17 @@ servers:
       ip: 10.10.40.143
       ssh:
         port: 1234
-        keyfile: "~/.ssh/id_rsa_server1"
+        keyfile: "~/.ssh/id_rsa_host_1"
         verify: false # default: true, if set to false it skips verification in known_hosts
     resourcePoolPath: "/var/lib/libvirt/pools/"
-  - name: remote-server-2
+  - name: remote-host-2
     connection:
       type: remote
       user: myuser
       ip: 10.10.40.144
       ssh:
         #port: 22 # default
-        keyfile: "~/.ssh/id_rsa_server2"
+        keyfile: "~/.ssh/id_rsa_host_2"
 
 cluster:
   name: "my-k8s-cluster"
@@ -56,15 +56,15 @@ cluster:
           mac: "52:54:00:00:00:40" # If omitted MAC address is generated
           ram: 8                   # Overrides default RAM value for this node
           cpu: 8                   # Overrides default CPU value for this node
-          server: server1          # If ommited first server from the list is taken
+          host: host1              # If omitted first host from the list is taken
         - id: 2
           ip: "10.10.64.6"
           mac: "52:54:00:00:00:41"
-          server: server2
+          host: host2
         - id: 3
           ip: "10.10.64.7"
           mac: "52:54:00:00:00:42"
-          #If server is not specifed, VM will be installed on the default server
+          # If host is not specifed, VM will be installed on the default host
     master:
       default:
         ram: 8
@@ -72,11 +72,11 @@ cluster:
         storage: 256
       instances:
         - id: 1 # Node with generated MAC, DHCP lease and default RAM and CPU
-          server: server1
+          host: host1
         - id: 2
-          server: server2
+          host: host2
         - id: 3
-          server: localhost
+          host: localhost
     worker:
       default:
         ram: 16
@@ -88,7 +88,7 @@ cluster:
           cpu: 8
           ram: 64
           label: "compute"
-          server: server1
+          host: host1
         - id: 2
           ip: "10.10.64.102"
         - id: 3
@@ -96,7 +96,7 @@ cluster:
           ram: 64
           label: "mem"
         - id: 4
-          server: server2
+          host: host2
         - id: 5
 
 kubernetes:

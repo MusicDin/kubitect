@@ -136,14 +136,14 @@ resource "null_resource" "remove_dhcp_lease" {
   provisioner "local-exec" {
     when    = destroy
     command = <<-EOF
-              virsh \
-              --connect $URI \
-              net-update $NETWORK_ID \
-              delete ip-dhcp-host "<host mac='$VM_MAC' ip='$VM_IP'/>" \
-              --live \
-              --config \
-              --parent-index 0
-              EOF
+      virsh \
+      --connect $URI \
+      net-update $NETWORK_ID \
+      delete ip-dhcp-host "<host mac='$VM_MAC' ip='$VM_IP'/>" \
+      --live \
+      --config \
+      --parent-index 0
+    EOF
 
     environment = {
       URI        = self.triggers.libvirt_provider_uri

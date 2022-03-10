@@ -1,0 +1,99 @@
+---
+
+# Verify that provided configuration exists
+
+- name: Check that the config file exists
+  stat:
+    path: "{{ config_path }}"
+  register: config_check_result
+
+- name: Verify that the configuration file exists
+  assert:
+    that: config_check_result.stat.exists
+    fail_msg: Cluster configuration file ({{ config_path }}) does not exist.
+
+- name: Read the config file
+  include_vars:
+    file: "{{ config_path }}"
+    name: config
+
+# Verify hosts are present
+
+- name: Verify hosts are defined
+  assert:
+    that: config.hosts is defined
+    fail_msg: |
+      Target 'hosts' are missing in the configuration. 
+      {{ config_example_hosts }}
+
+# Verify host names
+
+- name: Verify each host has a name
+  assert:
+    that: "{{ config.hosts | selectattr('name', 'undefined') | length == 0 }}"
+    fail_msg: |
+      One of the hosts is missing a 'name' argument. 
+      {{ config_example_hosts }}
+
+- name: Verify hosts names are unique
+  assert:
+    that: "{{ config.hosts | map(attribute='name') | unique | length | string == hosts_count }}"
+    fail_msg: |
+      Host names must be unique. 
+      {{ config_example_hosts }}
+  vars:
+    hosts_count: "{{ config.hosts | length }}"
+
+# Verify connection type
+
+- name: Verify each host has a connection type
+  assert:
+    that: "{{ config.hosts | selectattr('connection.type', 'undefined') | length == 0 }}"
+    fail_msg: |
+      The following hosts are missing a 'connection.type' argument:
+      {{ config.hosts | selectattr('connection.type', 'undefined') | map(attribute='name') }}
+      {{ config_example_hosts }}
+
+- name: Verify each connection type has a valid value
+  assert:
+    that: "{{ config.hosts | rejectattr('connection.type', 'in', ('localhost', 'local', 'remote')) | length == 0 }}"
+    fail_msg: |
+      One of the hosts has an invalid value set for 'connection.type'.
+      Valid values are ['localhost', 'local', 'remote'].
+
+- name: Verify there is only one host with connection type 'local' or 'localhost'
+  assert:
+    that: "{{ config.hosts | selectattr('connection.type', 'in', ('localhost', 'local')) | length <= 1 }}"
+    fail_msg: |
+      Only one host can have 'connection.type' set to 'localhost' or 'local'.
+
+- name: Verify user is set for 'remote' connections
+  assert:
+    that: "{{ config.hosts | selectattr('connection.type', 'eq', 'remote') | selectattr('connection.user', 'undefined') | length == 0 }}"
+    fail_msg: |
+      One of the hosts with 'connection.type' set to 'remote', is missing a 'connection.user' attribute.
+      User attribute is mandatory in order to SSH into a remote machine.
+      {{ config_example_hosts }}
+
+- name: Verify ip is set for 'remote' connections
+  assert:
+    that: "{{ config.hosts | selectattr('connection.type', 'eq', 'remote') | selectattr('connection.ip', 'undefined') | length == 0 }}"
+    fail_msg: |
+      One of the hosts with 'connection.type' set to 'remote', is missing a 'connection.ip' attribute.
+      IP attribute is mandatory in order to SSH into a remote machine.
+      {{ config_example_hosts }}
+
+# Verify default
+
+- name: Verify there is maximum one default host
+  assert:
+    that: "{{ config.hosts | selectattr('default', 'defined') | selectattr('default', 'eq', true) | length <= 1 }}"
+    fail_msg: |
+      Only one host can be marked as the default host.
+      {{ config_example_hosts }}
+
+# Print successful message
+
+- name: Configuration is valid
+  debug:
+    msg: "OK: 'hosts' seciton of provided cluster configuration is valid."

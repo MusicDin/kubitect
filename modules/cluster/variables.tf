@@ -10,6 +10,8 @@ variable "action" {
 variable "lb_vip" {
   type        = string
   description = "Load balancer virtual IP address (VIP)"
+  default     = ""
+  nullable    = false
 }
 
 variable "vm_distro" {

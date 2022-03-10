@@ -4,7 +4,7 @@
     src: "{{ template.base_path }}{{ template.type.custom }}{{ template.suffix.main }}"
     dest: "{{ main_tf_path }}"
   vars:
-    server_list: "{{ config.servers }}"
+    host_list: "{{ config.hosts }}"
 
 - name: Generate default variables.tf
   template:

@@ -41,7 +41,7 @@ defaults
 # Load balancer configuration #
 
 frontend kubernetes
-        bind ${bind_ip}:6443
+        bind ${lb_vip}:6443
         option tcplog
         mode tcp
         default_backend kubernetes-master-nodes

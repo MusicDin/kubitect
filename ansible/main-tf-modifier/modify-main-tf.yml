@@ -3,7 +3,7 @@
   any_errors_fatal: yes
   vars:
     action_type: "modify"
-    config_path: ../../cluster.yml
+    config_path: ../../cluster.yaml
   
   roles:
     - { role: verify-cluster-config, when: action_type == "modify" }

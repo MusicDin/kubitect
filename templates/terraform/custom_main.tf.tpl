@@ -36,11 +36,11 @@ resource "null_resource" "generate_ssh_keys" {
   provisioner "local-exec" {
 
     command = <<-EOF
-              dirname $SSH_PK_PATH | xargs mkdir -p
-              if [ ! -e $SSH_PK_PATH ] && [ ! -e $\{SSH_PK_PATH\}.pub ]; then \
-                ssh-keygen -f $SSH_PK_PATH -q -N ""; \
-              fi
-              EOF
+      dirname $SSH_PK_PATH | xargs mkdir -p
+      if [ ! -e $SSH_PK_PATH ] && [ ! -e $\{SSH_PK_PATH\}.pub ]; then \
+        ssh-keygen -f $SSH_PK_PATH -q -N ""; \
+      fi
+    EOF
 
     environment = {
       SSH_PK_PATH = local.ssh_pk_path
@@ -57,7 +57,7 @@ resource "null_resource" "generate_ssh_keys" {
   Provider uri (localhost): "qemu:///system"
   Provider uri (remote): "qemu+ssh://<USER>@<IP>:<PORT>/system?keyfile=<PK_PATH>"
 #}
-{% for item in server_list %}
+{% for item in host_list %}
 {% set ssh_pk_path = item.connection.ssh.keyfile if item.connection.ssh.keyfile is defined else keyfile_path %}
 {% set ssh_pk_path = ssh_pk_path | replace("~", lookup('env', 'HOME')) %}
 
@@ -88,20 +88,20 @@ provider "libvirt" {
 # Modules
 #======================================================================================
 
-{# Check if default server is defined #}
-{% set is_default_server_defined = [] -%}
-{% for item in server_list -%}
+{# Check if default host is defined #}
+{% set is_default_host_defined = [] -%}
+{% for item in host_list -%}
   {%- if item.default is defined and item.default == true -%}
-    {{ is_default_server_defined.append(true) }}
+    {{ is_default_host_defined.append(true) }}
   {%- endif -%}
 {% endfor %}
-{% for item in server_list %}
-{% set server_name = item.name %}
+{% for item in host_list %}
+{% set host_name = item.name %}
 {% set resource_pool_path = item.resourcePoolPath if item.resourcePoolPath is defined else resource_pool_path %}
-{% set is_default_server = item.default is defined and item.default == true or is_default_server_defined|length == 0 and loop.first == true %}
-{% set default_selector = " || try(node.server, null) == null" if is_default_server else "" %}
+{% set is_default_host = item.default is defined and item.default == true or is_default_host_defined|length == 0 and loop.first == true %}
+{% set default_selector = " || try(node.host, null) == null" if is_default_host else "" %}
 
-module "main_{{ server_name }}" {
+module "main_{{ host_name }}" {
 
   source = "./modules/main"
 
@@ -135,7 +135,7 @@ module "main_{{ server_name }}" {
   cluster_nodes_loadBalancer_default_storage = try(local.config.cluster.nodes.loadBalancer.default.storage, null)
   cluster_nodes_loadBalancer_instances = [
     for node in try(local.config.cluster.nodes.loadBalancer.instances, []) :
-    node if try(node.server, null) == "{{ server_name }}"{{ default_selector }}
+    node if try(node.host, null) == "{{ host_name }}"{{ default_selector }}
   ]
 
   # Master node VMs parameters
@@ -144,7 +144,7 @@ module "main_{{ server_name }}" {
   cluster_nodes_master_default_storage = try(local.config.cluster.nodes.master.default.storage, null)
   cluster_nodes_master_instances = [
     for node in try(local.config.cluster.nodes.master.instances, []) :
-    node if try(node.server, null) == "{{ server_name }}"{{ default_selector }}
+    node if try(node.host, null) == "{{ host_name }}"{{ default_selector }}
   ]
 
   # Worker node VMs parameters
@@ -154,7 +154,7 @@ module "main_{{ server_name }}" {
   cluster_nodes_worker_default_label   = try(local.config.cluster.nodes.worker.default.label, null)
   cluster_nodes_worker_instances = [
     for node in try(local.config.cluster.nodes.worker.instances, []) :
-    node if try(node.server, null) == "{{ server_name }}"{{ default_selector }}
+    node if try(node.host, null) == "{{ host_name }}"{{ default_selector }}
   ]
 
   # Kubernetes & Kubespray
@@ -171,7 +171,7 @@ module "main_{{ server_name }}" {
   internal = local.internal
 
   providers = {
-    libvirt = libvirt.{{ server_name }}
+    libvirt = libvirt.{{ host_name }}
   }
 
 }
@@ -181,12 +181,12 @@ module "main_{{ server_name }}" {
 #================================
 # Cluster
 #================================
-{# Creates a list of server modules. -#}
-{% set server_name_list = [] -%}
-{% for item in server_list -%}
-  {{ server_name_list.append("module.main_"~item.name~".nodes") }}
+{# Creates a list of host modules. -#}
+{% set host_name_list = [] -%}
+{% for item in host_list -%}
+  {{ host_name_list.append("module.main_"~item.name~".nodes") }}
 {% endfor -%}
-{% set server_name_list = server_name_list | join(', ') -%}
+{% set host_name_list = host_name_list | join(', ') -%}
 
 # Configures k8s cluster using Kubespray #
 module "k8s_cluster" {
@@ -207,15 +207,15 @@ module "k8s_cluster" {
   worker_node_label = try(local.config.cluster.nodes.worker.default.label, null)
   lb_vip            = try(local.config.cluster.nodes.loadBalancer.vip, null)
   lb_nodes = [
-    for node in flatten([{{ server_name_list }}]) :
+    for node in flatten([{{ host_name_list }}]) :
     node if node.type == local.internal.vm_types.load_balancer
   ]
   master_nodes = [
-    for node in flatten([{{ server_name_list }}]) :
+    for node in flatten([{{ host_name_list }}]) :
     node if node.type == local.internal.vm_types.master
   ]
   worker_nodes = [
-    for node in flatten([{{ server_name_list }}]) :
+    for node in flatten([{{ host_name_list }}]) :
     node if node.type == local.internal.vm_types.worker
   ]
 
@@ -235,7 +235,7 @@ module "k8s_cluster" {
 
   # K8s cluster creation depends on all VM modules #
   depends_on = [
-{% for item in server_list %}
+{% for item in host_list %}
     module.main_{{ item.name }},
 {% endfor %}
   ]
