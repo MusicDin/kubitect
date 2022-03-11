@@ -92,8 +92,6 @@ variable "cluster_nodeTemplate_image_source" {
 variable "cluster_nodeTemplate_networkInterface" {
   type        = string
   description = "Network interface used by VMs to connect to the network."
-  default     = "ens3"
-  nullable    = false
 }
 
 variable "cluster_nodeTemplate_updateOnBoot" {
@@ -245,7 +243,7 @@ variable "cluster_nodes_master_instances" {
     cpu     = optional(number)
     ram     = optional(number)
     storage = optional(number)
-    host  = optional(string)
+    host    = optional(string)
   }))
   description = "Master node instances (control plane)"
 
@@ -300,7 +298,7 @@ variable "cluster_nodes_worker_instances" {
     cpu     = optional(number)
     ram     = optional(number)
     storage = optional(number)
-    host  = optional(string)
+    host    = optional(string)
     #label   = optional(string)
   }))
   description = "Worker node instances."

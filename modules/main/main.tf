@@ -6,16 +6,11 @@
 locals {
   resource_pool_name = "${var.cluster_name}-resource-pool"
   network_name       = "${var.cluster_name}-network"
+  network_interface = (var.cluster_nodeTemplate_networkInterface != null
+    ? var.cluster_nodeTemplate_networkInterface
+    : var.cluster_nodeTemplate_image_distro == "ubuntu" ? "ens3" : "eth0"
+  )
 }
-
-#=====================================================================================
-# Provider specific
-#=====================================================================================
-
-# Sets libvirt provider's uri #
-#provider "libvirt" {
-#  uri = var.libvirt_provider_uri
-#}
 
 #======================================================================================
 # General Resources
@@ -93,7 +88,7 @@ module "lb_module" {
   vm_update            = var.cluster_nodeTemplate_updateOnBoot
   vm_ssh_private_key   = var.cluster_nodeTemplate_ssh_privateKeyPath
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
-  vm_network_interface = var.cluster_nodeTemplate_networkInterface
+  vm_network_interface = local.network_interface
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_loadBalancer_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_loadBalancer_default_ram
   vm_storage           = each.value.storage != null ? each.value.storage : var.cluster_nodes_loadBalancer_default_storage
@@ -136,7 +131,7 @@ module "master_module" {
   vm_update            = var.cluster_nodeTemplate_updateOnBoot
   vm_ssh_private_key   = var.cluster_nodeTemplate_ssh_privateKeyPath
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
-  vm_network_interface = var.cluster_nodeTemplate_networkInterface
+  vm_network_interface = local.network_interface
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_master_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_master_default_ram
   vm_storage           = each.value.storage != null ? each.value.storage : var.cluster_nodes_master_default_storage
@@ -179,7 +174,7 @@ module "worker_module" {
   vm_update            = var.cluster_nodeTemplate_updateOnBoot
   vm_ssh_private_key   = var.cluster_nodeTemplate_ssh_privateKeyPath
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
-  vm_network_interface = var.cluster_nodeTemplate_networkInterface
+  vm_network_interface = local.network_interface
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_worker_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_worker_default_ram
   vm_storage           = each.value.storage != null ? each.value.storage : var.cluster_nodes_worker_default_storage
