@@ -49,6 +49,8 @@ variable "worker_nodes" {
 variable "worker_node_label" {
   type        = string
   description = "Worker node role label"
+  default     = ""
+  nullable    = false
 }
 
 variable "master_nodes" {

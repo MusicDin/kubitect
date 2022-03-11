@@ -230,7 +230,8 @@ resource "null_resource" "kubespray_download" {
       cd ansible
       rm -rf kubespray
       git clone ${var.kubernetes_kubespray_url} \
-        --branch ${var.kubernetes_kubespray_version}
+        --branch ${var.kubernetes_kubespray_version} \
+        --single-branch
     EOF
   }
 }
@@ -405,7 +406,8 @@ resource "null_resource" "kubespray_upgrade" {
       cd ansible
       rm -rf kubespray
       git clone ${var.kubernetes_kubespray_url} \
-        --branch ${var.kubernetes_kubespray_version}
+        --branch ${var.kubernetes_kubespray_version} \
+        --single-branch
     EOF
   }
 
