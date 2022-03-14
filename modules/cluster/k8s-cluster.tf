@@ -20,7 +20,7 @@ locals {
 # Template files
 #======================================================================================
 
-# Kubespray all.yml template (Currently supports only 1 load balancer) #
+# Kubespray all.yml template #
 data "template_file" "kubespray_all" {
 
   template = file("templates/kubespray/kubespray_all.tpl")
@@ -247,7 +247,7 @@ resource "null_resource" "haproxy_install" {
         && . venv/bin/activate \
         && pip3 install -r requirements.txt
       ansible-playbook \
-        --inventory ../../config/hosts.ini \
+        --inventory config/hosts.ini \
         --become \
         --user=$SSH_USER \
         --private-key=$SSH_PRIVATE_KEY \
