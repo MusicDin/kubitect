@@ -25,29 +25,57 @@ TKK_CONFIG_PATH="$TKK_PATH/cluster.yaml"
 # Other variables
 TKK_ACTION=""
 
-# Colors..
-TKK_COLOR_RED='\033[0;31m'
-TKK_COLOR_GREEN='\033[0;32m'
-TKK_COLOR_CLEAR='\033[0m'
+# Text colors..
+TKK_TEXT_RED="\033[0;31m"
+TKK_TEXT_GREEN="\033[0;32m"
+TKK_TEXT_BOLD="\033[1m"
+TKK_TEXT_ITALIC="\033[3m"
+TKK_TEXT_UNDERLINE="\033[4m"
+TKK_TEXT_CLEAR="\033[0m"
 
 # Options
 TKK_OPTIONS_SHORT=a:,c:,h,v
-TKK_OPTIONS_LONG=action:,config:,help,version
+TKK_OPTIONS_LONG=action:,config:,help,version,tfvars,auto-approve
 TKK_OPTION_ACTION=""
-TKK_OPTION_TFVARS="false"
+TKK_OPTION_TFVARS=""
+TKK_OPTION_AUTO_APPROVE=""
+
+#
+# Prints bold message.
+#
+__print_bold() {
+    echo "${TKK_TEXT_BOLD}${1}${TKK_TEXT_CLEAR}"
+}
+
+#
+# Prints italic message.
+#
+__print_italic() {
+    echo "${TKK_TEXT_ITALIC}${1}${TKK_TEXT_CLEAR}"
+}
+
+#
+# Prints underline message.
+#
+__print_underline() {
+    echo "${TKK_TEXT_UNDERLINE}${1}${TKK_TEXT_CLEAR}"
+}
+
 
 #
 # Prints green ok status message.
 #
 __print_ok() {
-    echo "[ ${TKK_COLOR_GREEN}OK${TKK_COLOR_CLEAR} ] $1"
+    stamp=$(__print_bold "OK")
+    echo "[ ${TKK_TEXT_GREEN}${stamp}${TKK_TEXT_CLEAR} ] $1"
 }
 
 #
 # Prints red error message.
 #
 __print_err() {
-    echo "[ ${TKK_COLOR_RED}ERROR${TKK_COLOR_CLEAR} ] $1"
+    stamp=$(__print_bold "ERROR")
+    echo "[ ${TKK_TEXT_RED}${stamp}${TKK_TEXT_CLEAR} ] $1"
 }
 
 #
@@ -150,7 +178,8 @@ __apply() {
     terraform -chdir=$TKK_PATH apply \
         -var action="$TKK_ACTION" \
         -var config_path="$TKK_CONFIG_PATH" \
-        -compact-warnings
+        -compact-warnings \
+        $TKK_OPTION_AUTO_APPROVE
 }
 
 #
@@ -162,6 +191,15 @@ __plan() {
         -var action="$TKK_ACTION" \
         -var config_path="$TKK_CONFIG_PATH" \
         -compact-warnings
+}
+
+#
+# Destroy the cluster.
+#
+__destroy() {
+    terraform -chdir=$TKK_PATH destroy \
+        -compact-warnings \
+        $TKK_OPTION_AUTO_APPROVE
 }
 
 #
@@ -179,7 +217,7 @@ __version() {
 __help() {
 	cat <<-EOF
 
-	> $TKK_SCRIPT_NAME - $TKK_SCRIPT_VERSION
+	$(__print_bold "> $TKK_SCRIPT_NAME - $TKK_SCRIPT_VERSION")
 
 	    Script is useful when deploying Kubernetes cluster on 
 	    multiple hosts.
@@ -190,24 +228,34 @@ __help() {
 
 	    Enjoy.
 
-	> Quick start:
-	    1.) Modify hosts section in cluster.yml file.
+	$(__print_bold "> $(__print_underline "Quick start"):")
+	    1.) Modify hosts section in cluster.yaml file.
 	    2.) Run '$TKK_SCRIPT_NAME apply' command to create the cluster.
 
-	> Commands:
-	    apply         - Modify main.tf and apply new configuration.
-	    -a, --action  - Action to be executed on the cluster.
-	                    (default: create)
-	    -c, --config  - Custom path to the configuration file.
+	$(__print_bold "> $(__print_underline "Commands"):")
 
-	    create        - Only generate main.tf.
-	        --tfvars  - Generate main.tf file that uses Terraform
-	                    variables (terraform.tfvars) as an input
-	                    instead of YAML configuration.
+	    apply           - Modify main.tf and apply new configuration.
+	      -a, --action  - Action to be executed on the cluster.
+	                      (default: create)
+	      -c, --config  - Custom path to the configuration file.
 
-	> Global options:
-	    -h, --help    - Shows help.
-	    -v, --version - Shows script version.
+	    plan            - Creates terraform cluster plan.
+	      -a, --action  - Action to be executed on the cluster.
+	                      (default: create)
+	      -c, --config  - Custom path to the configuration file.
+
+	    destroy         - Destroys the cluster.
+
+	    create          - Only generate main.tf.
+	          --tfvars  - Generate main.tf file that uses Terraform
+	                      variables (terraform.tfvars) as an input
+	                      instead of YAML configuration.
+
+	$(__print_bold "> $(__print_underline "Global options"):")
+	    -h, --help         - Shows help.
+	    -v, --version      - Shows script version.
+	        --auto-approve - Automatically approves any user
+	                         confirmation request.
 	EOF
 }
 
@@ -232,13 +280,11 @@ while :; do
         -v | --version )
             __version
             exit 0
-            shift
             ;;
 
         -h | --help )
             __help
             exit 0
-            shift
             ;;
 
         -a | --action)
@@ -252,7 +298,12 @@ while :; do
             ;;
 
         --tfvars)
-            TKK_OPTION_TFVARS="true"
+            TKK_OPTION_TFVARS=$1
+            shift
+            ;;
+
+        --auto-approve)
+            TKK_OPTION_AUTO_APPROVE=$1
             shift
             ;;
 
@@ -269,11 +320,6 @@ while :; do
 done
 
 #
-# Prepare environment
-#
-#__set_project_path
-
-#
 # Commands.
 #
 case $1 in
@@ -288,8 +334,12 @@ case $1 in
     	__plan
     	;;
 
+    destroy)
+        __destroy
+        ;;
+
     create)
-        if [ "$TKK_OPTION_TFVARS" = "true" ]; then
+        if [ $TKK_OPTION_TFVARS ]; then
             __create_config_tfvars
         else
             __create_config

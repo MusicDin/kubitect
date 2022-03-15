@@ -19,7 +19,7 @@ shopt -s progcomp
 _tkk_completion() {
     local cur prev firstword lastword complete_words complete_options
  
-    # Don't break words at : and =, see [1] and [2]
+    # Don't break words at ':' and '='
     COMP_WORDBREAKS=${COMP_WORDBREAKS//[:=]}
  
     cur="${COMP_WORDS[COMP_CWORD]}"
@@ -37,7 +37,8 @@ _tkk_completion() {
  
     APPLY_OPTIONS="\
         -c --config\
-        -a --action"
+        -a --action\
+           --auto-approve"
 
     CREATE_COMMANDS="\
         config"
@@ -99,8 +100,8 @@ _tkk_completion() {
         compopt -o default
         COMPREPLY=()
     
-    elif [[ -z $complete_words ]] || [[ $cur == -* ]]; then
-        # Print options if word list is empty or current word starts with '-'.
+    elif [[ -z $complete_words ]] && [[ $cur == "-"* ]]; then
+        # Print options if word list is empty and current word starts with '-'.
         COMPREPLY=( $( compgen -W "$complete_options" -- $cur ))
  
     else
