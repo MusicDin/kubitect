@@ -8,5 +8,5 @@
     - "{{ config_path }}"
 
   roles:
-    - { role: verify-cluster-config } #, when: action_type == "modify" }
-  #  - { role: generate-main-tf }
+    - { role: verify-cluster-config, when: action_type == "modify" }
+    - { role: generate-main-tf }

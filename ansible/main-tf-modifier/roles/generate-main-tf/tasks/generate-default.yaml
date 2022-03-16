@@ -1,12 +1,12 @@
 ---
 - name: Generate default main.tf
   template:
-    src: ../../templates/terraform/default_main.tf.tpl
+    src: ../../templates/terraform/default_main.tf.j2
     dest: ../../main.tf
 
 - name: Generate default variables.tf
   template:
-    src: ../../templates/terraform/default_variables.tf.tpl
+    src: ../../templates/terraform/default_variables.tf.j2
     dest: ../../variables.tf
 
   # Generate terraform.tfvars only when file does not exist
@@ -19,7 +19,7 @@
 
 - name: Generate terraform.tfvars
   template:
-    src: ../../templates/terraform/default_terraform.tfvars.tpl
+    src: ../../templates/terraform/default_terraform.tfvars.j2
     dest: ../../terraform.tfvars
   when: 
     - terraform_tfvars_file.stat.exists == false
