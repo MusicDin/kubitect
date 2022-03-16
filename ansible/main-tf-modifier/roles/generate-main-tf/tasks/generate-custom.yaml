@@ -1,10 +1,10 @@
 ---
 - name: Create main.tf from template file
   template:
-    src: "{{ template.base_path }}{{ template.type.custom }}{{ template.suffix.main }}"
-    dest: "{{ main_tf_path }}"
+    src: ../../templates/terraform/
+    dest: ../../main.tf
   vars:
-    host_list: "{{ config.hosts }}"
+    host_list: "{{ hosts }}"
 
 - name: Generate default variables.tf
   template:

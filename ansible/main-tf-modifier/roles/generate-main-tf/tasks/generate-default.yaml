@@ -1,24 +1,25 @@
 ---
 - name: Generate default main.tf
   template:
-    src: "{{ template.base_path }}{{ template.type.default }}{{ template.suffix.main }}"
-    dest: "{{ main_tf_path }}"
+    src: ../../templates/terraform/default_main.tf.tpl
+    dest: ../../main.tf
 
 - name: Generate default variables.tf
   template:
-    src: "{{ template.base_path }}{{ template.type.default }}{{ template.suffix.vars }}"
-    dest: "{{ vars_tf_path }}"
+    src: ../../templates/terraform/default_variables.tf.tpl
+    dest: ../../variables.tf
 
   # Generate terraform.tfvars only when file does not exist
   # to prevent overwriting user's configuration.
 
-- name: Task name
+- name: Get stats of the terraform.tfvars file
   stat:
-    path: "{{ terraform_tfvars_path }}"
+    path: ../../terraform.tfvars
   register: terraform_tfvars_file
 
 - name: Generate terraform.tfvars
   template:
-    src: "{{ template.base_path }}{{ template.type.default }}{{ template.suffix.tfvars }}"
-    dest: "{{ terraform_tfvars_path }}"
-  when: not terraform_tfvars_file.stat.exists
+    src: ../../templates/terraform/default_terraform.tfvars.tpl
+    dest: ../../terraform.tfvars
+  when: 
+    - terraform_tfvars_file.stat.exists == false

@@ -1,13 +1,12 @@
 ---
-- name: Read config file
-  include_vars:
-    file: "{{ config_path }}"
-    name: config
-
 - name: Generate custom main.tf file that supports deployment on multiple hosts
-  include_tasks: generate-custom.yaml
-  when: action_type == "modify"
+  include_tasks: 
+    - generate-custom.yaml
+  when: 
+    - action_type == "modify"
 
 - name: Generate main.tf file that accepts Terraform variables or yaml config files
-  include_tasks: generate-default.yaml
-  when: action_type == "generate-tf"
+  include_tasks: 
+    - generate-default.yaml
+  when: 
+    - action_type == "generate-tf"
