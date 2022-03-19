@@ -58,7 +58,7 @@ resource "null_resource" "generate_ssh_keys" {
   Provider uri (remote): "qemu+ssh://<USER>@<IP>:<PORT>/system?keyfile=<PK_PATH>"
 #}
 {% for item in host_list %}
-{% set ssh_pk_path = item.connection.ssh.keyfile if item.connection.ssh.keyfile is defined else keyfile_path %}
+{% set ssh_pk_path = item.connection.ssh.keyfile if item.connection.ssh.keyfile is defined else default.keyfile_path %}
 {% set ssh_pk_path = ssh_pk_path | replace("~", lookup('env', 'HOME')) %}
 
 provider "libvirt" {
@@ -97,7 +97,7 @@ provider "libvirt" {
 {% endfor %}
 {% for item in host_list %}
 {% set host_name = item.name %}
-{% set resource_pool_path = item.resourcePoolPath if item.resourcePoolPath is defined else resource_pool_path %}
+{% set main_resource_pool_path = item.mainResourcePoolPath if item.mainResourcePoolPath is defined else default.resource_pool_path %}
 {% set is_default_host = item.default is defined and item.default == true or is_default_host_defined|length == 0 and loop.first == true %}
 {% set default_selector = " || try(node.host, null) == null" if is_default_host else "" %}
 
@@ -108,8 +108,10 @@ module "main_{{ host_name }}" {
   # General
   action = var.action
 
-  # Libvirt
-  libvirt_resource_pool_location = "{{ resource_pool_path }}"
+  # Resource pools
+  hosts_mainResourcePoolPath = "{{ main_resource_pool_path }}"
+  hosts_dataResourcePools    = try(local.config.hosts[index(local.config.hosts.*.name, "{{ host_name }}")].dataResourcePools, null)
+
 
   # General
   cluster_name                             = try(local.config.cluster.name, null)
@@ -129,29 +131,29 @@ module "main_{{ host_name }}" {
   cluster_network_dns     = try(local.config.cluster.network.dns, null)
 
   # HAProxy load balancer VMs parameters
-  cluster_nodes_loadBalancer_vip             = try(local.config.cluster.nodes.loadBalancer.vip, null)
-  cluster_nodes_loadBalancer_default_cpu     = try(local.config.cluster.nodes.loadBalancer.default.cpu, null)
-  cluster_nodes_loadBalancer_default_ram     = try(local.config.cluster.nodes.loadBalancer.default.ram, null)
-  cluster_nodes_loadBalancer_default_storage = try(local.config.cluster.nodes.loadBalancer.default.storage, null)
+  cluster_nodes_loadBalancer_vip                  = try(local.config.cluster.nodes.loadBalancer.vip, null)
+  cluster_nodes_loadBalancer_default_cpu          = try(local.config.cluster.nodes.loadBalancer.default.cpu, null)
+  cluster_nodes_loadBalancer_default_ram          = try(local.config.cluster.nodes.loadBalancer.default.ram, null)
+  cluster_nodes_loadBalancer_default_mainDiskSize = try(local.config.cluster.nodes.loadBalancer.default.mainDiskSize, null)
   cluster_nodes_loadBalancer_instances = [
     for node in try(local.config.cluster.nodes.loadBalancer.instances, []) :
     node if try(node.host, null) == "{{ host_name }}"{{ default_selector }}
   ]
 
   # Master node VMs parameters
-  cluster_nodes_master_default_cpu     = try(local.config.cluster.nodes.master.default.cpu, null)
-  cluster_nodes_master_default_ram     = try(local.config.cluster.nodes.master.default.ram, null)
-  cluster_nodes_master_default_storage = try(local.config.cluster.nodes.master.default.storage, null)
+  cluster_nodes_master_default_cpu          = try(local.config.cluster.nodes.master.default.cpu, null)
+  cluster_nodes_master_default_ram          = try(local.config.cluster.nodes.master.default.ram, null)
+  cluster_nodes_master_default_mainDiskSize = try(local.config.cluster.nodes.master.default.mainDiskSize, null)
   cluster_nodes_master_instances = [
     for node in try(local.config.cluster.nodes.master.instances, []) :
     node if try(node.host, null) == "{{ host_name }}"{{ default_selector }}
   ]
 
   # Worker node VMs parameters
-  cluster_nodes_worker_default_cpu     = try(local.config.cluster.nodes.worker.default.cpu, null)
-  cluster_nodes_worker_default_ram     = try(local.config.cluster.nodes.worker.default.ram, null)
-  cluster_nodes_worker_default_storage = try(local.config.cluster.nodes.worker.default.storage, null)
-  cluster_nodes_worker_default_label   = try(local.config.cluster.nodes.worker.default.label, null)
+  cluster_nodes_worker_default_cpu          = try(local.config.cluster.nodes.worker.default.cpu, null)
+  cluster_nodes_worker_default_ram          = try(local.config.cluster.nodes.worker.default.ram, null)
+  cluster_nodes_worker_default_mainDiskSize = try(local.config.cluster.nodes.worker.default.mainDiskSize, null)
+  cluster_nodes_worker_default_label        = try(local.config.cluster.nodes.worker.default.label, null)
   cluster_nodes_worker_instances = [
     for node in try(local.config.cluster.nodes.worker.instances, []) :
     node if try(node.host, null) == "{{ host_name }}"{{ default_selector }}

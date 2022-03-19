@@ -126,7 +126,7 @@ __set_action() {
         ""|create)
             TKK_ACTION="create"
             ;;
-        
+
         *)
             __err "Unsupported action '$TKK_OPTION_ACTION'"
     esac

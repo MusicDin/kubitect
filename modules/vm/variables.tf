@@ -7,9 +7,9 @@ variable "libvirt_provider_uri" {
   description = "Libvirt provider's URI"
 }
 
-variable "resource_pool_name" {
+variable "main_resource_pool_name" {
   type        = string
-  description = "Resource pool name"
+  description = "Main resource pool name"
 }
 
 variable "base_volume_id" {
@@ -20,6 +20,11 @@ variable "base_volume_id" {
 variable "network_id" {
   type        = string
   description = "Id of the network in which VM resides"
+}
+
+variable "cluster_name" {
+  type        = string
+  description = "Cluster name"
 }
 
 # ==================================== #
@@ -117,9 +122,25 @@ variable "vm_ram" {
   description = "The amount of RAM allocated to the virtual machine"
 }
 
-variable "vm_storage" {
+variable "vm_main_disk_size" {
   type        = number
-  description = "The amount of disk (in Bytes) allocated to the virtual machine"
+  description = "The amount of main (os) disk (in GiB) allocated to the virtual machine"
+}
+
+variable "vm_data_disks" {
+  type        = list(object({
+    name: string
+    size: number
+    pool: string
+  }))
+  description = "Additional data disks attached to the virtual machine"
+
+  # If pool does not exist, null is passed.
+  # If no additional disks need to be created, an empty array ([]) is passed.
+  validation {
+    condition = var.vm_data_disks != null
+    error_message = "At least one of the node instances is referencing a data resource pool that does not exist."
+  }
 }
 
 variable "vm_mac" {

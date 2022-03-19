@@ -2,6 +2,12 @@
 # Cloud-init
 #================================
 
+
+# Read SSH public key to inject it into cloud-init template. #
+data "local_file" "ssh_public_key" {
+  filename = "${var.vm_ssh_private_key}.pub"
+}
+
 # Network bridge configuration (for cloud-init) #
 data "template_file" "cloud_init_network_tpl" {
   template = file(!var.is_bridge
@@ -21,12 +27,6 @@ data "template_file" "cloud_init_network_tpl" {
   }
 }
 
-# Read SSH public key #
-# This is required if SSH keys are generated during the Terraform execution. #
-data "local_file" "ssh_public_key" {
-  filename = "${var.vm_ssh_private_key}.pub"
-}
-
 # Cloud-init configuration template #
 data "template_file" "cloud_init_tpl" {
   template = file("templates/cloud_init/cloud_init.tpl")
@@ -42,7 +42,7 @@ data "template_file" "cloud_init_tpl" {
 # Initializes cloud-init disk for user data #
 resource "libvirt_cloudinit_disk" "cloud_init" {
   name           = "${var.vm_name}-cloud-init.iso"
-  pool           = var.resource_pool_name
+  pool           = var.main_resource_pool_name
   user_data      = data.template_file.cloud_init_tpl.rendered
   network_config = data.template_file.cloud_init_network_tpl.rendered
 }
@@ -52,12 +52,22 @@ resource "libvirt_cloudinit_disk" "cloud_init" {
 #================================
 
 # Creates volume for new virtual machine #
-resource "libvirt_volume" "vm_volume" {
-  name           = "${var.vm_name}.qcow2"
-  pool           = var.resource_pool_name
+resource "libvirt_volume" "vm_main_disk" {
+  name           = "${var.vm_name}-main-disk"
+  pool           = var.main_resource_pool_name
   base_volume_id = var.base_volume_id
-  size           = var.vm_storage * pow(1024, 3) # GiB -> B
+  size           = var.vm_main_disk_size * pow(1024, 3) # GiB -> B
   format         = "qcow2"
+}
+
+# Creates volume for new virtual machine #
+resource "libvirt_volume" "vm_data_disks" {
+
+  for_each = {for disk in var.vm_data_disks : disk.name => disk }
+
+  name = "${var.vm_name}-${each.key}-data-disk"
+  pool = "${var.cluster_name}-${each.value.pool}-data-resource-pool"
+  size = each.value.size * pow(1024, 3) # GiB -> B
 }
 
 # Creates virtual machine #
@@ -83,8 +93,14 @@ resource "libvirt_domain" "vm_domain" {
   }
 
   # Storage configuration #
-  disk {
-    volume_id = libvirt_volume.vm_volume.id
+  dynamic "disk" {
+    for_each = concat(
+      [{"id" : libvirt_volume.vm_main_disk.id}],
+      [ for disk in libvirt_volume.vm_data_disks : {"id" : disk.id }]
+    )
+    content {
+      volume_id = disk.value.id
+    }
   }
 
   console {
@@ -171,10 +187,10 @@ resource "null_resource" "ssh_known_hosts" {
 
   provisioner "local-exec" {
     command = <<-EOF
-              sh ./scripts/filelock-exec.sh \
-                "touch ~/.ssh/known_hosts && ssh-keygen -R $VM_IP && ssh-keyscan -t rsa $VM_IP \
-                | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old"
-              EOF
+      sh ./scripts/filelock-exec.sh \
+        "touch ~/.ssh/known_hosts && ssh-keygen -R $VM_IP && ssh-keyscan -t rsa $VM_IP \
+        | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old"
+    EOF
 
     environment = {
       VM_IP = libvirt_domain.vm_domain.network_interface.0.addresses.0

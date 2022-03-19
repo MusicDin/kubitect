@@ -21,15 +21,31 @@ variable "libvirt_provider_uri" {
   nullable    = false
 }
 
-variable "libvirt_resource_pool_location" {
+variable "hosts_mainResourcePoolPath" {
   type        = string
-  description = "Location where resource pool will be initialized."
+  description = "Path where main resource pool will be initialized."
   default     = "/var/lib/libvirt/pools/"
   nullable    = false
 
   validation {
-    condition     = length(var.libvirt_resource_pool_location) != 0
-    error_message = "Libvirt resource pool location cannot be empty."
+    condition     = length(var.hosts_mainResourcePoolPath) != 0
+    error_message = "Main resource pool path cannot be empty."
+  }
+}
+
+variable "hosts_dataResourcePools" {
+  type        = list(object({
+    name: string
+    path: string
+  }))
+  description = "Location where main resource pool will be initialized."
+  default = []
+  nullable    = false
+
+  # Verify names are unique and that pool paths exist??
+  validation {
+    condition = length(var.hosts_dataResourcePools.*.name) == length(distinct(var.hosts_dataResourcePools.*.name))
+    error_message = "Duplicate data resource pool name found!\nMake sure that the data resource pool names on the same host are unique."
   }
 }
 
@@ -180,9 +196,9 @@ variable "cluster_nodes_loadBalancer_default_ram" {
   nullable    = false
 }
 
-variable "cluster_nodes_loadBalancer_default_storage" {
+variable "cluster_nodes_loadBalancer_default_mainDiskSize" {
   type        = number
-  description = "The default amount of disk (in GiB) allocated to the HAProxy load balancer."
+  description = "Size of the main disk (in GiB) that is attached to the HAProxy load balancer."
   default     = 16
   nullable    = false
 }
@@ -190,12 +206,12 @@ variable "cluster_nodes_loadBalancer_default_storage" {
 variable "cluster_nodes_loadBalancer_instances" {
   type = list(object({
     id      = number
+    host    = optional(string)
     mac     = optional(string)
     ip      = optional(string)
     cpu     = optional(number)
     ram     = optional(number)
-    storage = optional(number)
-    host    = optional(string)
+    mainDiskSize = optional(number)
   }))
   description = "HAProxy load balancer node instances."
 
@@ -228,31 +244,47 @@ variable "cluster_nodes_master_default_ram" {
   nullable    = false
 }
 
-variable "cluster_nodes_master_default_storage" {
+variable "cluster_nodes_master_default_mainDiskSize" {
   type        = number
-  description = "The default amount of disk (in GiB) allocated to the master node."
+  description = "Size of the main disk (in GiB) that is attached to the master node."
   default     = 16
+  nullable    = false
+}
+
+variable "cluster_nodes_master_default_dataDisks" {
+  type        = list(object({
+    name: string
+    pool: string
+    size: number
+  }))
+  description = "List of additional data disks that are attached to the master node."
+  default     = []
   nullable    = false
 }
 
 variable "cluster_nodes_master_instances" {
   type = list(object({
     id      = number
+    host    = optional(string)
     mac     = optional(string)
     ip      = optional(string)
     cpu     = optional(number)
     ram     = optional(number)
-    storage = optional(number)
-    host    = optional(string)
+    mainDiskSize = optional(number)
+    dataDisks = optional(list(object({ 
+      name: string
+      pool: string
+      size: number
+    })))
   }))
   description = "Master node instances (control plane)"
 
   validation {
     condition = (
-      #length(var.cluster_nodes_master_instances) % 2 != 0 &&
       compact(tolist([for node in var.cluster_nodes_master_instances : node.id])) == distinct(compact(tolist([for node in var.cluster_nodes_master_instances : node.id])))
       && compact(tolist([for node in var.cluster_nodes_master_instances : node.mac])) == distinct(compact(tolist([for node in var.cluster_nodes_master_instances : node.mac])))
       && compact(tolist([for node in var.cluster_nodes_master_instances : node.ip])) == distinct(compact(tolist([for node in var.cluster_nodes_master_instances : node.ip])))
+      # && length(var.cluster_nodes_master_instances) % 2 != 0
     )
     error_message = "Master nodes configuration is incorrect. Make sure that: \n - number of master nodes is odd (not divisible by 2),\n - every ID is unique,\n - every MAC and IP address is unique or null."
   }
@@ -276,10 +308,21 @@ variable "cluster_nodes_worker_default_ram" {
   nullable    = false
 }
 
-variable "cluster_nodes_worker_default_storage" {
+variable "cluster_nodes_worker_default_mainDiskSize" {
   type        = number
-  description = "The default amount of disk (in GiB) allocated to the worker node."
+  description = "Size of the main disk (in GiB) that is attached to the worker node."
   default     = 32
+  nullable    = false
+}
+
+variable "cluster_nodes_worker_default_dataDisks" {
+  type        = list(object({
+    name: string
+    pool: string
+    size: number
+  }))
+  description = "List of additional data disks that are attached to the worker node."
+  default     = []
   nullable    = false
 }
 
@@ -293,12 +336,17 @@ variable "cluster_nodes_worker_default_label" {
 variable "cluster_nodes_worker_instances" {
   type = list(object({
     id      = number
+    host    = optional(string)
     mac     = optional(string)
     ip      = optional(string)
     cpu     = optional(number)
     ram     = optional(number)
-    storage = optional(number)
-    host    = optional(string)
+    mainDiskSize = optional(number)
+    dataDisks = optional(list(object({ 
+      name: string
+      pool: string
+      size: number
+    })))
     #label   = optional(string)
   }))
   description = "Worker node instances."

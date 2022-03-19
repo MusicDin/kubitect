@@ -13,7 +13,12 @@ hosts:
         port: 1234
         keyfile: "~/.ssh/id_rsa_host_1"
         verify: false # default: true, if set to false it skips verification in known_hosts
-    resourcePoolPath: "/var/lib/libvirt/pools/"
+    mainResourcePoolPath: "/var/lib/libvirt/pools/" # This is where OS images are installed
+    dataResourcePools:
+      - name: data-pool
+        path: "/mnt/data/data-pool"
+      - name: backup-pool
+        path: "/mnt/backup/pool"
   - name: remote-host-2
     connection:
       type: remote
@@ -49,18 +54,18 @@ cluster:
       default: # For all VMs
         ram: 4 # GiB
         cpu: 1 # vCPU
-        storage: 16 # GiB
+        mainDiskSize: 16 # GiB
       instances:
         - id: 1
           ip: "10.10.64.5"         # If omitted DHCP lease is requested
           mac: "52:54:00:00:00:40" # If omitted MAC address is generated
           ram: 8                   # Overrides default RAM value for this node
           cpu: 8                   # Overrides default CPU value for this node
-          host: host1              # If omitted first host from the list is taken
+          host: remote-host-1      # If omitted first host from the list is taken
         - id: 2
           ip: "10.10.64.6"
           mac: "52:54:00:00:00:41"
-          host: host2
+          host: remote-host-2
         - id: 3
           ip: "10.10.64.7"
           mac: "52:54:00:00:00:42"
@@ -69,12 +74,12 @@ cluster:
       default:
         ram: 8
         cpu: 2
-        storage: 256
+        mainDiskSize: 256
       instances:
         - id: 1 # Node with generated MAC, DHCP lease and default RAM and CPU
-          host: host1
+          host: remote-host-1
         - id: 2
-          host: host2
+          host: remote-host-2
         - id: 3
           host: localhost
     worker:
@@ -88,7 +93,14 @@ cluster:
           cpu: 8
           ram: 64
           label: "compute"
-          host: host1
+          host: remote-host-1
+          dataDisks:
+            - name: rook-disk
+              pool: data-pool
+              size: 128
+            - name: test-disk
+              pool: backup-pool
+              size: 256
         - id: 2
           ip: "10.10.64.102"
         - id: 3
@@ -96,7 +108,7 @@ cluster:
           ram: 64
           label: "mem"
         - id: 4
-          host: host2
+          host: remote-host-2
         - id: 5
 
 kubernetes:
