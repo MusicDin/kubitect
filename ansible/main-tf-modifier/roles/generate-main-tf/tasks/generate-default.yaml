@@ -1,0 +1,25 @@
+---
+- name: Generate default main.tf
+  template:
+    src: ../../templates/terraform/default_main.tf.j2
+    dest: ../../main.tf
+
+- name: Generate default variables.tf
+  template:
+    src: ../../templates/terraform/default_variables.tf.j2
+    dest: ../../variables.tf
+
+  # Generate terraform.tfvars only when file does not exist
+  # to prevent overwriting user's configuration.
+
+- name: Get stats of the terraform.tfvars file
+  stat:
+    path: ../../terraform.tfvars
+  register: terraform_tfvars_file
+
+- name: Generate terraform.tfvars
+  template:
+    src: ../../templates/terraform/default_terraform.tfvars.j2
+    dest: ../../terraform.tfvars
+  when: 
+    - terraform_tfvars_file.stat.exists == false

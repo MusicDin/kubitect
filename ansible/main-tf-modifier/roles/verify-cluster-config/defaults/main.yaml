@@ -1,13 +1,13 @@
 ---
-config_example_servers: |
+config_example_hosts: |
   
   Please see the following example:
   ---
-  servers:
+  hosts:
     - name: localhost_example
       connection:
         type: localhost
-    - name: remote_server_example
+    - name: remote_host_example
       default: true
       connection:
         type: remote

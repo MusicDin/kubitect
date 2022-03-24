@@ -12,6 +12,7 @@ locals {
   default_extra_args    = "--timeout 3000 --verbose"
   dashboard_namespace   = "kube-system"
   initial_vrrp_priority = 201
+  ssh_pk_path           = abspath(var.vm_ssh_private_key)
 }
 
 
@@ -19,7 +20,7 @@ locals {
 # Template files
 #======================================================================================
 
-# Kubespray all.yml template (Currently supports only 1 load balancer) #
+# Kubespray all.yml template #
 data "template_file" "kubespray_all" {
 
   template = file("templates/kubespray/kubespray_all.tpl")
@@ -128,7 +129,7 @@ data "template_file" "haproxy" {
   template = file("templates/haproxy/haproxy.tpl")
 
   vars = {
-    bind_ip = var.lb_vip
+    lb_vip = var.lb_vip
   }
 }
 
@@ -226,10 +227,12 @@ resource "null_resource" "config_permissions" {
 resource "null_resource" "kubespray_download" {
   provisioner "local-exec" {
     command = <<-EOF
-              cd ansible
-              rm -rf kubespray
-              git clone --branch ${var.kubernetes_kubespray_version} ${var.kubernetes_kubespray_url}
-              EOF
+      cd ansible
+      rm -rf kubespray
+      git clone ${var.kubernetes_kubespray_url} \
+        --branch ${var.kubernetes_kubespray_version} \
+        --single-branch
+    EOF
   }
 }
 
@@ -240,19 +243,21 @@ resource "null_resource" "haproxy_install" {
 
   provisioner "local-exec" {
     command = <<-EOF
-              virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
-              ansible-playbook \
-                --inventory config/hosts.ini \
-                --become \
-                --user=$SSH_USER \
-                --private-key=$SSH_PRIVATE_KEY \
-                $EXTRA_ARGS \
-                ansible/haproxy/haproxy.yml
-              EOF
+      virtualenv -p python3 venv \
+        && . venv/bin/activate \
+        && pip3 install -r requirements.txt
+      ansible-playbook \
+        --inventory config/hosts.ini \
+        --become \
+        --user=$SSH_USER \
+        --private-key=$SSH_PRIVATE_KEY \
+        $EXTRA_ARGS \
+        ansible/haproxy/haproxy.yaml
+    EOF
 
     environment = {
       SSH_USER        = var.vm_user
-      SSH_PRIVATE_KEY = var.vm_ssh_private_key
+      SSH_PRIVATE_KEY = local.ssh_pk_path
       EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
     }
   }
@@ -272,21 +277,23 @@ resource "null_resource" "kubespray_create" {
 
   provisioner "local-exec" {
     command = <<-EOF
-              cd ansible/kubespray
-              virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
-              ansible-playbook \
-                --inventory ../../config/hosts.ini \
-                --become \
-                --user=$SSH_USER \
-                --private-key=$SSH_PRIVATE_KEY \
-                --extra-vars "kube_version=$K8S_VERSION" \
-                $EXTRA_ARGS \
-                cluster.yml
-              EOF
+      cd ansible/kubespray
+      virtualenv -p python3 venv \
+        && . venv/bin/activate \
+        && pip3 install -r requirements.txt
+      ansible-playbook \
+        --inventory ../../config/hosts.ini \
+        --become \
+        --user=$SSH_USER \
+        --private-key=$SSH_PRIVATE_KEY \
+        --extra-vars "kube_version=$K8S_VERSION" \
+        $EXTRA_ARGS \
+        cluster.yml
+    EOF
 
     environment = {
       SSH_USER        = var.vm_user
-      SSH_PRIVATE_KEY = var.vm_ssh_private_key
+      SSH_PRIVATE_KEY = local.ssh_pk_path
       K8S_VERSION     = var.kubernetes_version
       EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
     }
@@ -309,21 +316,23 @@ resource "null_resource" "kubespray_add" {
 
   provisioner "local-exec" {
     command = <<-EOF
-              cd ansible/kubespray
-              virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
-              ansible-playbook \
-                --inventory ../../config/hosts.ini \
-                --become \
-                --user=$SSH_USER \
-                --private-key=$SSH_PRIVATE_KEY \
-                --extra-vars "kube_version=$K8S_VERSION" \
-                $EXTRA_ARGS \
-                scale.yml
-              EOF
+      cd ansible/kubespray
+      virtualenv -p python3 venv \
+        && . venv/bin/activate \
+        && pip3 install -r requirements.txt
+      ansible-playbook \
+        --inventory ../../config/hosts.ini \
+        --become \
+        --user=$SSH_USER \
+        --private-key=$SSH_PRIVATE_KEY \
+        --extra-vars "kube_version=$K8S_VERSION" \
+        $EXTRA_ARGS \
+        scale.yml
+    EOF
 
     environment = {
       SSH_USER        = var.vm_user
-      SSH_PRIVATE_KEY = var.vm_ssh_private_key
+      SSH_PRIVATE_KEY = local.ssh_pk_path
       K8S_VERSION     = var.kubernetes_version
       EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
     }
@@ -346,24 +355,26 @@ resource "null_resource" "kubespray_remove" {
   triggers = {
     vm_name            = each.value.name
     vm_user            = var.vm_user
-    vm_ssh_private_key = var.vm_ssh_private_key
+    vm_ssh_private_key = local.ssh_pk_path
     extra_args         = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
   }
 
   provisioner "local-exec" {
     when    = destroy
     command = <<-EOF
-              cd ansible/kubespray
-              virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
-              ansible-playbook \
-                --inventory ../../config/hosts.ini \
-                --become \
-                --user=$SSH_USER \
-                --private-key=$SSH_PRIVATE_KEY \
-                --extra-vars "node=$VM_NAME delete_nodes_confirmation=yes" \
-                $EXTRA_ARGS \
-                remove-node.yml
-              EOF
+      cd ansible/kubespray
+      virtualenv -p python3 venv \
+        && . venv/bin/activate \
+        && pip3 install -r requirements.txt
+      ansible-playbook \
+        --inventory ../../config/hosts.ini \
+        --become \
+        --user=$SSH_USER \
+        --private-key=$SSH_PRIVATE_KEY \
+        --extra-vars "node=$VM_NAME delete_nodes_confirmation=yes" \
+        $EXTRA_ARGS \
+        remove-node.yml
+    EOF
 
     environment = {
       VM_NAME         = self.triggers.vm_name
@@ -392,29 +403,33 @@ resource "null_resource" "kubespray_upgrade" {
   # Deletes old Kubespray and installs new one #
   provisioner "local-exec" {
     command = <<-EOF
-              cd ansible
-              rm -rf kubespray
-              git clone --branch ${var.kubernetes_kubespray_version} ${var.kubernetes_kubespray_url}
-              EOF
+      cd ansible
+      rm -rf kubespray
+      git clone ${var.kubernetes_kubespray_url} \
+        --branch ${var.kubernetes_kubespray_version} \
+        --single-branch
+    EOF
   }
 
   provisioner "local-exec" {
     command = <<-EOF
-              cd ansible/kubespray
-              virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
-              ansible-playbook \
-                --inventory ../../config/hosts.ini \
-                --become \
-                --user=$SSH_USER \
-                --private-key=$SSH_PRIVATE_KEY \
-                --extra-vars "kube_version=$K8S_VERSION" \
-                $EXTRA_ARGS \
-                upgrade-cluster.yml
-              EOF
+      cd ansible/kubespray
+      virtualenv -p python3 venv \
+        && . venv/bin/activate \
+        && pip3 install -r requirements.txt
+      ansible-playbook \
+        --inventory ../../config/hosts.ini \
+        --become \
+        --user=$SSH_USER \
+        --private-key=$SSH_PRIVATE_KEY \
+        --extra-vars "kube_version=$K8S_VERSION" \
+        $EXTRA_ARGS \
+        upgrade-cluster.yml
+    EOF
 
     environment = {
       SSH_USER        = var.vm_user
-      SSH_PRIVATE_KEY = var.vm_ssh_private_key
+      SSH_PRIVATE_KEY = local.ssh_pk_path
       K8S_VERSION     = var.kubernetes_version
       EXTRA_ARGS      = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
     }
@@ -429,27 +444,31 @@ resource "null_resource" "kubespray_upgrade" {
   ]
 }
 
-# Fetch the local admin.conf kubectl configuration file #
+#Fetch the local admin.conf kubectl configuration file #
 resource "null_resource" "fetch_kubeconfig" {
+
+  count = var.action == "create" ? 1 : 0
 
   provisioner "local-exec" {
     command = <<-EOF
-              virtualenv -p python3 venv && . venv/bin/activate && pip3 install -r requirements.txt
-              ansible \
-                --inventory config/hosts.ini \
-                --become \
-                --user=$SSH_USER \
-                --private-key=$SSH_PRIVATE_KEY \
-                --module-name fetch \
-                --args "src=/etc/kubernetes/admin.conf dest=config/admin.conf flat=yes" \
-                $EXTRA_ARGS \
-                $MASTER_NODE_NAME
-              EOF
+      virtualenv -p python3 venv \
+        && . venv/bin/activate \
+        && pip3 install -r requirements.txt
+      ansible \
+        --inventory config/hosts.ini \
+        --become \
+        --user=$SSH_USER \
+        --private-key=$SSH_PRIVATE_KEY \
+        --module-name fetch \
+        --args "src=/etc/kubernetes/admin.conf dest=config/admin.conf flat=yes" \
+        $EXTRA_ARGS \
+        $MASTER_NODE_NAME
+    EOF
 
     environment = {
       MASTER_NODE_NAME = var.master_nodes[0].name
       SSH_USER         = var.vm_user
-      SSH_PRIVATE_KEY  = var.vm_ssh_private_key
+      SSH_PRIVATE_KEY  = local.ssh_pk_path
       EXTRA_ARGS       = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
     }
   }

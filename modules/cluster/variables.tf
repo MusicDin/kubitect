@@ -10,6 +10,8 @@ variable "action" {
 variable "lb_vip" {
   type        = string
   description = "Load balancer virtual IP address (VIP)"
+  default     = ""
+  nullable    = false
 }
 
 variable "vm_distro" {
@@ -47,6 +49,8 @@ variable "worker_nodes" {
 variable "worker_node_label" {
   type        = string
   description = "Worker node role label"
+  default     = ""
+  nullable    = false
 }
 
 variable "master_nodes" {

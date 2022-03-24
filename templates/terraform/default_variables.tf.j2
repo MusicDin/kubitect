@@ -129,7 +129,7 @@ variable "cluster_nodes_loadBalancer_instances" {
     id     = number
     mac    = string
     ip     = string
-    server = optional(string)
+    host   = optional(string)
   }))
   default = null
 }
@@ -158,7 +158,7 @@ variable "cluster_nodes_master_instances" {
     id     = number
     mac    = string
     ip     = string
-    server = optional(string)
+    host = optional(string)
   }))
   default = null
 }
@@ -192,7 +192,7 @@ variable "cluster_nodes_worker_instances" {
     id     = number
     mac    = string
     ip     = string
-    server = optional(string)
+    host = optional(string)
   }))
   default = null
 }

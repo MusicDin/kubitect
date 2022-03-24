@@ -4,124 +4,210 @@
 # terraform-kubespray-kvm (tkk) helper script
 #======================================================================================
 #
-# See 'tkk.sh --help' for help
+# See 'tkk --help' for help
 #
 
 # Script version
-VERSION="0.0.1"
-
-# Project root directory
-ROOTDIR="$(cd $(dirname $0)/.. && pwd)"
+TKK_PATH="$(cd $(dirname $0)/.. && pwd)"
+TKK_SCRIPT_NAME="tkk"
+TKK_SCRIPT_VERSION="0.0.1"
 
 # Ansible main.tf modifier
-MAIN_TF_MODIFIER_PATH="$ROOTDIR/ansible/main-tf-modifier"
-MAIN_TF_MODIFIER_PLAYBOOK_FILE="modify-main-tf.yml"
-MAIN_TF_MODIFIER_INVENTORY_FILE="hosts.ini"
+TKK_MAIN_TF_MODIFIER_PATH="$TKK_PATH/ansible/main-tf-modifier"
+TKK_MAIN_TF_MODIFIER_PLAYBOOK_FILE="modify-main-tf.yml"
+TKK_MAIN_TF_MODIFIER_INVENTORY_FILE="hosts.ini"
 
 # Other paths
-VENV_PATH="$ROOTDIR/venv"
-REQUIREMENTS_PATH="$ROOTDIR/requirements.txt"
-CONFIG_PATH="$ROOTDIR/cluster.yml"
+TKK_VENV_PATH="$TKK_PATH/venv"
+TKK_REQUIREMENTS_PATH="$TKK_PATH/requirements.txt"
+TKK_CONFIG_PATH="$TKK_PATH/cluster.yaml"
 
-# Colors..
-COLOR_RED='\033[0;31m'
-COLOR_GREEN='\033[0;32m'
-COLOR_CLEAR='\033[0m'
+# Other variables
+TKK_ACTION=""
+
+# Text colors..
+TKK_TEXT_RED="\033[0;31m"
+TKK_TEXT_GREEN="\033[0;32m"
+TKK_TEXT_BOLD="\033[1m"
+TKK_TEXT_ITALIC="\033[3m"
+TKK_TEXT_UNDERLINE="\033[4m"
+TKK_TEXT_CLEAR="\033[0m"
+
+# Options
+TKK_OPTIONS_SHORT=a:,c:,h,v
+TKK_OPTIONS_LONG=action:,config:,help,version,tfvars,auto-approve
+TKK_OPTION_ACTION=""
+TKK_OPTION_TFVARS=""
+TKK_OPTION_AUTO_APPROVE=""
+
+#
+# Prints bold message.
+#
+__print_bold() {
+    echo "${TKK_TEXT_BOLD}${1}${TKK_TEXT_CLEAR}"
+}
+
+#
+# Prints italic message.
+#
+__print_italic() {
+    echo "${TKK_TEXT_ITALIC}${1}${TKK_TEXT_CLEAR}"
+}
+
+#
+# Prints underline message.
+#
+__print_underline() {
+    echo "${TKK_TEXT_UNDERLINE}${1}${TKK_TEXT_CLEAR}"
+}
+
 
 #
 # Prints green ok status message.
 #
 __print_ok() {
-	echo "[ ${COLOR_GREEN}OK${COLOR_CLEAR} ] $1"
+    stamp=$(__print_bold "OK")
+    echo "[ ${TKK_TEXT_GREEN}${stamp}${TKK_TEXT_CLEAR} ] $1"
 }
 
 #
 # Prints red error message.
 #
 __print_err() {
-	echo "[ ${COLOR_RED}ERROR${COLOR_CLEAR} ] $1"
+    stamp=$(__print_bold "ERROR")
+    echo "[ ${TKK_TEXT_RED}${stamp}${TKK_TEXT_CLEAR} ] $1"
 }
 
 #
 # Print an error and exit the script.
 #
 __err() {
-	__print_err "$1\n"
-	exit 1
+    __print_err "$1\n"
+    exit 1
 }
 
 #
 # Set custom config path.
 #
 __set_config_path() {
-	CONFIG_PATH="$(cd $(dirname $1) && pwd)/$(basename $1)"
-	__print_ok "--config=$CONFIG_PATH\n"
+    TKK_CONFIG_PATH="$(cd $(dirname $1) && pwd)/$(basename $1)"
+    __print_ok "--config=$TKK_CONFIG_PATH"
 }
 
 #
-# Install Ansible with other dependencies within virtualenv
+# Set project path. If project path environment variable 
+# is not, then set project path to current directory (".").
+#
+__set_project_path() {
+    if [ -z $TKK_PATH]; then
+        TKK_PATH="$(cd $(dirname .) && pwd)"
+    fi
+    __print_ok "Project path set to: $TKK_PATH"
+}
+
+#
+# Set action to be executed on the cluster.
+#
+__set_action() {
+    case $TKK_OPTION_ACTION in
+        upgrade)
+            TKK_ACTION="upgrade"
+            ;;
+
+        add_worker)
+            TKK_ACTION="add_worker"
+            ;;
+
+        remove_worker)
+            TKK_ACTION="remove_worker"
+            ;;
+
+        # Default action.
+        ""|create)
+            TKK_ACTION="create"
+            ;;
+
+        *)
+            __err "Unsupported action '$TKK_OPTION_ACTION'"
+    esac
+    __print_ok "--action=$TKK_ACTION"
+}
+
+#
+# Install Ansible with other dependencies within virtualenv.
 #
 __activate_virtual_env() {
-	virtualenv -p python3 $VENV_PATH \
-		&& . $VENV_PATH/bin/activate \
-		&& pip3 install -r $REQUIREMENTS_PATH
+    virtualenv -p python3 $TKK_VENV_PATH \
+        && . $TKK_VENV_PATH/bin/activate \
+        && pip3 install -r $TKK_REQUIREMENTS_PATH
 }
 
 #
 # Trigger main.tf file modification.
 #
-__generate() {
-	cd $MAIN_TF_MODIFIER_PATH
-	__activate_virtual_env
-	ansible-playbook $MAIN_TF_MODIFIER_PLAYBOOK_FILE \
-		--inventory $MAIN_TF_MODIFIER_INVENTORY_FILE \
-		--extra-vars "config_path=$CONFIG_PATH" \
-		|| __err "An error has occured during main.tf modification."
-	terraform -chdir=$ROOTDIR init -upgrade
+__create_config() {
+    cd $TKK_MAIN_TF_MODIFIER_PATH
+    __activate_virtual_env
+    ansible-playbook $TKK_MAIN_TF_MODIFIER_PLAYBOOK_FILE \
+        --inventory $TKK_MAIN_TF_MODIFIER_INVENTORY_FILE \
+        --extra-vars "config_path=$TKK_CONFIG_PATH" \
+        || __err "An error has occured during main.tf modification."
+    terraform -chdir=$TKK_PATH init -upgrade
 }
 
 #
 # Generate main.tf file that read Terraform variables (terraform.tfvars)
 # as an input instead of YAML configuration.
 #
-__generate_tf() {
-	cd $MAIN_TF_MODIFIER_PATH
-	__activate_virtual_env
-	ansible-playbook $MAIN_TF_MODIFIER_PLAYBOOK_FILE \
-		--inventory $MAIN_TF_MODIFIER_INVENTORY_FILE \
-		--extra-vars "action_type=generate-tf" \
-		|| __err "An error has occured during the reset of the main.tf file."
-	terraform -chdir=$ROOTDIR init -upgrade
+__create_config_tfvars() {
+    cd $TKK_MAIN_TF_MODIFIER_PATH
+    __activate_virtual_env
+    ansible-playbook $TKK_MAIN_TF_MODIFIER_PLAYBOOK_FILE \
+        --inventory $TKK_MAIN_TF_MODIFIER_INVENTORY_FILE \
+        --extra-vars "action_type=generate-tf" \
+        || __err "An error has occured during the reset of the main.tf file."
+    terraform -chdir=$TKK_PATH init \
+        -upgrade
 }
 
 #
 # Modify and apply the configuration.
 #
 __apply() {
-	__generate
-	terraform -chdir=$ROOTDIR apply \
-		-var "config_path=$CONFIG_PATH" \
-		-compact-warnings \
-		$@
+    __create_config
+    terraform -chdir=$TKK_PATH apply \
+        -var action="$TKK_ACTION" \
+        -var config_path="$TKK_CONFIG_PATH" \
+        -compact-warnings \
+        $TKK_OPTION_AUTO_APPROVE
 }
 
 #
 # Modify and plan the configuration.
 #
 __plan() {
-	__generate
-	terraform -chdir=$ROOTDIR plan \
-		-var "config_path=$CONFIG_PATH" \
-		-compact-warnings \
-		$@
+    __create_config
+    terraform -chdir=$TKK_PATH plan \
+        -var action="$TKK_ACTION" \
+        -var config_path="$TKK_CONFIG_PATH" \
+        -compact-warnings
+}
+
+#
+# Destroy the cluster.
+#
+__destroy() {
+    terraform -chdir=$TKK_PATH destroy \
+        -compact-warnings \
+        $TKK_OPTION_AUTO_APPROVE
 }
 
 #
 # Print script version.
 #
 __version() {
-	cat <<-EOF
-		tkk.sh - $VERSION
+    cat <<-EOF
+		$TKK_SCRIPT_NAME - $TKK_SCRIPT_VERSION
 	EOF
 }
 
@@ -131,112 +217,136 @@ __version() {
 __help() {
 	cat <<-EOF
 
-		> tkk.sh - $VERSION
+	$(__print_bold "> $TKK_SCRIPT_NAME - $TKK_SCRIPT_VERSION")
 
-		  Script is useful when deploying Kubernetes cluster on 
-		  multiple physical servers.
+	    Script is useful when deploying Kubernetes cluster on 
+	    multiple hosts.
 
-		  It triggers Ansible playbook that modifies main.tf file
-		  based on cluster configuration and runs terraform apply
-		  or plan.
+	    It triggers Ansible playbook that modifies 'main.tf' 
+	    file based on the cluster configuration and then runs 
+	    appropriate terraform command.
 
-		  Enjoy.
+	    Enjoy.
 
-		> How to use:
-		  1.) Modify servers section in cluster.yml file.
-		  2.) Run 'sh tkk.sh apply' or 'sh tkk.sh plan'.
+	$(__print_bold "> $(__print_underline "Quick start"):")
+	    1.) Modify hosts section in cluster.yaml file.
+	    2.) Run '$TKK_SCRIPT_NAME apply' command to create the cluster.
 
-		> Commands:
-		  apply       - Modify main.tf and apply new configuration.
-		  plan        - Modify main.tf and plan new configuration.
-		  generate    - Only generate main.tf.
-		  generate-tf - Generate main.tf file that uses Terraform
-		                variables (terraform.tfvars) as an input
-		                instead of YAML configuration.
+	$(__print_bold "> $(__print_underline "Commands"):")
 
-		> Other options:
-		  -c, --config  - Path to cluster configuration.
-		  -h, --help    - Shows help.
-		  -v, --version - Shows script version.
+	    apply           - Modify main.tf and apply new configuration.
+	      -a, --action  - Action to be executed on the cluster.
+	                      (default: create)
+	      -c, --config  - Custom path to the configuration file.
+
+	    plan            - Creates terraform cluster plan.
+	      -a, --action  - Action to be executed on the cluster.
+	                      (default: create)
+	      -c, --config  - Custom path to the configuration file.
+
+	    destroy         - Destroys the cluster.
+
+	    create          - Only generate main.tf.
+	          --tfvars  - Generate main.tf file that uses Terraform
+	                      variables (terraform.tfvars) as an input
+	                      instead of YAML configuration.
+
+	$(__print_bold "> $(__print_underline "Global options"):")
+	    -h, --help         - Shows help.
+	    -v, --version      - Shows script version.
+	        --auto-approve - Automatically approves any user
+	                         confirmation request.
 	EOF
 }
 
 
-cmd="$1"
-flag=""
+#
+# Read options.
+#
+OPTS=$(getopt \
+    --unquoted \
+    --options $TKK_OPTIONS_SHORT \
+    --longoptions $TKK_OPTIONS_LONG \
+    -- "$@") \
+    || __err "Error reading options."
+
+eval set -- "$OPTS"
 
 #
-# Shift first argument (cmd) if it exists.
+# Set global options.
 #
-if [ "$#" -gt 0 ]; then
-	shift
-fi
+while :; do
+    case "$1" in
+        -v | --version )
+            __version
+            exit 0
+            ;;
 
-#
-# Check whether custom path (--config) is set.
-#
-for arg in "$@"; do
+        -h | --help )
+            __help
+            exit 0
+            ;;
 
-	shift
+        -a | --action)
+            TKK_OPTION_ACTION=$2
+            shift 2
+            ;;
 
-	if [ "$flag" = "--config" ]; then
-		__set_config_path $arg
-		flag=""
-		continue
-	fi
+        -c | --config)
+            __set_config_path $2
+            shift 2
+            ;;
 
-	case $arg in
-		"-c"|"--config")
-			flag="--config"
-			;;
+        --tfvars)
+            TKK_OPTION_TFVARS=$1
+            shift
+            ;;
 
-		"-c="*|"--config="*)
-			__set_config_path $(echo "$arg" | cut -d'=' -f 2)
-			;;
+        --auto-approve)
+            TKK_OPTION_AUTO_APPROVE=$1
+            shift
+            ;;
 
-		*)
-			set -- "$@" $arg
-	esac
+        --)
+            shift
+            break
+            ;;
+
+        *)
+            __err "Unexpected option: $1"
+            exit 41
+            ;;
+    esac
 done
-
-#
-# Throw an error if the --config flag is present,
-# but the path has not been provided.
-#
-if [ ! -z "$flag" ]; then
-	__err "Option '$flag' requires an argument."
-fi
 
 #
 # Commands.
 #
-case $cmd in
-	"-h"|"--help")
-		__help
-		;;
+case $1 in
 
-	"-v"|"--version")
-		__version
-		;;
+    apply)
+        __set_action
+        __apply
+        ;;
 
-	"apply")
-		__apply $@
-		;;
+    plan)
+        __set_action
+    	__plan
+    	;;
 
-	"plan")
-		__plan $@
-		;;
+    destroy)
+        __destroy
+        ;;
 
-	"generate")
-		__generate
-		;;
+    create)
+        if [ $TKK_OPTION_TFVARS ]; then
+            __create_config_tfvars
+        else
+            __create_config
+        fi
+        ;;
 
-	"generate-tf")
-		__generate_tf
-		;;
-
-	*)
-		__help
+    *)
+        __help
+        ;;
 esac
-
-exit 0
