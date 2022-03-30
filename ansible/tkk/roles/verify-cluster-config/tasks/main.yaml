@@ -1,18 +1,18 @@
 ---
 
 # Verify that provided configuration exists
-- name: Verify that provided configuration exists
-  block:
-    - name: Get stats of the config file
-      stat:
-        path: "{{ config_path }}"
-      register: config
+# - name: Verify that provided configuration exists
+#   block:
+#     - name: Get stats of the config file
+#       stat:
+#         path: "{{ config_path }}"
+#       register: config
 
-    - name: Verify that the configuration file exists
-      fail:
-        msg: Cluster configuration file ({{ config_path }}) does not exist.
-      when:
-        - config.stat.exists != true
+#     - name: Verify that the configuration file exists
+#       fail:
+#         msg: Cluster configuration file ({{ config_path }}) does not exist.
+#       when:
+#         - config.stat.exists != true
 
 # Verify hosts are present
 
@@ -22,7 +22,7 @@
       Target 'hosts' are missing in the configuration. 
       {{ config_example_hosts }}
   when:
-    - hosts is not defined
+    - config.hosts is not defined
 
 # Verify host names
 
@@ -32,7 +32,7 @@
       Host is missing a 'name' argument.
   when:
     - item.name is not defined
-  loop: "{{ hosts }}"
+  loop: "{{ config.hosts }}"
 
 - name: Fail if hosts names are not unique
   fail:
@@ -40,9 +40,9 @@
       Hosts names must be unique. 
       {{ config_example_hosts }}
   when: 
-    - hosts | map(attribute='name') | unique | length | string != hosts_count
+    - config.hosts | map(attribute='name') | unique | length | string != hosts_count
   vars:
-    hosts_count: "{{ hosts | length }}"
+    hosts_count: "{{ config.hosts | length }}"
 
 # Verify connection type
 
@@ -52,7 +52,7 @@
       Host with name '{{ item.name }}' is missing a 'connection.type' argument!
   when:
     - item.connection.type is not defined
-  loop: "{{ hosts }}"
+  loop: "{{ config.hosts }}"
 
 - name: Fail if host's connection type has an invalid value
   fail:
@@ -64,14 +64,14 @@
     - item.connection.type != 'local'
     - item.connection.type != 'localhost'
     - item.connection.type != 'remote'
-  loop: "{{ hosts }}"
+  loop: "{{ config.hosts }}"
 
 - name: Fail if multiple hosts have connection type 'local' or 'localhost'
   fail:
     msg: |
       Only one host can have 'connection.type' set to 'localhost' or 'local'.
   when:
-    - hosts | selectattr('connection.type', 'in', ('localhost', 'local')) | length > 1 
+    - config.hosts | selectattr('connection.type', 'in', ('localhost', 'local')) | length > 1 
 
 - name: Fail if remote host is missing a user attribute
   fail:
@@ -80,7 +80,7 @@
       Remote host username is mandatory in order to establish SSH connection with it.
   when:
     - item.connection.type == 'remote' and item.connection.user is not defined
-  loop: "{{ hosts }}"
+  loop: "{{ config.hosts }}"
 
 - name: Fail if remote host is missing an IP attribute
   fail:
@@ -89,7 +89,7 @@
       Remote host IP address is mandatory to establish SSH connection with it.
   when:
     - item.connection.type == 'remote' and item.connection.ip is not defined
-  loop: "{{ hosts }}"
+  loop: "{{ config.hosts }}"
 
 # # Verify default
 
@@ -98,4 +98,4 @@
     msg: |
       Only one host can be marked as default!
   when:
-    - hosts | selectattr('default', 'defined') | selectattr('default', 'eq', true) | length > 1
+    - config.hosts | selectattr('default', 'defined') | selectattr('default', 'eq', true) | length > 1

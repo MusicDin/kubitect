@@ -1,0 +1,37 @@
+---
+
+- name: Clone git project
+  git:
+    repo: "{{ tkk.url | default(tkk_url) }}"
+    version: "{{ tkk.version | default(tkk_version) }}"
+    dest: "{{ tkk_cluster_path }}"
+    single_branch: yes
+    force: yes
+
+- name: Create a copy of the custom config file in a cluster dirctory
+  copy:
+    src: "{{ config_path }}"
+    dest: "{{ tkk_cluster_config_path }}"
+  when:
+    - config_path is defined
+
+- name: Make sure cluster config exists
+  block:
+    - name: Get stats of the current cluster config file
+      stat:
+        path: "{{ tkk_cluster_config_path }}"
+      register: cluster_config
+
+    - name: Copy default config file if cluster config is missing
+      copy:
+        src: "{{ tkk_cluster_default_config_path }}"
+        dest: "{{ tkk_cluster_config_path }}"
+      when:
+        - cluster_config.stat.exists == false
+
+- name: Set cluster config as host fact
+#   set_fact:
+#     config: "{{ config | yaml }}"
+  include_vars:
+    file: "{{ tkk_cluster_config_path }}"
+    name: config

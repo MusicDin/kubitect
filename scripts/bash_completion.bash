@@ -1,4 +1,5 @@
 TKK_SCRIPT_NAME=tkk
+TKK_HOME=${TKK_HOME:-"$HOME/.tkk"}
 TKK_APPLY_ACTIONS="\
         create\
         upgrade\
@@ -29,7 +30,9 @@ _tkk_completion() {
  
     GLOBAL_COMMANDS="\
         apply\
-        create"
+        destroy\
+        purge\
+        list"
  
     GLOBAL_OPTIONS="\
         -h --help\
@@ -38,13 +41,19 @@ _tkk_completion() {
     APPLY_OPTIONS="\
         -c --config\
         -a --action\
+           --cluster\
            --auto-approve"
 
-    CREATE_COMMANDS="\
-        config"
+    DESTROY_OPTIONS="\
+        -c --config\
+           --cluster\
+           --auto-approve"
 
-    CREATE_CONFIG_OPTIONS="\
-        --tfvars"
+    PURGE_OPTIONS="\
+           --cluster"
+
+    LIST_COMMANDS="\
+        clusters"
 
     case "${firstword}" in 
 
@@ -57,28 +66,48 @@ _tkk_completion() {
                     complete_words="$TKK_APPLY_ACTIONS"
                     ;;
 
+                --cluster)
+                    complete_words="$(__tkk_get_clusters)"
+                    ;;
+
                 *)
                     complete_options="$APPLY_OPTIONS"
                     ;;
             esac
             ;;
 
-        create)
-            case "${lastword}" in
-                config)
-                    case "${prev}" in	
-                        --tfvars)
-                            return 0
-                            ;;
+        destroy)
+            case "${prev}" in
+                -c|--config)
+                    ;;
 
-                        *)
-                            complete_options="$CREATE_CONFIG_OPTIONS"
-                            ;;
-                    esac
+                --cluster)
+                    complete_words="$(__tkk_get_clusters)"
                     ;;
 
                 *)
-                    complete_words="$CREATE_COMMANDS"
+                    complete_options="$DESTROY_OPTIONS"
+                    ;;
+            esac
+            ;;
+
+
+        purge)
+            case "${prev}" in
+                --cluster)
+                    complete_words="$(__tkk_get_clusters)"
+                    ;;
+
+                *)
+                    complete_options="$PURGE_OPTIONS"
+                    ;;
+            esac
+            ;;
+
+        ls|list)
+            case "${lastword}" in
+                ls|list)
+                    complete_words="$LIST_COMMANDS"
                     ;;
             esac
             ;;
@@ -150,7 +179,7 @@ __tkk_get_lastword() {
     local lastword i
  
     lastword=
-    for ((i = 1; i < ${#COMP_WORDS[@]} && i < 3; ++i)); do
+    for ((i = 1; i < ${#COMP_WORDS[@]}; ++i)); do
         if [[ ${COMP_WORDS[i]} != -* ]] && [[ -n ${COMP_WORDS[i]} ]] && [[ ${COMP_WORDS[i]} != $cur ]]; then
             lastword=${COMP_WORDS[i]}
         fi
@@ -158,10 +187,24 @@ __tkk_get_lastword() {
  
     echo $lastword
 }
+
+#
+# Returns list of initialized clusters.
+#
+__tkk_get_clusters(){
+    clusters=""
+    for dir in "$TKK_HOME/clusters/"*; do
+        if [ -d "$dir" ]; then
+            clusters="$clusters $(basename "$dir")"
+        fi
+    done
+    echo "$(cd "$TKK_HOME/clusters/"; ls -d * 2>/dev/null)"
+}
  
 
 #================================================
-# Complete command
+# Script
 #================================================
 
+# Complete command
 complete -F _tkk_completion tkk

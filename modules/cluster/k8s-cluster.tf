@@ -483,7 +483,7 @@ resource "null_resource" "copy_kubeconfig" {
   count = var.kubernetes_other_copyKubeconfig ? 1 : 0
 
   provisioner "local-exec" {
-    command = "mkdir -p ~/.kube && cp config/admin.conf ~/.kube/"
+    command = "mkdir -p ~/.kube && cp config/admin.conf ~/.kube/admin.yaml"
   }
 
   # Kubeconfig needs to be fetched before it can be copied

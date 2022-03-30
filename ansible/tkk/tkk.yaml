@@ -1,0 +1,18 @@
+- hosts: localhost
+  gather_facts: no
+  any_errors_fatal: yes
+
+  roles:
+    - role: init-cluster
+      vars_files:
+        - "{{ config_path }}"
+      tags:
+        - apply
+
+    - role: verify-cluster-config
+      tags: 
+        - apply
+
+    - role: generate-main-tf
+      tags:
+        - apply

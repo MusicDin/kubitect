@@ -8,22 +8,18 @@
 #
 
 # Script version
-TKK_PATH="$(cd $(dirname $0)/.. && pwd)"
 TKK_SCRIPT_NAME="tkk"
 TKK_SCRIPT_VERSION="0.0.1"
 
-# Ansible main.tf modifier
-TKK_MAIN_TF_MODIFIER_PATH="$TKK_PATH/ansible/main-tf-modifier"
-TKK_MAIN_TF_MODIFIER_PLAYBOOK_FILE="modify-main-tf.yml"
-TKK_MAIN_TF_MODIFIER_INVENTORY_FILE="hosts.ini"
+# Other variables
+TKK_HOME=${TKK_HOME:-"$HOME/.tkk"}
+TKK_CLUSTER_NAME=${TKK_CLUSTER_NAME:-"default"}
+TKK_ACTION=""
 
 # Other paths
-TKK_VENV_PATH="$TKK_PATH/venv"
-TKK_REQUIREMENTS_PATH="$TKK_PATH/requirements.txt"
-TKK_CONFIG_PATH="$TKK_PATH/cluster.yaml"
-
-# Other variables
-TKK_ACTION=""
+TKK_CONFIG_PATH="cluster.yaml"
+TKK_REQUIREMENTS_PATH="requirements.txt"
+TKK_CLUSTER_PATH="$TKK_HOME/clusters/$TKK_CLUSTER_NAME"
 
 # Text colors..
 TKK_TEXT_RED="\033[0;31m"
@@ -35,9 +31,9 @@ TKK_TEXT_CLEAR="\033[0m"
 
 # Options
 TKK_OPTIONS_SHORT=a:,c:,h,v
-TKK_OPTIONS_LONG=action:,config:,help,version,tfvars,auto-approve
+TKK_OPTIONS_LONG=action:,config:,help,version,cluster:,auto-approve
 TKK_OPTION_ACTION=""
-TKK_OPTION_TFVARS=""
+TKK_OPTION_CLUSTER_NAME=""
 TKK_OPTION_AUTO_APPROVE=""
 
 #
@@ -84,6 +80,19 @@ __print_err() {
 __err() {
     __print_err "$1\n"
     exit 1
+}
+
+#
+# Set cluster name and path.
+#
+__set_cluster(){
+    if [ -n "$TKK_OPTION_CLUSTER_NAME" ]; then
+        TKK_CLUSTER_NAME="$TKK_OPTION_CLUSTER_NAME"
+    fi
+
+    TKK_CLUSTER_PATH="$TKK_HOME/clusters/$TKK_CLUSTER_NAME"
+
+    __print_ok "--cluster=$TKK_CLUSTER_NAME"
 }
 
 #
@@ -134,72 +143,132 @@ __set_action() {
 }
 
 #
-# Install Ansible with other dependencies within virtualenv.
+# List clusters in "$TKK_HOME/clusters" directory.
+#
+__list_clusters() {
+
+    clusters_path="$TKK_HOME/clusters"
+
+    if [ -z "$(ls -d "$clusters_path/"* 2>/dev/null)" ]; then
+        echo "There is no initialized clusters."
+        return
+    fi
+
+    echo "Clusters: "
+    for dir in "$clusters_path/"*; do
+        if [ -d "$dir" ]; then
+            echo "- $(basename "$dir")"
+        fi
+    done
+}
+
+__cluster_init() {}
+
+__cluster_apply(){}
+
+__cluster_destroy() {}
+
+__cluster_purge() {}
+
+#
+# Initialize a cluster.
+# Prepare a cluster directory.
+#
+__init_cluster() {
+
+    local tkk_url="https://github.com/MusicDin/terraform-kvm-kubespray"
+    local tkk_version="feature/multiple-servers"
+
+    # Fail if python3 is not installed.
+    command -v python3 >/dev/null 2>&1 \
+        || __err "Python3 needs to be installed."
+
+    # Fail if virtualenv is not installed.
+    command -v virtualenv >/dev/null 2>&1 \
+        || __err "Virtualenv (pip3 install virtualenv) needs to be installed."
+
+    mkdir -p "$TKK_CLUSTER_PATH"
+    cd "$TKK_CLUSTER_PATH"
+
+    # Clone git project
+    git init . --quiet
+    git fetch $tkk_url $tkk_version --depth 1 --quiet
+    git checkout FETCH_HEAD --quiet
+
+    __print_ok "Successfully initialized cluster '$TKK_CLUSTER_NAME'."
+}
+
+#
+# Create virtual environment and install Ansible with other
+# required dependencies.
 #
 __activate_virtual_env() {
-    virtualenv -p python3 $TKK_VENV_PATH \
-        && . $TKK_VENV_PATH/bin/activate \
+
+    venv_path="$TKK_CLUSTER_PATH/venv"
+
+    virtualenv -p python3 "$venv_path" \
+        && . "$venv_path/bin/activate" \
         && pip3 install -r $TKK_REQUIREMENTS_PATH
 }
 
 #
-# Trigger main.tf file modification.
+# Generates main.tf file for the given cluster config file.
 #
-__create_config() {
-    cd $TKK_MAIN_TF_MODIFIER_PATH
+__generate_config() {
+
     __activate_virtual_env
-    ansible-playbook $TKK_MAIN_TF_MODIFIER_PLAYBOOK_FILE \
-        --inventory $TKK_MAIN_TF_MODIFIER_INVENTORY_FILE \
+
+    cd "$TKK_CLUSTER_PATH/ansible/tkk"
+    ansible-playbook "tkk.yaml" \
+        --inventory "hosts.ini" \
         --extra-vars "config_path=$TKK_CONFIG_PATH" \
-        || __err "An error has occured during main.tf modification."
-    terraform -chdir=$TKK_PATH init -upgrade
+        --tags "apply" \
+        || __err "An error has occured during the main.tf generation."
+    terraform -chdir=$TKK_CLUSTER_PATH init -upgrade
 }
 
 #
-# Generate main.tf file that read Terraform variables (terraform.tfvars)
-# as an input instead of YAML configuration.
-#
-__create_config_tfvars() {
-    cd $TKK_MAIN_TF_MODIFIER_PATH
-    __activate_virtual_env
-    ansible-playbook $TKK_MAIN_TF_MODIFIER_PLAYBOOK_FILE \
-        --inventory $TKK_MAIN_TF_MODIFIER_INVENTORY_FILE \
-        --extra-vars "action_type=generate-tf" \
-        || __err "An error has occured during the reset of the main.tf file."
-    terraform -chdir=$TKK_PATH init \
-        -upgrade
-}
-
-#
-# Modify and apply the configuration.
+# Starts the cluster cretion process.
 #
 __apply() {
-    __create_config
-    terraform -chdir=$TKK_PATH apply \
-        -var action="$TKK_ACTION" \
-        -var config_path="$TKK_CONFIG_PATH" \
-        -compact-warnings \
-        $TKK_OPTION_AUTO_APPROVE
+    __init_cluster
+    # __generate_config
+    # terraform -chdir=$TKK_PATH apply \
+    #    -var action="$TKK_ACTION" \
+    #    -var config_path="$TKK_CONFIG_PATH" \
+    #    -compact-warnings \
+    #    $TKK_OPTION_AUTO_APPROVE
 }
 
 #
 # Modify and plan the configuration.
 #
 __plan() {
-    __create_config
-    terraform -chdir=$TKK_PATH plan \
-        -var action="$TKK_ACTION" \
-        -var config_path="$TKK_CONFIG_PATH" \
-        -compact-warnings
+    __generate_config
+    # terraform -chdir="$TKK_HOME/clusters/$TKK_CLUSTER_NAME" plan \
+    #     -var action="$TKK_ACTION" \
+    #     -compact-warnings
+        # -var config_path="$TKK_CONFIG_PATH" \
 }
 
 #
 # Destroy the cluster.
 #
 __destroy() {
-    terraform -chdir=$TKK_PATH destroy \
+    terraform -chdir="$TKK_HOME/clusters/$TKK_CLUSTER_NAME" destroy \
         -compact-warnings \
         $TKK_OPTION_AUTO_APPROVE
+}
+
+#
+# Remove cluster directory and it's content.
+# Before purging, trigger cluster destruction. 
+#
+__purge() {
+    TKK_OPTION_AUTO_APPROVE="--auto-approve"
+    __destroy
+    rm -rf "$TKK_HOME/clusters/$TKK_CLUSTER_NAME"
+    __print_ok "Successfully purged '$TKK_CLUSTER_NAME' cluster"
 }
 
 #
@@ -219,18 +288,10 @@ __help() {
 
 	$(__print_bold "> $TKK_SCRIPT_NAME - $TKK_SCRIPT_VERSION")
 
-	    Script is useful when deploying Kubernetes cluster on 
-	    multiple hosts.
-
-	    It triggers Ansible playbook that modifies 'main.tf' 
-	    file based on the cluster configuration and then runs 
-	    appropriate terraform command.
-
-	    Enjoy.
-
 	$(__print_bold "> $(__print_underline "Quick start"):")
-	    1.) Modify hosts section in cluster.yaml file.
-	    2.) Run '$TKK_SCRIPT_NAME apply' command to create the cluster.
+	    Run '$TKK_SCRIPT_NAME apply' command to create the cluster.
+	    Optionally prepare custom cluster config and provide it 
+	    using --config option.
 
 	$(__print_bold "> $(__print_underline "Commands"):")
 
@@ -238,6 +299,8 @@ __help() {
 	      -a, --action  - Action to be executed on the cluster.
 	                      (default: create)
 	      -c, --config  - Custom path to the configuration file.
+	          --cluster - Specify the cluster to be used.
+	                      (default: default)
 
 	    plan            - Creates terraform cluster plan.
 	      -a, --action  - Action to be executed on the cluster.
@@ -246,10 +309,8 @@ __help() {
 
 	    destroy         - Destroys the cluster.
 
-	    create          - Only generate main.tf.
-	          --tfvars  - Generate main.tf file that uses Terraform
-	                      variables (terraform.tfvars) as an input
-	                      instead of YAML configuration.
+	    list
+	      clusters      - List initialized clusters.
 
 	$(__print_bold "> $(__print_underline "Global options"):")
 	    -h, --help         - Shows help.
@@ -277,12 +338,12 @@ eval set -- "$OPTS"
 #
 while :; do
     case "$1" in
-        -v | --version )
+        -v | --version)
             __version
             exit 0
             ;;
 
-        -h | --help )
+        -h | --help)
             __help
             exit 0
             ;;
@@ -296,10 +357,10 @@ while :; do
             __set_config_path $2
             shift 2
             ;;
-
-        --tfvars)
-            TKK_OPTION_TFVARS=$1
-            shift
+        
+        --cluster)
+            TKK_OPTION_CLUSTER_NAME=$2
+            shift 2
             ;;
 
         --auto-approve)
@@ -325,25 +386,38 @@ done
 case $1 in
 
     apply)
+        __set_cluster
         __set_action
         __apply
         ;;
 
     plan)
+        __set_cluster
         __set_action
     	__plan
     	;;
 
     destroy)
+        __set_cluster
         __destroy
         ;;
 
-    create)
-        if [ $TKK_OPTION_TFVARS ]; then
-            __create_config_tfvars
-        else
-            __create_config
-        fi
+    purge)
+        __set_cluster
+        __purge
+        ;;
+
+    ls|list)
+        case $2 in
+            clusters)
+                __list_clusters
+                ;;
+
+            *)
+                # Temporary..
+                __list_clusters
+                ;;
+        esac
         ;;
 
     *)

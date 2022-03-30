@@ -42,7 +42,6 @@ variable "hosts_dataResourcePools" {
   default = []
   nullable    = false
 
-  # Verify names are unique and that pool paths exist??
   validation {
     condition = length(var.hosts_dataResourcePools.*.name) == length(distinct(var.hosts_dataResourcePools.*.name))
     error_message = "Duplicate data resource pool name found!\nMake sure that the data resource pool names on the same host are unique."
