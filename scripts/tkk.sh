@@ -19,7 +19,7 @@ TKK_ACTION=""
 # Other paths
 TKK_CONFIG_PATH=""
 TKK_REQUIREMENTS_PATH="requirements.txt"
-TKK_CLUSTER_PATH="$TKK_HOME/clusters/$TKK_CLUSTER_NAME"
+TKK_CLUSTER_PATH=""
 
 # Text colors..
 TKK_TEXT_RED="\033[0;31m"
@@ -30,9 +30,10 @@ TKK_TEXT_UNDERLINE="\033[4m"
 TKK_TEXT_CLEAR="\033[0m"
 
 # Options
-TKK_OPTIONS_SHORT=a:,c:,h,v
-TKK_OPTIONS_LONG=action:,config:,help,version,cluster:,auto-approve
+TKK_OPTIONS_SHORT=a:,c:,l,h,v
+TKK_OPTIONS_LONG=action:,config:,local,help,version,cluster:,auto-approve
 TKK_OPTION_ACTION=""
+TKK_OPTION_LOCAL=""
 TKK_OPTION_CLUSTER_NAME=""
 TKK_OPTION_AUTO_APPROVE=""
 
@@ -86,12 +87,19 @@ __err() {
 # Set cluster name and path.
 #
 __set_cluster(){
+
     if [ -n "$TKK_OPTION_CLUSTER_NAME" ]; then
         TKK_CLUSTER_NAME="$TKK_OPTION_CLUSTER_NAME"
     fi
 
+    # Local dir
+    if [ -n "$TKK_OPTION_LOCAL" ]; then
+        TKK_CLUSTER_PATH="."
+        __print_ok "--cluster=."
+        return
+    fi
+    
     TKK_CLUSTER_PATH="$TKK_HOME/clusters/$TKK_CLUSTER_NAME"
-
     __print_ok "--cluster=$TKK_CLUSTER_NAME"
 }
 
@@ -170,6 +178,11 @@ __list_clusters() {
 #
 __init_cluster() {
 
+    # Skip init phase for local actions
+    if [ -n $TKK_OPTION_LOCAL ]; then
+        return
+    fi
+
     local tkk_url="https://github.com/MusicDin/terraform-kvm-kubespray"
     local tkk_version="feature/multiple-servers"
 
@@ -188,7 +201,7 @@ __init_cluster() {
     git init . --quiet
     git fetch $tkk_url $tkk_version --depth 1 --quiet
     git checkout FETCH_HEAD --quiet
-    #git reset --hard --quiet
+    git reset --hard --quiet
 
     __print_ok "Successfully initialized cluster '$TKK_CLUSTER_NAME'."
 }
@@ -213,12 +226,21 @@ __generate_config() {
 
     __activate_virtual_env
 
+    local extra_args
+
+    if [ -n $TKK_OPTION_LOCAL ]; then
+        extra_args="--extra-vars tkk_cluster_path=$(pwd)"
+    fi
+
     cd "$TKK_CLUSTER_PATH/ansible/tkk"
     ansible-playbook "tkk.yaml" \
         --inventory "hosts.ini" \
         --extra-vars "config_path=$TKK_CONFIG_PATH" \
+        $extra_args \
         --tags "apply" \
         || __err "An error has occured during the main.tf generation."
+
+    cd "../.."
     terraform -chdir="$TKK_CLUSTER_PATH" init -upgrade
 }
 
@@ -357,6 +379,11 @@ while :; do
         --cluster)
             TKK_OPTION_CLUSTER_NAME=$2
             shift 2
+            ;;
+
+        --local)
+            TKK_OPTION_LOCAL=$1
+            shift
             ;;
 
         --auto-approve)

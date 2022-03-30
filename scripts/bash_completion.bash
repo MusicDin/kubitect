@@ -39,14 +39,16 @@ _tkk_completion() {
         -v --version"
  
     APPLY_OPTIONS="\
-        -c --config\
         -a --action\
+        -c --config\
            --cluster\
+        -l --local\
            --auto-approve"
 
     DESTROY_OPTIONS="\
         -c --config\
            --cluster\
+        -l --local\
            --auto-approve"
 
     PURGE_OPTIONS="\
@@ -61,7 +63,7 @@ _tkk_completion() {
             case "${prev}" in
                 -c|--config)
                     ;;
-                    
+
                 -a|--action)
                     complete_words="$TKK_APPLY_ACTIONS"
                     ;;

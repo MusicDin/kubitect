@@ -15,7 +15,7 @@ locals {
   )
   internal = {
     is_bridge = (local.config.cluster.network.mode == "bridge")
-    network_interface = (try(local.config.cluster.nodeTemplate.networkInterface) != null
+    network_interface = (try(local.config.cluster.nodeTemplate.networkInterface, null) != null
       ? local.config.cluster.nodeTemplate.networkInterface
       : local.config.cluster.nodeTemplate.image.distro == "ubuntu" ? "ens3" : "eth0"
     )
