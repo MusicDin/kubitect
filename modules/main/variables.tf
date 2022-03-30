@@ -446,6 +446,7 @@ variable "kubernetes_other_copyKubeconfig" {
 variable "internal" {
   type = object({
     is_bridge = string
+    network_interface = string
     vm_types = object({
       load_balancer = string
       master        = string

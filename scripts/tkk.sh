@@ -17,7 +17,7 @@ TKK_CLUSTER_NAME=${TKK_CLUSTER_NAME:-"default"}
 TKK_ACTION=""
 
 # Other paths
-TKK_CONFIG_PATH="cluster.yaml"
+TKK_CONFIG_PATH=""
 TKK_REQUIREMENTS_PATH="requirements.txt"
 TKK_CLUSTER_PATH="$TKK_HOME/clusters/$TKK_CLUSTER_NAME"
 
@@ -99,8 +99,10 @@ __set_cluster(){
 # Set custom config path.
 #
 __set_config_path() {
-    TKK_CONFIG_PATH="$(cd $(dirname $1) && pwd)/$(basename $1)"
-    __print_ok "--config=$TKK_CONFIG_PATH"
+    if [ -n $1 ]; then
+        TKK_CONFIG_PATH="$(cd $(dirname $1) && pwd)/$(basename $1)"
+        __print_ok "--config=$TKK_CONFIG_PATH"
+    fi
 }
 
 #
@@ -162,14 +164,6 @@ __list_clusters() {
     done
 }
 
-__cluster_init() {}
-
-__cluster_apply(){}
-
-__cluster_destroy() {}
-
-__cluster_purge() {}
-
 #
 # Initialize a cluster.
 # Prepare a cluster directory.
@@ -194,6 +188,7 @@ __init_cluster() {
     git init . --quiet
     git fetch $tkk_url $tkk_version --depth 1 --quiet
     git checkout FETCH_HEAD --quiet
+    #git reset --hard --quiet
 
     __print_ok "Successfully initialized cluster '$TKK_CLUSTER_NAME'."
 }
@@ -224,7 +219,7 @@ __generate_config() {
         --extra-vars "config_path=$TKK_CONFIG_PATH" \
         --tags "apply" \
         || __err "An error has occured during the main.tf generation."
-    terraform -chdir=$TKK_CLUSTER_PATH init -upgrade
+    terraform -chdir="$TKK_CLUSTER_PATH" init -upgrade
 }
 
 #
@@ -232,12 +227,13 @@ __generate_config() {
 #
 __apply() {
     __init_cluster
-    # __generate_config
-    # terraform -chdir=$TKK_PATH apply \
-    #    -var action="$TKK_ACTION" \
-    #    -var config_path="$TKK_CONFIG_PATH" \
-    #    -compact-warnings \
-    #    $TKK_OPTION_AUTO_APPROVE
+    __generate_config
+    terraform -chdir="$TKK_CLUSTER_PATH" apply \
+       -var action="$TKK_ACTION" \
+       -input=false \
+       -compact-warnings \
+       $TKK_OPTION_AUTO_APPROVE
+       #-var config_path="$TKK_CONFIG_PATH" \
 }
 
 #
@@ -357,7 +353,7 @@ while :; do
             __set_config_path $2
             shift 2
             ;;
-        
+
         --cluster)
             TKK_OPTION_CLUSTER_NAME=$2
             shift 2

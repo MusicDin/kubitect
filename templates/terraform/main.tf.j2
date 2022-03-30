@@ -15,7 +15,7 @@ locals {
   )
   internal = {
     is_bridge = (local.config.cluster.network.mode == "bridge")
-    network_interface = (local.config.cluster.nodeTemplate.networkInterface != null
+    network_interface = (try(local.config.cluster.nodeTemplate.networkInterface) != null
       ? local.config.cluster.nodeTemplate.networkInterface
       : local.config.cluster.nodeTemplate.image.distro == "ubuntu" ? "ens3" : "eth0"
     )
@@ -203,7 +203,7 @@ module "k8s_cluster" {
   vm_user              = try(local.config.cluster.nodeTemplate.user, null)
   vm_ssh_private_key   = local.ssh_pk_path
   vm_distro            = try(local.config.cluster.nodeTemplate.image.distro, null)
-  vm_network_interface = local.internal.networkInterface
+  vm_network_interface = local.internal.network_interface
 
   worker_node_label = try(local.config.cluster.nodes.worker.default.label, null)
   lb_vip            = try(local.config.cluster.nodes.loadBalancer.vip, null)

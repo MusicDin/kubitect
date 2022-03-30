@@ -121,6 +121,8 @@ variable "kubernetes_kubespray_addons_configPath" {
 variable "kubernetes_other_copyKubeconfig" {
   type        = string
   description = "If enabled, kubeconfig (config/admin.conf) will be copied to ~/.kube directory"
+  nullable    = false
+  default     = false
 }
 
 #======================================================================================
