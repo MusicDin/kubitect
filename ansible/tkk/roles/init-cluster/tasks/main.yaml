@@ -1,12 +1,12 @@
 ---
 
-- name: Clone git project
-  git:
-    repo: "{{ tkk.url | default(tkk_url) }}"
-    version: "{{ tkk.version | default(tkk_version) }}"
-    dest: "{{ tkk_cluster_path }}"
-    single_branch: yes
-    force: yes
+# - name: Clone git project
+#   git:
+#     repo: "{{ tkk.url | default(tkk_url) }}"
+#     version: "{{ tkk.version | default(tkk_version) }}"
+#     dest: "{{ tkk_cluster_path }}"
+#     single_branch: yes
+#     force: yes
 
 - name: Create a copy of the custom config file in a cluster dirctory
   copy:
