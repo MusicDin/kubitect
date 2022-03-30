@@ -1,7 +1,7 @@
-# Setting up a cluster using bridged network
+# Setting up nodes that use network bridge
 
-*Note: This example uses `systemd-networkd` to set up the bridge,
-but the same result can be achieved with many other approaches.*
+> :scroll: **Note:** This example uses `systemd-networkd` to set up the bridge,
+but the same result can be achieved with many other approaches.
 
 ## (Pre)configure the bridge on the host
 
@@ -81,22 +81,26 @@ The final step is to disable netfilter on the bridge
 
 ## Setting up a cluster over bridged network
 
-In the [terraform.tfvars](/terraform.tfvars) file, set the variables:
-- `network_mode` to `bridge`,
-- `network_bridge` to the name of the bridge you created (`br0` in our case) and
-- `network_gateway` if the first host in `netwrok_cidr` is not a gateway.
+In the config file (default is [cluster.yaml](/cluster.yaml)), set the following variables:
+- `cluster.network.mode` to `bridge`,
+- `cluster.network.bridge` to the name of the bridge you created (`br0` in our case) and
+- `cluster.network.gateway` if the first host in `netwrok_cidr` is not a gateway.
 
-```hcl
-worker_nodes = [
-  {
-    id  = 1
-    ip  = "192.168.0.25"  # Static IP
-    mac = "52:54:00:00:00:40"
-  },
-  {
-    id  = 2
-    ip  = null            # DHCP lease
-    mac = "52:54:00:00:00:41"
-  }
-]
+```yaml
+cluster:
+  ...
+  network:
+    mode: "bridge"
+    cidr: "10.10.13.0/24"
+    gateway: "10.10.13.1"
+    bridge: "br0"
+  nodes:
+    master:
+      instances:
+        - id: 1
+    worker:
+      instances:
+        - id: 1
+        - id: 2
+        - id: 3
 ```
