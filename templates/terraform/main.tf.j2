@@ -15,6 +15,10 @@ locals {
   )
   internal = {
     is_bridge = (local.config.cluster.network.mode == "bridge")
+    network_interface = (local.config.cluster.nodeTemplate.networkInterface != null
+      ? local.config.cluster.nodeTemplate.networkInterface
+      : local.config.cluster.nodeTemplate.image.distro == "ubuntu" ? "ens3" : "eth0"
+    )
     vm_types = {
       load_balancer = "lb"
       master        = "master"
@@ -118,9 +122,7 @@ module "main_{{ host_name }}" {
   cluster_nodeTemplate_user                = try(local.config.cluster.nodeTemplate.user, null)
   cluster_nodeTemplate_ssh_privateKeyPath  = local.ssh_pk_path
   cluster_nodeTemplate_ssh_addToKnownHosts = try(local.config.cluster.nodeTemplate.ssh.addToKnownHosts, null)
-  cluster_nodeTemplate_image_distro        = try(local.config.cluster.nodeTemplate.image.distro, null)
   cluster_nodeTemplate_image_source        = try(local.config.cluster.nodeTemplate.image.source, null)
-  cluster_nodeTemplate_networkInterface    = try(local.config.cluster.nodeTemplate.networkInterface, null)
   cluster_nodeTemplate_updateOnBoot        = try(local.config.cluster.nodeTemplate.updateOnBoot, null)
 
   # Network configuration
@@ -198,13 +200,10 @@ module "k8s_cluster" {
   action = var.action
 
   # VM variables #
-  vm_user            = try(local.config.cluster.nodeTemplate.user, null)
-  vm_ssh_private_key = local.ssh_pk_path
-  vm_distro          = try(local.config.cluster.nodeTemplate.image.distro, null)
-  vm_network_interface = (local.internal.is_bridge
-    ? local.config.cluster.network.bridge
-    : local.config.cluster.nodeTemplate.networkInterface
-  )
+  vm_user              = try(local.config.cluster.nodeTemplate.user, null)
+  vm_ssh_private_key   = local.ssh_pk_path
+  vm_distro            = try(local.config.cluster.nodeTemplate.image.distro, null)
+  vm_network_interface = local.internal.networkInterface
 
   worker_node_label = try(local.config.cluster.nodes.worker.default.label, null)
   lb_vip            = try(local.config.cluster.nodes.loadBalancer.vip, null)

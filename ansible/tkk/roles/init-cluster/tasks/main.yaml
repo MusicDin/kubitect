@@ -14,6 +14,7 @@
     dest: "{{ tkk_cluster_config_path }}"
   when:
     - config_path is defined
+    - config_path != ""
 
 - name: Make sure cluster config exists
   block:

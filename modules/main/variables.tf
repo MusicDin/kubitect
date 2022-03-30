@@ -87,13 +87,6 @@ variable "cluster_nodeTemplate_ssh_addToKnownHosts" {
   nullable    = false
 }
 
-variable "cluster_nodeTemplate_image_distro" {
-  type        = string
-  description = "Linux distribution of selected operating system (ubuntu, centos, debian, n/a)."
-  default     = "N/A"
-  nullable    = false
-}
-
 variable "cluster_nodeTemplate_image_source" {
   type        = string
   description = "Image source, which can be path on host's filesystem or URL."
@@ -102,11 +95,6 @@ variable "cluster_nodeTemplate_image_source" {
     condition     = length(var.cluster_nodeTemplate_image_source) != 0
     error_message = "Virtual machine (VM) image source is missing. Please specify local path or URL to the image."
   }
-}
-
-variable "cluster_nodeTemplate_networkInterface" {
-  type        = string
-  description = "Network interface used by VMs to connect to the network."
 }
 
 variable "cluster_nodeTemplate_updateOnBoot" {

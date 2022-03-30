@@ -6,10 +6,6 @@
 locals {
   main_resource_pool_name = "${var.cluster_name}-main-resource-pool"
   network_name       = "${var.cluster_name}-network"
-  network_interface = (var.cluster_nodeTemplate_networkInterface != null
-    ? var.cluster_nodeTemplate_networkInterface
-    : var.cluster_nodeTemplate_image_distro == "ubuntu" ? "ens3" : "eth0"
-  )
 }
 
 #======================================================================================
@@ -100,7 +96,7 @@ module "lb_module" {
   vm_update            = var.cluster_nodeTemplate_updateOnBoot
   vm_ssh_private_key   = var.cluster_nodeTemplate_ssh_privateKeyPath
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
-  vm_network_interface = local.network_interface
+  vm_network_interface = var.internal.network_interface
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_loadBalancer_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_loadBalancer_default_ram
   vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_loadBalancer_default_mainDiskSize
@@ -146,7 +142,7 @@ module "master_module" {
   vm_update            = var.cluster_nodeTemplate_updateOnBoot
   vm_ssh_private_key   = var.cluster_nodeTemplate_ssh_privateKeyPath
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
-  vm_network_interface = local.network_interface
+  vm_network_interface = var.internal.network_interface
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_master_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_master_default_ram
   vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_master_default_mainDiskSize
@@ -192,7 +188,7 @@ module "worker_module" {
   vm_update            = var.cluster_nodeTemplate_updateOnBoot
   vm_ssh_private_key   = var.cluster_nodeTemplate_ssh_privateKeyPath
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
-  vm_network_interface = local.network_interface
+  vm_network_interface = var.internal.network_interface
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_worker_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_worker_default_ram
   vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_worker_default_mainDiskSize
