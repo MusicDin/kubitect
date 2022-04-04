@@ -1,7 +1,6 @@
 ---
 tkk_home: "~/.tkk"
-tkk_url: "https://github.com/MusicDin/terraform-kvm-kubespray"
-tkk_version: "feature/multiple-servers" # "master"
+tkk_cluster_action: "create"
 tkk_cluster_name: "default"
 tkk_cluster_path: "{{ tkk_home }}/clusters/{{ tkk_cluster_name }}"
 tkk_cluster_config_path: "{{ tkk_cluster_path }}/tkk.yaml"

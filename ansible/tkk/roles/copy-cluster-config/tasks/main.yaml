@@ -30,9 +30,7 @@
       when:
         - cluster_config.stat.exists == false
 
-- name: Set cluster config as host fact
-#   set_fact:
-#     config: "{{ config | yaml }}"
+- name: Include cluster config as variable
   include_vars:
     file: "{{ tkk_cluster_config_path }}"
     name: config
