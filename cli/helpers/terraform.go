@@ -14,18 +14,14 @@ import (
 )
 
 const (
-	terraformDir = "bin/terraform"
+	terraformBinDir     = "bin/terraform"
+	terraformProjectDir = "terraform"
 )
 
 // TerraformApply prepares Terraform project and applies the configuration.
 func TerraformApply(clusterPath string) error {
 
-	tf, err := getTerraform(clusterPath)
-	if err != nil {
-		return err
-	}
-
-	err = terraformInit(tf)
+	tf, err := terraformInit(clusterPath)
 	if err != nil {
 		return err
 	}
@@ -41,12 +37,7 @@ func TerraformApply(clusterPath string) error {
 // TerraformDestroy destroys the Terraform project on the provided path.
 func TerraformDestroy(clusterPath string) error {
 
-	tf, err := getTerraform(clusterPath)
-	if err != nil {
-		return err
-	}
-
-	err = terraformInit(tf)
+	tf, err := terraformInit(clusterPath)
 	if err != nil {
 		return err
 	}
@@ -59,12 +50,15 @@ func TerraformDestroy(clusterPath string) error {
 	return nil
 }
 
-// getTerraform installs terraform with appropriate version.
-func getTerraform(clusterPath string) (*tfexec.Terraform, error) {
+// terraformInit installs terraform with the appropriate version
+// into the bin directory. Afterwards it initializes the project
+// and returns Terraform object.
+func terraformInit(clusterPath string) (*tfexec.Terraform, error) {
 
 	fmt.Println("Installing Terraform...")
 
-	tfInstallDir := filepath.Join(env.ProjectHomePath, terraformDir, env.ConstTerraformVersion)
+	tfInstallDir := filepath.Join(env.ProjectHomePath, terraformBinDir, env.ConstTerraformVersion)
+	tfProjectDir := filepath.Join(clusterPath, terraformProjectDir)
 
 	// Make sure terraform install directory exists
 	err := os.MkdirAll(tfInstallDir, os.ModePerm)
@@ -84,7 +78,7 @@ func getTerraform(clusterPath string) (*tfexec.Terraform, error) {
 		return nil, fmt.Errorf("Error installing Terraform: %w", err)
 	}
 
-	tf, err := tfexec.NewTerraform(clusterPath, execPath)
+	tf, err := tfexec.NewTerraform(tfProjectDir, execPath)
 	if err != nil {
 		return nil, fmt.Errorf("Error running NewTerraform: %w", err)
 	}
@@ -92,19 +86,12 @@ func getTerraform(clusterPath string) (*tfexec.Terraform, error) {
 	tf.SetStdout(os.Stdout)
 	// tf.SetColor(true)
 
-	return tf, nil
-}
-
-// terraformInit initializes Terraform project.
-func terraformInit(tf *tfexec.Terraform) error {
-
 	fmt.Println("Initializing Terraform project...")
 
-	err := tf.Init(context.Background())
-
+	err = tf.Init(context.Background())
 	if err != nil {
-		return fmt.Errorf("Failed to initialize Terraform project: %w", err)
+		return nil, fmt.Errorf("Failed to initialize Terraform project: %w", err)
 	}
 
-	return nil
+	return tf, nil
 }

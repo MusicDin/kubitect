@@ -80,11 +80,11 @@ func apply() error {
 		PlaybookFile: filepath.Join(env.ClusterPath, env.ConstAnsiblePlaybookPath),
 		Tags:         ansiblePlaybookTags,
 		Extravars: []string{
+			"config_path=" + env.ConfigPath,
 			"tkk_home=" + env.ProjectHomePath,
 			"tkk_cluster_action=" + env.ClusterAction,
 			"tkk_cluster_name=" + env.ClusterName,
 			"tkk_cluster_path=" + env.ClusterPath,
-			"tkk_cluster_config_path=" + filepath.Join(env.ConfigPath),
 		},
 	})
 	if err != nil {

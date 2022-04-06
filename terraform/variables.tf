@@ -1,7 +1,3 @@
-#
-# Configuration generated on: {{ now() }}
-#
-
 variable "action" {
   type    = string
   default = null
@@ -10,5 +6,5 @@ variable "action" {
 variable "config_path" {
   type        = string
   description = "Path to the cluster's YAML configuration file."
-  default     = "./tkk.yml"
+  default     = "../tkk.yaml"
 }

@@ -105,9 +105,9 @@ provider "libvirt" {
 {% set is_default_host = item.default is defined and item.default == true or is_default_host_defined|length == 0 and loop.first == true %}
 {% set default_selector = " || try(node.host, null) == null" if is_default_host else "" %}
 
-module "main_{{ host_name }}" {
+module "host_{{ host_name }}" {
 
-  source = "./modules/main"
+  source = "./modules/host"
 
   # General
   action = var.action
@@ -188,7 +188,7 @@ module "main_{{ host_name }}" {
 {# Creates a list of host modules. -#}
 {% set host_name_list = [] -%}
 {% for item in host_list -%}
-  {{ host_name_list.append("module.main_"~item.name~".nodes") }}
+  {{ host_name_list.append("module.host_"~item.name~".nodes") }}
 {% endfor -%}
 {% set host_name_list = host_name_list | join(', ') -%}
 
@@ -237,7 +237,7 @@ module "k8s_cluster" {
   # K8s cluster creation depends on all VM modules #
   depends_on = [
 {% for item in host_list %}
-    module.main_{{ item.name }},
+    module.host_{{ item.name }},
 {% endfor %}
   ]
 }

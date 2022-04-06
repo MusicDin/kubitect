@@ -11,10 +11,10 @@ data "local_file" "ssh_public_key" {
 # Network bridge configuration (for cloud-init) #
 data "template_file" "cloud_init_network_tpl" {
   template = file(!var.is_bridge
-    ? "templates/cloud_init/cloud_init_network_nat.tpl"
+    ? "../templates/cloud_init/cloud_init_network_nat.tpl"
     : (var.vm_ip != null
-      ? "templates/cloud_init/cloud_init_network_bridge_static.tpl"
-      : "templates/cloud_init/cloud_init_network_bridge_dhcp.tpl"
+      ? "../templates/cloud_init/cloud_init_network_bridge_static.tpl"
+      : "../templates/cloud_init/cloud_init_network_bridge_dhcp.tpl"
     )
   )
 
@@ -29,7 +29,7 @@ data "template_file" "cloud_init_network_tpl" {
 
 # Cloud-init configuration template #
 data "template_file" "cloud_init_tpl" {
-  template = file("templates/cloud_init/cloud_init.tpl")
+  template = file("../templates/cloud_init/cloud_init.tpl")
 
   vars = {
     hostname       = var.vm_name
@@ -132,7 +132,7 @@ resource "libvirt_domain" "vm_domain" {
     }
 
     inline = [
-      "while ! sudo grep \"Cloud-init .* finished\" /var/log/cloud-init.log; do echo \"$(date -Ins) Waiting for cloud-init to finish\"; sleep 2; done"
+      "while ! sudo grep \"Cloud-init .* finished\" /var/log/cloud-init.log; do echo \"$(date -Ins) Waiting for cloud-init to finish...\"; sleep 2; done"
     ]
   }
 }
@@ -199,7 +199,7 @@ resource "null_resource" "ssh_known_hosts" {
 
   provisioner "local-exec" {
     when       = destroy
-    command    = "sh ./scripts/filelock-exec.sh \"ssh-keygen -R ${self.triggers.vm_ip}\""
+    command    = "sh ../scripts/filelock-exec.sh \"ssh-keygen -R ${self.triggers.vm_ip}\""
     on_failure = continue
   }
 }

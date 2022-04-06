@@ -11,7 +11,7 @@ const (
 	// default values
 	DefaultClusterName       = "default"
 	DefaultClusterAction     = "create"
-	DefaultClusterConfigPath = "./tkk.yaml"
+	DefaultClusterConfigPath = "config/tkk.yaml"
 	DefaultGitProjectUrl     = "https://github.com/MusicDin/terraform-kvm-kubespray"
 	DefaultGitProjectVersion = "feature/multiple-servers"
 )
@@ -20,10 +20,9 @@ var (
 	// Defines required files/directories that are copied from tmp git project.
 	ProjectRequiredFiles = [...]string{
 		"ansible/",
-		"modules/",
-		"examples/",
+		"terraform/",
 		"templates/",
-		"versions.tf",
+		"scripts/",
 		"requirements.txt",
 		"LICENSE",
 	}

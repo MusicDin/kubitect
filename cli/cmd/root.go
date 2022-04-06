@@ -68,7 +68,7 @@ func setup() error {
 	// Make sure ConfigPath exists
 	if len(env.ConfigPath) > 0 {
 
-		// Convert config filepath to absoultue
+		// Convert config filepath to absolute path
 		env.ConfigPath, err = filepath.Abs(env.ConfigPath)
 		if err != nil {
 			return fmt.Errorf("Config filepath '%s' cannot be converted to absolute path: %w", env.ConfigPath, err)

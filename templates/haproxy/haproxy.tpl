@@ -44,9 +44,9 @@ frontend kubernetes
         bind ${lb_vip}:6443
         option tcplog
         mode tcp
-        default_backend kubernetes-master-nodes
+        default_backend kubernetes-control-plane
 
-backend kubernetes-master-nodes
+backend kubernetes-control-plane
         mode tcp
         balance roundrobin
 
