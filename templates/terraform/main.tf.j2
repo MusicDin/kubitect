@@ -11,7 +11,7 @@ locals {
   config = yamldecode(file(pathexpand("{{ tkk_cluster_config_path }}")))
   ssh_pk_path = (try(local.config.cluster_nodeTemplate_ssh_privateKeyPath, null) != null
     ? pathexpand(local.config.cluster_nodeTemplate_ssh_privateKeyPath)
-    : pathexpand("${path.module}/config/.ssh/id_rsa")
+    : pathexpand("../config/.ssh/id_rsa")
   )
   internal = {
     is_bridge = (local.config.cluster.network.mode == "bridge")

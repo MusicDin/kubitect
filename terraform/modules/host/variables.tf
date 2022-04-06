@@ -139,8 +139,6 @@ variable "cluster_network_gateway" {
 variable "cluster_network_bridge" {
   type        = string
   description = "Network (virtual) bridge."
-  default     = "virbr0"
-  nullable    = false
 }
 
 

@@ -187,7 +187,7 @@ resource "null_resource" "ssh_known_hosts" {
 
   provisioner "local-exec" {
     command = <<-EOF
-      sh ./scripts/filelock-exec.sh \
+      sh ../scripts/filelock-exec.sh \
         "touch ~/.ssh/known_hosts && ssh-keygen -R $VM_IP && ssh-keyscan -t rsa $VM_IP \
         | tee -a ~/.ssh/known_hosts && rm -f ~/.ssh/known_hosts.old"
     EOF

@@ -8,6 +8,11 @@
 #     single_branch: yes
 #     force: yes
 
+- name: Make sure config directory exists
+  file:
+    path: "{{ tkk_cluster_config_path | dirname }}"
+    state: directory
+
 - name: Create a copy of the custom config file in a cluster dirctory
   copy:
     src: "{{ config_path }}"

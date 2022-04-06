@@ -221,7 +221,7 @@ resource "local_file" "keepalived" {
 # Modify permissions on config directory #
 resource "null_resource" "config_permissions" {
   provisioner "local-exec" {
-    command = "chmod -R 700 config"
+    command = "chmod -R 700 ../config"
   }
 }
 
@@ -248,7 +248,7 @@ resource "null_resource" "haproxy_install" {
       cd ..
       virtualenv -p python3 $KUBESPRAY_VENV \
         && . $KUBESPRAY_VENV/bin/activate \
-        && pip3 install -r requirements.txt
+        && pip3 install -r ansible/kubespray/requirements.txt
       ansible-playbook \
         --inventory config/hosts.ini \
         --become \
@@ -284,7 +284,7 @@ resource "null_resource" "kubespray_create" {
       cd ..
       virtualenv -p python3 $KUBESPRAY_VENV \
         && . $KUBESPRAY_VENV/bin/activate \
-        && pip3 install -r requirements.txt
+        && pip3 install -r ansible/kubespray/requirements.txt
       ansible-playbook \
         --inventory config/hosts.ini \
         --become \
@@ -324,7 +324,7 @@ resource "null_resource" "kubespray_add" {
       cd ..
       virtualenv -p python3 $KUBESPRAY_VENV \
         && . $KUBESPRAY_VENV/bin/activate \
-        && pip3 install -r requirements.txt
+        && pip3 install -r ansible/kubespray/requirements.txt
       ansible-playbook \
         --inventory config/hosts.ini \
         --become \
@@ -372,7 +372,7 @@ resource "null_resource" "kubespray_remove" {
       cd ..
       virtualenv -p python3 $KUBESPRAY_VENV \
         && . $KUBESPRAY_VENV/bin/activate \
-        && pip3 install -r requirements.txt
+        && pip3 install -r ansible/kubespray/requirements.txt
       ansible-playbook \
         --inventory config/hosts.ini \
         --become \
@@ -424,7 +424,7 @@ resource "null_resource" "kubespray_upgrade" {
       cd ..
       virtualenv -p python3 $KUBESPRAY_VENV \
         && . $KUBESPRAY_VENV/bin/activate \
-        && pip3 install -r requirements.txt
+        && pip3 install -r ansible/kubespray/requirements.txt
       ansible-playbook \
         --inventory config/hosts.ini \
         --become \
@@ -463,7 +463,7 @@ resource "null_resource" "fetch_kubeconfig" {
       cd ..
       virtualenv -p python3 $KUBESPRAY_VENV \
         && . $KUBESPRAY_VENV/bin/activate \
-        && pip3 install -r requirements.txt
+        && pip3 install -r ansible/kubespray/requirements.txt
       ansible \
         --inventory config/hosts.ini \
         --become \
