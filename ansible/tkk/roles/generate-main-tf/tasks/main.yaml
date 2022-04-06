@@ -2,11 +2,6 @@
 - name: Create main.tf from template file
   template:
     src: ../../templates/terraform/main.tf.j2
-    dest: ../../main.tf
+    dest: ../../terraform/main.tf
   vars:
     host_list: "{{ config.hosts }}"
-
-- name: Generate default variables.tf
-  template:
-    src: ../../templates/terraform/variables.tf.j2
-    dest: ../../variables.tf
