@@ -5,6 +5,7 @@ var (
 	ConfigPath      string
 	ClusterPath     string
 	ProjectHomePath string
+	IsCustomConfig  bool
 
 	// Local options (falgs)
 	ClusterAction string

@@ -9,8 +9,7 @@ import (
 )
 
 const (
-	venvBinDir = "bin/venvs"
-	venvName   = "venv-main"
+	venvBinDir = "bin/venvs/venv-main"
 )
 
 // PrepareVirtualEnironment creates virtual environment in the cluster path
@@ -37,7 +36,7 @@ func createVirtualEnvironment(clusterPath string) error {
 
 	fmt.Println("Creating virtual environment...")
 
-	cmd := exec.Command("virtualenv", "-p", "python3", filepath.Join(venvBinDir, venvName))
+	cmd := exec.Command("virtualenv", "-p", "python3", venvBinDir)
 	cmd.Dir = clusterPath
 
 	if env.DebugMode {
@@ -59,7 +58,7 @@ func installPipRequirements(clusterPath string) error {
 	fmt.Println("This process can take up to a minute if the cluster has not been initialized yet...")
 
 	cmd := exec.Command("pip3", "install", "-r", "requirements.txt")
-	cmd.Path = filepath.Join(clusterPath, venvBinDir, venvName, "bin", "pip3")
+	cmd.Path = filepath.Join(clusterPath, venvBinDir, "bin", "pip3")
 	cmd.Dir = clusterPath
 
 	if env.DebugMode {

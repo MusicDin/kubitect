@@ -26,6 +26,7 @@ clusters running on KVM.`,
 		err := setup()
 		if err != nil {
 			fmt.Println(err)
+			os.Exit(1)
 		}
 	},
 }
@@ -68,6 +69,8 @@ func setup() error {
 	// Make sure ConfigPath exists
 	if len(env.ConfigPath) > 0 {
 
+		env.IsCustomConfig = true
+
 		// Convert config filepath to absolute path
 		env.ConfigPath, err = filepath.Abs(env.ConfigPath)
 		if err != nil {
@@ -84,6 +87,7 @@ func setup() error {
 		}
 
 	} else {
+		env.IsCustomConfig = false
 		env.ConfigPath = filepath.Join(env.ClusterPath, env.DefaultClusterConfigPath)
 	}
 

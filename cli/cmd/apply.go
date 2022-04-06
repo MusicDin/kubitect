@@ -30,6 +30,7 @@ single cluster.`,
 		err := apply()
 		if err != nil {
 			fmt.Println(err)
+			os.Exit(1)
 		}
 	},
 }
@@ -75,17 +76,22 @@ func apply() error {
 		return err
 	}
 
+	extravars := []string{
+		"tkk_home=" + env.ProjectHomePath,
+		"tkk_cluster_action=" + env.ClusterAction,
+		"tkk_cluster_name=" + env.ClusterName,
+		"tkk_cluster_path=" + env.ClusterPath,
+	}
+
+	if env.IsCustomConfig {
+		extravars = append(extravars, "config_path="+env.ConfigPath)
+	}
+
 	// Execute the project ansible playbook.
 	err = helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		PlaybookFile: filepath.Join(env.ClusterPath, env.ConstAnsiblePlaybookPath),
 		Tags:         ansiblePlaybookTags,
-		Extravars: []string{
-			"config_path=" + env.ConfigPath,
-			"tkk_home=" + env.ProjectHomePath,
-			"tkk_cluster_action=" + env.ClusterAction,
-			"tkk_cluster_name=" + env.ClusterName,
-			"tkk_cluster_path=" + env.ClusterPath,
-		},
+		Extravars:    extravars,
 	})
 	if err != nil {
 		return err

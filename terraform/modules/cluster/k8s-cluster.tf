@@ -81,7 +81,7 @@ data "template_file" "master_hosts" {
 
   for_each = { for node in var.master_nodes : node.name => node }
 
-  template = file("../templates/kubespray/kubesoray_host.tpl")
+  template = file("../templates/kubespray/kubespray_host.tpl")
 
   vars = {
     hostname    = each.value.name
@@ -95,7 +95,7 @@ data "template_file" "worker_hosts" {
 
   for_each = { for node in var.worker_nodes : node.name => node }
 
-  template = file("../templates/kubespray/kubesoray_host.tpl")
+  template = file("../templates/kubespray/kubespray_host.tpl")
 
   vars = {
     hostname = each.value.name
@@ -110,7 +110,7 @@ data "template_file" "worker_hosts" {
 
 # Template for hosts.ini file #
 data "template_file" "kubespray_hosts" {
-  template = file("../templates/ansible/ansible_hosts_list.tpl")
+  template = file("../templates/kubespray/kubespray_hosts_list.tpl")
 
   vars = {
     lb_hosts     = chomp(join("", [for tpl in data.template_file.lb_hosts : tpl.rendered]))
@@ -363,6 +363,7 @@ resource "null_resource" "kubespray_remove" {
     vm_user            = var.vm_user
     vm_ssh_private_key = local.ssh_pk_path
     extra_args         = lookup(local.extra_args, var.vm_distro, local.default_extra_args)
+    kubespray_venv     = local.kubespray_venv
   }
 
   provisioner "local-exec" {
@@ -387,7 +388,7 @@ resource "null_resource" "kubespray_remove" {
       SSH_USER        = self.triggers.vm_user
       SSH_PRIVATE_KEY = self.triggers.vm_ssh_private_key
       EXTRA_ARGS      = self.triggers.extra_args
-      KUBESPRAY_VENV  = local.kubespray_venv
+      KUBESPRAY_VENV  = self.triggers.kubespray_venv
     }
     on_failure = continue
   }

@@ -15,6 +15,7 @@ versions.tf.save
 /bin/
 /config/
 /downloads/
+/terraform/main.tf
 
 ## Other
 /downloads/

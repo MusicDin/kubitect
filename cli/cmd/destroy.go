@@ -4,6 +4,7 @@ import (
 	"cli/env"
 	"cli/helpers"
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -18,6 +19,7 @@ the operation is executed on the 'default' cluster.`,
 		err := destroy()
 		if err != nil {
 			fmt.Println(err)
+			os.Exit(1)
 		}
 	},
 }

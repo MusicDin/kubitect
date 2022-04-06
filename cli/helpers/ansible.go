@@ -94,12 +94,12 @@ func ExecAnsiblePlaybook(clusterPath string, ansibleCmd *AnsiblePlaybookCmd) err
 	)
 
 	playbook := &playbook.AnsiblePlaybookCmd{
-		Playbooks:         []string{ansibleCmd.PlaybookFile},
-		ConnectionOptions: ansiblePlaybookConnectionOptions,
-		Options:           ansiblePlaybookOptions,
-		StdoutCallback:    "yaml",
-		Binary:            filepath.Join(clusterPath, venvName, "bin", "ansible-playbook"),
+		Binary:            filepath.Join(clusterPath, venvBinDir, "bin", "ansible-playbook"),
 		Exec:              executor,
+		Playbooks:         []string{ansibleCmd.PlaybookFile},
+		Options:           ansiblePlaybookOptions,
+		ConnectionOptions: ansiblePlaybookConnectionOptions,
+		StdoutCallback:    "yaml",
 	}
 
 	options.AnsibleForceColor()
