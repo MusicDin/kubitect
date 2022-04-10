@@ -2,7 +2,7 @@ name: Release CLI Binaries
 
 on:
   release:
-    types: [ created, published, edited ]
+    types: [published]
 
 env:
   CLI_PATH: ./cli
@@ -13,9 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        goos: [ linux, windows, darwin ]
-        goarch: [ "386", amd64, arm64 ]
+        goos: [ linux, windows, darwin ]  # Target systems,
+        goarch: [ "386", amd64, arm64 ]   # with their architecture.
         exclude:
+          # Exclude some combinations of system and architecture.
           - goarch: "386"
             goos: darwin
           - goarch: arm64
@@ -30,5 +31,4 @@ jobs:
           goversion: 1.18
           binary_name: "tkk-cli"
           project_path: ${{ env.CLI_PATH }}
-          sha256sum: TRUE
           extra_files: LICENSE
