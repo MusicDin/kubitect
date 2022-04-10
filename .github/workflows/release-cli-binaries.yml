@@ -2,7 +2,7 @@ name: Release CLI Binaries
 
 on:
   release:
-    types: [published]
+    types: [ published ]
 
 env:
   CLI_PATH: ./cli
@@ -31,4 +31,4 @@ jobs:
           goversion: 1.18
           binary_name: "tkk-cli"
           project_path: ${{ env.CLI_PATH }}
-          extra_files: LICENSE
+          extra_files: LICENSE  # Additional files to include with the binaries.
