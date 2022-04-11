@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"cli/env"
 	"context"
 	"errors"
 	"fmt"
@@ -19,16 +20,22 @@ const (
 )
 
 var (
-	ClusterPathMissing              = errors.New("Cluster path is missing.")
-	AnsiblePlaybookCmdMissing       = errors.New("AnsiblePlaybookCmd is null.")
-	AnsiblePlaybookFilePathMissing  = errors.New("To run ansible-playbook playbook file path must be specified.")
-	AnsiblePlaybookInventoryMissing = errors.New("To run ansible-playbook an inventory must be specified.")
+	VenvNameMissing           = errors.New("VenvName must be provided!")
+	ClusterPathMissing        = errors.New("Cluster path is missing.")
+	AnsiblePlaybookCmdMissing = errors.New("AnsiblePlaybookCmd is null.")
+	PlaybookFilePathMissing   = errors.New("To run ansible-playbook playbook file path must be specified.")
+	InventoryMissing          = errors.New("To run ansible-playbook an inventory must be specified.")
 )
 
 type AnsiblePlaybookCmd struct {
+	VenvName        string
 	PlaybookFile    string // "clusterPath/PlaybookFile"
-	Tags            string
 	Inventory       string
+	Tags            string
+	Become          bool
+	User            string
+	PrivateKey      string
+	Timeout         int
 	ConnectionLocal bool
 	Extravars       []string
 }
@@ -56,15 +63,42 @@ func ExecAnsiblePlaybook(clusterPath string, ansibleCmd *AnsiblePlaybookCmd) err
 	}
 
 	if len(ansibleCmd.PlaybookFile) < 1 {
-		return AnsiblePlaybookFilePathMissing
+		return PlaybookFilePathMissing
 	}
 
 	if len(ansibleCmd.Inventory) < 1 {
-		return AnsiblePlaybookInventoryMissing
+		return InventoryMissing
+	}
+
+	if len(ansibleCmd.VenvName) < 1 {
+		return VenvNameMissing
 	}
 
 	if len(clusterPath) < 1 {
 		return ClusterPathMissing
+	}
+
+	privilegeEscalationOptions := &options.AnsiblePrivilegeEscalationOptions{
+		Become: ansibleCmd.Become,
+	}
+
+	connectionOptions := &options.AnsibleConnectionOptions{
+		PrivateKey: ansibleCmd.PrivateKey,
+		Timeout:    ansibleCmd.Timeout,
+		User:       ansibleCmd.User,
+	}
+
+	if ansibleCmd.ConnectionLocal {
+		connectionOptions.Connection = "local"
+	}
+
+	playbookOptions := &playbook.AnsiblePlaybookOptions{
+		Inventory: ansibleCmd.Inventory,
+		Tags:      ansibleCmd.Tags,
+	}
+
+	if env.DebugMode {
+		playbookOptions.Verbose = true
 	}
 
 	vars, err := extravarsListToMap(ansibleCmd.Extravars)
@@ -72,34 +106,22 @@ func ExecAnsiblePlaybook(clusterPath string, ansibleCmd *AnsiblePlaybookCmd) err
 		return err
 	}
 
-	ansiblePlaybookConnectionOptions := &options.AnsibleConnectionOptions{}
-	if ansibleCmd.ConnectionLocal {
-		ansiblePlaybookConnectionOptions.Connection = "local"
-	}
-
-	ansiblePlaybookOptions := &playbook.AnsiblePlaybookOptions{
-		Inventory: ansibleCmd.Inventory,
-		Tags:      ansibleCmd.Tags,
-	}
-
 	for keyVar, valueVar := range vars {
-		ansiblePlaybookOptions.AddExtraVar(keyVar, valueVar)
+		playbookOptions.AddExtraVar(keyVar, valueVar)
 	}
 
 	executor := execute.NewDefaultExecute(
 		execute.WithWriteError(io.Writer(os.Stdout)),
-		// execute.WithTransformers(
-		// 	results.Prepend("[ - ]"),
-		// ),
 	)
 
 	playbook := &playbook.AnsiblePlaybookCmd{
-		Binary:            filepath.Join(clusterPath, venvBinDir, "bin", "ansible-playbook"),
-		Exec:              executor,
-		Playbooks:         []string{ansibleCmd.PlaybookFile},
-		Options:           ansiblePlaybookOptions,
-		ConnectionOptions: ansiblePlaybookConnectionOptions,
-		StdoutCallback:    "yaml",
+		Binary:                     filepath.Join(clusterPath, venvBinDir, ansibleCmd.VenvName, "bin", "ansible-playbook"),
+		Exec:                       executor,
+		Playbooks:                  []string{ansibleCmd.PlaybookFile},
+		Options:                    playbookOptions,
+		ConnectionOptions:          connectionOptions,
+		PrivilegeEscalationOptions: privilegeEscalationOptions,
+		StdoutCallback:             "yaml",
 	}
 
 	options.AnsibleForceColor()

@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 // GetEnv check if environment variable with name 'envKey' exists.
@@ -31,4 +32,38 @@ func ForceMove(srcPath string, dstPath string) error {
 	}
 
 	return nil
+}
+
+// StrArrayContains returns true if string array 'arr' contains string 'value'.
+func StrArrayContains(arr []string, value string) bool {
+	for _, s := range arr {
+		if value == s {
+			return true
+		}
+	}
+	return false
+}
+
+// AskUserConfirmation ask user for confirmation. Function returns true if user
+// types any variant of "y" or "yes" and false if user types any variant of "n"
+// or "no". Otherwise user is asked again.
+func AskUserConfirmation() bool {
+
+	var response string
+
+	fmt.Println("\nAre you sure you want to continue? (yes/no)")
+
+	_, err := fmt.Scan(&response)
+	if err != nil {
+		panic(fmt.Errorf("Error asking user for confirmation: %w", err))
+	}
+
+	switch strings.ToLower(response) {
+	case "y", "yes":
+		return true
+	case "n", "no":
+		return false
+	default:
+		return AskUserConfirmation()
+	}
 }

@@ -1,5 +1,4 @@
 - hosts: haproxy
-
   gather_facts: false
 
   tasks:

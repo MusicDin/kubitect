@@ -4,13 +4,13 @@
 
 variable "action" {
   type        = string
-  description = "Action (create, upgrade)."
+  description = "Action (create, upgrade, scale)."
   default     = "create"
   nullable    = false
 
   validation {
-    condition     = contains(["create", "upgrade"], var.action)
-    error_message = "Variable 'action' is invalid. Possible values are: ['create', 'upgrade']."
+    condition     = contains(["create", "upgrade", "scale"], var.action)
+    error_message = "Variable 'action' is invalid. Possible values are: ['create', 'upgrade', 'scale']."
   }
 }
 

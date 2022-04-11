@@ -22,7 +22,7 @@ kube_token_dir: "{{ kube_config_dir }}/tokens"
 kube_api_anonymous_auth: true
 
 ## Change this to use another Kubernetes version, e.g. a current beta release
-kube_version: ${kube_version}
+kube_version: "<< config.kubernetes.version >>"
 
 # Where the binaries will be downloaded.
 # Note: ensure that you've enough disk space (about 1G)
@@ -69,7 +69,7 @@ credentials_dir: "{{ inventory_dir }}/credentials"
 
 # Choose network plugin (cilium, calico, weave or flannel. Use cni for generic cni plugin)
 # Can also be set to 'cloud', which lets the cloud provider setup appropriate routing
-kube_network_plugin: ${kube_network_plugin}
+kube_network_plugin: "<< config.kubernetes.networkPlugin >>"
 
 # Setting multi_networking to true will install Multus: https://github.com/intel/multus-cni
 kube_network_plugin_multus: false
@@ -131,7 +131,7 @@ kube_proxy_mode: ipvs
 
 # configure arp_ignore and arp_announce to avoid answering ARP queries from kube-ipvs0 interface
 # must be set to true for MetalLB to work
-kube_proxy_strict_arp: ${kube_proxy_strict_arp}
+kube_proxy_strict_arp: true # "{{ config.kubernetes.strictArp }}" 
 
 # A string slice of values which specify the addresses to use for NodePorts.
 # Values may be valid IP blocks (e.g. 1.2.3.0/24, 1.2.3.4/32).
@@ -164,7 +164,7 @@ cluster_name: cluster.local
 # Subdomains of DNS domain to be resolved via /etc/resolv.conf for hostnet pods
 ndots: 2
 # Can be coredns, coredns_dual, manual or none
-dns_mode: ${dns_mode}
+dns_mode: "<< config.kubernetes.dnsMode >>"
 # Set manual server if using a custom cluster DNS server
 # manual_dns_server: 10.x.x.x
 # Enable nodelocal dns cache

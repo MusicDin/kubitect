@@ -1,0 +1,5 @@
+---
+- name: Include cluster config as variable
+  include_vars:
+    file: "{{ tkk_cluster_config_path }}"
+    name: config

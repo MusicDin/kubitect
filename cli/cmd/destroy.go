@@ -45,7 +45,7 @@ func destroy() error {
 
 	fmt.Printf("Destroying cluster '%s'...\n", env.ClusterName)
 
-	// Terraform apply
+	// Terraform destroy
 	err = helpers.TerraformDestroy(env.ClusterPath)
 	if err != nil {
 		return err

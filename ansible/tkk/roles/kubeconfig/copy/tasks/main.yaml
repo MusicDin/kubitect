@@ -1,0 +1,11 @@
+---
+- name: Make sure ~/.kube directory exists
+  file:
+    path: "~/.kube"
+    state: directory
+
+- name: Create a copy of the kubeconfig file in a ~/.kube dirctory
+  copy:
+    src: "{{ tkk_cluster_path }}/config/admin.conf"
+    dest: "~/.kube/admin.yaml"
+    mode: "0600"

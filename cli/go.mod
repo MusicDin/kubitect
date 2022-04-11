@@ -24,7 +24,7 @@ require (
 	github.com/apenella/go-common-utils/data v0.0.0-20210528133155-34ba915e28c8 // indirect
 	github.com/apenella/go-common-utils/error v0.0.0-20210528133155-34ba915e28c8 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/fatih/color v1.13.0 // indirect
+	github.com/fatih/color v1.13.0
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.3.1 // indirect
 	github.com/goccy/go-yaml v1.9.5

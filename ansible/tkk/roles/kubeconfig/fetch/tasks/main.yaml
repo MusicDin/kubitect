@@ -1,0 +1,6 @@
+---
+- name: Fetch Kubeconfig
+  fetch:
+    src: "/etc/kubernetes/admin.conf"
+    dest: "{{ tkk_cluster_path }}/config/admin.conf"
+    flat: true

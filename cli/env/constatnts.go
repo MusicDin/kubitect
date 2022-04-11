@@ -2,11 +2,10 @@ package env
 
 const (
 	// Global constants
-	ConstTerraformVersion    = "1.1.4"
-	ConstAnsiblePlaybookPath = "ansible/tkk/tkk.yaml"
-	ConstProjectHomeEnvName  = "TKK_HOME"
-	ConstProjectHomeDir      = ".tkk"
-	ConstProjectClustersDir  = "clusters"
+	ConstTerraformVersion   = "1.1.4"
+	ConstProjectHomeEnvName = "TKK_HOME"
+	ConstProjectHomeDir     = ".tkk"
+	ConstProjectClustersDir = "clusters"
 
 	// default values
 	DefaultClusterName       = "default"
@@ -31,7 +30,6 @@ var (
 	ProjectApplyActions = [...]string{
 		"create",
 		"upgrade",
-		"add_worker",
-		"remove_worker",
+		"scale",
 	}
 )

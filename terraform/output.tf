@@ -1,3 +1,3 @@
-output "nodes" {
-  value = module.k8s_cluster
+output "output-yaml" {
+  value = replace(yamlencode(module.output), "/((?:^|\n)[\\s-]*)\"([\\w-]+)\":/", "$1$2:")
 }

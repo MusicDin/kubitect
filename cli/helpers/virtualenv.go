@@ -9,21 +9,21 @@ import (
 )
 
 const (
-	venvBinDir = "bin/venvs/venv-main"
+	venvBinDir = "bin/venvs"
 )
 
 // PrepareVirtualEnironment creates virtual environment in the cluster path
 // and installs required pip3 and ansible dependencies.
-func PrepareVirtualEnironment(clusterPath string) error {
+func PrepareVirtualEnironment(clusterPath string, venvName string, requirementsFile string) error {
 
 	var err error
 
-	err = createVirtualEnvironment(clusterPath)
+	err = createVirtualEnvironment(clusterPath, venvName)
 	if err != nil {
 		return err
 	}
 
-	err = installPipRequirements(clusterPath)
+	err = installPipRequirements(clusterPath, venvName, requirementsFile)
 	if err != nil {
 		return err
 	}
@@ -32,11 +32,13 @@ func PrepareVirtualEnironment(clusterPath string) error {
 }
 
 // createVirtualEnvironment creates virtual environment if it does not yet exist.
-func createVirtualEnvironment(clusterPath string) error {
+func createVirtualEnvironment(clusterPath string, venvName string) error {
 
 	fmt.Println("Creating virtual environment...")
 
-	cmd := exec.Command("virtualenv", "-p", "python3", venvBinDir)
+	venvPath := filepath.Join(venvBinDir, venvName)
+
+	cmd := exec.Command("virtualenv", "-p", "python3", venvPath)
 	cmd.Dir = clusterPath
 
 	if env.DebugMode {
@@ -52,13 +54,13 @@ func createVirtualEnvironment(clusterPath string) error {
 }
 
 // installPipRequirements installs pip3 requirements into virtual envrionment.
-func installPipRequirements(clusterPath string) error {
+func installPipRequirements(clusterPath string, venvName string, requirementsFile string) error {
 
 	fmt.Println("Installing pip3 dependencies...")
-	fmt.Println("This process can take up to a minute if the cluster has not been initialized yet...")
+	fmt.Println("This may take up to a minute if the virtual environment is initialized for the first time...")
 
-	cmd := exec.Command("pip3", "install", "-r", "requirements.txt")
-	cmd.Path = filepath.Join(clusterPath, venvBinDir, "bin", "pip3")
+	cmd := exec.Command("pip3", "install", "-r", requirementsFile)
+	cmd.Path = filepath.Join(clusterPath, venvBinDir, venvName, "bin", "pip3")
 	cmd.Dir = clusterPath
 
 	if env.DebugMode {

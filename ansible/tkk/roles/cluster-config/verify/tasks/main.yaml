@@ -91,7 +91,7 @@
     - item.connection.type == 'remote' and item.connection.ip is not defined
   loop: "{{ config.hosts }}"
 
-# # Verify default
+# Verify default
 
 - name: Fail if there are multiple default hosts
   fail:

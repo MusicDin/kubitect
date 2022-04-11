@@ -8,14 +8,31 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
 
 const (
-	tmpDirName          = "temp"
-	ansiblePlaybookTags = "apply"
+	tmpDirName            = "temp"
+	mainRequirements      = "requirements.txt"
+	mainVenvName          = "main-venv"
+	kubesprayRequirements = "ansible/kubespray/requirements.txt"
+	kubesprayVenvName     = "kubespray-venv"
 )
+
+var (
+	validNodeTypes = []string{
+		"worker",
+		"master",
+		"loadBalancer",
+	}
+)
+
+type Node struct {
+	Id   int    `yaml:"id"`
+	Name string `yaml:"name"`
+}
 
 // applyCmd represents the apply command
 var applyCmd = &cobra.Command{
@@ -61,6 +78,8 @@ func apply() error {
 
 	var err error
 
+	infraConfigPath := filepath.Join(env.ClusterPath, "config/infrastructure.yaml")
+
 	fmt.Printf("Preparing cluster '%s'...\n", env.ClusterName)
 
 	if !env.Local {
@@ -70,8 +89,10 @@ func apply() error {
 		}
 	}
 
-	// Activate virtual environment and install Ansible.
-	err = helpers.PrepareVirtualEnironment(env.ClusterPath)
+	fmt.Println("Creating main virtual environment...")
+
+	// Prepare main virtual environment.
+	err = helpers.PrepareVirtualEnironment(env.ClusterPath, mainVenvName, mainRequirements)
 	if err != nil {
 		return err
 	}
@@ -89,16 +110,212 @@ func apply() error {
 
 	// Execute the project ansible playbook.
 	err = helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		PlaybookFile: filepath.Join(env.ClusterPath, env.ConstAnsiblePlaybookPath),
-		Tags:         ansiblePlaybookTags,
+		VenvName:     mainVenvName,
+		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/tkk/init.yaml"),
 		Extravars:    extravars,
 	})
 	if err != nil {
 		return err
 	}
 
+	// Nodes should be gracefully removed from the cluster before actual virtual
+	// machines are removed. Node removal is triggered on 'scale' action when
+	// infrastructure config exists (tf output).
+	_, err = os.Stat(infraConfigPath)
+	if env.ClusterAction == "scale" && err == nil {
+
+		// Extract required values from tf output
+		sshUser, err := config.GetStrValue(infraConfigPath, "cluster.ssh.user")
+		if err != nil {
+			return err
+		}
+
+		sshPKey, err := config.GetStrValue(infraConfigPath, "cluster.ssh.pkey")
+		if err != nil {
+			return err
+		}
+
+		removedWorkers, err := getRemovedNodes(env.ConfigPath, infraConfigPath, "worker")
+		if err != nil {
+			return err
+		}
+
+		if len(removedWorkers) > 0 {
+
+			var removedWorkerNames []string
+
+			utils.PrintWarning("The following nodes will get removed: ")
+
+			for _, worker := range removedWorkers {
+				removedWorkerNames = append(removedWorkerNames, worker.Name)
+				fmt.Println("- " + worker.Name)
+			}
+
+			// Ask user for permission
+			confirm := utils.AskUserConfirmation()
+			if !confirm {
+				return fmt.Errorf("User aborted.")
+			}
+
+			extravars = []string{
+				"delete_nodes_confirmation=yes",
+				"node=" + strings.Join(removedWorkerNames, ","),
+			}
+
+			// Remove nodes.
+			err = helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
+				VenvName:     kubesprayVenvName,
+				PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/remove-node.yml"),
+				Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
+				Become:       true,
+				User:         sshUser,
+				PrivateKey:   sshPKey,
+				Timeout:      3000,
+				Extravars:    extravars,
+			})
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	// Terraform apply
 	err = helpers.TerraformApply(env.ClusterPath)
+	if err != nil {
+		return err
+	}
+
+	extravars = []string{
+		"tkk_cluster_path=" + env.ClusterPath,
+	}
+
+	// Prepare Kubespray configuration files (all.yaml, k8s_cluster.yaml, ...)
+	// and clone Kubespray git project.
+	err = helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
+		VenvName:     mainVenvName,
+		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/tkk/kubespray-setup.yaml"),
+		Extravars:    extravars,
+	})
+	if err != nil {
+		return err
+	}
+
+	// Prepare Kubespray's virtual environment.
+	err = helpers.PrepareVirtualEnironment(env.ClusterPath, kubesprayVenvName, kubesprayRequirements)
+	if err != nil {
+		return err
+	}
+
+	// Extract required values from tf output
+	sshUser, err := config.GetStrValue(infraConfigPath, "cluster.ssh.user")
+	if err != nil {
+		return err
+	}
+
+	sshPKey, err := config.GetStrValue(infraConfigPath, "cluster.ssh.pkey")
+	if err != nil {
+		return err
+	}
+
+	k8sVersion, err := config.GetStrValue(env.ConfigPath, "kubernetes.version")
+	if err != nil {
+		return err
+	}
+
+	// Run Kubespray role based on the provided cluster action.
+	switch env.ClusterAction {
+	case "create":
+
+		err = helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
+			VenvName:     mainVenvName,
+			PlaybookFile: filepath.Join(env.ClusterPath, "ansible/haproxy/haproxy.yaml"),
+			Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
+			Become:       true,
+			User:         sshUser,
+			PrivateKey:   sshPKey,
+			Timeout:      3000,
+		})
+		if err != nil {
+			return err
+		}
+
+		extravars = []string{
+			"kube_version=" + k8sVersion,
+		}
+
+		err = helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
+			VenvName:     kubesprayVenvName,
+			PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/cluster.yml"),
+			Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
+			Become:       true,
+			User:         sshUser,
+			PrivateKey:   sshPKey,
+			Timeout:      3000,
+			Extravars:    extravars,
+		})
+		if err != nil {
+			return err
+		}
+
+	case "upgrade":
+
+		extravars = []string{
+			"kube_version=" + k8sVersion,
+		}
+
+		err = helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
+			VenvName:     kubesprayVenvName,
+			PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/upgrade-cluster.yml"),
+			Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
+			Become:       true,
+			User:         sshUser,
+			PrivateKey:   sshPKey,
+			Timeout:      3000,
+			Extravars:    extravars,
+		})
+		if err != nil {
+			return err
+		}
+
+	case "scale":
+
+		extravars = []string{
+			"kube_version=" + k8sVersion,
+		}
+
+		err = helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
+			VenvName:     kubesprayVenvName,
+			PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/scale.yml"),
+			Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
+			Become:       true,
+			User:         sshUser,
+			PrivateKey:   sshPKey,
+			Timeout:      3000,
+			Extravars:    extravars,
+		})
+		if err != nil {
+			return err
+		}
+
+	default:
+		return fmt.Errorf("Unknown cluster action: %s", env.ClusterAction)
+	}
+
+	extravars = []string{
+		"tkk_cluster_path=" + env.ClusterPath,
+	}
+
+	// Finalize Kubernetes cluster installation.
+	err = helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
+		VenvName:     mainVenvName,
+		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/tkk/finalize.yaml"),
+		Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
+		Become:       true,
+		User:         sshUser,
+		PrivateKey:   sshPKey,
+		Timeout:      3000,
+		Extravars:    extravars,
+	})
 	if err != nil {
 		return err
 	}
@@ -141,7 +358,7 @@ func initCluster(clusterPath string) error {
 		return err
 	}
 
-	// Replace relevant files from temporary git project.
+	// Move relevant project files into cluster directory.
 	for _, path := range env.ProjectRequiredFiles {
 
 		srcPath := filepath.Join(gitTmpDir, path)
@@ -150,7 +367,7 @@ func initCluster(clusterPath string) error {
 		utils.ForceMove(srcPath, dstPath)
 	}
 
-	// Remove temp project.
+	// Remove temporary directory.
 	err = os.RemoveAll(gitTmpDir)
 
 	if err != nil {
@@ -158,4 +375,43 @@ func initCluster(clusterPath string) error {
 	}
 
 	return nil
+}
+
+// getRemovedNodes function returns a list of nodes that are present
+// in the infrastructure config (config created by terraform) and are not
+// present in the cluster config (currently applied config).
+func getRemovedNodes(configPath string, infraConfigPath string, nodeType string) ([]Node, error) {
+
+	if !utils.StrArrayContains(validNodeTypes, nodeType) {
+		return nil, fmt.Errorf("Invalid node type '%s'. Valid node types are [%s].", nodeType, strings.Join(validNodeTypes, ", "))
+	}
+
+	var configNodes []Node
+	var infraNodes []Node
+
+	configKey := fmt.Sprintf("cluster.nodes.%s.instances[*]", nodeType)
+
+	// Ignore errors, because it is possible that nodes of provided type
+	config.GetValue(configPath, configKey, &configNodes)
+	config.GetValue(infraConfigPath, configKey, &infraNodes)
+
+	removedNodes := []Node{}
+
+	for _, infNode := range infraNodes {
+
+		isNodeRemoved := true
+
+		for _, cfgNode := range configNodes {
+			if cfgNode.Id == infNode.Id {
+				isNodeRemoved = false
+				break
+			}
+		}
+
+		if isNodeRemoved {
+			removedNodes = append(removedNodes, infNode)
+		}
+	}
+
+	return removedNodes, nil
 }

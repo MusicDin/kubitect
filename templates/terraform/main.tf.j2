@@ -183,7 +183,7 @@ module "host_{{ host_name }}" {
 
 
 #================================
-# Cluster
+# Infrastructure output
 #================================
 {# Creates a list of host modules. -#}
 {% set host_name_list = [] -%}
@@ -193,16 +193,13 @@ module "host_{{ host_name }}" {
 {% set host_name_list = host_name_list | join(', ') -%}
 
 # Configures k8s cluster using Kubespray #
-module "k8s_cluster" {
+module "output" {
 
-  source = "./modules/cluster"
-
-  action = var.action
+  source = "./modules/output"
 
   # VM variables #
   vm_user              = try(local.config.cluster.nodeTemplate.user, null)
   vm_ssh_private_key   = local.ssh_pk_path
-  vm_distro            = try(local.config.cluster.nodeTemplate.image.distro, null)
   vm_network_interface = local.internal.network_interface
 
   worker_node_label = try(local.config.cluster.nodes.worker.default.label, null)
@@ -220,24 +217,15 @@ module "k8s_cluster" {
     node if node.type == local.internal.vm_types.worker
   ]
 
-  # Kubernetes & Kubespray
-  kubernetes_version                     = try(local.config.kubernetes.version, null)
-  kubernetes_networkPlugin               = try(local.config.kubernetes.networkPlugin, null)
-  kubernetes_dnsMode                     = try(local.config.kubernetes.dnsMode, null)
-  kubernetes_kubespray_url               = try(local.config.kubernetes.kubespray.url, null)
-  kubernetes_kubespray_version           = try(local.config.kubernetes.kubespray.version, null)
-  kubernetes_kubespray_addons_enabled    = false # try(local.config.kubernetes.kubespray.addons.enabled, null)
-  kubernetes_kubespray_addons_configPath = ""    # try(local.config.kubernetes.kubespray.addons.configPath, null)
-  kubernetes_other_copyKubeconfig        = try(local.config.kubernetes.other.copyKubeconfig, null)
-
-  # Other #
-  #k8s_dashboard_rbac_enabled = var.k8s_dashboard_rbac_enabled
-  #k8s_dashboard_rbac_user    = var.k8s_dashboard_rbac_user
-
   # K8s cluster creation depends on all VM modules #
   depends_on = [
 {% for item in host_list %}
     module.host_{{ item.name }},
 {% endfor %}
   ]
+}
+
+resource "local_file" "output" {
+  content  = replace(yamlencode(module.output), "/((?:^|\n)[\\s-]*)\"([\\w-]+)\":/", "$1$2:")
+  filename = "../config/infrastructure.yaml"
 }
