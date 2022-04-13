@@ -89,6 +89,18 @@ func apply() error {
 		}
 	}
 
+	// Fail if cluster path is not pointing on a valid cluster directory.
+	if !utils.IsClusterDir(env.ClusterPath) {
+
+		utils.PrintError("Cluster path points to the invalid cluster directory!")
+
+		if env.Local {
+			utils.PrintError("Are you sure you are in the right directory?")
+		}
+
+		return fmt.Errorf("Invalid cluster directory.")
+	}
+
 	fmt.Println("Creating main virtual environment...")
 
 	// Prepare main virtual environment.

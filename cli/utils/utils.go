@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"cli/env"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -66,4 +68,31 @@ func AskUserConfirmation() bool {
 	default:
 		return AskUserConfirmation()
 	}
+}
+
+// IsClusterDir verifies if the provided cluster directory exists and if it
+// contains necessary directories/files that represent a cluster directory. It
+// returnes true if specific cluster directories are present. Otherwise it
+// returns false.
+func IsClusterDir(clusterPath string) bool {
+
+	// Check if cluster directory exists
+	_, err := os.Stat(clusterPath)
+	if err != nil {
+		return false
+	}
+
+	// Check if ansible directory exists
+	for _, path := range env.ProjectRequiredFiles {
+
+		// Check if all required directories are present
+		if strings.HasSuffix(path, "/") {
+			_, err = os.Stat(filepath.Join(clusterPath, path))
+			if err != nil {
+				return false
+			}
+		}
+	}
+
+	return true
 }
