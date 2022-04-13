@@ -158,6 +158,7 @@ func apply() error {
 			}
 
 			extravars = []string{
+				"skip_confirmation=yes",
 				"delete_nodes_confirmation=yes",
 				"node=" + strings.Join(removedWorkerNames, ","),
 			}
@@ -179,10 +180,13 @@ func apply() error {
 		}
 	}
 
-	// Terraform apply
-	err = helpers.TerraformApply(env.ClusterPath)
-	if err != nil {
-		return err
+	// Apply terraform if cluster action equals 'create' or 'scale'.
+	if utils.StrArrayContains([]string{"create", "scale"}, env.ClusterAction) {
+
+		err = helpers.TerraformApply(env.ClusterPath)
+		if err != nil {
+			return err
+		}
 	}
 
 	extravars = []string{
