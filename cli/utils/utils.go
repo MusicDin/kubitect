@@ -70,11 +70,28 @@ func AskUserConfirmation() bool {
 	}
 }
 
+// VerifyClusterDir returns an error if the provided path is pointing to
+// an invalid cluster directory.
+func VerifyClusterDir(clusterPath string) error {
+
+	if !isClusterDir(clusterPath) {
+		PrintError("Cluster path points to the invalid cluster directory!")
+
+		if env.Local {
+			PrintError("Are you sure you are in the right directory?")
+		}
+
+		return fmt.Errorf("Invalid cluster directory.")
+	}
+
+	return nil
+}
+
 // IsClusterDir verifies if the provided cluster directory exists and if it
 // contains necessary directories/files that represent a cluster directory. It
 // returnes true if specific cluster directories are present. Otherwise it
 // returns false.
-func IsClusterDir(clusterPath string) bool {
+func isClusterDir(clusterPath string) bool {
 
 	// Check if cluster directory exists
 	_, err := os.Stat(clusterPath)

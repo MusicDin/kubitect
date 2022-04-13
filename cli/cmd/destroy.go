@@ -3,6 +3,7 @@ package cmd
 import (
 	"cli/env"
 	"cli/helpers"
+	"cli/utils"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -44,6 +45,12 @@ func destroy() error {
 	var err error
 
 	fmt.Printf("Destroying cluster '%s'...\n", env.ClusterName)
+
+	// Fail if cluster path is not pointing on a valid cluster directory.
+	err = utils.VerifyClusterDir(env.ClusterPath)
+	if err != nil {
+		return err
+	}
 
 	// Terraform destroy
 	err = helpers.TerraformDestroy(env.ClusterPath)
