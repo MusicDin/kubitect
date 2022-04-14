@@ -4,11 +4,16 @@
     file: "{{ tkk_cluster_path }}/config/infrastructure.yaml"
     name: infra
 
-- name: Make sure config directory exists
+- name: Make sure config directories exist
   file:
-    path: "{{ tkk_cluster_config_path | dirname }}"
+    path: "{{ item }}"
     state: directory
     mode: 0700
+  loop:
+    - ../../config/haproxy
+    - ../../config/keepalived
+    - ../../config/group_vars/all
+    - ../../config/group_vars/k8s_cluster
 
 - name: Generate HAProxy config
   template:
@@ -48,6 +53,7 @@
   template:
     src: ../../templates/kubespray/etcd.yaml.j2
     dest: ../../config/group_vars/etcd.yaml
+    #dest: ../../config/group_vars/all/etcd.yaml
 
 - name: Generate cluster's hosts.ini
   template:
