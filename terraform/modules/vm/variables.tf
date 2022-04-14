@@ -128,17 +128,17 @@ variable "vm_main_disk_size" {
 }
 
 variable "vm_data_disks" {
-  type        = list(object({
-    name: string
-    size: number
-    pool: string
+  type = list(object({
+    name : string
+    size : number
+    pool : string
   }))
   description = "Additional data disks attached to the virtual machine"
 
   # If pool does not exist, null is passed.
   # If no additional disks need to be created, an empty array ([]) is passed.
   validation {
-    condition = var.vm_data_disks != null
+    condition     = var.vm_data_disks != null
     error_message = "At least one of the node instances is referencing a data resource pool that does not exist."
   }
 }

@@ -34,16 +34,16 @@ variable "hosts_mainResourcePoolPath" {
 }
 
 variable "hosts_dataResourcePools" {
-  type        = list(object({
-    name: string
-    path: string
+  type = list(object({
+    name : string
+    path : string
   }))
   description = "Location where main resource pool will be initialized."
-  default = []
+  default     = []
   nullable    = false
 
   validation {
-    condition = length(var.hosts_dataResourcePools.*.name) == length(distinct(var.hosts_dataResourcePools.*.name))
+    condition     = length(var.hosts_dataResourcePools.*.name) == length(distinct(var.hosts_dataResourcePools.*.name))
     error_message = "Duplicate data resource pool name found!\nMake sure that the data resource pool names on the same host are unique."
   }
 }
@@ -190,12 +190,12 @@ variable "cluster_nodes_loadBalancer_default_mainDiskSize" {
 
 variable "cluster_nodes_loadBalancer_instances" {
   type = list(object({
-    id      = number
-    host    = optional(string)
-    mac     = optional(string)
-    ip      = optional(string)
-    cpu     = optional(number)
-    ram     = optional(number)
+    id           = number
+    host         = optional(string)
+    mac          = optional(string)
+    ip           = optional(string)
+    cpu          = optional(number)
+    ram          = optional(number)
     mainDiskSize = optional(number)
   }))
   description = "HAProxy load balancer node instances."
@@ -237,10 +237,10 @@ variable "cluster_nodes_master_default_mainDiskSize" {
 }
 
 variable "cluster_nodes_master_default_dataDisks" {
-  type        = list(object({
-    name: string
-    pool: string
-    size: number
+  type = list(object({
+    name : string
+    pool : string
+    size : number
   }))
   description = "List of additional data disks that are attached to the master node."
   default     = []
@@ -249,17 +249,17 @@ variable "cluster_nodes_master_default_dataDisks" {
 
 variable "cluster_nodes_master_instances" {
   type = list(object({
-    id      = number
-    host    = optional(string)
-    mac     = optional(string)
-    ip      = optional(string)
-    cpu     = optional(number)
-    ram     = optional(number)
+    id           = number
+    host         = optional(string)
+    mac          = optional(string)
+    ip           = optional(string)
+    cpu          = optional(number)
+    ram          = optional(number)
     mainDiskSize = optional(number)
-    dataDisks = optional(list(object({ 
-      name: string
-      pool: string
-      size: number
+    dataDisks = optional(list(object({
+      name : string
+      pool : string
+      size : number
     })))
   }))
   description = "Master node instances (control plane)"
@@ -301,10 +301,10 @@ variable "cluster_nodes_worker_default_mainDiskSize" {
 }
 
 variable "cluster_nodes_worker_default_dataDisks" {
-  type        = list(object({
-    name: string
-    pool: string
-    size: number
+  type = list(object({
+    name : string
+    pool : string
+    size : number
   }))
   description = "List of additional data disks that are attached to the worker node."
   default     = []
@@ -320,17 +320,17 @@ variable "cluster_nodes_worker_default_label" {
 
 variable "cluster_nodes_worker_instances" {
   type = list(object({
-    id      = number
-    host    = optional(string)
-    mac     = optional(string)
-    ip      = optional(string)
-    cpu     = optional(number)
-    ram     = optional(number)
+    id           = number
+    host         = optional(string)
+    mac          = optional(string)
+    ip           = optional(string)
+    cpu          = optional(number)
+    ram          = optional(number)
     mainDiskSize = optional(number)
-    dataDisks = optional(list(object({ 
-      name: string
-      pool: string
-      size: number
+    dataDisks = optional(list(object({
+      name : string
+      pool : string
+      size : number
     })))
     #label   = optional(string)
   }))
@@ -443,7 +443,7 @@ variable "kubernetes_other_copyKubeconfig" {
 
 variable "internal" {
   type = object({
-    is_bridge = string
+    is_bridge         = string
     network_interface = string
     vm_types = object({
       load_balancer = string

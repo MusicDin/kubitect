@@ -5,7 +5,7 @@
 # Local variables used in many resources #
 locals {
   main_resource_pool_name = "${var.cluster_name}-main-resource-pool"
-  network_name       = "${var.cluster_name}-network"
+  network_name            = "${var.cluster_name}-network"
 }
 
 #======================================================================================
@@ -26,7 +26,7 @@ resource "libvirt_pool" "main_resource_pool" {
 # Creates data resource pools #
 resource "libvirt_pool" "data_resource_pools" {
 
-  for_each = { for pool in var.hosts_dataResourcePools: pool.name => pool }
+  for_each = { for pool in var.hosts_dataResourcePools : pool.name => pool }
 
   name = "${var.cluster_name}-${each.key}-data-resource-pool"
   type = "dir"

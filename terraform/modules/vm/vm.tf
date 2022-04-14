@@ -63,7 +63,7 @@ resource "libvirt_volume" "vm_main_disk" {
 # Creates volume for new virtual machine #
 resource "libvirt_volume" "vm_data_disks" {
 
-  for_each = {for disk in var.vm_data_disks : disk.name => disk }
+  for_each = { for disk in var.vm_data_disks : disk.name => disk }
 
   name = "${var.vm_name}-${each.key}-data-disk"
   pool = "${var.cluster_name}-${each.value.pool}-data-resource-pool"
@@ -95,8 +95,8 @@ resource "libvirt_domain" "vm_domain" {
   # Storage configuration #
   dynamic "disk" {
     for_each = concat(
-      [{"id" : libvirt_volume.vm_main_disk.id}],
-      [ for disk in libvirt_volume.vm_data_disks : {"id" : disk.id }]
+      [{ "id" : libvirt_volume.vm_main_disk.id }],
+      [for disk in libvirt_volume.vm_data_disks : { "id" : disk.id }]
     )
     content {
       volume_id = disk.value.id
