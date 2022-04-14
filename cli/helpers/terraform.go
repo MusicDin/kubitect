@@ -55,7 +55,7 @@ func TerraformDestroy(clusterPath string) error {
 // and returns Terraform object.
 func terraformInit(clusterPath string) (*tfexec.Terraform, error) {
 
-	fmt.Println("Installing Terraform...")
+	fmt.Printf("Ensuring Terraform '%s' is installed...\n", env.ConstTerraformVersion)
 
 	tfInstallDir := filepath.Join(env.ProjectHomePath, terraformBinDir, env.ConstTerraformVersion)
 	tfProjectDir := filepath.Join(clusterPath, terraformProjectDir)

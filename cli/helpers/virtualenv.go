@@ -12,18 +12,36 @@ const (
 	venvBinDir = "bin/venvs"
 )
 
-// PrepareVirtualEnironment creates virtual environment in the cluster path
+type VirtualEnvironment struct {
+	Name             string
+	RequirementsPath string
+}
+
+var (
+	MainVenv = &VirtualEnvironment{
+		Name:             "main",
+		RequirementsPath: "requirements.txt",
+	}
+	KubesprayVenv = &VirtualEnvironment{
+		Name:             "kubespray",
+		RequirementsPath: "ansible/kubespray/requirements.txt",
+	}
+)
+
+// setupVirtualEnironment creates virtual environment in the cluster path
 // and installs required pip3 and ansible dependencies.
-func PrepareVirtualEnironment(clusterPath string, venvName string, requirementsFile string) error {
+func SetupVirtualEnironment(clusterPath string, venv *VirtualEnvironment) error {
+
+	fmt.Printf("Setting up '%s' virtual environment...\n", venv.Name)
 
 	var err error
 
-	err = createVirtualEnvironment(clusterPath, venvName)
+	err = createVirtualEnvironment(clusterPath, venv.Name)
 	if err != nil {
 		return err
 	}
 
-	err = installPipRequirements(clusterPath, venvName, requirementsFile)
+	err = installPipRequirements(clusterPath, venv)
 	if err != nil {
 		return err
 	}
@@ -54,13 +72,13 @@ func createVirtualEnvironment(clusterPath string, venvName string) error {
 }
 
 // installPipRequirements installs pip3 requirements into virtual envrionment.
-func installPipRequirements(clusterPath string, venvName string, requirementsFile string) error {
+func installPipRequirements(clusterPath string, venv *VirtualEnvironment) error {
 
 	fmt.Println("Installing pip3 dependencies...")
 	fmt.Println("This may take up to a minute if the virtual environment is initialized for the first time...")
 
-	cmd := exec.Command("pip3", "install", "-r", requirementsFile)
-	cmd.Path = filepath.Join(clusterPath, venvBinDir, venvName, "bin", "pip3")
+	cmd := exec.Command("pip3", "install", "-r", venv.RequirementsPath)
+	cmd.Path = filepath.Join(clusterPath, venvBinDir, venv.Name, "bin", "pip3")
 	cmd.Dir = clusterPath
 
 	if env.DebugMode {

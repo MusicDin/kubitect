@@ -28,16 +28,16 @@ var (
 )
 
 type AnsiblePlaybookCmd struct {
-	VenvName        string
 	PlaybookFile    string // "clusterPath/PlaybookFile"
 	Inventory       string
 	Tags            string
-	Become          bool
 	User            string
 	PrivateKey      string
-	Timeout         int
+	Become          bool
 	ConnectionLocal bool
+	Timeout         int
 	Extravars       []string
+	Venv            *VirtualEnvironment
 }
 
 // Sets inventory and connection type to localhost before executing
@@ -70,7 +70,7 @@ func ExecAnsiblePlaybook(clusterPath string, ansibleCmd *AnsiblePlaybookCmd) err
 		return InventoryMissing
 	}
 
-	if len(ansibleCmd.VenvName) < 1 {
+	if len(ansibleCmd.Venv.Name) < 1 {
 		return VenvNameMissing
 	}
 
@@ -115,7 +115,7 @@ func ExecAnsiblePlaybook(clusterPath string, ansibleCmd *AnsiblePlaybookCmd) err
 	)
 
 	playbook := &playbook.AnsiblePlaybookCmd{
-		Binary:                     filepath.Join(clusterPath, venvBinDir, ansibleCmd.VenvName, "bin", "ansible-playbook"),
+		Binary:                     filepath.Join(clusterPath, venvBinDir, ansibleCmd.Venv.Name, "bin", "ansible-playbook"),
 		Exec:                       executor,
 		Playbooks:                  []string{ansibleCmd.PlaybookFile},
 		Options:                    playbookOptions,

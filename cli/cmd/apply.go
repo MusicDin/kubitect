@@ -4,6 +4,7 @@ import (
 	"cli/config"
 	"cli/env"
 	"cli/helpers"
+	"cli/playbook"
 	"cli/utils"
 	"fmt"
 	"os"
@@ -14,11 +15,7 @@ import (
 )
 
 const (
-	tmpDirName            = "temp"
-	mainRequirements      = "requirements.txt"
-	mainVenvName          = "main-venv"
-	kubesprayRequirements = "ansible/kubespray/requirements.txt"
-	kubesprayVenvName     = "kubespray-venv"
+	tmpDirName = "temp"
 )
 
 var (
@@ -30,8 +27,10 @@ var (
 )
 
 type Node struct {
-	Id   int    `yaml:"id"`
-	Name string `yaml:"name"`
+	Id        int    `yaml:"id"`
+	Ip        string `yaml:"ip"`
+	Name      string `yaml:"name"`
+	IsRemoved bool   `yaml:"removed"` // Tag nodes as removed after removal
 }
 
 // applyCmd represents the apply command
@@ -89,101 +88,28 @@ func apply() error {
 		}
 	}
 
-	// Fail if cluster path is not pointing on a valid cluster directory.
+	// Fail if the cluster path is pointing on an invalid cluster directory.
 	err = utils.VerifyClusterDir(env.ClusterPath)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Creating main virtual environment...")
-
 	// Prepare main virtual environment.
-	err = helpers.PrepareVirtualEnironment(env.ClusterPath, mainVenvName, mainRequirements)
+	err = helpers.SetupVirtualEnironment(env.ClusterPath, helpers.MainVenv)
 	if err != nil {
 		return err
-	}
-
-	extravars := []string{
-		"tkk_home=" + env.ProjectHomePath,
-		"tkk_cluster_action=" + env.ClusterAction,
-		"tkk_cluster_name=" + env.ClusterName,
-		"tkk_cluster_path=" + env.ClusterPath,
-	}
-
-	if env.IsCustomConfig {
-		extravars = append(extravars, "config_path="+env.ConfigPath)
 	}
 
 	// Execute the project ansible playbook.
-	err = helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		VenvName:     mainVenvName,
-		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/tkk/init.yaml"),
-		Extravars:    extravars,
-	})
+	err = playbook.TkkInit()
 	if err != nil {
 		return err
 	}
 
-	// Nodes should be gracefully removed from the cluster before actual virtual
-	// machines are removed. Node removal is triggered on 'scale' action when
-	// infrastructure config exists (tf output).
-	_, err = os.Stat(infraConfigPath)
-	if env.ClusterAction == "scale" && err == nil {
-
-		// Extract required values from tf output
-		sshUser, err := config.GetStrValue(infraConfigPath, "cluster.ssh.user")
-		if err != nil {
-			return err
-		}
-
-		sshPKey, err := config.GetStrValue(infraConfigPath, "cluster.ssh.pkey")
-		if err != nil {
-			return err
-		}
-
-		removedWorkers, err := getRemovedNodes(env.ConfigPath, infraConfigPath, "worker")
-		if err != nil {
-			return err
-		}
-
-		if len(removedWorkers) > 0 {
-
-			var removedWorkerNames []string
-
-			utils.PrintWarning("The following nodes will get removed: ")
-
-			for _, worker := range removedWorkers {
-				removedWorkerNames = append(removedWorkerNames, worker.Name)
-				fmt.Println("- " + worker.Name)
-			}
-
-			// Ask user for permission
-			confirm := utils.AskUserConfirmation()
-			if !confirm {
-				return fmt.Errorf("User aborted.")
-			}
-
-			extravars = []string{
-				"skip_confirmation=yes",
-				"delete_nodes_confirmation=yes",
-				"node=" + strings.Join(removedWorkerNames, ","),
-			}
-
-			// Remove nodes.
-			err = helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-				VenvName:     kubesprayVenvName,
-				PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/remove-node.yml"),
-				Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
-				Become:       true,
-				User:         sshUser,
-				PrivateKey:   sshPKey,
-				Timeout:      3000,
-				Extravars:    extravars,
-			})
-			if err != nil {
-				return err
-			}
-		}
+	// Remove nodes (if any nodes are removed).
+	err = removeNodes(env.ConfigPath, infraConfigPath, "worker")
+	if err != nil {
+		return err
 	}
 
 	// Apply terraform if cluster action equals 'create' or 'scale'.
@@ -195,23 +121,14 @@ func apply() error {
 		}
 	}
 
-	extravars = []string{
-		"tkk_cluster_path=" + env.ClusterPath,
-	}
-
-	// Prepare Kubespray configuration files (all.yaml, k8s_cluster.yaml, ...)
-	// and clone Kubespray git project.
-	err = helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		VenvName:     mainVenvName,
-		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/tkk/kubespray-setup.yaml"),
-		Extravars:    extravars,
-	})
+	// Prepare Kubespray configuration files.
+	err = playbook.TkkKubespraySetup()
 	if err != nil {
 		return err
 	}
 
 	// Prepare Kubespray's virtual environment.
-	err = helpers.PrepareVirtualEnironment(env.ClusterPath, kubesprayVenvName, kubesprayRequirements)
+	err = helpers.SetupVirtualEnironment(env.ClusterPath, helpers.KubesprayVenv)
 	if err != nil {
 		return err
 	}
@@ -236,73 +153,26 @@ func apply() error {
 	switch env.ClusterAction {
 	case "create":
 
-		err = helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-			VenvName:     mainVenvName,
-			PlaybookFile: filepath.Join(env.ClusterPath, "ansible/haproxy/haproxy.yaml"),
-			Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
-			Become:       true,
-			User:         sshUser,
-			PrivateKey:   sshPKey,
-			Timeout:      3000,
-		})
+		err = playbook.HAProxyCreate(sshUser, sshPKey)
 		if err != nil {
 			return err
 		}
 
-		extravars = []string{
-			"kube_version=" + k8sVersion,
-		}
-
-		err = helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-			VenvName:     kubesprayVenvName,
-			PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/cluster.yml"),
-			Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
-			Become:       true,
-			User:         sshUser,
-			PrivateKey:   sshPKey,
-			Timeout:      3000,
-			Extravars:    extravars,
-		})
+		err = playbook.KubesprayCreate(sshUser, sshPKey, k8sVersion)
 		if err != nil {
 			return err
 		}
 
 	case "upgrade":
 
-		extravars = []string{
-			"kube_version=" + k8sVersion,
-		}
-
-		err = helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-			VenvName:     kubesprayVenvName,
-			PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/upgrade-cluster.yml"),
-			Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
-			Become:       true,
-			User:         sshUser,
-			PrivateKey:   sshPKey,
-			Timeout:      3000,
-			Extravars:    extravars,
-		})
+		err = playbook.KubesprayUpgrade(sshUser, sshPKey, k8sVersion)
 		if err != nil {
 			return err
 		}
 
 	case "scale":
 
-		extravars = []string{
-			"kube_version=" + k8sVersion,
-		}
-
-		err = helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-			VenvName:     kubesprayVenvName,
-			PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/scale.yml"),
-			Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
-			Become:       true,
-			User:         sshUser,
-			PrivateKey:   sshPKey,
-			Timeout:      3000,
-			Extravars:    extravars,
-		})
+		playbook.KubesprayScale(sshUser, sshPKey, k8sVersion)
 		if err != nil {
 			return err
 		}
@@ -311,24 +181,8 @@ func apply() error {
 		return fmt.Errorf("Unknown cluster action: %s", env.ClusterAction)
 	}
 
-	extravars = []string{
-		"tkk_cluster_path=" + env.ClusterPath,
-	}
-
-	// Finalize Kubernetes cluster installation.
-	err = helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		VenvName:     mainVenvName,
-		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/tkk/finalize.yaml"),
-		Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
-		Become:       true,
-		User:         sshUser,
-		PrivateKey:   sshPKey,
-		Timeout:      3000,
-		Extravars:    extravars,
-	})
-	if err != nil {
-		return err
-	}
+	// Finalize Kubernets cluster installation.
+	playbook.TkkFinalize(sshUser, sshPKey)
 
 	return nil
 }
@@ -387,27 +241,119 @@ func initCluster(clusterPath string) error {
 	return nil
 }
 
-// getRemovedNodes function returns a list of nodes that are present
-// in the infrastructure config (config created by terraform) and are not
-// present in the cluster config (currently applied config).
-func getRemovedNodes(configPath string, infraConfigPath string, nodeType string) ([]Node, error) {
+// removeNodes function identifies which nodes are deleted from the cluster config
+// and gracefully removes them from the Kubernetes cluster. Removed nodes are then
+// marked as removed in the infrastructure config to prevent them from being removed
+// again. Node removal is triggered only when cluster action is set to scale and
+// when infrastructure config already exists.
+func removeNodes(configPath string, infraConfigPath string, nodeType string) error {
 
+	// Verify that nodeType is valid.
 	if !utils.StrArrayContains(validNodeTypes, nodeType) {
-		return nil, fmt.Errorf("Invalid node type '%s'. Valid node types are [%s].", nodeType, strings.Join(validNodeTypes, ", "))
+		return fmt.Errorf("Invalid node type '%s'. Valid node types are [%s].", nodeType, strings.Join(validNodeTypes, ", "))
 	}
 
-	var configNodes []Node
-	var infraNodes []Node
+	// Check if infrastructure config exists.
+	_, err := os.Stat(infraConfigPath)
+
+	// Trigger removal if the cluster action is set to 'scale' and if the infrastrcutre
+	// config already exists.
+	if env.ClusterAction == "scale" && err == nil {
+
+		// Extract required values from tf output.
+		sshUser, err := config.GetStrValue(infraConfigPath, "cluster.ssh.user")
+		if err != nil {
+			return err
+		}
+
+		sshPKey, err := config.GetStrValue(infraConfigPath, "cluster.ssh.pkey")
+		if err != nil {
+			return err
+		}
+
+		// Get list of all nodes.
+		nodes, err := getNodes(infraConfigPath, nodeType)
+		if err != nil {
+			return err
+		}
+
+		// Get list of removed nodes.
+		removedNodes, err := getRemovedNodes(configPath, infraConfigPath, nodeType)
+		if err != nil {
+			return err
+		}
+
+		if len(removedNodes) > 0 {
+
+			var removedNodeNames []string
+
+			utils.PrintWarning("The following nodes will get removed: ")
+			for _, node := range removedNodes {
+				removedNodeNames = append(removedNodeNames, node.Name)
+				fmt.Println("- " + node.Name)
+			}
+
+			// Ask user for permission.
+			confirm := utils.AskUserConfirmation()
+			if !confirm {
+				return fmt.Errorf("User aborted.")
+			}
+
+			// Remove Kubespray nodes
+			err = playbook.KubesprayRemoveNodes(sshUser, sshPKey, removedNodeNames)
+			if err != nil {
+				return err
+			}
+
+			// Tag nodes in infrastructure config as removed. This prevents
+			// nodes from being removed again on the next run if Terraform
+			// fails for some reason on the first run.
+			saveTaggedNodes(infraConfigPath, nodes, removedNodes, nodeType)
+			os.Exit(4)
+		}
+	}
+
+	return nil
+}
+
+// getNodes returns all a list of nodes from provided config file. Only
+// nodes that match provided node type are returned.
+func getNodes(configPath string, nodeType string) ([]Node, error) {
+
+	var nodes []Node
 
 	configKey := fmt.Sprintf("cluster.nodes.%s.instances[*]", nodeType)
 
 	// Ignore errors, because it is possible that nodes of provided type
-	config.GetValue(configPath, configKey, &configNodes)
-	config.GetValue(infraConfigPath, configKey, &infraNodes)
+	// does not exist.
+	config.GetValue(configPath, configKey, &nodes)
+
+	return nodes, nil
+}
+
+// getRemovedNodes function returns a list of nodes that are present in
+// the infrastructure config (config created by terraform) and are not
+// present in the cluster config (currently applied config).
+func getRemovedNodes(configPath string, infraConfigPath string, nodeType string) ([]Node, error) {
+
+	configNodes, err := getNodes(configPath, nodeType)
+	if err != nil {
+		return nil, err
+	}
+
+	infraNodes, err := getNodes(infraConfigPath, nodeType)
+	if err != nil {
+		return nil, err
+	}
 
 	removedNodes := []Node{}
 
 	for _, infNode := range infraNodes {
+
+		// Skip already removed nodes
+		if infNode.IsRemoved {
+			continue
+		}
 
 		isNodeRemoved := true
 
@@ -424,4 +370,36 @@ func getRemovedNodes(configPath string, infraConfigPath string, nodeType string)
 	}
 
 	return removedNodes, nil
+}
+
+// saveTaggedNodes function taggs removed nodes and saves them into provided
+// config file.
+func saveTaggedNodes(configPath string, nodes []Node, removedNodes []Node, nodeType string) error {
+
+	configKey := fmt.Sprintf("cluster.nodes.%s.instances", nodeType)
+
+	// Tag removed nodes.
+	for i := range nodes {
+		for _, removedNode := range removedNodes {
+			if nodes[i].Id == removedNode.Id {
+				nodes[i].IsRemoved = true
+			}
+		}
+	}
+
+	// Replace existing nodes with modified nodes in config.
+	yaml, err := config.ReplaceValue(configPath, configKey, nodes)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(yaml)
+
+	// Save config.
+	err = os.WriteFile(configPath, []byte(yaml), os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

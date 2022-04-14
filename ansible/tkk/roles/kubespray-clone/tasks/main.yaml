@@ -6,4 +6,5 @@
     version: "{{ config.kubernetes.kubespray.version }}"
     dest: "{{ tkk_cluster_path }}/ansible/kubespray"
     single_branch: yes
+    depth: 1
     force: yes

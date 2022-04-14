@@ -31,7 +31,8 @@ clusters running on KVM.`,
 	},
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
+// Execute adds all child commands to the root command and sets the flags
+// accordingly.
 func Execute() error {
 	return rootCmd.Execute()
 }
@@ -40,8 +41,8 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&env.DebugMode, "debug", false, "enable debug messages")
 }
 
-// setup is an entry point into CLI tool and it sets
-// various global variables.
+// setup function is an entry point into CLI tool which sets various global
+// variables.
 func setup() error {
 
 	workingDir, err := os.Getwd()
