@@ -75,7 +75,7 @@ func createVirtualEnvironment(clusterPath string, venvName string) error {
 func installPipRequirements(clusterPath string, venv *VirtualEnvironment) error {
 
 	fmt.Println("Installing pip3 dependencies...")
-	fmt.Println("This may take up to a minute if the virtual environment is initialized for the first time...")
+	fmt.Println("This can take up to a minute when the virtual environment is initialized for the first time...")
 
 	cmd := exec.Command("pip3", "install", "-r", venv.RequirementsPath)
 	cmd.Path = filepath.Join(clusterPath, venvBinDir, venv.Name, "bin", "pip3")
