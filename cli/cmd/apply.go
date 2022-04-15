@@ -58,6 +58,7 @@ func init() {
 	applyCmd.PersistentFlags().StringVarP(&env.ClusterAction, "action", "a", env.DefaultClusterAction, "specify cluster action")
 	applyCmd.PersistentFlags().StringVar(&env.ClusterName, "cluster", env.DefaultClusterName, "specify the cluster to be used")
 	applyCmd.PersistentFlags().BoolVarP(&env.Local, "local", "l", false, "use a current directory as the cluster path")
+	applyCmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
 
 	// Add completion values for flag 'action'.
 	applyCmd.RegisterFlagCompletionFunc("action", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
@@ -287,14 +288,15 @@ func removeNodes(configPath string, infraConfigPath string, nodeType string) err
 
 			var removedNodeNames []string
 
-			utils.PrintWarning("The following nodes will get removed: ")
+			warning := "The following nodes will get removed:\n"
+
 			for _, node := range removedNodes {
 				removedNodeNames = append(removedNodeNames, node.Name)
-				fmt.Println("- " + node.Name)
+				warning = warning + "- " + node.Name + "\n"
 			}
 
 			// Ask user for permission.
-			confirm := utils.AskUserConfirmation()
+			confirm := utils.AskUserConfirmation(warning)
 			if !confirm {
 				return fmt.Errorf("User aborted.")
 			}
