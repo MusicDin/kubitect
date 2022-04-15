@@ -44,13 +44,21 @@ func destroy() error {
 
 	var err error
 
-	fmt.Printf("Destroying cluster '%s'...\n", env.ClusterName)
-
 	// Fail if cluster path is not pointing on a valid cluster directory.
 	err = utils.VerifyClusterDir(env.ClusterPath)
 	if err != nil {
 		return err
 	}
+
+	utils.PrintWarning(fmt.Sprintf("The '%s' cluster will be destroyed.", env.ClusterName))
+
+	// Ask user for permission.
+	confirm := utils.AskUserConfirmation()
+	if !confirm {
+		return fmt.Errorf("User aborted.")
+	}
+
+	fmt.Printf("Destroying '%s' cluster...\n", env.ClusterName)
 
 	// Terraform destroy
 	err = helpers.TerraformDestroy(env.ClusterPath)
