@@ -37,7 +37,7 @@ type AnsiblePlaybookCmd struct {
 	ConnectionLocal bool
 	Timeout         int
 	Extravars       []string
-	Venv            *VirtualEnvironment
+	Venv            VirtualEnvironment
 }
 
 // Sets inventory and connection type to localhost before executing

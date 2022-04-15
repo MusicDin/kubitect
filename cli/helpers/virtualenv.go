@@ -17,20 +17,34 @@ type VirtualEnvironment struct {
 	RequirementsPath string
 }
 
-var (
-	MainVenv = &VirtualEnvironment{
+var Venvs = struct {
+	Main      VirtualEnvironment
+	Kubespray VirtualEnvironment
+}{
+	Main: VirtualEnvironment{
 		Name:             "main",
 		RequirementsPath: "requirements.txt",
-	}
-	KubesprayVenv = &VirtualEnvironment{
+	},
+	Kubespray: VirtualEnvironment{
 		Name:             "kubespray",
 		RequirementsPath: "ansible/kubespray/requirements.txt",
-	}
-)
+	},
+}
+
+// var (
+// 	MainVenv = &VirtualEnvironment{
+// 		Name:             "main",
+// 		RequirementsPath: "requirements.txt",
+// 	}
+// 	KubesprayVenv = &VirtualEnvironment{
+// 		Name:             "kubespray",
+// 		RequirementsPath: "ansible/kubespray/requirements.txt",
+// 	}
+// )
 
 // setupVirtualEnironment creates virtual environment in the cluster path
 // and installs required pip3 and ansible dependencies.
-func SetupVirtualEnironment(clusterPath string, venv *VirtualEnvironment) error {
+func SetupVirtualEnironment(clusterPath string, venv VirtualEnvironment) error {
 
 	fmt.Printf("Setting up '%s' virtual environment...\n", venv.Name)
 
@@ -72,7 +86,7 @@ func createVirtualEnvironment(clusterPath string, venvName string) error {
 }
 
 // installPipRequirements installs pip3 requirements into virtual envrionment.
-func installPipRequirements(clusterPath string, venv *VirtualEnvironment) error {
+func installPipRequirements(clusterPath string, venv VirtualEnvironment) error {
 
 	fmt.Println("Installing pip3 dependencies...")
 	fmt.Println("This can take up to a minute when the virtual environment is initialized for the first time...")

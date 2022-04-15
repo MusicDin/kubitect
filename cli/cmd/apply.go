@@ -95,7 +95,7 @@ func apply() error {
 	}
 
 	// Prepare main virtual environment.
-	err = helpers.SetupVirtualEnironment(env.ClusterPath, helpers.MainVenv)
+	err = helpers.SetupVirtualEnironment(env.ClusterPath, helpers.Venvs.Main)
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func apply() error {
 	}
 
 	// Prepare Kubespray's virtual environment.
-	err = helpers.SetupVirtualEnironment(env.ClusterPath, helpers.KubesprayVenv)
+	err = helpers.SetupVirtualEnironment(env.ClusterPath, helpers.Venvs.Kubespray)
 	if err != nil {
 		return err
 	}

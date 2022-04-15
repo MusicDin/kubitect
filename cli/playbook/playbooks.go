@@ -24,7 +24,7 @@ func TkkInit() error {
 	}
 
 	err := helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		Venv:         helpers.MainVenv,
+		Venv:         helpers.Venvs.Main,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/tkk/init.yaml"),
 		Extravars:    extravars,
 	})
@@ -46,7 +46,7 @@ func TkkKubespraySetup() error {
 	}
 
 	err := helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		Venv:         helpers.MainVenv,
+		Venv:         helpers.Venvs.Main,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/tkk/kubespray-setup.yaml"),
 		Extravars:    extravars,
 	})
@@ -67,7 +67,7 @@ func TkkFinalize(sshUser string, sshPKey string) error {
 	}
 
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		Venv:         helpers.MainVenv,
+		Venv:         helpers.Venvs.Main,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/tkk/finalize.yaml"),
 		Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
 		Become:       true,
@@ -76,6 +76,7 @@ func TkkFinalize(sshUser string, sshPKey string) error {
 		Timeout:      3000,
 		Extravars:    extravars,
 	})
+
 	if err != nil {
 		return err
 	}
@@ -88,7 +89,7 @@ func TkkFinalize(sshUser string, sshPKey string) error {
 func HAProxyCreate(sshUser string, sshPKey string) error {
 
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		Venv:         helpers.MainVenv,
+		Venv:         helpers.Venvs.Main,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/haproxy/haproxy.yaml"),
 		Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
 		Become:       true,
@@ -113,7 +114,7 @@ func KubesprayCreate(sshUser string, sshPKey string, k8sVersion string) error {
 	}
 
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		Venv:         helpers.KubesprayVenv,
+		Venv:         helpers.Venvs.Kubespray,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/cluster.yml"),
 		Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
 		Become:       true,
@@ -139,7 +140,7 @@ func KubesprayUpgrade(sshUser string, sshPKey string, k8sVersion string) error {
 	}
 
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		Venv:         helpers.KubesprayVenv,
+		Venv:         helpers.Venvs.Kubespray,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/upgrade-cluster.yml"),
 		Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
 		Become:       true,
@@ -164,7 +165,7 @@ func KubesprayScale(sshUser string, sshPKey string, k8sVersion string) error {
 	}
 
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		Venv:         helpers.KubesprayVenv,
+		Venv:         helpers.Venvs.Kubespray,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/scale.yml"),
 		Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
 		Become:       true,
@@ -191,7 +192,7 @@ func KubesprayRemoveNodes(sshUser string, sshPKey string, removedNodeNames []str
 	}
 
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		Venv:         helpers.KubesprayVenv,
+		Venv:         helpers.Venvs.Kubespray,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/remove-node.yml"),
 		Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
 		Become:       true,
