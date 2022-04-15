@@ -10,10 +10,11 @@ import (
 )
 
 // clustersCmd represents the clusters command
-var clustersCmd = &cobra.Command{
+var listClustersCmd = &cobra.Command{
 	Use:   "clusters",
 	Short: "List initialized clusters",
-	Long:  `Command 'list clusters' lists initialized clusters that are located in TKK_HOME/clusters directory.`,
+	Long: `Lists clusters that have been initialized in $TKK_HOME.
+Local clusters (applied with --local flag) are not listed.`,
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return listClusters()
@@ -21,7 +22,7 @@ var clustersCmd = &cobra.Command{
 }
 
 func init() {
-	listCmd.AddCommand(clustersCmd)
+	listCmd.AddCommand(listClustersCmd)
 }
 
 // listClusters lists all clusters located in the project clusters directory.

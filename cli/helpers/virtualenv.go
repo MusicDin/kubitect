@@ -31,17 +31,6 @@ var Venvs = struct {
 	},
 }
 
-// var (
-// 	MainVenv = &VirtualEnvironment{
-// 		Name:             "main",
-// 		RequirementsPath: "requirements.txt",
-// 	}
-// 	KubesprayVenv = &VirtualEnvironment{
-// 		Name:             "kubespray",
-// 		RequirementsPath: "ansible/kubespray/requirements.txt",
-// 	}
-// )
-
 // setupVirtualEnironment creates virtual environment in the cluster path
 // and installs required pip3 and ansible dependencies.
 func SetupVirtualEnironment(clusterPath string, venv VirtualEnvironment) error {

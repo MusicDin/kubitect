@@ -13,9 +13,8 @@ var (
 	listCmd = &cobra.Command{
 		Use:     "list",
 		Aliases: listCmdAliases,
-		Short:   "Lists initialized clusters",
-		Long: `Lists clusters that have been initialized in $TKK_HOME.
-Local clusters (applied with --local flag) are not listed.`,
+		Short:   "Lists objects",
+		Long:    `Command that lists specified objects.`,
 	}
 )
 
