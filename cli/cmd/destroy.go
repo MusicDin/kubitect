@@ -30,6 +30,7 @@ func init() {
 
 	destroyCmd.PersistentFlags().StringVar(&env.ClusterName, "cluster", env.DefaultClusterName, "specify the cluster to be used")
 	destroyCmd.PersistentFlags().BoolVar(&env.Local, "local", false, "use a current directory as the cluster path")
+	destroyCmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
 
 	// Auto complete cluster names from project clusters directory
 	// for flag 'cluster'.
@@ -50,10 +51,8 @@ func destroy() error {
 		return err
 	}
 
-	utils.PrintWarning(fmt.Sprintf("The '%s' cluster will be destroyed.", env.ClusterName))
-
 	// Ask user for permission.
-	confirm := utils.AskUserConfirmation()
+	confirm := utils.AskUserConfirmation("The '%s' cluster will be destroyed.", env.ClusterName)
 	if !confirm {
 		return fmt.Errorf("User aborted.")
 	}

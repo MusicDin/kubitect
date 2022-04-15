@@ -49,9 +49,20 @@ func StrArrayContains(arr []string, value string) bool {
 // AskUserConfirmation ask user for confirmation. Function returns true if user
 // types any variant of "y" or "yes" and false if user types any variant of "n"
 // or "no". Otherwise user is asked again.
-func AskUserConfirmation() bool {
+func AskUserConfirmation(warning ...any) bool {
 
 	var response string
+
+	// Automatically approve if '--auto-approve' flag is used
+	if env.AutoApprove {
+		return true
+	}
+
+	if len(warning) > 0 {
+		format := fmt.Sprint(warning[0])
+		args := warning[1:]
+		PrintWarning(fmt.Sprintf(format, args...))
+	}
 
 	fmt.Println("\nAre you sure you want to continue? (yes/no)")
 
@@ -66,7 +77,7 @@ func AskUserConfirmation() bool {
 	case "n", "no":
 		return false
 	default:
-		return AskUserConfirmation()
+		return AskUserConfirmation(warning...)
 	}
 }
 

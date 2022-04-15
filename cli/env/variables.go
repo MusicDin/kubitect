@@ -12,6 +12,7 @@ var (
 	ClusterAction string
 	ClusterName   string
 	Local         bool
+	AutoApprove   bool
 
 	// Global options (flags)
 	DebugMode bool
