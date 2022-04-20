@@ -1,16 +1,32 @@
 # Cluster management
 
 Project currently supports the following actions that can be executed on the running Kubernetes cluster:
-+ adding worker nodes,
-+ removing worker nodes,
++ scaling the cluster
+  - adding worker nodes,
+  - removing worker nodes,
 + upgrading the cluster,
 + destroying the cluster.
 
+> :scroll: **Note:**
+Each action supports the `--cluster <cluster_name>` option, which allows you to execute the action on a specific cluster. 
+By default, all actions are executed on the `default` cluster, which corresponds to using the `--cluster default` option.
 
-## Add worker nodes to the cluster
+### Export cluster configuration file
 
-In the configuration file (default is [cluster.yaml](/cluster.yml)) add new worker nodes to `cluster.nodes.worker.instances` list.
-```yml
+Each action requires the cluster configuration file to be modified.
+Cluster configuration file can be exported using `export` command of the `tkk` tool.
+
+```sh
+tkk export config > cluster.yaml
+```
+
+## Scale the cluster
+
+### Add worker nodes to the cluster
+
+In the configuration file add new worker nodes to `cluster.nodes.worker.instances` list.
+```yaml
+# cluster.yaml
 cluster:
   ...
   nodes:
@@ -22,16 +38,17 @@ cluster:
         - id: 3 # New worker node
 ```
 
-Apply the modified configuration using tkk tool to add new worker nodes:
-```shell
-tkk apply --config cluster.yaml --action add-worker
+Apply the modified configuration using `tkk` tool to add new worker nodes:
+```sh
+tkk apply --config cluster.yaml --action scale
 ```
 
 
-## Remove worker nodes from the cluster
+### Remove worker nodes from the cluster
 
-In the configuration file (default is [cluster.yaml](/cluster.yml)) remove worker nodes from `cluster.nodes.worker.instances` list.
+In the configuration file remove worker nodes from `cluster.nodes.worker.instances` list.
 ```yaml
+# cluster.yaml
 cluster:
   ...
   nodes:
@@ -43,9 +60,9 @@ cluster:
         #- id: 3
 ```
 
-Apply the modified configuration using `tkk` command to remove worker nodes:
-```shell
-tkk apply --config cluster.yaml --action remove_worker
+Apply the modified configuration using `tkk` tool to remove worker nodes:
+```sh
+tkk apply --config cluster.yaml --action scale
 ```
 
 
@@ -54,14 +71,15 @@ tkk apply --config cluster.yaml --action remove_worker
 > :exclamation: **IMPORTANT:** *Do not skip releases when upgrading--upgrade by one tag at a time.*
 > For more information read [Kubespray upgrades](https://github.com/kubernetes-sigs/kubespray/blob/master/docs/upgrades.md).
 
-> :bulb: **Tip:** Before upgrading the cluster, make sure [Kubespray](https://github.com/kubernetes-sigs/kubespray#supported-components) supports specific Kubernetes version.
+> :bulb: **Tip:** Before upgrading the cluster, make sure that [Kubespray](https://github.com/kubernetes-sigs/kubespray#supported-components) supports a specific Kubernetes version.
 
-In the configuration file (default is [cluster.yaml](/cluster.yml)) set the following variables:
+In the cluster configuration file set the following variables:
   + `kubernetes.version` and
   + `kubernetes.kubespray.version`.
 
 For example:
 ```yaml
+# cluster.yaml
 kubernetes:
   version: "v1.22.5" # Old value: "v1.21.6"
   ...
@@ -70,8 +88,8 @@ kubernetes:
     ...
 ```
 
-Execute terraform script to upgrade the cluster:
-```shell
+Apply the modified configuration using `tkk` tool:
+```sh
 tkk apply --config cluster.yaml --action upgrade
 ```
 
@@ -79,6 +97,6 @@ tkk apply --config cluster.yaml --action upgrade
 ## Destroy the cluster
 
 To destroy the cluster, simply run:
-```shell
+```sh
 tkk destroy
 ```

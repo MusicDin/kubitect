@@ -5,9 +5,8 @@
 The local machine is the machine on which the project is cloned. The following requirements must be met on the local machine:
 
 + [Git](https://git-scm.com/)
-+ [Terraform](https://www.terraform.io/) >= 1.1.4
 + [Python](https://www.python.org/) >= 3.0
-  - Project also uses [venv](https://docs.python.org/3/library/venv.html)
+  - Python [virtualenv](https://docs.python.org/3/library/venv.html)
   
 ## Hosts
 
@@ -21,5 +20,5 @@ Each host requires:
     + `libvirt-clients`
     + `libvirt-daemon`
     + `libvirt-daemon-system`
-  - User needs to be int `kvm` and `libvirt` groups.
+  - User needs to be in `kvm` and `libvirt` groups.
 + Password-less SSH keys (*Only if hosts are remote machines*).

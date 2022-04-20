@@ -29,7 +29,7 @@ sudo systemctl start libvirtd
 ```
 
 *Optional:* Start the `libvirt` service automatically at boot time:
-```bash
+```sh
 sudo systemctl enable libvirtd
 ```
 
@@ -80,7 +80,7 @@ This problem can occur when you apply the Terraform plan.
 #### Solution:
 Make sure the `security_driver` in `/etc/libvirt/qemu.conf` is set to `none` instead of `selinux`.
 This line is commented out by default, so you should uncomment it if needed:
-```bash
+```sh
 # /etc/libvirt/qemu.conf
 
 ...
@@ -89,7 +89,7 @@ security_driver = "none"
 ```
 
 Do not forget to restart the `libvirt` service after making the changes:
-```bash
+```sh
 sudo systemctl restart libvirtd
 ```
 
@@ -212,10 +212,47 @@ sudo systemctl restart libvirtd
 ```
 
 
+### -> Problem 10
+
+#### Error:
+*Error: error deleting storage pool: failed to remove pool '/var/lib/libvirt/pools/local-k8s-cluster-main-resource-pool': Directory not empty*
+
+#### Explanation:
+The pool cannot be deleted because there are still some volumes in the pool.
+Therefore, the volumes should be removed before the pool can be deleted.
+
+#### Solution:
+
+1. Make sure the pool is running.
+```sh
+virsh pool-start --pool local-k8s-cluster-main-resource-pool
+```
+
+2. List volumes in the pool.
+```sh
+virsh vol-list --pool local-k8s-cluster-main-resource-pool
+
+#  Name         Path
+# -------------------------------------------------------------------------------------
+#  base_volume  /var/lib/libvirt/pools/local-k8s-cluster-main-resource-pool/base_volume
+```
+
+3. Delete listed volumes from the pool.
+```sh
+virsh vol-delete --pool local-k8s-cluster-main-resource-pool --vol base_volume
+```
+
+4. Destroy and undefine the pool.
+```sh
+virsh pool-destroy --pool local-k8s-cluster-main-resource-pool
+virsh pool-undefine --pool local-k8s-cluster-main-resource-pool
+```
+
+
 ## HAProxy load balancer errors
 
 
-### -> Problem 10
+### -> Problem 11
 
 #### Error:
 

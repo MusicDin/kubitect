@@ -3,6 +3,7 @@
 Content:
 + [Configuration example](#configuration-example)
 + [List of variables used in configuration file](#list-of-variables-used-in-configuration-file)
+  - [Project (tkk)](#tkk-section) section
   - [Hosts](#hosts-section) section
   - [Cluster](#cluster-section) section
   - [Kubernetes](#kubernetes-section) section
@@ -11,6 +12,19 @@ Content:
 ## Configuration example
 
 ```yaml
+#
+# In the 'tkk' section, you can specify the target git project and version.
+# This can be handy if you want to use a specific project version or if you
+# want to point to your forked/cloned project.
+#
+# [!] Note that this is ignored if you use the --local option with the
+# actions of the CLI tool, since in this case you should be in the Git
+# repository.
+#
+tkk:
+  url: "https://github.com/MusicDin/terraform-kvm-kubespray"
+  version: "2.0.0"
+
 #
 # The "hosts" section contains data about the physical servers on which 
 # the Kubernetes cluster will be installed.
@@ -163,9 +177,6 @@ kubernetes:
   kubespray:
     url: "https://github.com/kubernetes-sigs/kubespray.git"
     version: "v2.17.1"
-    addons:
-      enabled: true
-      configPath: "sample/addons.yaml"
   other:
     copyKubeconfig: false
 
@@ -174,11 +185,40 @@ kubernetes:
 # List of variables used in configuration file
 
 Cluster configuration consists of three parts:
++ `tkk` - Project metadata.
 + `hosts` - A list of physical hosts (local or remote).
 + `cluster` - Cluster configuration. Virtual machine properties, node types that will be installed and location (server) where the nodes will be installed.
 + `kubernetes` - Kubernetes and Kubespray configuration. Versions, addons and other Kubernetes related settings.
 
 > :scroll: **Note:** `[*]` annotates an array.
+
+## *Tkk* section
+
+<table>
+  <tbody>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Default value</th>
+      <th>Required?</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td><code>tkk.url</code></td>
+      <td>string</td>
+      <td>https://github.com/MusicDin/terraform-kvm-kubespray</td>
+      <td>No</td>
+      <td>URL of the project's git repository.</td>
+    </tr>
+    <tr>
+      <td><code>tkk.version</code></td>
+      <td>string</td>
+      <td>master</td>
+      <td>No</td>
+      <td>Version of the git repository. Can be a branch or a tag.</td>
+    </tr>
+  </tbody>
+</table>
 
 ## *Hosts* section
 
@@ -762,20 +802,6 @@ Cluster configuration consists of three parts:
       <td></td>
       <td>Yes</td>
       <td>Kubespray version. Version is used to checkout into appropriate branch.</td>
-    </tr>
-    <tr>
-      <td><code>kubernetes.kubespray.addons.enabled</code></td>
-      <td>boolean</td>
-      <td>false</td>
-      <td></td>
-      <td>If set to true, Kubespray addons will be installed.</td>
-    </tr>
-    <tr>
-      <td><code>kubernetes.kubespray.addons.configPath</code></td>
-      <td>string</td>
-      <td></td>
-      <td>Yes, if addons are enabled</td>
-      <td>Path to the Kubespray addons YAML file.</td>
     </tr>
     <tr>
       <td><code>kubernetes.kubespray.other.copyKubeconfig</code></td>
