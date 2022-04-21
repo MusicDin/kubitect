@@ -1,30 +1,29 @@
-# terraform-kvm-kubespray
 
-> Set up highly available (HA) Kubernetes cluster using KVM, Terraform and Kubespray.
+<center>
+<h1>Kubitect</h1>
 
-## Project goal
-
-The goal of this project is to provide a simple way to set up a highly available Kubernetes cluster and to enable the setup of a cluster on multiple physical machines (hosts).
+**Kubitect provides a simple way to set up a highly available Kubernetes cluster across multiple hosts.**
+</center>
 
 ## Quick start
 
-### Step 1 - Download and install `tkk` tool
+### Step 1 - Download and install `kubitect` tool
 
 **TODO**
 
 ```
-wget -O tkk https://raw.githubusercontent.com/MusicDin/terraform-kvm-kubespray/<BRANCH>/scripts/tkk.sh
+wget -O kubitect 
 
-sudo install tkk /usr/local/bin
+sudo install kubitect /usr/local/bin
 ```
 
 ### Step 2 - Create the cluster
 
 Run the following command to create the default cluster.
-Cluster will be created in `~/.tkk/clusters/default/` directory.
+Cluster will be created in `~/.kubitect/clusters/default/` directory.
 
 ```
-tkk apply
+kubitect apply
 ```
 
 > :scroll: **Note**:
@@ -37,7 +36,7 @@ After successful installation of the Kubernetes cluster, Kubeconfig will be crea
 To export the Kubeconfig into custom file run the following command.
 
 ```
-tkk export kubeconfig > kubeconfig.yaml
+kubitect export kubeconfig > kubeconfig.yaml
 ```
 
 ### Step 4 - Test the cluster
@@ -48,16 +47,6 @@ Test if the cluster works by displaying all cluster nodes.
 kubectl get nodes --kubeconfig kubeconfig.yaml
 ```
 
-### What's next?
-
-By following the quick start you have created a *default* cluster.
-If custom configuration file is not passed to the apply command then  [default configuration file](/examples/localhost_1-worker_1-master.yaml) is used.
-
-This configuration defines a simple local cluster that consists of 1 master and 1 worker node which is mostly used to test if *tkk* works on your setup.
-
-Now it's time to prepare your own cluster.
-
-
 ## Documentation
 + [Getting started](docs/getting-started.md)
 + [Requirements](docs/requirements.md)
@@ -67,11 +56,6 @@ Now it's time to prepare your own cluster.
 + Examples: 
   - [Cluster over bridged network](docs/examples/bridged-network.md)
   - [Single node cluster deployment](docs/examples/single-node-cluster.md)
-
-
-## Related projects
-
-If you are interested in deploying a Kubernetes cluster on *vSphere* instead of *KVM* check out [this project](https://github.com/sguyennet/terraform-vsphere-kubespray).
 
 ## Having issues?
 
