@@ -13,7 +13,7 @@ import (
 var listClustersCmd = &cobra.Command{
 	Use:   "clusters",
 	Short: "List initialized clusters",
-	Long: `Lists clusters that have been initialized in $TKK_HOME.
+	Long: `Lists clusters that have been initialized in $KUBITECT_HOME.
 Local clusters (applied with --local flag) are not listed.`,
 
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -45,7 +45,7 @@ func listClusters() error {
 		fmt.Println("\nSelect specific cluster with '--cluster <CLUSTER>' flag.")
 
 	} else {
-		fmt.Println("No clusters initialized yet. Run 'tkk apply' to create the default cluster.")
+		fmt.Println("No clusters initialized yet. Run 'kubitect apply' to create the default cluster.")
 	}
 
 	return nil

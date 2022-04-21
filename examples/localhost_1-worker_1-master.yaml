@@ -4,8 +4,8 @@
 # It also creates a dedicated virtual NAT network.
 #
 
-tkk:
-  url: "https://example.com"
+kubitect:
+  url: "https://github.com/MusicDin/terraform-kvm-kubespray"
   version: "master"
 
 hosts:

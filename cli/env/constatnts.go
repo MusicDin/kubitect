@@ -3,14 +3,14 @@ package env
 const (
 	// Global constants
 	ConstTerraformVersion   = "1.1.4"
-	ConstProjectHomeEnvName = "TKK_HOME"
-	ConstProjectHomeDir     = ".tkk"
+	ConstProjectHomeEnvName = "KUBITECT_HOME"
+	ConstProjectHomeDir     = ".kubitect"
 	ConstProjectClustersDir = "clusters"
 
 	// default values
 	DefaultClusterName       = "default"
 	DefaultClusterAction     = "create"
-	DefaultClusterConfigPath = "config/tkk.yaml"
+	DefaultClusterConfigPath = "config/kubitect.yaml"
 	DefaultGitProjectUrl     = "https://github.com/MusicDin/terraform-kvm-kubespray"
 	DefaultGitProjectVersion = "feature/multiple-servers"
 )

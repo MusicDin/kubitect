@@ -8,7 +8,7 @@
 
 # Local variables used in many resources #
 locals {
-  config = yamldecode(file(pathexpand("{{ tkk_cluster_config_path }}")))
+  config = yamldecode(file(pathexpand("{{ kubitect_cluster_config_path }}")))
   ssh_pk_path = (try(local.config.cluster_nodeTemplate_ssh_privateKeyPath, null) != null
     ? pathexpand(local.config.cluster_nodeTemplate_ssh_privateKeyPath)
     : pathexpand("../config/.ssh/id_rsa")

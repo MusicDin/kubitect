@@ -1,7 +1,7 @@
 ---
 - name: Include infrastructure config (tf output)
   include_vars:
-    file: "{{ tkk_cluster_path }}/config/infrastructure.yaml"
+    file: "{{ kubitect_cluster_path }}/config/infrastructure.yaml"
     name: infra
 
 - name: Make sure config directories exist

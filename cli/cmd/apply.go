@@ -102,7 +102,7 @@ func apply() error {
 	}
 
 	// Execute the project ansible playbook.
-	err = playbook.TkkInit()
+	err = playbook.KubitectInit()
 	if err != nil {
 		return err
 	}
@@ -123,7 +123,7 @@ func apply() error {
 	}
 
 	// Prepare Kubespray configuration files.
-	err = playbook.TkkKubespraySetup()
+	err = playbook.KubitectKubespraySetup()
 	if err != nil {
 		return err
 	}
@@ -183,7 +183,7 @@ func apply() error {
 	}
 
 	// Finalize Kubernets cluster installation.
-	playbook.TkkFinalize(sshUser, sshPKey)
+	playbook.KubitectFinalize(sshUser, sshPKey)
 
 	return nil
 }
@@ -196,19 +196,19 @@ func initCluster(clusterPath string) error {
 
 	gitTmpDir := filepath.Join(clusterPath, tmpDirName)
 
-	url, err := config.GetStrValue(env.ConfigPath, "tkk.url")
+	url, err := config.GetStrValue(env.ConfigPath, "kubitect.url")
 	if err != nil {
 		url = env.DefaultGitProjectUrl
 	}
 
-	version, err := config.GetStrValue(env.ConfigPath, "tkk.version")
+	version, err := config.GetStrValue(env.ConfigPath, "kubitect.version")
 	if err != nil {
 		version = env.DefaultGitProjectVersion
 	}
 
 	if env.DebugMode {
-		fmt.Println("tkk.url: " + url)
-		fmt.Println("tkk.version: " + version)
+		fmt.Println("kubitect.url: " + url)
+		fmt.Println("kubitect.version: " + version)
 	}
 
 	// Make sure that the cluster folder exists

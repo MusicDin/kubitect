@@ -7,15 +7,15 @@ import (
 	"strings"
 )
 
-// TkkInit function calls an Ansible playbook that creates a cluster config
+// KubitectInit function calls an Ansible playbook that creates a cluster config
 // snapshot and generates Terraform main script.
-func TkkInit() error {
+func KubitectInit() error {
 
 	extravars := []string{
-		"tkk_home=" + env.ProjectHomePath,
-		"tkk_cluster_action=" + env.ClusterAction,
-		"tkk_cluster_name=" + env.ClusterName,
-		"tkk_cluster_path=" + env.ClusterPath,
+		"kubitect_home=" + env.ProjectHomePath,
+		"kubitect_cluster_action=" + env.ClusterAction,
+		"kubitect_cluster_name=" + env.ClusterName,
+		"kubitect_cluster_path=" + env.ClusterPath,
 	}
 
 	// Set custom config path if provided.
@@ -25,7 +25,7 @@ func TkkInit() error {
 
 	err := helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Main,
-		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/tkk/init.yaml"),
+		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubitect/init.yaml"),
 		Extravars:    extravars,
 	})
 
@@ -36,18 +36,18 @@ func TkkInit() error {
 	return nil
 }
 
-// TkkKubespraySetup functions calls an Ansible playbook that prepares Kubespray
+// KubitectKubespraySetup functions calls an Ansible playbook that prepares Kubespray
 // configuration files (all.yaml, k8s_cluster.yaml, ...) and clones Kubespray
 // git project.
-func TkkKubespraySetup() error {
+func KubitectKubespraySetup() error {
 
 	extravars := []string{
-		"tkk_cluster_path=" + env.ClusterPath,
+		"kubitect_cluster_path=" + env.ClusterPath,
 	}
 
 	err := helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Main,
-		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/tkk/kubespray-setup.yaml"),
+		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubitect/kubespray-setup.yaml"),
 		Extravars:    extravars,
 	})
 
@@ -58,17 +58,17 @@ func TkkKubespraySetup() error {
 	return nil
 }
 
-// TkkFinalize function calls an Ansible playbook that finalizes Kubernetes
+// KubitectFinalize function calls an Ansible playbook that finalizes Kubernetes
 // cluster installation.
-func TkkFinalize(sshUser string, sshPKey string) error {
+func KubitectFinalize(sshUser string, sshPKey string) error {
 
 	extravars := []string{
-		"tkk_cluster_path=" + env.ClusterPath,
+		"kubitect_cluster_path=" + env.ClusterPath,
 	}
 
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Main,
-		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/tkk/finalize.yaml"),
+		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubitect/finalize.yaml"),
 		Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
 		Become:       true,
 		User:         sshUser,

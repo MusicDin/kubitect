@@ -14,11 +14,11 @@ import (
 
 // Root command (cli name)
 var rootCmd = &cobra.Command{
-	Use:   "tkk",
-	Short: "Terraform KVM Kubespray - TKK",
-	Long: `tkk is a CLI tool that helps you manage multiple Kubernetes
-clusters running on KVM.`,
-	Version: "0.0.1",
+	Use:   "kubitect",
+	Short: "Kubitect",
+	Long: `Kubitect is a CLI tool that helps you manage multiple Kubernetes
+clusters.`,
+	Version: "2.0.0",
 
 	// This is run when any command is run (also applies to all subcommands).
 	// Flags are in this stage already resolved.
