@@ -254,16 +254,16 @@ When the cluster is applied, it is created in *tkk* home directory, which has th
        └── ...
 ```
 
-### Step 5 - Test the cluster
-
-
-Using *tkk* command line tool, list all created clusters.
+All created clusters can be listed at any time using *tkk* command line tool.
 ```sh
 tkk list clusters
 ```
 
-After successful installation of the Kubernetes cluster, Kubeconfig will be created within cluster's directory.
-To export the Kubeconfig into a custom file run the following command.
+### Step 5 - Test the cluster
+
+After successful installation of the Kubernetes cluster, Kubeconfig is created in the cluster's directory.
+
+To export the Kubeconfig to a separate file, run the following command.
 ```
 tkk export kubeconfig --cluster my-first-cluster > kubeconfig.yaml
 ```
@@ -273,7 +273,7 @@ Use the exported Kubeconfig to list all cluster nodes.
 kubectl get nodes --kubeconfig kubeconfig.yaml
 ```
 
-:clap: Congratulations, you have completed the *getting started* tutorial! 
+:clap: Congratulations, you have completed the *getting started* tutorial.
 
 ## What's next?
 

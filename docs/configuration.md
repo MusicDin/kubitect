@@ -3,7 +3,7 @@
 Content:
 + [Configuration example](#configuration-example)
 + [List of variables used in configuration file](#list-of-variables-used-in-configuration-file)
-  - [Project (tkk)](#tkk-section) section
+  - [Project (kubitect)](#kubitect-section) section
   - [Hosts](#hosts-section) section
   - [Cluster](#cluster-section) section
   - [Kubernetes](#kubernetes-section) section
@@ -13,7 +13,7 @@ Content:
 
 ```yaml
 #
-# In the 'tkk' section, you can specify the target git project and version.
+# In the 'kubitect' section, you can specify the target git project and version.
 # This can be handy if you want to use a specific project version or if you
 # want to point to your forked/cloned project.
 #
@@ -21,7 +21,7 @@ Content:
 # actions of the CLI tool, since in this case you should be in the Git
 # repository.
 #
-tkk:
+kubitect:
   url: "https://github.com/MusicDin/terraform-kvm-kubespray"
   version: "2.0.0"
 
@@ -185,14 +185,14 @@ kubernetes:
 # List of variables used in configuration file
 
 Cluster configuration consists of three parts:
-+ `tkk` - Project metadata.
++ `kubitect` - Project metadata.
 + `hosts` - A list of physical hosts (local or remote).
 + `cluster` - Cluster configuration. Virtual machine properties, node types that will be installed and location (server) where the nodes will be installed.
 + `kubernetes` - Kubernetes and Kubespray configuration. Versions, addons and other Kubernetes related settings.
 
 > :scroll: **Note:** `[*]` annotates an array.
 
-## *Tkk* section
+## *Kubitect* section
 
 <table>
   <tbody>
@@ -204,14 +204,14 @@ Cluster configuration consists of three parts:
       <th>Description</th>
     </tr>
     <tr>
-      <td><code>tkk.url</code></td>
+      <td><code>kubitect.url</code></td>
       <td>string</td>
       <td>https://github.com/MusicDin/terraform-kvm-kubespray</td>
       <td>No</td>
       <td>URL of the project's git repository.</td>
     </tr>
     <tr>
-      <td><code>tkk.version</code></td>
+      <td><code>kubitect.version</code></td>
       <td>string</td>
       <td>master</td>
       <td>No</td>

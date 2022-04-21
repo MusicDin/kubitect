@@ -14,10 +14,10 @@ By default, all actions are executed on the `default` cluster, which corresponds
 ### Export cluster configuration file
 
 Each action requires the cluster configuration file to be modified.
-Cluster configuration file can be exported using `export` command of the `tkk` tool.
+Cluster configuration file can be exported using `export` command of the `kubitect` tool.
 
 ```sh
-tkk export config > cluster.yaml
+kubitect export config > cluster.yaml
 ```
 
 ## Scale the cluster
@@ -38,9 +38,9 @@ cluster:
         - id: 3 # New worker node
 ```
 
-Apply the modified configuration using `tkk` tool to add new worker nodes:
+Apply the modified configuration using `kubitect` tool to add new worker nodes:
 ```sh
-tkk apply --config cluster.yaml --action scale
+kubitect apply --config cluster.yaml --action scale
 ```
 
 
@@ -60,9 +60,9 @@ cluster:
         #- id: 3
 ```
 
-Apply the modified configuration using `tkk` tool to remove worker nodes:
+Apply the modified configuration using `kubitect` tool to remove worker nodes:
 ```sh
-tkk apply --config cluster.yaml --action scale
+kubitect apply --config cluster.yaml --action scale
 ```
 
 
@@ -88,9 +88,9 @@ kubernetes:
     ...
 ```
 
-Apply the modified configuration using `tkk` tool:
+Apply the modified configuration using `kubitect` tool:
 ```sh
-tkk apply --config cluster.yaml --action upgrade
+kubitect apply --config cluster.yaml --action upgrade
 ```
 
 
@@ -98,5 +98,5 @@ tkk apply --config cluster.yaml --action upgrade
 
 To destroy the cluster, simply run:
 ```sh
-tkk destroy
+kubitect destroy
 ```

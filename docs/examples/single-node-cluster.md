@@ -19,7 +19,7 @@ Do not forget to remove (or comment out) the worker and load balancer nodes.
 
 Apply the cluster:
 ```sh
-tkk apply --config single-node.yaml
+kubitect apply --config single-node.yaml
 ```
 
 Your master node now also becomes a worker node.
