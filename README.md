@@ -1,9 +1,8 @@
+<h1 align=center>Kubitect</h1>
 
-<center>
-<h1>Kubitect</h1>
+<p align=center><b>Kubitect provides a simple way to set up a highly available Kubernetes cluster across multiple hosts.</b></p>
 
-**Kubitect provides a simple way to set up a highly available Kubernetes cluster across multiple hosts.**
-</center>
+---
 
 ## Quick start
 
