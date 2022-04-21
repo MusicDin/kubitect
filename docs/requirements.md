@@ -2,24 +2,26 @@
 
 ## Local machine
 
-The local machine is the machine on which the project is cloned. The following requirements must be met on the local machine:
+On the machine where the command-line tool is installed, the following requirements must be met:
 
 + [Git](https://git-scm.com/)
-+ [Terraform](https://www.terraform.io/) >= 1.1.4
 + [Python](https://www.python.org/) >= 3.0
-  - Project also uses [venv](https://docs.python.org/3/library/venv.html)
-  
+  - Python [virtualenv](https://docs.python.org/3/library/venv.html)
+
 ## Hosts
 
-Hosts are physical servers running virtual machines that are part of the Kubernetes cluster. The local machine can also be a host.
-Each host requires:
+A host is a physical server that can be either a local or remote machine.
+Each host must have **a hypervisor** installed along with the **[libvirt](https://libvirt.org/) virtualization API**.
 
-+ [KVM - Kernel Virtual Machine](https://www.linux-kvm.org/)
-  - Using *yum* or *apt* install following packages:
-    + `qemu`
-    + `qemu-kvm`
-    + `libvirt-clients`
-    + `libvirt-daemon`
-    + `libvirt-daemon-system`
-  - User needs to be int `kvm` and `libvirt` groups.
-+ Password-less SSH keys (*Only if hosts are remote machines*).
+If the host is a remote machine, pasword-less SSH keys are required to sucessfully connect to the remote hypervisor.
+
+### Example - Install KVM
+
+For example, to install the [KVM](https://www.linux-kvm.org) (Kernel Virtual Machine) hypervisor and libvirt, use *yum* or *apt* to install the following packages:
+  + `qemu`
+  + `qemu-kvm`
+  + `libvirt-clients`
+  + `libvirt-daemon`
+  + `libvirt-daemon-system`
+
+After installation, also add user to the `kvm` and `libvirt` groups.

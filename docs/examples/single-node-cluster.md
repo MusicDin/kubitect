@@ -1,9 +1,10 @@
 # Single node cluster
 
 If you want to initialize a cluster with only one node,
-specify single master node in [cluster.yml](/cluster.yml):
+specify single master node in cluster configuration file:
 
 ```yaml
+# single-node.yaml
 cluster:
   ...
   nodes:
@@ -18,7 +19,7 @@ Do not forget to remove (or comment out) the worker and load balancer nodes.
 
 Apply the cluster:
 ```sh
-tkk apply
+tkk apply --config single-node.yaml
 ```
 
 Your master node now also becomes a worker node.
