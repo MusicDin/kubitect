@@ -1,4 +1,4 @@
-# Setting up nodes that use network bridge
+<h1 align="center">Setting up nodes over bridged network</h1>
 
 This example shows how to configure a simple bridge interface using [netplan](https://netplan.io/).
 
@@ -7,25 +7,31 @@ This example shows how to configure a simple bridge interface using [netplan](ht
 In order to use the bridged network, bridge interface needs to be preconfigured on the host machine.
 
 Create the bridge interface (`br0` in our case) by creating a file with the following content:
-```yaml
-# /etc/netplan/bridge0.yaml
+```yaml title="/etc/netplan/bridge0.yaml"
 network:
   version: 2
   renderer: networkd
   ethernets:
-    eth0: {}       # Existing ethernet interface to be enslaved
+    eth0: {}       # (1)
   bridges:
-    br0:           # Custom name of the bridge
+    br0:           # (2)
       interfaces:
         - eth0
       dhcp4: true
       dhcp6: false
-      addresses:   # Optionally set a static IP for the bridged interface
+      addresses:   # (3)
         - 10.10.0.17
 ```
 
-> :bulb: **Tip**:
-See the official [netplan configuration examples](https://netplan.io/examples/) for more complex configurations.
+1. Existing ethernet interface to be enslaved.
+
+2. Custom name of the bridge interface.
+
+3. Optionally a static IP address can be set for the bridge interface.
+
+!!! tip "Tip"
+
+    See the official [netplan configuration examples](https://netplan.io/examples/) for more complex configurations.
 
 Validate if the configuration is correctly parsed by netplan.
 ```sh
@@ -50,12 +56,14 @@ The final step is to prevent packets traversing the bridge from being sent to ip
  sysctl -p /etc/sysctl.conf
 ```
 
-> :bulb: **Tip**:
-For more information, see the [libvirt documentation](https://wiki.libvirt.org/page/Net.bridge.bridge-nf-call_and_sysctl.conf).
+!!! tip "Tip"
+
+    For more information, see the [libvirt documentation](https://wiki.libvirt.org/page/Net.bridge.bridge-nf-call_and_sysctl.conf).
 
 ## Step 3 - Set up a cluster over bridged network
 
 In the cluster configuration file, set the following variables:
+
 - `cluster.network.mode` to `bridge`,
 - `cluster.network.bridge` to the name of the bridge you have created (`br0` in our case) and
 - `cluster.network.gateway` if the first host in `netwrok_cidr` is not a gateway.

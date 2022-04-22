@@ -1,196 +1,21 @@
-# Configuration
+---
+hide:
+  - navigation
+  - toc
+---
 
-Content:
-+ [Configuration example](#configuration-example)
-+ [List of variables used in configuration file](#list-of-variables-used-in-configuration-file)
-  - [Project (kubitect)](#kubitect-section) section
-  - [Hosts](#hosts-section) section
-  - [Cluster](#cluster-section) section
-  - [Kubernetes](#kubernetes-section) section
+<h1 align="center">Reference</h1>
 
+The cluster configuration consists of four parts:
 
-## Configuration example
-
-```yaml
-#
-# In the 'kubitect' section, you can specify the target git project and version.
-# This can be handy if you want to use a specific project version or if you
-# want to point to your forked/cloned project.
-#
-# [!] Note that this is ignored if you use the --local option with the
-# actions of the CLI tool, since in this case you should be in the Git
-# repository.
-#
-kubitect:
-  url: "https://github.com/MusicDin/terraform-kvm-kubespray"
-  version: "2.0.0"
-
-#
-# The "hosts" section contains data about the physical servers on which 
-# the Kubernetes cluster will be installed.
-#
-# For each host, a name and connection type must be specified. Only one
-# host can have the connection type set to 'local' or 'localhost'.
-#
-# If the host is a remote machine, SSH key file must be specified.
-# [!] Note that the connection to the remote hosts supports only 
-#     passwordless login (using only SSH keyfile).  
-#
-# The host can be marked also as default, which means that if an instance
-# (in "cluster.nodes" section) does not have a particular host specified,
-# it will be installed on a default host. If none of the hosts are marked 
-# as default, the first one in the list is used as the default host.
-# 
-hosts:
-  - name: localhost # Custom host name (used only to link instances to the specific host)
-    default: true                
-    connection:
-      type: local
-  - name: remote-server-1
-    connection:
-      type: remote
-      user: myuser
-      ip: 10.10.40.143
-      ssh:
-        verify: false # If set to false, host verification is skipped 
-        keyfile: "~/.ssh/id_rsa_server1"
-  - name: remote-server-2
-    connection:
-      type: remote
-      user: myuser
-      ip: 10.10.40.144
-      ssh:
-        port: 1234  # default port is 22
-        keyfile: "~/.ssh/id_rsa_server2"
-    mainResourcePoolPath: "/var/lib/libvirt/pools/"
-    dataResourcePools:
-      - name: data-pool
-        path: "/mnt/data/pool"
-      - name: backup-pool
-        path: "/mnt/backup/pool"
-
-#
-# The "cluster" section of configuration contains general data about the cluster,
-# nodes that are part of the cluster and cluster's network.
-# 
-cluster:
-  name: "my-k8s-cluster"   # Cluster name used as a prefix for the various components
-  network:
-    mode: "bridge"         # [bridge, nat, route]
-    cidr: "10.10.64.0/24"
-    gateway: "10.10.64.1"
-    bridge: "br0"
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
-  nodeTemplate: # Applies to all nodes
-    networkInterface: "ens3"
-    user: "k8s"
-    ssh:
-      privateKeyPath: "~/.ssh/id_rsa_test"
-      addToKnownHosts: true
-    image:
-      distro: "ubuntu"
-      source: "https://cloud-images.ubuntu.com/releases/focal/release-20220111/ubuntu-20.04-server-cloudimg-amd64.img"
-    updateOnBoot: true
-  nodes:
-    loadBalancer:
-      vip: "10.10.64.200" # Virtual IP shared between load balancers - floating IP
-      default: # Default values apply for all virtual machines (VMs) of type load balancer
-        ram: 4           # GiB
-        cpu: 1           # vCPU
-        mainDiskSize: 16 # GiB
-      instances:
-        - id: 1
-          ip: "10.10.64.5"         # If omitted DHCP lease is requested
-          mac: "52:54:00:00:00:40" # If omitted MAC address is generated
-          ram: 8                   # Overrides default RAM value for this node
-          cpu: 8                   # Overrides default CPU value for this node
-          host: remote-server-1    # If omitted the default host is used
-        - id: 2
-          ip: "10.10.64.6"
-          mac: "52:54:00:00:00:41"
-          host: server2
-        - id: 3
-          ip: "10.10.64.7"
-          mac: "52:54:00:00:00:42"
-          # If server is not specifed, VM will be installed on the default server.
-          # If default server is not specified, VM will be installed on the first
-          # server in the list.
-    master:
-      default:
-        ram: 8
-        cpu: 2
-        mainDiskSize: 256
-      instances:
-          # IMPORTANT: There should be odd number of master nodes.
-        - id: 1 # Node with generated MAC address, IP retrieved as an DHCP lease and default RAM and CPU.
-          host: remote-server-1
-        - id: 2
-          host: remote-server-2
-        - id: 3
-          server: localhost
-    worker:
-      default:
-        ram: 16
-        cpu: 4
-        label: "node"
-        # Default dataDisks are NOT YET supported
-        dataDisks:            # Default data disks (attached to each worker node)
-          - name: rook-disk   # Unique disk name
-            pool: data-pool   # Reference to the data resource pool that must exist on the same host as worker node
-            size: 128         # Size of the disk in GiB
-          - name: backup-disk
-            pool: data-pool
-            size: 512
-      instances:
-        - id: 1
-          ip: "10.10.64.101"
-          cpu: 8
-          ram: 64
-          host: remote-server-1
-        - id: 2
-          ip: "10.10.64.102"
-          dataDisks:          # Override default disks only for this specific worker node
-            - name: rook-disk
-              pool: data-pool
-              size: 128
-            - name: test-disk
-              pool: data-pool
-              size: 128
-        - id: 3
-          ip: "10.10.64.103"
-          ram: 64
-        - id: 4
-          host: remote-server-2
-        - id: 5
-
-#
-# The "kubernetes" section specifies what version of Kubernetes and Kubespray
-# should be used, which network plugin and dns server should be installed and
-# whether or not to install a Kubespray addons.
-#
-kubernetes:
-  version: "v1.21.6"
-  networkPlugin: "calico"
-  dnsMode: "coredns"
-  kubespray:
-    url: "https://github.com/kubernetes-sigs/kubespray.git"
-    version: "v2.17.1"
-  other:
-    copyKubeconfig: false
-
-```
-
-# List of variables used in configuration file
-
-Cluster configuration consists of three parts:
-+ `kubitect` - Project metadata.
-+ `hosts` - A list of physical hosts (local or remote).
-+ `cluster` - Cluster configuration. Virtual machine properties, node types that will be installed and location (server) where the nodes will be installed.
++ `kubitect` - project metadata.
++ `hosts` - a list of physical hosts (local or remote).
++ `cluster` - cluster infrastructure configuration. Virtual machine properties, node types to install, and the host on which to install the nodes.
 + `kubernetes` - Kubernetes and Kubespray configuration. Versions, addons and other Kubernetes related settings.
 
-> :scroll: **Note:** `[*]` annotates an array.
+!!! note "Note"
+
+    `[*]` annotates an array.
 
 ## *Kubitect* section
 

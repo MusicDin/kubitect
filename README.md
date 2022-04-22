@@ -47,12 +47,12 @@ kubectl get nodes --kubeconfig kubeconfig.yaml
 ```
 
 ## Documentation
-+ [Getting started](docs/getting-started.md)
-+ [Requirements](docs/requirements.md)
-+ [Configuration](docs/configuration.md)
-+ [Load balancing](docs/load-balancer.md)
-+ [Troubleshooting](docs/troubleshooting.md)
-+ Examples: 
++ [Getting started](docs/getting-started/getting-started.md)
++ [Requirements](docs/getting-started/requirements.md)
++ [Load balancing](docs/getting-started/load-balancer.md)
++ [Troubleshooting](docs/getting-started/troubleshooting.md)
++ [Reference](docs/reference/reference.md)
++ Examples:
   - [Cluster over bridged network](docs/examples/bridged-network.md)
   - [Single node cluster deployment](docs/examples/single-node-cluster.md)
 

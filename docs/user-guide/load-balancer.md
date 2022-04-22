@@ -1,4 +1,4 @@
-# Internal load balancing (iLB)
+<h1 align="center">Internal load balancing (iLB)</h1>
 
 Multiple master nodes ensure that services remain available if one or even more master nodes fail. 
 Cluster has to be set up with an odd number of master nodes so that the quorum (the majority of master nodes) can be maintained if one or more masters fail.
@@ -25,7 +25,7 @@ cluster:
 ## Cluster without internal load balancers
 
 If you have only one master node, the internal load balancers are redundant.
-In this case, remove (or comment out) all load balancer nodes from the cluster configuration file:
+In this case, remove (or comment out) all load balancer instances from the cluster configuration file:
 ```yaml
 cluster:
   ...
@@ -33,7 +33,7 @@ cluster:
     ...
     loadBalancer:
       ...
-      instances:
+      #instances:
         #- id: 1
         #- id: 40
 ```

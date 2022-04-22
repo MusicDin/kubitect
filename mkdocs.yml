@@ -1,0 +1,74 @@
+site_name: Kubitect documentation
+
+repo_url: https://github.com/musicdin/terraform-kvm-kubespray
+repo_name: MusicDin/kubitect
+
+edit_uri: "" # Remove docs edit button
+
+theme:
+  name: material
+
+  palette: 
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.top
+    - navigation.sections
+    - search.highlight
+    - search.share
+    - search.suggest
+    - content.code.annotate
+    #- content.tabs.link
+
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.superfences
+
+  # Content tabs
+  - pymdownx.tabbed:
+      alternate_style: true 
+
+  # Emoji
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+# Page tree
+nav:
+  - User guide:
+    - Installation: user-guide/installation.md
+    - Quick start: user-guide/quick-start.md
+    - Getting started: user-guide/getting-started.md
+    - Cluster management: user-guide/cluster-management.md
+    - Other:
+      - Requirements: user-guide/requirements.md
+      - Troubleshooting: user-guide/troubleshooting.md
+  - Reference: reference/reference.md
+  - Examples:
+    #- Load balancing: user-guide/load-balancer.md
+    - Single node cluster: examples/single-node-cluster.md
+    - Bridged network: examples/bridged-network.md
+    - Full example: examples/full-example.md
+  
+  
