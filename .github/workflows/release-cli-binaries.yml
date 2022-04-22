@@ -29,6 +29,6 @@ jobs:
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           goversion: 1.18
-          binary_name: "tkk-cli"
+          binary_name: "kubitect-cli"
           project_path: ${{ env.CLI_PATH }}
           extra_files: LICENSE  # Additional files to include with the binaries.
