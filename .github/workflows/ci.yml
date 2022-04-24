@@ -1,0 +1,35 @@
+name: documentation
+on:
+  push:
+    branches:
+      #- master
+      - feature/multiple-servers
+
+env:
+  PYTHON_VERSION: 3.x
+
+jobs:
+  documentation:
+    name: Build documentation
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python runtime
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python dependencies
+        run: |
+          pip install \
+            mkdocs>=1.3.0 \
+            mkdocs-material>=8.0.0 \
+            mkdocs-material-extensions>=1.0.3 \
+            mkdocs-minify-plugin>=0.3 \
+            mkdocs-redirects>=1.0
+
+      - name: Deploy documentation
+        run: mkdocs gh-deploy --force
