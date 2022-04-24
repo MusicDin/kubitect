@@ -1,5 +1,42 @@
 <h1 align="center"> Troubleshooting - Common errors and possible solutions</h1>
 
+## General errors
+
+### Virtualenv not found
+
+=== ":fontawesome-solid-xmark: Error"
+
+    !!! failure "Error"
+
+        Output: /bin/sh: 1: virtualenv: not found
+
+        /bin/sh: 2: ansible-playbook: not found
+
+=== ":fontawesome-solid-circle-info: Explanation"
+
+    !!! info "Explanation"
+
+        The error indicates that the `virtualenv` is not installed.
+
+=== ":fontawesome-solid-check: Solution"
+
+    !!! success "Solution"
+
+        There are many ways to install `virtualenv`.
+        For all installation options you can refere to their official documentation - [Virtualenv installation](https://virtualenv.pypa.io/en/latest/installation.html).
+
+        For example, virtualenv can be installed using `pip`.
+
+        First install pip.
+        ```sh
+        sudo apt install python3-pip
+        ```
+
+        Then install virtualenv using pip3.
+        ```sh
+        pip3 install virtualenv
+        ```
+
 ## KVM/Libvirt errors
 
 ### Failed to connect socket (No such file or directory)

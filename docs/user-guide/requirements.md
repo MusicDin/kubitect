@@ -6,7 +6,7 @@ On the machine where the command-line tool is installed, the following requireme
 
 + [Git](https://git-scm.com/)
 + [Python](https://www.python.org/) >= 3.0
-  - Python [virtualenv](https://docs.python.org/3/library/venv.html)
+  - Python [virtualenv](https://virtualenv.pypa.io/en/latest/index.html)
 
 ## Hosts
 

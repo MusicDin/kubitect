@@ -3,7 +3,8 @@ site_name: Kubitect documentation
 repo_url: https://github.com/musicdin/terraform-kvm-kubespray
 repo_name: MusicDin/kubitect
 
-edit_uri: "" # Remove docs edit button
+# Remove docs edit button
+edit_uri: ""
 
 theme:
   name: material

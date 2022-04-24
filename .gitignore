@@ -17,6 +17,9 @@ versions.tf.save
 /downloads/
 /terraform/main.tf
 
+## Mkdocs generated files
+/site
+
 ## Other
 /downloads/
 /utils/
