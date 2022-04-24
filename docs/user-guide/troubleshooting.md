@@ -4,7 +4,7 @@
 
 ### Virtualenv not found
 
-=== ":fontawesome-solid-xmark: Error"
+=== ":material-close-thick: Error"
 
     !!! failure "Error"
 
@@ -12,13 +12,13 @@
 
         /bin/sh: 2: ansible-playbook: not found
 
-=== ":fontawesome-solid-circle-info: Explanation"
+=== ":material-information: Explanation"
 
     !!! info "Explanation"
 
         The error indicates that the `virtualenv` is not installed.
 
-=== ":fontawesome-solid-check: Solution"
+=== ":material-check-bold: Solution"
 
     !!! success "Solution"
 
@@ -41,19 +41,19 @@
 
 ### Failed to connect socket (No such file or directory)
 
-=== ":fontawesome-solid-xmark: Error"
+=== ":material-close-thick: Error"
 
     !!! failure "Error"
 
         Error: virError(Code=38, Domain=7, Message='Failed to connect socket to '/var/run/libvirt/libvirt-sock': No such file or directory') on libvirt.tf line 1, in provider "libvirt”": 1: provider "libvirt" {...
 
-=== ":fontawesome-solid-circle-info: Explanation"
+=== ":material-information: Explanation"
 
     !!! info "Explanation"
 
         The problem may occur when libvirt is not started.
 
-=== ":fontawesome-solid-check: Solution"
+=== ":material-check-bold: Solution"
 
     !!! success "Solution"
 
@@ -74,19 +74,19 @@
 
 ### Failed to connect socket (Permission denied)
 
-=== ":fontawesome-solid-xmark: Error"
+=== ":material-close-thick: Error"
 
     !!! failure "Error"
 
         Error: virError(Code=38, Domain=7, Message='Failed to connect socket to '/var/run/libvirt/libvirt-sock': Permission denied')
 
-=== ":fontawesome-solid-circle-info: Explanation"
+=== ":material-information: Explanation"
 
     !!! info "Explanation"
 
         The error indicates that either the `libvirtd` service is not running or the current user is not in the `libvirt` (or `kvm`) group.
 
-=== ":fontawesome-solid-check: Solution"
+=== ":material-check-bold: Solution"
 
     !!! success "Solution"
 
@@ -109,13 +109,13 @@
 
 ### Error creating libvirt domain
 
-=== ":fontawesome-solid-xmark: Error"
+=== ":material-close-thick: Error"
 
     !!! failure "Error"
 
         Error: Error creating libvirt domain: … Could not open '/tmp/terraform_libvirt_provider_images/image.qcow2': Permission denied')
 
-=== ":fontawesome-solid-circle-info: Explanation"
+=== ":material-information: Explanation"
 
     !!! info "Explanation"
 
@@ -125,7 +125,7 @@
         + Make sure the directory of the file that is being denied has appropriate user permissions.
         + Optionally qemu security driver can be disabled. 
 
-=== ":fontawesome-solid-check: Solution"
+=== ":material-check-bold: Solution"
 
     !!! success "Solution"
 
@@ -146,19 +146,19 @@
 
 ### Libvirt domain already exists
 
-=== ":fontawesome-solid-xmark: Error"
+=== ":material-close-thick: Error"
 
     !!! failure "Error"
 
         Error: Error defining libvirt domain: virError(Code=9, Domain=20, Message='operation failed: domain '**your-domain**' already exists with uuid '...')
 
-=== ":fontawesome-solid-circle-info: Explanation"
+=== ":material-information: Explanation"
 
     !!! info "Explanation"
 
         The error indicates that the libvirt domain (virtual machine) already exists.
 
-=== ":fontawesome-solid-check: Solution"
+=== ":material-check-bold: Solution"
 
     !!! success "Solution"
 
@@ -182,7 +182,7 @@
 
 ### Libvirt volume already exists
 
-=== ":fontawesome-solid-xmark: Error"
+=== ":material-close-thick: Error"
 
     !!! failure "Error"
 
@@ -192,13 +192,13 @@
 
         Error:Error creating libvirt volume for cloudinit device <b>cloud-init</b>.iso: virError(Code=90, Domain=18, Message='storage volume '<b>cloud-init</b>.iso' exists already')
 
-=== ":fontawesome-solid-circle-info: Explanation"
+=== ":material-information: Explanation"
 
     !!! info "Explanation"
 
         The error indicates that the specified volume already exists.
 
-=== ":fontawesome-solid-check: Solution"
+=== ":material-check-bold: Solution"
 
     !!! success "Solution"
 
@@ -217,19 +217,19 @@
 
 ### Libvirt storage pool already exists
 
-=== ":fontawesome-solid-xmark: Error"
+=== ":material-close-thick: Error"
 
     !!! failure "Error"
 
         Error: Error storage pool '**your-pool**' already exists
 
-=== ":fontawesome-solid-circle-info: Explanation"
+=== ":material-information: Explanation"
 
     !!! info "Explanation"
 
         The error indicates that the libvirt storage pool already exists.
 
-=== ":fontawesome-solid-check: Solution"
+=== ":material-check-bold: Solution"
 
     !!! success "Solution"
 
@@ -241,20 +241,20 @@
 
 ### Failed to apply firewall rules
 
-=== ":fontawesome-solid-xmark: Error"
+=== ":material-close-thick: Error"
 
     !!! failure "Error"
 
         Error: internal error: Failed to apply firewall rules /sbin/iptables -w --table filter --insert LIBVIRT_INP --in-interface virbr2 --protocol tcp --destination-port 67 --jump ACCEPT: iptables: No chain/target/match by that name.
 
-=== ":fontawesome-solid-circle-info: Explanation"
+=== ":material-information: Explanation"
 
     !!! info "Explanation"
 
         Libvirt was already running when firewall (usually FirewallD) was started/installed.
         Therefore, `libvirtd` service must be restarted to detect the changes.
 
-=== ":fontawesome-solid-check: Solution"
+=== ":material-check-bold: Solution"
 
     !!! success "Solution"
 
@@ -265,20 +265,20 @@
 
 ### Failed to remove storage pool
 
-=== ":fontawesome-solid-xmark: Error"
+=== ":material-close-thick: Error"
 
     !!! failure "Error"
 
         Error: error deleting storage pool: failed to remove pool '/var/lib/libvirt/pools/local-k8s-cluster-main-resource-pool': Directory not empty
 
-=== ":fontawesome-solid-circle-info: Explanation"
+=== ":material-information: Explanation"
 
     !!! info "Explanation"
 
         The pool cannot be deleted because there are still some volumes in the pool.
         Therefore, the volumes should be removed before the pool can be deleted.
 
-=== ":fontawesome-solid-check: Solution"
+=== ":material-check-bold: Solution"
 
     !!! success "Solution"
 
@@ -313,19 +313,19 @@
 ### Random HAProxy (503) bad gateway
 
 
-=== ":fontawesome-solid-xmark: Error"
+=== ":material-close-thick: Error"
 
     !!! failure "Error"
 
         HAProxy returns a random *HTTP 503 (Bad gateway)* error.
 
-=== ":fontawesome-solid-circle-info: Explanation"
+=== ":material-information: Explanation"
 
     !!! info "Explanation"
 
         More than one HAProxy processes are listening on the same port.
 
-=== ":fontawesome-solid-check: Solution"
+=== ":material-check-bold: Solution"
 
     !!! success "Solution 1"
 

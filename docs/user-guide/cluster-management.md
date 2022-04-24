@@ -68,7 +68,7 @@ kubitect apply --config cluster.yaml --action scale
 
 ## Upgrade the cluster
 
-!!! danger "Important"
+!!! warning "Important"
 
     *Do not skip releases when upgrading--upgrade by one tag at a time.*
     > For more information read [Kubespray upgrades](https://github.com/kubernetes-sigs/kubespray/blob/master/docs/upgrades.md).
