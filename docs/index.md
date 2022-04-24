@@ -1,5 +1,5 @@
 ---
 template: home.html
-title: Xournal++
+title: Kubitect
 ---
 {newline}
