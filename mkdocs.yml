@@ -9,7 +9,8 @@ edit_uri: ""
 
 theme:
   name: material
-
+  custom_dir: docs/overrides
+  
   palette: 
     - scheme: default
       toggle:
@@ -21,16 +22,16 @@ theme:
         name: Switch to light mode
 
   features:
-    - content.code.annotate
-    #- content.tabs.link
     - navigation.instant
-    - navigation.sections
+    - navigation.tracking
     - navigation.tabs
     - navigation.top
-    - navigation.tracking
+    - navigation.sections
     - search.highlight
     - search.share
     - search.suggest
+    - content.code.annotate
+    #- content.tabs.link
 
   icon:
     repo: fontawesome/brands/github
@@ -44,7 +45,6 @@ markdown_extensions:
   - attr_list
   - admonition
   - md_in_html
-
   - pymdownx.details
   - pymdownx.superfences
 
