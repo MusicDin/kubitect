@@ -1,6 +1,6 @@
 <h1 align="center">Local development</h1>
 
-This tutorial shows how to use the project without creating any files outside the project's directory and how to build a CLI tool manually.
+This document shows how to build a CLI tool manually and how to use the project without creating any files outside the project's directory.
 
 ## Clone the project
 
@@ -37,7 +37,9 @@ sudo mv cli /usr/bin/local/
 ## Local development
 
 By default, Kubitect creates and manages clusters located in the Kubitect home directory (`~/.kubitect`).
+
 Although this pattern is very useful for everyday use, it can be somewhat inconvenient if you are actively making changes to the project, as each change must be committed to the Git repository. 
+
 For this very reason, the Kubitect CLI tool has the `--local` option, which replaces the project's home directory with the path of the current directory.
 This way, the source code from the current directory is used to create a cluster and all cluster-related files are created in the current directory.
 This option can be used with most actions, such as `apply` or `destroy`.

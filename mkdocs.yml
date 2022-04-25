@@ -66,6 +66,7 @@ nav:
     - Cluster management: user-guide/cluster-management.md
     - Other:
       - Requirements: user-guide/requirements.md
+      - Local development: user-guide/local-development.md
       - Troubleshooting: user-guide/troubleshooting.md
   - Reference: reference/reference.md
   - Examples:
