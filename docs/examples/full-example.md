@@ -99,7 +99,7 @@ cluster:
         - id: 2
           ip: 10.10.64.6
           mac: "52:54:00:00:00:41"
-          host: server2
+          host: remote-server-2
         - id: 3
           ip: 10.10.64.7
           mac: "52:54:00:00:00:42"
@@ -118,7 +118,7 @@ cluster:
         - id: 2
           host: remote-server-2
         - id: 3
-          server: localhost
+          host: localhost
     worker:
       default:
         ram: 16

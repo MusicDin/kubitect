@@ -2,6 +2,8 @@
 
 Before starting with installation, make sure you meet all the [requirements](./requirements.md).
 
+## Install Kubitect CLI tool
+
 After all requirements are met, download the Kubitect command line tool.
 ```sh
 wget -O kubitect ...
@@ -12,6 +14,22 @@ Install Kubitect command line tool by placing the Kubitect binary file in `/usr/
 sudo mv kubitect /usr/local/bin/
 ```
 
+Verify the installation by checking the Kubitect version.
+```sh
+kubitect --version
+
+# kubitect version 2.0.0
+```
+
 !!! tip "Tip"
 
     If you are using Kubitect for the first time, we strongly recommend you to take a look at the [getting started](./getting-started.md) tutorial.
+
+## Enable shell autocomplete
+
+For example, to enable automplete for `bash`, run the following command.
+```sh
+echo 'source <(kubitect completion bash)' >> ~/.bashrc
+```
+
+Then reload your shell.

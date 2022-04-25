@@ -1,4 +1,9 @@
-<h1 align="center"> Troubleshooting - Common errors and possible solutions</h1>
+<h1 align="center"> Troubleshooting</h1>
+
+??? question "Is your problem not listed here?"
+
+    If the troubleshooting page is missing an error you encountered, please report it on GitHub by [opening an issue](https://github.com/MusicDin/terraform-kvm-kubespray/issues/new).
+    By doing so, you will help improve the project and help others find the solution to the same problem faster.
 
 ## General errors
 
@@ -45,7 +50,7 @@
 
     !!! failure "Error"
 
-        Error: virError(Code=38, Domain=7, Message='Failed to connect socket to '/var/run/libvirt/libvirt-sock': No such file or directory') on libvirt.tf line 1, in provider "libvirt”": 1: provider "libvirt" {...
+        Error: virError(Code=38, Domain=7, Message='Failed to connect socket to '/var/run/libvirt/libvirt-sock': No such file or directory')
 
 === ":material-information: Explanation"
 

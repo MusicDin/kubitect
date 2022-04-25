@@ -57,7 +57,7 @@ A host can be either a local or a remote machine.
                 keyfile: "~/.ssh/id_rsa_server1" # Password-less SSH key file
         ```
 
-In this tutorial we will use only a localhost.
+In this tutorial we will use only localhost.
 
 ## Step 4 - Define cluster infrastructure
 
