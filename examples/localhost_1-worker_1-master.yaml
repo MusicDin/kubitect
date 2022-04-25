@@ -1,7 +1,7 @@
 #
-# Example creates a cluster on a local machine.
+# Configuration defines a localhost cluster.
 # Cluster contains single master node and single worker node.
-# It also creates a dedicated virtual NAT network.
+# It also defines a dedicated virtual NAT network.
 #
 
 kubitect:

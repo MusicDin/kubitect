@@ -1,0 +1,108 @@
+#
+# Configuration defines a cluster that spreads across 3 hosts.
+# Cluster contains 3 master nodes, 3 worker nodes, and 3 load balancers.
+# 
+# Configuration requires:
+#   - a preconfigured bridge interface (br0) on each host,
+#   - SSH key for each host.
+#
+kubitect:
+  version: "2.0.0"
+
+# Define remote hosts
+hosts:
+  - name: host1
+    connection:
+      type: remote
+      user: myuser
+      ip: 10.10.40.143
+      ssh:
+        verify: false
+        keyfile: "~/.ssh/id_rsa_host1"
+
+  - name: host2
+    connection:
+      type: remote
+      user: myuser
+      ip: 10.10.40.144
+      ssh:
+        verify: false 
+        port: 1234  # default port is 22
+        keyfile: "~/.ssh/id_rsa_host2"
+
+  - name: host3
+    connection:
+      type: remote
+      user: myuser
+      ip: 10.10.40.145
+      ssh:
+        verify: false
+        keyfile: "~/.ssh/id_rsa_host3"
+
+cluster:
+  name: my-cluster
+  network:
+    mode: bridge
+    cidr: "10.10.64.0/24"
+    bridge: br0 # Bridge interface needs to be preconfigured on each host
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+  nodeTemplate:
+    user: k8s
+    image:
+      distro: ubuntu
+      source: "https://cloud-images.ubuntu.com/releases/focal/release-20220111/ubuntu-20.04-server-cloudimg-amd64.img"
+  nodes:
+    loadBalancer:
+      vip: 10.10.64.200
+      default:
+        ram: 4
+        cpu: 2
+        mainDiskSize: 32
+      instances:
+        - id: 1
+          ip: 10.10.64.10
+          host: host1 # Link instance with the "host1"
+        - id: 2
+          ip: 10.10.64.11
+          host: host2
+        - id: 3
+          ip: 10.10.64.12
+          host: host3
+    master:
+      default:
+        ram: 8
+        cpu: 2
+        mainDiskSize: 256
+      instances:
+        - id: 1
+          ip: 10.10.64.30
+          host: host1
+        - id: 2
+          ip: 10.10.64.31
+          host: host2
+        - id: 3
+          ip: 10.10.64.32
+          host: host3
+    worker:
+      default:
+        ram: 16
+        cpu: 4
+      instances:
+        - id: 1
+          ip: 10.10.64.101
+          host: host1
+        - id: 2
+          ip: 10.10.64.102
+          host: host2
+        - id: 3
+          ip: 10.10.64.103
+          host: host3
+
+kubernetes:
+  version: "v1.21.6"
+  networkPlugin: calico
+  dnsMode: coredns
+  kubespray:
+    version: "v2.17.1"
