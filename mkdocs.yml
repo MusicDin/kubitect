@@ -1,5 +1,5 @@
 site_name: Kubitect documentation
-site_url: https://musicdin.github.io/terraform-kvm-kubespray
+site_url: https://kubitect.io
 
 repo_url: https://github.com/musicdin/terraform-kvm-kubespray
 repo_name: MusicDin/kubitect
@@ -10,7 +10,7 @@ edit_uri: ""
 theme:
   name: material
   custom_dir: docs/overrides
-  
+
   palette: 
     - scheme: default
       toggle:

@@ -26,8 +26,7 @@ kubitect export config > cluster.yaml
 ### Add worker nodes to the cluster
 
 In the configuration file add new worker nodes to `cluster.nodes.worker.instances` list.
-```yaml
-# cluster.yaml
+```yaml title="cluster.yaml"
 cluster:
   ...
   nodes:

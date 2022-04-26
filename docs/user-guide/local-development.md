@@ -31,7 +31,7 @@ go build .
 
 This will create a `cli` binary file, which can be moved into `/usr/local/bin/` directory to use it globaly.
 ```sh
-sudo mv cli /usr/bin/local/
+sudo mv cli /usr/bin/local/kubitect
 ```
 
 ## Local development
