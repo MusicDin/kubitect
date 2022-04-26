@@ -21,7 +21,7 @@ var (
 		"ansible/",
 		"terraform/",
 		"templates/",
-		"examples/",
+		"resources/",
 		"scripts/",
 		"requirements.txt",
 		"LICENSE",

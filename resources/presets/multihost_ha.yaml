@@ -6,10 +6,10 @@
 #   - a preconfigured bridge interface (br0) on each host,
 #   - SSH key for each host.
 #
+
 kubitect:
   version: "2.0.0"
 
-# Define remote hosts
 hosts:
   - name: host1
     connection:
@@ -27,7 +27,7 @@ hosts:
       ip: 10.10.40.144
       ssh:
         verify: false 
-        port: 1234  # default port is 22
+        port: 1234
         keyfile: "~/.ssh/id_rsa_host2"
 
   - name: host3
@@ -44,7 +44,7 @@ cluster:
   network:
     mode: bridge
     cidr: "10.10.64.0/24"
-    bridge: br0 # Bridge interface needs to be preconfigured on each host
+    bridge: br0
     dns:
       - 1.1.1.1
       - 1.0.0.1
@@ -63,7 +63,7 @@ cluster:
       instances:
         - id: 1
           ip: 10.10.64.10
-          host: host1 # Link instance with the "host1"
+          host: host1
         - id: 2
           ip: 10.10.64.11
           host: host2
@@ -101,8 +101,8 @@ cluster:
           host: host3
 
 kubernetes:
-  version: "v1.21.6"
+  version: "v1.22.6"
   networkPlugin: calico
   dnsMode: coredns
   kubespray:
-    version: "v2.17.1"
+    version: "v2.18.1"

@@ -1,12 +1,11 @@
 #
-# Configuration defines a localhost cluster.
-# Cluster contains single master node and single worker node.
+# Configuration defines a localhost cluster that contains 
+# only single master node that also acts as a worker node. 
 # It also defines a dedicated virtual NAT network.
 #
 
 kubitect:
-  url: "https://github.com/MusicDin/terraform-kvm-kubespray"
-  version: "master"
+  version: "2.0.0"
 
 hosts:
   - name: localhost
@@ -35,14 +34,6 @@ cluster:
       instances:
         - id: 1
           ip: 192.168.113.10
-    worker:
-      default:
-        ram: 4
-        cpu: 2
-        mainDiskSize: 32
-      instances:
-        - id: 1
-          ip: 192.168.113.20
 
 kubernetes:
   version: "v1.22.6"
