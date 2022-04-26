@@ -12,10 +12,10 @@
 }
 
 .quote {
-    font-size: 20px;
     margin-left: auto;
     margin-right: auto;
     max-width: 57ch !important;
+    color: white !important;
 }
 
 .quote {
@@ -40,3 +40,54 @@
     from, to { border-color: transparent }
     50% { border-color: orange; }
   }
+
+  #with_image{
+    background-image: url('../assets/images/backgroundimage.jpg');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+#content-banner{
+    box-shadow: -10px 0px 10px 1px rgba(0,0,0,0.3);
+}
+
+.md-main{
+  display: none !important;
+}
+
+.bg-primary{
+  background-color: #4051b5;
+}
+
+.scrollable{
+  box-shadow: inset 0px 5px 5px -7px rgba(0,0,0,0.3), inset 0px -10px 5px -10px rgba(0,0,0,0.3);
+}
+
+.commandLine{
+  font-family: 'Inconsolata';
+  border-radius: 5px;
+  font-size:15px;
+  background-color: #212121;
+  box-shadow: 0px 5px 10px -2px rgba(0,0,0,0.4);
+}
+
+.illustrator-bg{
+  background-image: url('assets/images/cloud_illustration.svg');
+  background-size: cover;
+}
+
+.dimmed{
+  background: linear-gradient(180deg,rgba(0,0,0,0.8),rgba(0,0,0,0.3));
+}
+
+.first-content{
+  color:white;
+  margin-top:50vh;
+  transform: translateY(-50%);
+  z-index:0;
+  flex-wrap: wrap;
+}
+
+.blur{
+  background-color: rgba(0,0,0,0.2);
+  filter: blur(1rem);
+}
