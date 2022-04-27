@@ -7,5 +7,5 @@ kubitect_cluster_path: "{{ kubitect_home }}/clusters/{{ kubitect_cluster_name }}
 # Location where cluster config is saved
 kubitect_cluster_config_path: "{{ kubitect_cluster_path }}/config/kubitect.yaml"
 
-# Default cluster config that is used when cluster config does not exist.
-kubitect_cluster_default_config_path: "{{ kubitect_cluster_path }}/examples/default-cluster.yaml"
+# Default cluster config is used when cluster config does not exist.
+kubitect_cluster_default_config_path: "{{ kubitect_cluster_path }}/resources/default/default-cluster.yaml"

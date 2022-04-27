@@ -93,11 +93,10 @@ func setup() error {
 	}
 
 	if env.DebugMode {
-		fmt.Println("env.ConfigPath: " + env.ConfigPath)
-		fmt.Println("env.ClusterPath: " + env.ClusterPath)
-		fmt.Println("env.ProjectHomePath: " + env.ProjectHomePath)
-		fmt.Println("env.Local: " + strconv.FormatBool(env.Local))
-		fmt.Println("")
+		utils.PrintDebug("env.ConfigPath: %s", env.ConfigPath)
+		utils.PrintDebug("env.ClusterPath: %s", env.ClusterPath)
+		utils.PrintDebug("env.ProjectHomePath: %s", env.ProjectHomePath)
+		utils.PrintDebug("env.Local: %s", strconv.FormatBool(env.Local))
 	}
 
 	return nil

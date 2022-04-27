@@ -103,9 +103,9 @@ cluster:
         - id: 3
           ip: 10.10.64.7
           mac: "52:54:00:00:00:42"
-          # If server is not specifed, VM will be installed on the default server.
-          # If default server is not specified, VM will be installed on the first
-          # server in the list.
+          # If host is not specifed, VM will be installed on the default host.
+          # If default host is not specified, VM will be installed on the first
+          # host in the list.
     master:
       default:
         ram: 8

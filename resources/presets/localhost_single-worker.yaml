@@ -1,0 +1,52 @@
+#
+# Configuration defines a localhost cluster that contains 
+# single master node and single worker node. It also defines
+# a dedicated virtual NAT network.
+#
+
+kubitect:
+  version: "2.0.0"
+
+hosts:
+  - name: localhost
+    connection:
+      type: local
+
+cluster:
+  name: "local-k8s-cluster"
+  network:
+    mode: "nat"
+    cidr: "192.168.113.0/24"
+  nodeTemplate:
+    user: "k8s"
+    ssh:
+      addToKnownHosts: true
+    image:
+      distro: "ubuntu"
+      source: "https://cloud-images.ubuntu.com/releases/focal/release-20220111/ubuntu-20.04-server-cloudimg-amd64.img"
+    updateOnBoot: true
+  nodes:
+    master:
+      default:
+        ram: 4
+        cpu: 2
+        mainDiskSize: 32
+      instances:
+        - id: 1
+          ip: 192.168.113.10
+    worker:
+      default:
+        ram: 4
+        cpu: 2
+        mainDiskSize: 32
+      instances:
+        - id: 1
+          ip: 192.168.113.20
+
+kubernetes:
+  version: "v1.22.6"
+  networkPlugin: "calico"
+  dnsMode: "coredns"
+  kubespray:
+    url: "https://github.com/kubernetes-sigs/kubespray.git"
+    version: "v2.18.1"
