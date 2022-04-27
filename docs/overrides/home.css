@@ -17,37 +17,34 @@
     max-width: 57ch !important;
     color: white !important;
 }
-
-.quote {
-    overflow: hidden; /* Ensures the content is not revealed until the animation */
-    border-right: .15em solid orange; /* The typwriter cursor */
-    white-space: nowrap; /* Keeps the content on a single line */
-    margin: 0 auto; /* Gives that scrolling effect as the typing happens */
-    letter-spacing: .15em; /* Adjust as needed */
-    animation: 
-      typing 3.5s steps(110, end),
-      blink-caret .75s step-end infinite;
-  }
-  
-  /* The typing effect */
-  @keyframes typing {
-    from { width: 0 }
-    to { width: 100% }
-  }
-  
-  /* The typewriter cursor effect */
-  @keyframes blink-caret {
-    from, to { border-color: transparent }
-    50% { border-color: orange; }
-  }
-
-  #with_image{
-    background-image: url('../assets/images/backgroundimage.jpg');
-    background-repeat: no-repeat;
-    background-size: contain;
+.cli-toolbar-button{
+  width:10px;
+  height:10px;
+  background-color:rgba(255,255,255,0.2);
 }
+
+
 #content-banner{
     box-shadow: -10px 0px 10px 1px rgba(0,0,0,0.3);
+}
+
+
+.md-header{
+  background-color: transparent!important;
+  box-shadow: none!important;
+}
+/* .md-header:after{
+  content:'';
+  position: absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  filter:blur(10px)
+} */
+
+.command-dollar-sign{
+  color:rgb(5, 241, 52)
 }
 
 .md-main{
@@ -63,12 +60,87 @@
 }
 
 .commandLine{
-  font-family: 'Inconsolata';
+  font-family: 'Inconsolota',"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace !important;
   border-radius: 5px;
-  font-size:15px;
-  background-color: #212121;
+  /* font-size:15px; */
+  background-color: rgba(0,0,0,0.4);
+  /* border:1px solid rgba(0,0,0,0.3); */
   box-shadow: 0px 5px 10px -2px rgba(0,0,0,0.4);
+	
 }
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+  50% {
+    background-position: 100% 50%;
+  }
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+@keyframes shiftGradients {
+  0%{
+    background: #0575E6;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #021B79, #0575E6);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #021B79, #0575E6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  }
+  50%{
+    background: #0575E6;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #0575E6,#021B79 );  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #0575E6, #021B79); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  }
+  100%{
+    background: #0575E6;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #021B79, #0575E6);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #021B79, #0575E6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  }
+}
+
+#main-box{
+  /* background: linear-gradient(#2a2e31,#1b1f23,#26313c); */
+
+
+  /* background: url(https://tailwindcss.com/_next/static/media/hero-dark@90.a7a063e8f9d179fbd72b0b735c5797b7.jpg);
+  background-size: contain;
+  background-repeat: repeat; */
+
+  background: linear-gradient( 99.9deg, rgba(27,24,31,1) 21.2%, rgb(22, 98, 180) 84.8% );
+  /* animation: myStuff 2s ease infinite; */
+  /* background-size: 200% 200%;  */
+
+  
+
+  position: absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  width:100%;
+  height:100%;
+
+  overflow: auto;
+  
+  /* background: linear-gradient( 99.9deg, rgba(27,24,31,1) 21.2%, rgb(92, 14, 160) 84.8% ); */
+}
+
+/* #main-box::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top:0;
+  left:0;
+  z-index: -1;
+  background: linear-gradient( 99.9deg, rgba(27,24,31,1) 21.2%, rgb(92, 14, 160) 84.8% );
+  /* transform: rotate(-30deg); */
+  
+  /* animation: myStuff 2s ease infinite; */
+  background-size: 200% 200%;
+} */
+
 
 .illustrator-bg{
   background-image: url('assets/images/cloud_illustration.svg');
@@ -85,6 +157,14 @@
   transform: translateY(-50%);
   z-index:0;
   flex-wrap: wrap;
+}
+
+.top-command{
+  font-size: 0.5rem;
+  font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace !important;
+}
+.top-label{
+  font-size: 20px;
 }
 
 .blur{
