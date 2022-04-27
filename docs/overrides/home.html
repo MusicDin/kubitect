@@ -2,34 +2,46 @@
 {% block tabs %}
 {{ super() }}
 
+<!-- import custom css -->
 <link rel="stylesheet" href="home.css">
+
+<!-- import tailwind css -->
 <script src="https://cdn.tailwindcss.com"></script>
+
+
+<!-- import google fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link
     href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;600;700;800;900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
     rel="stylesheet">
 
+<!-- import custom javascript -->
 <script src="assets/javascripts/animating.js"></script>
 
 
+<!-- main flex container of the page, overflows topbar -->
 <div id="main-box" class="flex flex-row flex-grow flex-wrap w-full overflow-auto items-center">
 
-
-
-    <!-- this is the left side -->
+    <!-- first (left section of the page) -->
     <div class="h-full md:h-full md:pl-20 w-full md:w-5/12 flex flex-row justify-center md:justify-end"
         style="color:white">
 
+        <!-- flex container with logo, title, description and github link -->
         <div class="flex flex-col justify-center items-center" style="">
 
+            <!-- app logo with app title -->
             <div class="flex flex-row items-center text-3xl text-kubeblue font-bold text-center mt-20 md:mt-0">
                 <img src="assets/images/logo.svg" style="width:40px;height:auto">
                 Kubitect
             </div>
+
+            <!-- App short description -->
             <div class="text-lg mt-2 text-center">A coherent CLI tool for deploying kubernetes
                 clusters.
             </div>
+
+            <!-- Link to github repo -->
             <a href="https://github.com/MusicDin/terraform-kvm-kubespray"
                 class="mt-2 justify-center flex flex-row rounded-md hover:cursor-pointer p-2  ease-in duration-300"
                 style="transition-duration: 300ms;">
@@ -37,27 +49,24 @@
                 &nbsp;&nbsp;View on GitHub
             </a>
         </div>
+
     </div>
 
     <!-- this is the right side (showing commands)-->
     <div class="w-full md:w-7/12 p-5 flex justify-center" style="color:white;">
 
-        <!-- content container -->
+        <!-- flex conatiner containing command line div -->
         <div class="flex flex-col justify-center items-center mt-20 md:mt-0">
-            <div class="flex justify-center flex-row top-command">
-                <span id="top-command-bg relative" style="color:transparent;position:relative">
-                    <span id="top-command-bg" style="color:transparent;">
 
-                    </span>
-                    <span id="top-command-fg" class="absolute left-0 top-0" style="color:white">
-
-                    </span>
-                </span>
-            </div>
+            <!--  -->
             <div id="command-description" class="flex justify-center flex-row pt-1 pb-3 top-label">
                 Get started quickly
             </div>
-            <div class="commandLine">
+
+            <!-- the terminal outline element -->
+            <div class="terminal">
+
+                <!-- row with toolbar buttons -->
                 <div class="flex flex-row justify-start p-2 rounded-t">
                     <div class="rounded-full cli-toolbar-button">
                     </div>
@@ -66,49 +75,32 @@
                     <div class="rounded-full ml-2 cli-toolbar-button">
                     </div>
                 </div>
-                <!-- <div class="flex flex-row px-2">
-                    <div class="chevron pr-2">
-                        $
-                    </div>
-                    <div id="command-bg" style="position:relative;color:transparent" class="command">
-                        <div id="command-anim-bg">
 
-                        </div>
-                        <div id="command-anim" class="command"
-                            style="width:100%;position:absolute;left:0;top:0;color:white">
-
-                        </div>
-                    </div>
-                </div> -->
+                <!-- command line output container -->
                 <div id="command-result-bg" class="command-result px-2 pb-2"
                     style="color:transparent;position:relative">
+
+                    <!-- placeholder content (for sizing) -->
                     $ curl -o kubitect -L https://dl.kubitect.com<br>$ sudo mv kubitect /usr/local/bin/<br>$ kubitect
                     apply<br><br>Preparing cluster '<span>default</span>'...<br>Setting up
                     'main' virtual environment...<br>Creating virtual environment...<br>Installing pip3
                     dependencies...<br>This can take up to a minute when the virtual environment is initialized for the
                     first time...<br><br>PLAY [localhost]<br><br>TASK [cluster-config/copy : Make sure config directory
                     exists]<br><span>ok: [127.0.0.1]</span><br><br>...<br>
+
+                    <!-- command line output will be rendered in this element's innerHtml -->
                     <div id="command_line" class="command-result px-2 m-0"
                         style="position:absolute;top:0;left:0;color:white">
 
                     </div>
-                </div>
-            </div>
 
-            <!-- <button href="" class="p-2 m-2">
-                Read the docs
-            </button> -->
+                </div>
+
+            </div>
 
         </div>
 
-
-
-
-
     </div>
-
-
-
 
 </div>
 
