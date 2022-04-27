@@ -39,8 +39,11 @@ theme:
   icon:
     repo: fontawesome/brands/github
 
+extra_css:
+  - stylesheets/style.css
+
 extra_javascript:
-    - javascripts/hashtags.js
+  - javascripts/hashtags.js
 
 plugins:
   - search
