@@ -11,144 +11,108 @@
     rel="stylesheet">
 
 <script src="assets/javascripts/animating.js"></script>
-<!-- <div class="home">
-
-    <div class="temp-content">
-
-        <span class="title">
-            Kubitect
-        </span>
-        <span class="quote">
-            A coherent CLI tool for creating Kubernetes clusters.
-        </span>
-
-    </div>
 
 
-</div> -->
+<div id="main-box" class="flex flex-row flex-grow flex-wrap w-full overflow-auto items-center">
 
 
-<div class="flex flex-row flex-grow flex-wrap w-full" style="align-items: center;background: rgb(4,51,101);
-background: linear-gradient(122deg, rgba(4,51,101,1) 0%, rgba(27,34,49,1) 100%);">
-    <!-- <div class="dimmed" style="position:absolute;width:100%;height:100%;top:0;left:0;right:0;bottom:0;"
-        style="z-index:0">
-    </div> -->
 
     <!-- this is the left side -->
-    <div class="md:hw-full md:w-1/3" style="z-index:1">
-        <div class="flex flex-col">
-            <div class="flex flex-col justify-center" style="color:white">
-                <div class="text-3xl text-kubeblue font-bold text-center">Kubitect.io</div>
-                <div class="text-md mt-2 text-center">A coherent CLI tool for deploying kubernetes
-                    clusters.
-                </div>
-                <a href="https://github.com/MusicDin/terraform-kvm-kubespray"
-                    class="justify-center flex flex-row rounded-md hover:cursor-pointer p-2 hover:shadow-md ease-in duration-300"
-                    style="transition-duration: 300ms;">
-                    <img src="https://github.githubassets.com/images/modules/logos_page/Octocat.png"
-                        class="w-3 h-3 self-center">
-                    &nbsp;view on GitHub
-                </a>
+    <div class="h-full md:h-full md:pl-20 w-full md:w-5/12 flex flex-row justify-center md:justify-end"
+        style="color:white">
+
+        <div class="flex flex-col justify-center items-center" style="">
+
+            <div class="flex flex-row items-center text-3xl text-kubeblue font-bold text-center mt-20 md:mt-0">
+                <img src="assets/images/logo.svg" style="width:40px;height:auto">
+                Kubitect
             </div>
-
-
-            <div class="flex flex-row justify-center self-center pb-3" style="z-index:2">
-
+            <div class="text-lg mt-2 text-center">A coherent CLI tool for deploying kubernetes
+                clusters.
             </div>
+            <a href="https://github.com/MusicDin/terraform-kvm-kubespray"
+                class="mt-2 justify-center flex flex-row rounded-md hover:cursor-pointer p-2  ease-in duration-300"
+                style="transition-duration: 300ms;">
+                <img src="assets/images/octocat.svg" style="color:white!important" class="w-3 h-3 self-center">
+                &nbsp;&nbsp;View on GitHub
+            </a>
         </div>
-        <!-- <img src="assets/images/cloud_illustration.svg" style="max-width:60%"> -->
     </div>
 
     <!-- this is the right side (showing commands)-->
-    <div class="w-full md:w-2/3 p-5" style="z-index:1;color:white">
+    <div class="w-full md:w-7/12 p-5 flex justify-center" style="color:white;">
 
-        <div class="commandLine flex flex-col p-3">
-            <div class="flex flex-row">
-                <div class="chevron pr-2">
-                    $
+        <!-- content container -->
+        <div class="flex flex-col justify-center items-center mt-20 md:mt-0">
+            <div class="flex justify-center flex-row top-command">
+                <span id="top-command-bg relative" style="color:transparent;position:relative">
+                    <span id="top-command-bg" style="color:transparent;">
+
+                    </span>
+                    <span id="top-command-fg" class="absolute left-0 top-0" style="color:white">
+
+                    </span>
+                </span>
+            </div>
+            <div id="command-description" class="flex justify-center flex-row pt-1 pb-3 top-label">
+                Get started quickly
+            </div>
+            <div class="commandLine">
+                <div class="flex flex-row justify-start p-2 rounded-t">
+                    <div class="rounded-full cli-toolbar-button">
+                    </div>
+                    <div class="rounded-full ml-2 cli-toolbar-button">
+                    </div>
+                    <div class="rounded-full ml-2 cli-toolbar-button">
+                    </div>
                 </div>
-                <div id="command-bg" style="position:relative;color:#212121" class="command">
-                    kubitect apply
-                    <div id="command-anim" class="command" style="position:absolute;left:0;top:0;color:white">
+                <!-- <div class="flex flex-row px-2">
+                    <div class="chevron pr-2">
+                        $
+                    </div>
+                    <div id="command-bg" style="position:relative;color:transparent" class="command">
+                        <div id="command-anim-bg">
+
+                        </div>
+                        <div id="command-anim" class="command"
+                            style="width:100%;position:absolute;left:0;top:0;color:white">
+
+                        </div>
+                    </div>
+                </div> -->
+                <div id="command-result-bg" class="command-result px-2 pb-2"
+                    style="color:transparent;position:relative">
+                    $ curl -o kubitect -L https://dl.kubitect.com<br>$ sudo mv kubitect /usr/local/bin/<br>$ kubitect
+                    apply<br><br>Preparing cluster '<span>default</span>'...<br>Setting up
+                    'main' virtual environment...<br>Creating virtual environment...<br>Installing pip3
+                    dependencies...<br>This can take up to a minute when the virtual environment is initialized for the
+                    first time...<br><br>PLAY [localhost]<br><br>TASK [cluster-config/copy : Make sure config directory
+                    exists]<br><span>ok: [127.0.0.1]</span><br><br>...<br>
+                    <div id="command_line" class="command-result px-2 m-0"
+                        style="position:absolute;top:0;left:0;color:white">
 
                     </div>
                 </div>
             </div>
-            <div class="command-result" style="color:#212121;position:relative">
-                <p>
-                    Preparing cluster '<span>default</span>'...<br>
-                    Setting up 'main' virtual environment...<br>
-                    Creating virtual environment...<br>
-                    Installing pip3 dependencies...<br>
-                    This can take up to a minute when the virtual environment is initialized for the first
-                    time...<br>
-                    <br>
-                    PLAY [localhost]
-                    <br>
-                    <br>
-                    TASK [cluster-config/copy : Make sure config directory exists]<br>
-                    <span>ok: [127.0.0.1]</span>
-                    <br>
-                    <br>
-                    ...
-                </p>
-                <div id="command-result-fg" class="command-result" style="position:absolute;top:0;left:0;color:white">
 
-                </div>
-            </div>
+            <!-- <button href="" class="p-2 m-2">
+                Read the docs
+            </button> -->
+
         </div>
+
+
+
 
 
     </div>
 
-    <!-- 
-    <div class="flex w-full justify-between justify-center content-center" style="z-index:2">
 
-        <div class="flex w-full md:w-1/2 align-center flex-col">
-
-            <div class="flex flex-col p-3">
-                <div class="flex flex-col justify-center flex-grow p-10" style="">
-                    <div class="text-3xl text-kubeblue font-bold text-center">Kubitect.io</div>
-                    <div class="text-md mt-2 text-center">A coherent CLI tool for deploying kubernetes
-                        clusters.
-                    </div>
-                </div>
-
-
-                <div class="flex flex-row justify-center self-center pb-3" style="z-index:2">
-                    <a href="https://github.com/MusicDin/terraform-kvm-kubespray"
-                        class="flex flex-row rounded-md hover:cursor-pointer p-2 hover:shadow-md ease-in duration-300"
-                        style="transition-duration: 300ms;">
-                        <img src="https://github.githubassets.com/images/modules/logos_page/Octocat.png"
-                            class="w-3 h-3 self-center">
-                        &nbsp;view on GitHub
-                    </a>
-                </div>
-            </div>
-
-
-        </div>
-
-        <div class="flex w-full md:w-1/2 flex-col p-2">
-            
-
-        </div>
-
-
-    </div> -->
 
 
 </div>
 
-<!-- <div id="with_image" class="fixed h-full w-full flex">
-    <div id="content-banner" class="absolute right-0 h-full bg-white skew-x-12 w-8/12 shadow-neutral-600">
-        
-    </div>
-</div>
 
-<div class="bg-black">
-
-</div> -->
 
 
 {% endblock %}
