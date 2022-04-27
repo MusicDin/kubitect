@@ -70,12 +70,6 @@ window.addEventListener('load', (event) => {
                         printCommand(terminal,'kubitect apply',()=>{
                             setTimeout(()=>{
                                 appendMultipleLines(terminal,terminalOutputLines,50,()=>{
-
-                                    let readTheDocs = document.getElementById('read-the-docs')
-                                    setTimeout(()=>{
-                                        readTheDocs.style.display = 'block'
-                                    },timeBetween)
-
                                 })
                             },timeBetween)
                         })
@@ -85,3 +79,8 @@ window.addEventListener('load', (event) => {
         })
     },timeBetween)
 });
+
+function learnMore(){
+    console.log("hello")
+    window.location.href = '/user-guide/installation'
+}
