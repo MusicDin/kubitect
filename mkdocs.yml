@@ -1,5 +1,5 @@
 site_name: Kubitect documentation
-site_url: https://musicdin.github.io/terraform-kvm-kubespray
+site_url: https://kubitect.io
 
 repo_url: https://github.com/musicdin/terraform-kvm-kubespray
 repo_name: MusicDin/kubitect
@@ -12,6 +12,9 @@ theme:
   custom_dir: docs/overrides
 
   palette:
+    favicon: assets/images/favicon.svg
+    logo: assets/images/logo_white.svg
+
     - scheme: default
       toggle:
         icon: material/weather-night
@@ -35,6 +38,12 @@ theme:
 
   icon:
     repo: fontawesome/brands/github
+
+extra_css:
+  - stylesheets/style.css
+
+extra_javascript:
+  - javascripts/hashtags.js
 
 plugins:
   - search

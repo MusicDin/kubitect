@@ -59,9 +59,7 @@ func AskUserConfirmation(warning ...any) bool {
 	}
 
 	if len(warning) > 0 {
-		format := fmt.Sprint(warning[0])
-		args := warning[1:]
-		PrintWarning(fmt.Sprintf(format, args...))
+		PrintWarning(warning...)
 	}
 
 	fmt.Println("\nAre you sure you want to continue? (yes/no)")
@@ -86,12 +84,11 @@ func AskUserConfirmation(warning ...any) bool {
 func VerifyClusterDir(clusterPath string) error {
 
 	if !isClusterDir(clusterPath) {
-		PrintError("Cluster path points to the invalid cluster directory!")
+		PrintError("Cluster path points to an invalid cluster directory!")
 
 		if env.Local {
 			PrintError("Are you sure you are in the right directory?")
 		}
-
 		return fmt.Errorf("Invalid cluster directory.")
 	}
 
@@ -115,8 +112,13 @@ func isClusterDir(clusterPath string) bool {
 
 		// Check if all required directories are present
 		if strings.HasSuffix(path, "/") {
+
 			_, err = os.Stat(filepath.Join(clusterPath, path))
+
 			if err != nil {
+				if env.DebugMode {
+					PrintDebug("Directory '%s' in missing!", path)
+				}
 				return false
 			}
 		}

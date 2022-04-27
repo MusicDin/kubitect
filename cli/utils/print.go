@@ -2,24 +2,39 @@ package utils
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/fatih/color"
 )
 
 var (
-	red    = color.New(color.FgRed).SprintFunc()
-	yellow = color.New(color.FgYellow).SprintFunc()
+	red    = color.New(color.FgHiRed).SprintFunc()
+	yellow = color.New(color.FgHiYellow).SprintFunc()
+	blue   = color.New(color.FgHiCyan).SprintFunc()
 )
 
-func PrintError(str ...string) {
-	printStamp(red("ERROR"), str)
+func PrintError(msg ...any) {
+	printStamp(red("ERROR"), msg)
 }
 
-func PrintWarning(str ...string) {
-	printStamp(yellow("WARNING"), str)
+func PrintWarning(msg ...any) {
+	printStamp(yellow("WARNING"), msg)
 }
 
-func printStamp(stamp string, str []string) {
-	fmt.Printf("[ %v ] %s\n", stamp, strings.Join(str, " "))
+func PrintDebug(msg ...any) {
+	printStamp(blue("DEBUG"), msg)
+}
+
+func printStamp(stamp string, msg []any) {
+
+	stamp = fmt.Sprintf("[ %v ] ", stamp)
+
+	if len(msg) == 0 {
+		fmt.Println(stamp)
+		return
+	}
+
+	format := stamp + fmt.Sprint(msg[0])
+	args := msg[1:]
+
+	fmt.Println(fmt.Sprintf(format, args...))
 }

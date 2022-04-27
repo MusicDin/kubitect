@@ -207,8 +207,8 @@ func initCluster(clusterPath string) error {
 	}
 
 	if env.DebugMode {
-		fmt.Println("kubitect.url: " + url)
-		fmt.Println("kubitect.version: " + version)
+		utils.PrintDebug("kubitect.url: %s", url)
+		utils.PrintDebug("kubitect.version: %s", version)
 	}
 
 	// Make sure that the cluster folder exists
@@ -234,7 +234,6 @@ func initCluster(clusterPath string) error {
 
 	// Remove temporary directory.
 	err = os.RemoveAll(gitTmpDir)
-
 	if err != nil {
 		return fmt.Errorf("Failed removing temporary git project: %w", err)
 	}
