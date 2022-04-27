@@ -10,8 +10,8 @@ edit_uri: ""
 theme:
   name: material
   custom_dir: docs/overrides
-  
-  palette: 
+
+  palette:
     - scheme: default
       toggle:
         icon: material/weather-night
@@ -50,29 +50,27 @@ markdown_extensions:
 
   # Content tabs
   - pymdownx.tabbed:
-      alternate_style: true 
+      alternate_style: true
 
   # Emoji
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_generator: !!python/name:materialx.emoji.to_svg # Page tree
 
-# Page tree
 nav:
+  - Home: index.md
   - User guide:
-    - Installation: user-guide/installation.md
-    - Quick start: user-guide/quick-start.md
-    - Getting started: user-guide/getting-started.md
-    - Cluster management: user-guide/cluster-management.md
-    - Other:
-      - Requirements: user-guide/requirements.md
-      - Local development: user-guide/local-development.md
-      - Troubleshooting: user-guide/troubleshooting.md
+      - Installation: user-guide/installation.md
+      - Quick start: user-guide/quick-start.md
+      - Getting started: user-guide/getting-started.md
+      - Cluster management: user-guide/cluster-management.md
+      - Other:
+          - Requirements: user-guide/requirements.md
+          - Local development: user-guide/local-development.md
+          - Troubleshooting: user-guide/troubleshooting.md
   - Reference: reference/reference.md
   - Examples:
-    #- Load balancing: user-guide/load-balancer.md
-    - Single node cluster: examples/single-node-cluster.md
-    - Bridged network: examples/bridged-network.md
-    - Full example: examples/full-example.md
-  
-  
+      #- Load balancing: user-guide/load-balancer.md
+      - Single node cluster: examples/single-node-cluster.md
+      - Bridged network: examples/bridged-network.md
+      - Full example: examples/full-example.md

@@ -1,11 +1,32 @@
 /* Overwriting mkdocs material css */
-.md-header{
-  background-color: transparent!important;
-  box-shadow: none!important;
+.md-header {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
 }
-.md-main{
-  display: none !important;
+
+.md-search__form {
+  background-color: transparent !important;
+  color: white !important;
 }
+
+.md-search__form:hover {
+  background-color: #f8f8f229 !important;
+  color: white !important;
+}
+
+.md-search__input {
+  background-color: transparent !important
+}
+
+.md-search__input:hover {
+  background-color: transparent !important
+}
+.md-tabs{
+  z-index: 10;
+    background-color: transparent;
+}
+
 
 /* main outer box css (overflowing topbar) */
 #main-box{
