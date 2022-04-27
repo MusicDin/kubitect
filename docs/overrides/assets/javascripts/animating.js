@@ -1,136 +1,35 @@
-
-const command1 = 'wget -O kubitect https://download.kubitect.io'
-const commandResult1 = [
-    '$'
-]
-const command2 = 'sudo mv kubitect /usr/local/bin/'
-const commandResult2 = [
-    '$'
-]
-const command3 = "kubitect apply"
-const commandResult3 = [
-    '',
-    "Preparing cluster 'default'...",
-    "Setting up 'main' virtual environment...",
-    "Creating virtual environment...",
-    "Installing pip3 dependencies...",
-    "This can take up to a minute when the virtual environment is initialized for the first time...<br>",
-    "PLAY [localhost]<br>",
-    "TASK [cluster-config/copy : Make sure config directory exists]",
-    "<span style=\"color:green\">ok: [127.0.0.1]</span><br>",
-    "...",
-]
-
+// trigger terminal animation when window loads
 window.addEventListener('load', (event) => {
-    console.log('page is fully loaded');
-    let command_top = document.getElementById('top-command-fg')
-    let top_command_bg = document.getElementById('top-command-bg')
-
-    let command_anim = document.getElementById('command-anim')
-    let command_bg = document.getElementById('command-anim-bg')
-
-    let command_result = document.getElementById('command-result-fg')
-    let main_box = document.getElementById('main-box')
-
-    let command_description = document.getElementById('command-description')
-
-    let boundingRect = main_box.getBoundingClientRect()
-    console.log(boundingRect.width)
-    console.log(boundingRect.height)
-
-    // console.log(command_anim)
-    // console.log(command_result)
-    // setTimeout(()=>{
-    //     command_anim.innerHTML = commandText
-    // },1000)
-
     
-    const printLines = async () => {
-        appendLine(command_result,'$ ')
-        appendLine(command_result,'hello marko1')
-        appendLine(command_result,'hello marko2')
-        appendLine(command_result,'hello marko3')
-    }
-    
-    const clearCommands =  () => {
-        command_top.innerHTML = ''
-        command_anim.innerHTML = ''
-        command_result.innerHTML = ''
-    }
-
-    const loopCommands = async () => {
-        clearCommands()
-        //print first sequence
-        top_command_bg.innerHTML = "$ "+command1
-        command_bg.innerHTML = command1
-        command_description.innerHTML = 'Downloads kubitect.'
-        printSequence(command_top,command_anim,command1,20,()=>{
-            console.log("printed first sequence")
-            setTimeout(()=>{
-                //print result
-
-                printCommandResult(command_result,commandResult1,50,()=>{
-                    console.log("printed result1")
-
-                    setTimeout(()=>{
-                        clearCommands()
-                        
-                        top_command_bg.innerHTML = command2
-                        command_bg.innerHTML = command2
-                        
-                        command_description.innerHTML = 'Installs kubitect.'
-                        printSequence(command_top,command_anim,command2,20,()=>{
-                            console.log("printed second command")
-                            setTimeout(()=>{
-                                printCommandResult(command_result,commandResult2,50,()=>{
-                                    console.log("printed result2")
-
-                                    setTimeout(()=>{
-                                        clearCommands()
-                                        
-                                        command_description.innerHTML = 'Creates a kubernetes cluster.'
-                                        command_bg.innerHTML = command3
-                                        top_command_bg.innerHTML = command3
-                                        printSequence(command_top,command_anim,command3,20,()=>{
-                                            console.log("printed third command")
-                                            setTimeout(()=>{
-                                                printCommandResult(command_result,commandResult3,50,()=>{
-                                                    console.log("printed result3")
-                                                    
-                                                    setTimeout(()=>{
-                                                        loopCommands()
-                                                    },4000)
-                
-                                                })
-                                            },400)
-                                        })
-                                    },4000)
-                                })
-                            },400)
-                        })
-                    },4000)
-                })
-            },400)
-        })
-    
-    }
-
-    // printSequence()
+    // miliseconds between each command typed
     let timeBetween = 500
-    let commandLine = document.getElementById('command_line')
+
+    // get the terminal nativeElement
+    let terminal = document.getElementById('command_line')
+
+    // output lines to be appended at the end of all 3 commands
+    const terminalOutputLines = [
+        '',
+        "Preparing cluster 'default'...",
+        "Setting up 'main' virtual environment...",
+        "Creating virtual environment...",
+        "Installing pip3 dependencies...",
+        "This can take up to a minute when the virtual environment is initialized for the first time...<br>",
+        "PLAY [localhost]<br>",
+        "TASK [cluster-config/copy : Make sure config directory exists]",
+        "<span style=\"color:green\">ok: [127.0.0.1]</span><br>",
+        "...",
+    ]
+
+    // start animation
     setTimeout(()=>{
-        // appendNext(command_top3,command_anim3,commandText,command_result3)
-        // animation_done = true
-        printCommand(commandLine,'curl -o kubitect -L https://dl.kubitect.com',()=>{
+        printCommand(terminal,'curl -o kubitect -L https://dl.kubitect.com',()=>{
             setTimeout(()=>{
-                printCommand(commandLine,'sudo mv kubitect /usr/local/bin/',()=>{
+                printCommand(terminal,'sudo mv kubitect /usr/local/bin/',()=>{
                     setTimeout(()=>{
-                        printCommand(commandLine,'kubitect apply',()=>{
-                            console.log("all commands printed")
+                        printCommand(terminal,'kubitect apply',()=>{
                             setTimeout(()=>{
-                                appendMultipleLines(commandLine,commandResult3,50,()=>{
-                                    console.log(commandLine.innerHTML)
-                                })
+                                appendMultipleLines(terminal,terminalOutputLines,50,()=>{})
                             },timeBetween)
                         })
                     },timeBetween)
@@ -138,85 +37,14 @@ window.addEventListener('load', (event) => {
             },timeBetween)
         })
     },timeBetween)
-
-    // window.addEventListener('scroll', function() {
-    //     var position = command_anim3.getBoundingClientRect();
-    
-    //     // checking whether fully visible
-    //     if(position.top >= 0 && position.bottom <= (3/4)*window.innerHeight) {
-    //         if(!animation_done){
-
-                
-    //         }
-    //     }
-    // });
-
-
 });
 
-
-
-animation_done = false
-
-// let commands = [
-//     {
-//         command:'wget -O kubitect https://download.kubitect.com',
-//         result:'$'
-//     },
-//     { 
-//         command:'sudo mv kubitect /usr/local/bin/',
-//         result:'$'
-//     },
-//     {
-//         command:'kubitect apply',
-//         result: resultText
-//     },
-// ]
-
-let commandText = 'kubitect apply'
-let resultText = "<p class=\"px-2 m-0\">"
-// Preparing cluster '<span style=\"background-color:red\">default</span>'...<br>
-// Setting up 'main' virtual environment...<br>
-// Creating virtual environment...<br>
-// Installing pip3 dependencies...<br>
-// This can take up to a minute when the virtual environment is initialized for the first time...<br><br>
-// PLAY [localhost]<br><br>
-// TASK [cluster-config/copy : Make sure config directory exists]<br>
-// <span style=\"color:green\">ok: [127.0.0.1]</span><br><br>
-// ...
-
-
-const printSequence = async (top_element,main_element,sequence,speed, callback) => {
-    if(sequence.length===0)callback()
-    else{
-        top_element.innerHTML = top_element.innerHTML += sequence[0]
-        main_element.innerHTML = main_element.innerHTML += sequence[0]
-        setTimeout(()=>{
-            printSequence(top_element,main_element,sequence.substr(1),speed,()=>{
-                callback()
-            })
-        },speed)
-    }
-}
-
-const printCommandResult = async (result_element,lines,speed,callback) => {
-    if(lines.length===0)callback()
-    else{
-        result_element.innerHTML+=lines[0]+'<br>'
-        setTimeout(()=>{
-            printCommandResult(result_element,lines.slice(1),speed,()=>{
-                callback()
-            })
-        },speed)
-    }
-
-}
-
-
+// appends one given line to given target's innerHtml and adds a break (<br>)
 const appendLine = async (target,line) => {
     target.innerHTML += line+'<br>'
 }
 
+// recursively appends given lines to the given target's innerHtml (uses appendLine() function)
 const appendMultipleLines = async (target,lines,speed,callback)=>{
     if(lines.length===0)callback()
     else{
@@ -229,6 +57,8 @@ const appendMultipleLines = async (target,lines,speed,callback)=>{
     }
 }
 
+// append command to the target's innterHtml (adds a styled '$' at the beggining)
+// uses typeSequence to simulate typing the command
 const printCommand = async (target, command, callback) => {
     target.innerHTML += '<span class="command-dollar-sign">$</span> '
     typeSequence(target,command,20,()=>{
@@ -250,20 +80,3 @@ const typeSequence = async (target, sequence, speed, callback) => {
     }
 }
 
-
-const appendNext = async (top_element,element,remainer,result) => {
-    if(remainer===''){
-        // result.innerHTML = resultText
-        setTimeout(()=>{
-            result.innerHTML = resultText
-        },500)
-        
-    }else{
-        top_element.innerHTML=top_element.innerHTML+=remainer[0]
-        element.innerHTML=element.innerHTML+=remainer[0]
-        setTimeout(()=>{
-            appendNext(top_element,element,remainer.substr(1),result)
-        },20)
-    }
-
-}
