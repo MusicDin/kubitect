@@ -5,9 +5,11 @@
   border: none !important;
 }
 
-.md-search__form {
+.md-search {
   background-color: transparent !important;
   color: white !important;
+  display: none;
+  width:0;
 }
 
 .md-search__form:hover {
@@ -23,14 +25,34 @@
   background-color: transparent !important
 }
 .md-tabs{
-  z-index: 10;
+  z-index: 3;
     background-color: transparent;
+    color: gray !important;
+}
+
+form.md-header__option label.md-header__button.md-icon{
+  display: none;
+}
+
+.md-tabs__link:hover {
+  color: white
 }
 
 
 /* main outer box css (overflowing topbar) */
+/* flex flex-row flex-grow flex-wrap w-full overflow-auto items-center */
 #main-box{
-  background: linear-gradient( 99.9deg, rgba(27,24,31,1) 21.2%, rgb(22, 98, 180) 84.8% );
+  /* from tailwind */
+  /* display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  flex-wrap: wrap;
+  width:100%;
+  overflow: auto;
+  align-items: center; */
+
+
+  background: linear-gradient( 99.9deg, rgb(10, 17, 27), rgb(22, 98, 180));
   position: absolute;
   top:0;
   left:0;
@@ -40,6 +62,27 @@
   height:100%;
   overflow: auto;
 
+}
+
+#main-box a{
+  color:white;
+  font-weight: bold;
+}
+
+#main-box button{
+  background-color: rgba(0,0,0,0.4);
+  color:white;
+  padding:0.5rem 2rem;
+  border-radius: 3px;
+  transition-duration: 500ms!important;
+  box-shadow: 0 3px 4px 1px rgba(0,0,0,0.2);
+}
+#main-box button:hover{
+  transition-duration: 500ms!important;
+  background-color: rgba(0,0,0,0.6);
+  color:white;
+  padding:0.5rem 2rem;
+  border-radius: 3px;
 }
 
 /* --- classes for terminal design --- */

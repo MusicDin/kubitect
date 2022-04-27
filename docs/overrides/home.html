@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block tabs %}
 {{ super() }}
+{% endblock %}
+{% block content %}
+
+
 <!-- import custom css -->
 <link rel="stylesheet" href="home.css">
 
@@ -41,12 +45,16 @@
             </div>
 
             <!-- Link to github repo -->
-            <a href="https://github.com/MusicDin/terraform-kvm-kubespray"
+            <!-- <a href="https://github.com/MusicDin/terraform-kvm-kubespray"
                 class="mt-2 justify-center flex flex-row rounded-md hover:cursor-pointer p-2  ease-in duration-300"
                 style="transition-duration: 300ms;">
                 <img src="assets/images/octocat.svg" style="color:white!important" class="w-3 h-3 self-center">
                 &nbsp;&nbsp;View on GitHub
-            </a>
+            </a> -->
+
+            <button class="mt-5">
+                Learn more
+            </button>
         </div>
 
     </div>
@@ -57,27 +65,33 @@
         <!-- flex conatiner containing command line div -->
         <div class="flex flex-col justify-center items-center mt-20 md:mt-0">
 
-            <!--  -->
-            <div id="command-description" class="flex justify-center flex-row pt-1 pb-3 top-label">
-                Get started quickly
-            </div>
+            <!-- Slick label -->
+            <!-- <div id="command-description" class="flex justify-center flex-row pt-1 pb-3 top-label">
+                Create your first cluster...
+            </div> -->
 
             <!-- the terminal outline element -->
             <div class="terminal">
 
                 <!-- row with toolbar buttons -->
-                <div class="flex flex-row justify-start p-2 rounded-t">
-                    <div class="rounded-full cli-toolbar-button">
+                <div class="flex flex-row justify-between p-2 rounded-t">
+                    <div class="flex flex-row justify-start p-2">
+                        <div class="rounded-full cli-toolbar-button">
+                        </div>
+                        <div class="rounded-full ml-2 cli-toolbar-button">
+                        </div>
+                        <div class="rounded-full ml-2 cli-toolbar-button">
+                        </div>
                     </div>
-                    <div class="rounded-full ml-2 cli-toolbar-button">
-                    </div>
-                    <div class="rounded-full ml-2 cli-toolbar-button">
+
+                    <div class="pr-2" style="color:rgba(255,255,255,0.3)">
+                        Create your first cluster
                     </div>
                 </div>
 
                 <!-- command line output container -->
                 <div id="command-result-bg" class="command-result px-2 pb-2"
-                    style="color:transparent;position:relative">
+                    style="color:transparent;position:relative;font-size: 13px;">
 
                     <!-- placeholder content (for sizing) -->
                     $ curl -o kubitect -L https://dl.kubitect.com<br>$ sudo mv kubitect /usr/local/bin/<br>$ kubitect
@@ -97,6 +111,13 @@
 
             </div>
 
+            <!-- link to documentation -->
+            <!-- <div class="flex justify-center flex-row mt-3 pb-1 top-label">
+                <button>
+                    Learn more
+                </button>
+            </div> -->
+
         </div>
 
     </div>
@@ -106,6 +127,5 @@
 
 
 {% endblock %}
-{% block content %}{% endblock %}
 {% block footer %}
 {% endblock %}

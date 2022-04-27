@@ -1,6 +1,48 @@
+console.log("ayy")
+
 // trigger terminal animation when window loads
 window.addEventListener('load', (event) => {
+    console.log("hello")
+    const appendLine = async (target,line) => {
+        target.innerHTML += line+'<br>'
+    }
     
+    // recursively appends given lines to the given target's innerHtml (uses appendLine() function)
+    const appendMultipleLines = async (target,lines,speed,callback)=>{
+        if(lines.length===0)callback()
+        else{
+            appendLine(target,lines[0])
+            setTimeout(()=>{
+                appendMultipleLines(target,lines.slice(1),speed,()=>{
+                    callback()
+                })
+            },speed)
+        }
+    }
+    
+    // append command to the target's innterHtml (adds a styled '$' at the beggining)
+    // uses typeSequence to simulate typing the command
+    const printCommand = async (target, command, callback) => {
+        target.innerHTML += '<span class="command-dollar-sign">$</span> '
+        typeSequence(target,command,20,()=>{
+            target.innerHTML += '<br>'
+            callback()
+        })
+    }
+    
+    //smoothly appends characters of the given sequence to given target's innerHtml
+    const typeSequence = async (target, sequence, speed, callback) => {
+        if(sequence.length===0)callback()
+        else{
+            target.innerHTML += sequence[0]
+            setTimeout(()=>{
+                typeSequence(target,sequence.substr(1),speed,()=>{
+                    callback()
+                })
+            },speed)
+        }
+    }
+
     // miliseconds between each command typed
     let timeBetween = 500
 
@@ -29,7 +71,14 @@ window.addEventListener('load', (event) => {
                     setTimeout(()=>{
                         printCommand(terminal,'kubitect apply',()=>{
                             setTimeout(()=>{
-                                appendMultipleLines(terminal,terminalOutputLines,50,()=>{})
+                                appendMultipleLines(terminal,terminalOutputLines,50,()=>{
+
+                                    let readTheDocs = document.getElementById('read-the-docs')
+                                    setTimeout(()=>{
+                                        readTheDocs.style.display = 'block'
+                                    },timeBetween)
+
+                                })
                             },timeBetween)
                         })
                     },timeBetween)
@@ -40,43 +89,5 @@ window.addEventListener('load', (event) => {
 });
 
 // appends one given line to given target's innerHtml and adds a break (<br>)
-const appendLine = async (target,line) => {
-    target.innerHTML += line+'<br>'
-}
 
-// recursively appends given lines to the given target's innerHtml (uses appendLine() function)
-const appendMultipleLines = async (target,lines,speed,callback)=>{
-    if(lines.length===0)callback()
-    else{
-        appendLine(target,lines[0])
-        setTimeout(()=>{
-            appendMultipleLines(target,lines.slice(1),speed,()=>{
-                callback()
-            })
-        },speed)
-    }
-}
-
-// append command to the target's innterHtml (adds a styled '$' at the beggining)
-// uses typeSequence to simulate typing the command
-const printCommand = async (target, command, callback) => {
-    target.innerHTML += '<span class="command-dollar-sign">$</span> '
-    typeSequence(target,command,20,()=>{
-        target.innerHTML += '<br>'
-        callback()
-    })
-}
-
-//smoothly appends characters of the given sequence to given target's innerHtml
-const typeSequence = async (target, sequence, speed, callback) => {
-    if(sequence.length===0)callback()
-    else{
-        target.innerHTML += sequence[0]
-        setTimeout(()=>{
-            typeSequence(target,sequence.substr(1),speed,()=>{
-                callback()
-            })
-        },speed)
-    }
-}
 
