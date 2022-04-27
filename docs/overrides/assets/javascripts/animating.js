@@ -1,8 +1,6 @@
-console.log("ayy")
-
 // trigger terminal animation when window loads
 window.addEventListener('load', (event) => {
-    console.log("hello")
+    
     const appendLine = async (target,line) => {
         target.innerHTML += line+'<br>'
     }
@@ -42,7 +40,7 @@ window.addEventListener('load', (event) => {
             },speed)
         }
     }
-
+    
     // miliseconds between each command typed
     let timeBetween = 500
 
@@ -87,7 +85,3 @@ window.addEventListener('load', (event) => {
         })
     },timeBetween)
 });
-
-// appends one given line to given target's innerHtml and adds a break (<br>)
-
-
