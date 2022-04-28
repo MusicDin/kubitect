@@ -1,4 +1,4 @@
-site_name: Kubitect documentation
+site_name: Kubitect
 site_url: https://kubitect.io
 
 repo_url: https://github.com/musicdin/terraform-kvm-kubespray

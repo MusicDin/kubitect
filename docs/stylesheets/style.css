@@ -174,10 +174,32 @@
 
 
 /*
- * HEADER - Navigation link
+ * SIDEBAR (mobile)
  */
 
-[data-md-color-scheme=slate] .md-nav__source {
+.md-sidebar.md-sidebar--primary .md-nav.md-nav--primary .md-nav__source {
+    color: var(--md-text-color);
+    background-color: var(--md-primary-fg-color--transparent)
+}
+
+[data-md-color-scheme=default] .md-sidebar.md-sidebar--primary .md-nav.md-nav--primary .md-nav__title {
+    color: var(--md-header-text-color);
+    background-color: var(--md-header-bg-color);
+    border-bottom: .1rem solid var(--md-primary-fg-color)
+}
+
+[data-md-color-scheme=slate] .md-sidebar.md-sidebar--primary .md-nav.md-nav--primary .md-nav__title {
+    color: var(--md-header-text-color);
+    background-color: var(--md-header-bg-color);
+    border-bottom: .05rem solid var(--md-primary-fg-color)
+}
+
+
+/*
+ * NAVIGATION - links
+ */
+
+ [data-md-color-scheme=slate] .md-nav__source {
     color: var(--md-header-text-color)
 }
 
