@@ -1,6 +1,6 @@
 <div align=center>
-
-<h1 style="border: none"><a href="https://kubitect.io">Kubitect</a></h1>
+  
+<h1><a href="https://kubitect.io">Kubitect</a></h1>
 
 
 <img src="docs/theme/assets/images/favicon.svg" width=200></img>
@@ -10,21 +10,20 @@
 ---
 
 </br>
-</br>
 
-## Getting started
+### Getting started
 
 For documentation and examples on how to use Kubitect visit **[kubitect.io](https://kubitect.io)**.
 
 </br>
 
-## Authors
+### Authors
 
 [Din Mušić](https://github.com/MusicDin) and [all contributors](https://github.com/MusicDin/terraform-kvm-kubespray/graphs/contributors).
 
 </br>
 
-## License
+### License
 
 [:page_with_curl: Apache License 2.0](./LICENSE)
 
