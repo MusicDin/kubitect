@@ -4,11 +4,11 @@
 {% endblock %}
 {% block content %}
 
-
 <!-- import custom css -->
 <link rel="stylesheet" href="home.css">
-<link rel="stylesheet" href="tailwind.css">
+<link rel="stylesheet" href="stylesheets/tailwind.css">
 
+<!-- tailwind dev -->
 <!-- <script src="https://cdn.tailwindcss.com"></script> -->
 
 <!-- import google fonts -->
@@ -42,14 +42,6 @@
                 clusters.
             </div>
 
-            <!-- Link to github repo -->
-            <!-- <a href="https://github.com/MusicDin/terraform-kvm-kubespray"
-                class="mt-2 justify-center flex flex-row rounded-md hover:cursor-pointer p-2  ease-in duration-300"
-                style="transition-duration: 300ms;">
-                <img src="assets/images/octocat.svg" style="color:white!important" class="w-3 h-3 self-center">
-                &nbsp;&nbsp;View on GitHub
-            </a> -->
-
             <a id="btn_learn-more" href="user-guide/installation" class="mt-5">
                 Learn more
             </a>
@@ -62,22 +54,17 @@
         <!-- flex conatiner containing command line div -->
         <div class="flex flex-col justify-center items-center mt-20 md:mt-0">
 
-            <!-- Slick label -->
-            <!-- <div id="command-description" class="flex justify-center flex-row pt-1 pb-3 top-label">
-                Create your first cluster...
-            </div> -->
-
             <!-- the terminal outline element -->
             <div id="terminal" class="terminal">
 
                 <!-- row with toolbar buttons -->
                 <div class="flex flex-row justify-between p-2 rounded-t items-center">
                     <div class="flex flex-row justify-start p-2">
-                        <div class="rounded-full cli-toolbar-button">
+                        <div class="rounded-full terminal-toolbar-button">
                         </div>
-                        <div class="rounded-full ml-2 cli-toolbar-button">
+                        <div class="rounded-full ml-2 terminal-toolbar-button">
                         </div>
-                        <div class="rounded-full ml-2 cli-toolbar-button">
+                        <div class="rounded-full ml-2 terminal-toolbar-button">
                         </div>
                     </div>
 

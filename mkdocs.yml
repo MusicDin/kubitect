@@ -43,8 +43,7 @@ extra_css:
   - stylesheets/style.css
 
 extra_javascript:
-  - javascripts/hashtags.js
-  - javascripts/animating.js
+  - javascripts/extra.js
 
 plugins:
   - search
