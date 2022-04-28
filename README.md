@@ -3,7 +3,7 @@
 <h1 style="border: none"><a href="https://kubitect.io">Kubitect</a></h1>
 
 
-<img src="docs/assets/images/favicon.svg" width=200></img>
+<img src="docs/theme/assets/images/favicon.svg" width=200></img>
 
 *Kubitect provides a simple way to set up a highly available Kubernetes cluster across multiple hosts.*
 
