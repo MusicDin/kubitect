@@ -25,11 +25,11 @@ kubitect:
 # [!] Note that the connection to the remote hosts supports only 
 #     passwordless login (using only SSH keyfile).  
 #
-# The host can be marked also as default, which means that if an instance
-# (in "cluster.nodes" section) does not have a particular host specified,
-# it will be installed on a default host. If none of the hosts are marked 
-# as default, the first one in the list is used as the default host.
-# 
+# The host can also be marked as default, i.e. if no specific host is
+# specified for an instance (in the cluster.nodes section), it will be
+# installed on a default host. If none of the hosts is marked as default, 
+# the first one in the list is used as default host.
+#
 hosts:
   - name: localhost # (3)
     default: true # (4)
@@ -155,9 +155,8 @@ cluster:
         - id: 5
 
 #
-# The "kubernetes" section specifies what version of Kubernetes and Kubespray
-# should be used, which network plugin and dns server should be installed and
-# whether or not to install a Kubespray addons.
+# The "kubernetes" section specifies which version of Kubernetes and
+# Kubespray to use and which network plugin and DNS server to install.
 #
 kubernetes:
   version: "v1.21.6"

@@ -66,7 +66,7 @@ In the cluster configuration file, set the following variables:
 
 - `cluster.network.mode` to `bridge`,
 - `cluster.network.bridge` to the name of the bridge you have created (`br0` in our case) and
-- `cluster.network.gateway` if the first host in `netwrok_cidr` is not a gateway.
+- `cluster.network.gateway` if the first host in `network_cidr` is not a gateway.
 
 ```yaml
 cluster:
