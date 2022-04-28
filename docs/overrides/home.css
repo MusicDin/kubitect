@@ -64,7 +64,8 @@ form.md-header__option label.md-header__button.md-icon{
   font-weight: bold;
 }
 
-#main-box button{
+
+a#btn_learn-more{
   background-color: rgba(0,0,0,0.4);
   color:white;
   padding:0.5rem 2rem;
@@ -72,7 +73,7 @@ form.md-header__option label.md-header__button.md-icon{
   transition-duration: 500ms!important;
   box-shadow: 0 3px 4px 1px rgba(0,0,0,0.2);
 }
-#main-box button:hover{
+a#btn_learn-more:hover{
   transition-duration: 500ms!important;
   background-color: rgba(0,0,0,0.6);
   color:white;
