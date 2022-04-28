@@ -1,67 +1,31 @@
-<h1 align=center>Kubitect</h1>
+<div align=center>
 
-<p align=center><b>Kubitect provides a simple way to set up a highly available Kubernetes cluster across multiple hosts.</b></p>
+<h1 style="border: none"><a href="https://kubitect.io">Kubitect</a></h1>
+
+
+<img src="docs/assets/images/favicon.svg" width=200></img>
+
+*Kubitect provides a simple way to set up a highly available Kubernetes cluster across multiple hosts.*
 
 ---
 
-## Quick start
+</br>
+</br>
 
-### Step 1 - Download and install `kubitect` tool
+## Getting started
 
-**TODO**
+For documentation and examples on how to use Kubitect visit **[kubitect.io](https://kubitect.io)**.
 
-```
-wget -O kubitect 
+</br>
 
-sudo install kubitect /usr/local/bin
-```
+## Authors
 
-### Step 2 - Create the cluster
+[Din Mušić](https://github.com/MusicDin) and [all contributors](https://github.com/MusicDin/terraform-kvm-kubespray/graphs/contributors).
 
-Run the following command to create the default cluster.
-Cluster will be created in `~/.kubitect/clusters/default/` directory.
-
-```
-kubitect apply
-```
-
-> :scroll: **Note**:
-Using a `--cluster` option, you can provide custom cluster name.
-This way multiple clusters can be created.
-
-### Step 3 - Export kubeconfig
-
-After successful installation of the Kubernetes cluster, Kubeconfig will be created within cluster's directory.
-To export the Kubeconfig into custom file run the following command.
-
-```
-kubitect export kubeconfig > kubeconfig.yaml
-```
-
-### Step 4 - Test the cluster
-
-Test if the cluster works by displaying all cluster nodes.
-
-```
-kubectl get nodes --kubeconfig kubeconfig.yaml
-```
-
-## Documentation
-+ [Getting started](docs/getting-started/getting-started.md)
-+ [Requirements](docs/getting-started/requirements.md)
-+ [Load balancing](docs/getting-started/load-balancer.md)
-+ [Troubleshooting](docs/getting-started/troubleshooting.md)
-+ [Reference](docs/reference/reference.md)
-+ Examples:
-  - [Cluster over bridged network](docs/examples/bridged-network.md)
-  - [Single node cluster deployment](docs/examples/single-node-cluster.md)
-
-## Having issues?
-
-In case you have found a bug, or some unexpected behaviour please [open an issue](https://github.com/MusicDin/terraform-kvm-kubespray/issues/new).
-
-If you need anything else, you can contact me on [:email: din.music@din-cloud.com](mailto:din.music@din-cloud.com).
+</br>
 
 ## License
 
-[Apache License 2.0](./LICENSE)
+[:page_with_curl: Apache License 2.0](./LICENSE)
+
+</div>

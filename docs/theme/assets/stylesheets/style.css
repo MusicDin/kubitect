@@ -146,7 +146,7 @@
     background-color: var(--md-default-fg-color--darker)
 }
 
-[data-md-color-scheme=default] .md-search__form .md-search__icon {
+[data-md-color-scheme=default] .md-search__icon.md-icon :nth-child(2) {
     color: var(--md-text-color)
 }
 
