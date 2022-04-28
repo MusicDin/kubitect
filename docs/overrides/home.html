@@ -7,9 +7,9 @@
 
 <!-- import custom css -->
 <link rel="stylesheet" href="home.css">
+<link rel="stylesheet" href="tailwind.css">
 
-<!-- import tailwind css -->
-<script src="https://cdn.tailwindcss.com"></script>
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
 
 <!-- import google fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,10 +17,6 @@
 <link
     href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;600;700;800;900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
     rel="stylesheet">
-
-<!-- import custom javascript -->
-<script src="assets/javascripts/animating.js"></script>
-
 
 <!-- main flex container of the page, overflows topbar -->
 <div id="main-box" class="flex flex-row flex-grow flex-wrap w-full overflow-auto items-center">
@@ -34,8 +30,11 @@
 
             <!-- app logo with app title -->
             <div class="flex flex-row items-center text-3xl text-kubeblue font-bold text-center mt-20 md:mt-0">
-                <img src="assets/images/logo.svg" style="width:40px;height:auto">
+
+                <!-- img src="assets/images/logo.svg" style="width:40px;height:auto; transform:scaleX(-1)"-->
+                <img src="assets/images/logo.svg" style="width:40px;height:auto;">
                 Kubitect
+
             </div>
 
             <!-- App short description -->
@@ -51,11 +50,10 @@
                 &nbsp;&nbsp;View on GitHub
             </a> -->
 
-            <button onclick="learnMore()" class="mt-5">
+            <a id="btn_learn-more" href="user-guide/installation" class="mt-5">
                 Learn more
-            </button>
+            </a>
         </div>
-
     </div>
 
     <!-- this is the right side (showing commands)-->
@@ -70,10 +68,10 @@
             </div> -->
 
             <!-- the terminal outline element -->
-            <div class="terminal">
+            <div id="terminal" class="terminal">
 
                 <!-- row with toolbar buttons -->
-                <div class="flex flex-row justify-between p-2 rounded-t">
+                <div class="flex flex-row justify-between p-2 rounded-t items-center">
                     <div class="flex flex-row justify-start p-2">
                         <div class="rounded-full cli-toolbar-button">
                         </div>
@@ -83,7 +81,7 @@
                         </div>
                     </div>
 
-                    <div class="pr-2" style="color:rgba(255,255,255,0.3)">
+                    <div class="pr-2 terminal-label" style="color:rgba(255,255,255,0.3)">
                         Create your first cluster
                     </div>
                 </div>
