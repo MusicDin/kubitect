@@ -146,6 +146,10 @@
     background-color: var(--md-default-fg-color--darker)
 }
 
+[data-md-color-scheme=default] .md-search__form .md-search__icon {
+    color: var(--md-text-color)
+}
+
 [data-md-color-scheme=slate] .md-search__input {
     color: var(--md-header-text-color);
     background-color: var(--md-header-bg-color)
