@@ -6,12 +6,17 @@ Before starting with installation, make sure you meet all the [requirements](./r
 
 After all requirements are met, download the Kubitect command line tool.
 ```sh
-wget -O kubitect ...
+curl -o kubitect.tar.gz -L https://github.com/MusicDin/kubitect/releases/download/v2.0.0/kubitect-cli-v2.0.0-linux-amd64.tar.gz
+```
+
+Unpack `tar.gz` file.
+```sh
+tar -xzf kubitect.tar.gz
 ```
 
 Install Kubitect command line tool by placing the Kubitect binary file in `/usr/local/bin` directory.
 ```sh
-sudo mv kubitect /usr/local/bin/
+sudo mv kubitect-cli /usr/local/bin/kubitect
 ```
 
 Verify the installation by checking the Kubitect version.

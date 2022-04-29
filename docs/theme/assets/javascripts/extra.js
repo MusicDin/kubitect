@@ -57,7 +57,6 @@ function removeHashtags() {
     })
 };
 
-
 // terminal animation
 function terminalAnimation() {
 
@@ -66,40 +65,33 @@ function terminalAnimation() {
     }
 
     // recursively appends given lines to the given target's innerHtml (uses appendLine() function)
-    const appendMultipleLines = async (target, lines, speed, callback) => {
-        if (lines.length === 0) callback()
-        else {
+    const appendMultipleLines = async (target, lines, speed) => {
+        if (lines.length !== 0)
             appendLine(target, lines[0])
             setTimeout(() => {
-                appendMultipleLines(target, lines.slice(1), speed, () => {
-                    callback()
-                })
+                appendMultipleLines(target, lines.slice(1), speed)
             }, speed)
-        }
     }
 
     // append command to the target's innterHtml (adds a styled '$' at the beggining)
     // uses typeSequence to simulate typing the command
-    const printCommand = async (target, command, callback) => {
+    const printCommand = async (target, command) => {
         target.innerHTML += '<span class="command-dollar-sign">$</span> '
-        typeSequence(target, command, 20, () => {
-            target.innerHTML += '<br>'
-            callback()
-        })
+        await typeSequence(target, command, 20)
+        target.innerHTML += '<br>'
     }
 
     //smoothly appends characters of the given sequence to given target's innerHtml
-    const typeSequence = async (target, sequence, speed, callback) => {
-        if (sequence.length === 0) callback()
-        else {
+    const typeSequence = async (target, sequence, speed) => {
+        if (sequence.length > 0) {
             target.innerHTML += sequence[0]
-            setTimeout(() => {
-                typeSequence(target, sequence.substr(1), speed, () => {
-                    callback()
-                })
-            }, speed)
+            await delay(speed)
+            await typeSequence(target, sequence.substr(1), speed)
         }
     }
+
+    const delay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    
 
     // miliseconds between each command typed
     let timeBetween = 500
@@ -108,10 +100,9 @@ function terminalAnimation() {
     let terminal = document.getElementById('command_line')
 
     // Prevent animation if terminal element is not found
-    if (terminal == null) {
+    if (terminal == null)
         return
-    }
-
+    
     // output lines to be appended at the end of commands
     const terminalOutputLines = [
         '',
@@ -126,24 +117,19 @@ function terminalAnimation() {
         "...",
     ]
 
-    // animation 
-    const animate = () => {
-        setTimeout(() => {
-            printCommand(terminal, 'curl -o kubitect -L https://dl.kubitect.com', () => {
-                setTimeout(() => {
-                    printCommand(terminal, 'sudo mv kubitect /usr/local/bin/', () => {
-                        setTimeout(() => {
-                            printCommand(terminal, 'kubitect apply', () => {
-                                setTimeout(() => {
-                                    appendMultipleLines(terminal, terminalOutputLines, 50, () => {
-                                    })
-                                }, timeBetween)
-                            })
-                        }, timeBetween)
-                    })
-                }, timeBetween)
-            })
-        }, timeBetween)
+    const animate = async () => {
+
+        await printCommand(terminal, 'curl -o kubitect.tar.gz -L https://github.com/MusicDin/kubitect/releases/...')
+        await delay(timeBetween)
+        await printCommand(terminal, 'tar -xzf kubitect.tar.gz')
+        await delay(timeBetween)
+        await printCommand(terminal, 'sudo mv kubitect-cli /usr/local/bin/kubitect')
+        await delay(timeBetween)
+        await printCommand(terminal, 'kubitect apply')
+        await delay(timeBetween)
+
+        await appendMultipleLines(terminal, terminalOutputLines, 50)
+
     }
 
     const animated = false

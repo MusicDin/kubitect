@@ -78,12 +78,39 @@
                     style="color:transparent;position:relative;font-size: 13px;">
 
                     <!-- placeholder content (for sizing) -->
-                    $ curl -o kubitect -L https://dl.kubitect.com<br>$ sudo mv kubitect /usr/local/bin/<br>$ kubitect
-                    apply<br><br>Preparing cluster '<span>default</span>'...<br>Setting up
-                    'main' virtual environment...<br>Creating virtual environment...<br>Installing pip3
-                    dependencies...<br>This can take up to a minute when the virtual environment is initialized for the
-                    first time...<br><br>PLAY [localhost]<br><br>TASK [cluster-config/copy : Make sure config directory
-                    exists]<br><span>ok: [127.0.0.1]</span><br><br>...<br>
+                    $ curl -o kubitect -L https://github.com/MusicDin/kubitect/releases/...
+                    <br>
+                    $ tar -xzf kubitect.tar.gz
+                    <br>
+                    $ sudo mv kubitect-cli /usr/local/bin/kubitect
+                    <br>
+                    $ kubitect apply
+                    <br>
+                    <br>
+                    Preparing cluster '<span>default</span>'...
+                    <br>
+                    Setting up
+                    'main' virtual environment...
+                    <br>
+                    Creating virtual environment...
+                    <br>
+                    Installing pip3 dependencies...
+                    <br>
+                    This can take up to a minute when the virtual environment is initialized for the
+                    first time...
+                    <br>
+                    <br>
+                    PLAY [localhost]
+                    <br>
+                    <br>
+                    TASK [cluster-config/copy : Make sure config directory
+                    exists]
+                    <br>
+                    <span>ok: [127.0.0.1]</span>
+                    <br>
+                    <br>
+                    ...
+                    <br>
 
                     <!-- command line output will be rendered in this element's innerHtml -->
                     <div id="command_line" class="command-result px-2 m-0"
