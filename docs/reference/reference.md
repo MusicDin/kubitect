@@ -1,0 +1,642 @@
+---
+hide:
+  - navigation
+  - toc
+---
+
+<h1 align="center">Reference</h1>
+
+The cluster configuration consists of four parts:
+
++ `kubitect` - project metadata.
++ `hosts` - a list of physical hosts (local or remote).
++ `cluster` - cluster infrastructure configuration. Virtual machine properties, node types to install, and the host on which to install the nodes.
++ `kubernetes` - Kubernetes and Kubespray configuration. Versions, addons and other Kubernetes related settings.
+
+!!! note "Note"
+
+    `[*]` annotates an array.
+
+## *Kubitect* section
+
+<table>
+  <tbody>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Default value</th>
+      <th>Required?</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td><code>kubitect.url</code></td>
+      <td>string</td>
+      <td>https://github.com/MusicDin/kubitect</td>
+      <td>No</td>
+      <td>URL of the project's git repository.</td>
+    </tr>
+    <tr>
+      <td><code>kubitect.version</code></td>
+      <td>string</td>
+      <td>master</td>
+      <td>No</td>
+      <td>Version of the git repository. Can be a branch or a tag.</td>
+    </tr>
+  </tbody>
+</table>
+
+## *Hosts* section
+
+<table>
+  <tbody>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Default value</th>
+      <th>Required?</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td><code>hosts[*].name</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes</td>
+      <td>Custom server name used to link nodes with physical hosts.</td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].default</code></td>
+      <td>string</td>
+      <td>false</td>
+      <td></td>
+      <td>
+        Nodes where host is not specified will be installed on default host. 
+        The first host in the list is used as a default host if none is marked as a default.
+      </td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].connection.type</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes</td>
+      <td>Possible values are:
+        <ul>
+            <li><code>local</code> or <code>localhost</code></li>
+            <li><code>remote</code></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].connection.user</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes, if <code>connection.type</code> is set to <code>remote</code></td>
+      <td>Username is used to SSH into the remote machine.</td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].connection.ip</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes, if <code>connection.type</code> is set to <code>remote</code></td>
+      <td>IP address is used to SSH into the remote machine.</td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].connection.ssh.port</code></td>
+      <td>number</td>
+      <td>22</td>
+      <td></td>
+      <td>The port number of SSH protocol for remote machine.</td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].connection.ssh.keyfile</code></td>
+      <td>string</td>
+      <td>~/.ssh/id_rsa</td>
+      <td></td>
+      <td>Path to the keyfile that is used to SSH into the remote machine</td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].connection.ssh.verify</code></td>
+      <td>boolean</td>
+      <td>true</td>
+      <td></td>
+      <td>If set to true, SSH host is verified.</td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].mainResourcePoolPath</code></td>
+      <td>string</td>
+      <td>/var/lib/libvirt/pools/</td>
+      <td></td>
+      <td>Path to the resource pool used for main virtual machine volumes.</td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].dataResourcePools[*].name</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        Name of the data resource pool. Must be unique within the same host.
+        It is used to link virtual machine volumes to the specific resource pool.
+      </td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].dataResourcePools[*].path</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>Host path to the location where data resource pool is created.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+## *Cluster* section
+
+<table>
+  <tbody>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Default value</th>
+      <th>Required?</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td><code>cluster.name</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes</td>
+      <td>Custom cluster name that is used as a prefix for various cluster components.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.network.mode</code></td>
+      <td>string</td>
+      <td>nat</td>
+      <td>Yes</td>
+      <td>
+        Network mode. Possible values are:
+        <ul>
+          <li><code>nat</code> - Creates virtual local network.</li>
+          <li><code>bridge</code> - Uses preconfigured bridge interface on the machine (Only bridge mode supports multiple hosts).</li>
+          <li><code>route</code> - Creates virtual local network, but does not apply NAT.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.network.cidr</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes</td>
+      <td>Network cidr that contains network IP with network mask bits (IPv4/mask_bits).</td>
+    </tr>
+    <tr>
+      <td><code>cluster.network.gateway</code></td>
+      <td>string</td>
+      <td><i>First client IP in network.</i></td>
+      <td></td>
+      <td>
+        By default first client IP is taken as a gateway.
+        If network cidr is set to 10.0.0.0/24 then gateway would be 10.0.0.1.
+        Set gateway if it differs from default value.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.network.bridge</code></td>
+      <td>string</td>
+      <td>virbr0</td>
+      <td></td>
+      <td>
+        By default virbr0 is set as a name of virtual bridge.
+        In case network mode is set to bridge, name of the preconfigured bridge needs to be set here.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.network.dns</code></td>
+      <td>list</td>
+      <td>[<i>Network gateway</i>]</td>
+      <td></td>
+      <td>
+        DNS used by all created virtual machines.
+        If none is provided, gateway is used as a DNS server.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.images.networkInterface</code></td>
+      <td>string</td>
+      <td>ens3, if <code>distro</code> is set to ubuntu, otherwise eth0</td>
+      <td></td>
+      <td>
+        Network interface used by virtual machines to connect to the network.
+        Usually for Ubuntu images is ens3 and for most other distros is eth0. 
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.user</code></td>
+      <td>string</td>
+      <td>user</td>
+      <td></td>
+      <td>User created on each virtual machine.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.ssh.privateKeyPath</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        Path to private key that is later used to SSH into each virtual machine.
+        On the same path with <code>.pub</code> prefix needs to be present public key.
+        If this value is not set, SSH key will be generated in <code>./config/.ssh/</code> directory.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.ssh.addToKnownHosts</code></td>
+      <td>boolean</td>
+      <td>true</td>
+      <td></td>
+      <td>
+        If set to true, each virtual machine will be added to the known hosts on the machine where the project is being run.
+        Note that all machines will also be removed from known hosts when destroying the cluster.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.image.distro</code></td>
+      <td>string</td>
+      <td>N/A</td>
+      <td></td>
+      <td>
+        Set OS image distribution. Possible values are:
+        <ul>
+          <li><code>ubuntu</code></li>
+          <li><code>debian</code></li>
+          <li><code>centos</code></li>
+          <li><code>N/A</code> - For all other distros</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.image.source</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes</td>
+      <td>
+        Source of an OS image. 
+        It can be either path on a local file system or a URL to an image.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.updateOnBoot</code></td>
+      <td>boolean</td>
+      <td>true</td>
+      <td></td>
+      <td>If set to true, the operating system will be updated when it boots.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.vip</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes, if more then one instance of load balancer is specified.</td>
+      <td>
+        Virtual IP (floating IP) is the static IP used by load balancers to provide a fail-over.
+        Each load balancer still has its own IP beside the shared one.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.default.ram</code></td>
+      <td>number</td>
+      <td>4</td>
+      <td>Yes</td>
+      <td>Default amount of RAM (in GiB) allocated to a load balancer instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.default.cpu</code></td>
+      <td>number</td>
+      <td>1</td>
+      <td></td>
+      <td>Default number of vCPU allocated to a load balancer instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.default.mainDiskSize</code></td>
+      <td>number</td>
+      <td>16</td>
+      <td></td>
+      <td>Size of the main disk (in GiB) that is attached to a load balancer instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.instances[*].id</code></td>
+      <td>number</td>
+      <td></td>
+      <td>Yes</td>
+      <td>
+        Unique numeric identifier of a load balancer instance.
+        It has to be a number between 0 and 200, because the priority of a load balancer is calculated out of its ID.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.instances[*].ip</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        If an IP is set for an instance then the instance will use it as a static IP.
+        Otherwise it will try to request an IP from a DHCP server.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.instances[*].mac</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>MAC used by the instance. If it is not set, it will be generated.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.instances[*].ram</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for the RAM for that instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.instances[*].cpu</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for that specific instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.instances[*].mainDiskSize</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for that specific instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.default.ram</code></td>
+      <td>number</td>
+      <td>4</td>
+      <td></td>
+      <td>Default amount of RAM (in GiB) allocated to a master node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.default.cpu</code></td>
+      <td>number</td>
+      <td>1</td>
+      <td></td>
+      <td>Default number of vCPU allocated to a master node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.default.mainDiskSize</code></td>
+      <td>number</td>
+      <td>16</td>
+      <td></td>
+      <td>Size of the main disk (in GiB) that is attached to a master node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.instances[*].id</code></td>
+      <td>number</td>
+      <td></td>
+      <td>Yes</td>
+      <td>Unique numeric identifier of a master node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.instances[*].ip</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        If an IP is set for an instance then the instance will use it as a static IP.
+        Otherwise it will try to request an IP from a DHCP server.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.instances[*].mac</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>MAC used by the instance. If it is not set, it will be generated.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.instances[*].ram</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for the RAM for that instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.instances[*].cpu</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for that specific instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.instances[*].mainDiskSize</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for that specific instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.instances[*].dataDisks[*].name</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>Name of the additional data disk that is attached to the master node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.instances[*].dataDisks[*].pool</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        Name of the data resource pool where the additional data disk is created. 
+        Referenced resource pool must be specified on the same host.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.instances[*].dataDisks[*].size</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        Size of the additional data disk (in GiB) that is attached to the master node.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.default.ram</code></td>
+      <td>number</td>
+      <td>8</td>
+      <td></td>
+      <td>Default amount of RAM (in GiB) allocated to a worker node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.default.cpu</code></td>
+      <td>number</td>
+      <td>2</td>
+      <td></td>
+      <td>Default number of vCPU allocated to a worker node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.default.mainDiskSize</code></td>
+      <td>number</td>
+      <td>32</td>
+      <td></td>
+      <td>Size of the main disk (in GiB) that is attached to a worker node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.default.label</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>Default label for worker nodes.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].id</code></td>
+      <td>number</td>
+      <td></td>
+      <td>Yes</td>
+      <td>Unique numeric identifier of a worker node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].ip</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        If an IP is set for an instance then the instance will use it as a static IP.
+        Otherwise it will try to request an IP from a DHCP server.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].mac</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>MAC used by the instance. If it is not set, it will be generated.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].ram</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for the RAM for that instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].cpu</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for that specific instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].mainDiskSize</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for that specific instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].dataDisks[*].name</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>Name of the additional data disk that is attached to the worker node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].dataDisks[*].pool</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        Name of the data resource pool where the additional data disk is created. 
+        Referenced resource pool must be specified on the same host.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].dataDisks[*].size</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        Size of the additional data disk (in GiB) that is attached to the worker node.
+      </td>
+    </tr>    
+  </tbody>
+</table>
+
+
+
+## *Kubernetes* section
+
+<table>
+  <tbody>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Default value</th>
+      <th>Required?</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td><code>kubernetes.version</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes</td>
+      <td>Kubernetes version that will be installed.</td>
+    </tr>
+    <tr>
+      <td><code>kubernetes.networkPlugin</code></td>
+      <td>string</td>
+      <td>calico</td>
+      <td></td>
+      <td>
+        Network plugin used within a Kubernetes cluster. Possible values are: 
+        <ul>
+          <li><code>flannel</code></li>
+          <li><code>weave</code></li>
+          <li><code>calico</code></li>
+          <li><code>cilium</code></li>
+          <li><code>canal</code></li>
+          <li><code>kube-router</code></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>kubernetes.dnsMode</code></td>
+      <td>string</td>
+      <td>coredns</td>
+      <td></td>
+      <td>
+        DNS server used within a Kubernetes cluster. Possible values are: 
+        <ul>
+          <li><code>coredns</code></li>
+          <li><code>kubedns</code></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>kubernetes.kubespray.url</code></td>
+      <td>string</td>
+      <td><a href="https://github.com/kubernetes-sigs/kubespray.git">https://github.com/kubernetes-sigs/kubespray.git</a></td>
+      <td></td>
+      <td>
+        URL to the Kubespray project.
+        For example, it can be changed so that it targets your fork of a project.
+      </td>
+    </tr>
+    <tr>
+      <td><code>kubernetes.kubespray.version</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes</td>
+      <td>Kubespray version. Version is used to checkout into appropriate branch.</td>
+    </tr>
+    <tr>
+      <td><code>kubernetes.kubespray.other.copyKubeconfig</code></td>
+      <td>boolean</td>
+      <td>false</td>
+      <td></td>
+      <td>
+        If set to true, Kubeconfig of a new cluster will be copied to the `~/.kube/admin.conf`. 
+        Please note that setting this to true can result in overwriting file on target location.
+      </td>
+    </tr>
+  </tbody>
+</table>

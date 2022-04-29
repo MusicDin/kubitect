@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block tabs %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="/assets/stylesheets/overview.css">
+
+<h2>What is Kubitect?</h2>
+<div>
+
+    <p>
+        Kubitect is an open source project that aims to simplify the <b>deployment</b> and later <b>management of the
+        Kubernetes clusters.</b>
+    </p>
+    <p>
+        It provides a CLI tool written in golang that lets you <b>set up</b>, <b>update</b>, <b>scale</b>, and
+        <b>destroy</b> Kubernetes clusters.
+    </p>
+    <p>
+
+        Under the hood, it uses <a href="https://www.terraform.io/">Terraform</a> along with 
+        <a href="https://github.com/dmacvicar/terraform-provider-libvirt">terraform-libvirt-provider</a>
+        to deploy virtual machines on target hosts running libvirt.
+        Kubernetes is configured on deployed virtual machines using the popular open source project 
+        <a href="https://kubespray.io">Kubespray</a>.
+    </p>
+</div>
+
+
+<h2>Core goals</h2>
+
+<!-- CARDS Key Benefits-->
+<div class="card-container">
+
+    <div class="card-row">
+        <div class="card">
+
+            <div class="card-header">As many clusters on as many hosts</div class="card-header">
+            <p class="card-content-text">
+                With Kubitect, you can set up a variety of cluster topologies, from single-node clusters to complex
+                clusters running on multiple hosts.
+            </p>
+            <div class="card-footer-nav">
+                <img src="/assets/images/network.svg" alt="">
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-header">Open source forever</div class="card-header">
+            <p class="card-content-text">
+                Kubitect is based exclusively on open source technologies and will therefore remain open source forever!
+            </p>
+
+            <div class="card-footer-nav">
+                <img src="/assets/images/handshake.svg" alt="">
+            </div>
+
+        </div>
+
+    </div>
+    <div style="display: flex;">
+
+        <div class="card">
+
+            <div class="card-header">Reliable, scalable and reproducible</div class="card-header">
+            <p class="card-content-text">
+                By using a single configuration file, Kubitect clusters can be easily replicated in different
+                environments,
+                while Kubespray ensures reliability and scalability.
+            </p>
+
+            <div class="card-footer-nav">
+                <img src="/assets/images/filelaptop.svg" alt="">
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-header">From home-labs to small companies</div class="card-header">
+            <p class="card-content-text">
+                Bridging the gap between local and enterprise environments, Kubitect enables you to set up a cluster for
+                your home lab or a business without needing in-depth knowledge.
+            </p>
+
+            <div class="card-footer-nav">
+                <img src="/assets/images/lab.svg" alt="">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<h2>Project roadmap</h2>
+<div style="padding-bottom: 16pt">
+    The aim of this project is to combine a robust array of functionalities into a signle easy-to-use tool.
+    Below is the roadmap of the Kubitect project. If you have an idea that is not listed among these features,
+    feel free to <a href="https://github.com/MusicDin/kubitect/issues/new">open an issue</a>.
+</div>
+
+<div class="feature-list">
+
+
+    <div><img src="/assets/images/checkmark.svg" alt=""><span>Deploy single node clusters</span></div>
+
+    <div class="road"></div>
+    <div><img src="/assets/images/checkmark.svg" alt=""><span>Support for multiple worker nodes</span></div>
+
+    <div class="road"></div>
+    <div><img src="/assets/images/checkmark.svg" alt=""><span>Implement internal load balancers</span></div>
+
+    <div class="road"></div>
+    <div><img src="/assets/images/checkmark.svg" alt=""><span>Support for network bridges</span></div>
+
+    <div class="road"></div>
+    <div><img src="/assets/images/checkmark.svg" alt=""><span>Deploy clusters on multiple hosts</span></div>
+
+    <div class="road"></div>
+    <div><img src="/assets/images/checkmark.svg" alt=""><span>High availability clusters</span></div>
+
+    <div class="road"></div>
+    <div><img src="/assets/images/checkmark.svg" alt=""><span>Management trough CLI tool</span></div>
+
+    <div class="road"></div>
+    <div><img src="/assets/images/checkmark.svg" alt=""><span>Attaching virtual disks</span></div>
+
+    <div class="road todo"></div>
+    <div><img src="/assets/images/checkmark_gray.svg" alt=""><span>Support for kubespray addons</span></div>
+
+    <div class="road todo"></div>
+    <div><img src="/assets/images/checkmark_gray.svg" alt=""><span>Storage solution out of the box</span></div>
+
+    <div class="road todo"></div>
+    <div style="color: #999999"><img src="/assets/images/questionmark_gray.svg" alt=""><span>Any new ideas? <a
+                href="https://github.com/MusicDin/kubitect/issues/new">Open an issue.</a></span></div>
+</div>
+
+{% endblock %}
+{% block footer %}
+{{ super() }}
+{% endblock %}

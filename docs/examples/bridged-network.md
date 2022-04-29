@@ -1,74 +1,51 @@
-# Setting up a cluster using bridged network
+<h1 align="center">Setting up nodes over bridged network</h1>
 
-*Note: This example uses `systemd-networkd` to set up the bridge,
-but the same result can be achieved with many other approaches.*
+This example shows how to configure a simple bridge interface using [netplan](https://netplan.io/).
 
-## (Pre)configure the bridge on the host
+## Step 1 - (Pre)configure the bridge on the host
 
-In order to use the bridged network, bridge needs to be preconfigured on the host machine.
+In order to use the bridged network, bridge interface needs to be preconfigured on the host machine.
 
-Create the bridge interface (`br0` in our case) by creating the file `/etc/systemd/network/br0.netdev` 
-with the following content:
-
-```editorconfig
-[NetDev]
-Name=br0
-Kind=bridge
+Create the bridge interface (`br0` in our case) by creating a file with the following content:
+```yaml title="/etc/netplan/bridge0.yaml"
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0: {} # (1)
+  bridges:
+    br0: # (2)
+      interfaces:
+        - eth0
+      dhcp4: true
+      dhcp6: false
+      addresses: # (3)
+        - 10.10.0.17
 ```
 
-Bind the ethernet interface (`eno1` in our case) to the bridge interface (`br0` in our case) 
-by creating the file `/etc/systemd/network/br0-bind.network` with the following content:
+1. Existing ethernet interface to be enslaved.
 
-```editorconfig
-[Match]
-Name=eno1
+2. Custom name of the bridge interface.
 
-[Network]
-Bridge=br0
-```
+3. Optionally a static IP address can be set for the bridge interface.
 
-### Wired adapter using DHCP
+!!! tip "Tip"
 
-To use router's DHCP, instruct `systemd-networkd` to obtain an IPv4 DHCP lease through the bridge interface 
-by creating the file `/etc/systemd/network/br0-dhcp.network` with the following content:
+    See the official [netplan configuration examples](https://netplan.io/examples/) for more complex configurations.
 
-```editorconfig
-[Match]
-Name=br0
-
-[Network]
-DHCP=ipv4
-```
-
-### Wired adapter using a static IP
-
-To provision virtual machines with static IPs, instruct `systemd-networkd` to obtain an IPv4 DHCP lease through the bridge interface
-by creating the file `/etc/systemd/network/br0-static-ip.network` with the following content:
-
-```editorconfig
-[Match]
-Name=br0
-
-[Network]
-Address=192.168.0.10/24
-Gateway=192.168.0.1
-DNS=192.168.0.1     # Router's DNS 
-# DNS=8.8.8.8       # Additional DNS if required
-```
-
-In our case, the IP of the server is `192.168.0.10` in the subnet `192.168.0.0/24` 
-and the IP of the router (gateway) is `192.168.0.1`.
-
----
-
-After that, restart `systemd-networkd` and the bridge should be configured:
+Validate if the configuration is correctly parsed by netplan.
 ```sh
-systemctl restart systemd-networkd
+sudo netplan generate
 ```
 
-The final step is to disable netfilter on the bridge
-(More information can be found [here](https://wiki.libvirt.org/page/Net.bridge.bridge-nf-call_and_sysctl.conf)):
+Apply the configuration.
+```sh
+sudo netplan apply
+```
 
+## Step 2 - Disable netfilter on the host
+
+The final step is to prevent packets traversing the bridge from being sent to iptables for processing.
 ```sh
  cat >> /etc/sysctl.conf <<EOF
  net.bridge.bridge-nf-call-ip6tables = 0
@@ -79,24 +56,24 @@ The final step is to disable netfilter on the bridge
  sysctl -p /etc/sysctl.conf
 ```
 
-## Setting up a cluster over bridged network
+!!! tip "Tip"
 
-In the [terraform.tfvars](/terraform.tfvars) file, set the variables:
-- `network_mode` to `bridge`,
-- `network_bridge` to the name of the bridge you created (`br0` in our case) and
-- `network_gateway` if the first host in `netwrok_cidr` is not a gateway.
+    For more information, see the [libvirt documentation](https://wiki.libvirt.org/page/Net.bridge.bridge-nf-call_and_sysctl.conf).
 
-```hcl
-worker_nodes = [
-  {
-    id  = 1
-    ip  = "192.168.0.25"  # Static IP
-    mac = "52:54:00:00:00:40"
-  },
-  {
-    id  = 2
-    ip  = null            # DHCP lease
-    mac = "52:54:00:00:00:41"
-  }
-]
+## Step 3 - Set up a cluster over bridged network
+
+In the cluster configuration file, set the following variables:
+
+- `cluster.network.mode` to `bridge`,
+- `cluster.network.bridge` to the name of the bridge you have created (`br0` in our case) and
+- `cluster.network.gateway` if the first host in `network_cidr` is not a gateway.
+
+```yaml
+cluster:
+  network:
+    mode: "bridge"
+    cidr: "10.10.13.0/24"
+    gateway: "10.10.13.1"
+    bridge: "br0"
+...
 ```

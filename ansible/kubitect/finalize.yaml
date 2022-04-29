@@ -1,0 +1,13 @@
+- hosts: kube_control_plane[0]
+  gather_facts: false
+  any_errors_fatal: true
+  roles: 
+    - role: kubeconfig/fetch
+
+- hosts: localhost
+  gather_facts: false
+  any_errors_fatal: true
+  become: false
+  roles:
+    - role: cluster-config/import
+    - role: kubeconfig/copy

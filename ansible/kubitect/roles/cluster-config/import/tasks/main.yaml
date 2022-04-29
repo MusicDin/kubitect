@@ -1,0 +1,5 @@
+---
+- name: Include cluster config as variable
+  include_vars:
+    file: "{{ kubitect_cluster_config_path }}"
+    name: config

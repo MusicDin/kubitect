@@ -1,0 +1,7 @@
+---
+- name: Create main.tf from template file
+  template:
+    src: ../../templates/terraform/main.tf.j2
+    dest: ../../terraform/main.tf
+  vars:
+    host_list: "{{ config.hosts }}"

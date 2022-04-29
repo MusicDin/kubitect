@@ -1,0 +1,10 @@
+
+---
+- name: Clone Kubespray git project
+  git:
+    repo: "{{ config.kubernetes.kubespray.url }}"
+    version: "{{ config.kubernetes.kubespray.version }}"
+    dest: "{{ kubitect_cluster_path }}/ansible/kubespray"
+    single_branch: yes
+    depth: 1
+    force: yes

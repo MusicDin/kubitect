@@ -1,0 +1,28 @@
+---
+- name: Make sure config directory exists
+  file:
+    path: "{{ kubitect_cluster_config_path | dirname }}"
+    state: directory
+    mode: "0700"
+
+- name: Create a copy of the custom config file in a cluster dirctory
+  copy:
+    src: "{{ config_path }}"
+    dest: "{{ kubitect_cluster_config_path }}"
+  when:
+    - config_path is defined
+    - config_path != ""
+
+- name: Make sure cluster config exists
+  block:
+    - name: Get stats of the current cluster config file
+      stat:
+        path: "{{ kubitect_cluster_config_path }}"
+      register: cluster_config
+
+    - name: Copy default config file if cluster config is missing
+      copy:
+        src: "{{ kubitect_cluster_default_config_path }}"
+        dest: "{{ kubitect_cluster_config_path }}"
+      when:
+        - cluster_config.stat.exists == false

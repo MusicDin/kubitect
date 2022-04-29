@@ -1,0 +1,10 @@
+- hosts: localhost
+  gather_facts: false
+  any_errors_fatal: true
+  roles:
+    - role: cluster-config/copy
+      vars_files:
+        - "{{ config_path }}"
+    - role: cluster-config/import
+    - role: cluster-config/verify
+    - role: generate-main-tf

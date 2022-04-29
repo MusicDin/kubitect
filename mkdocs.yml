@@ -1,0 +1,87 @@
+site_name: Kubitect
+site_url: https://kubitect.io
+
+repo_url: https://github.com/musicdin/kubitect
+repo_name: MusicDin/kubitect
+
+# Remove docs edit button
+edit_uri: ""
+
+theme:
+  name: material
+  custom_dir: docs/theme/overrides
+
+  favicon: theme/assets/images/favicon.svg
+  logo: theme/assets/images/logo_white.svg
+
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.top
+    - navigation.sections
+    - search.highlight
+    - search.share
+    - search.suggest
+    - content.code.annotate
+    #- content.tabs.link
+
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - theme/assets/stylesheets/style.css
+
+extra_javascript:
+  - theme/assets/javascripts/extra.js
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.superfences
+
+  # Content tabs
+  - pymdownx.tabbed:
+      alternate_style: true
+
+  # Emoji
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg # Page tree
+
+
+nav:
+  - Home: index.md
+  - User guide:
+      - Overview: user-guide/overview.md
+      - Installation: user-guide/installation.md
+      - Quick start: user-guide/quick-start.md
+      - Getting started: user-guide/getting-started.md
+      - Cluster management: user-guide/cluster-management.md
+      - Other:
+          - Requirements: user-guide/requirements.md
+          - Local development: user-guide/local-development.md
+          - Troubleshooting: user-guide/troubleshooting.md
+  - Reference: reference/reference.md
+  - Examples:
+      #- Load balancing: user-guide/load-balancer.md
+      - Single node cluster: examples/single-node-cluster.md
+      - Bridged network: examples/bridged-network.md
+      - Full example: examples/full-example.md
