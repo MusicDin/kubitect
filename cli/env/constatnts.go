@@ -11,8 +11,8 @@ const (
 	DefaultClusterName       = "default"
 	DefaultClusterAction     = "create"
 	DefaultClusterConfigPath = "config/kubitect.yaml"
-	DefaultGitProjectUrl     = "https://github.com/MusicDin/terraform-kvm-kubespray"
-	DefaultGitProjectVersion = "feature/multiple-servers"
+	DefaultGitProjectUrl     = "https://github.com/MusicDin/kubitect"
+	DefaultGitProjectVersion = "master"
 )
 
 var (

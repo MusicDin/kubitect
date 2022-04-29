@@ -19,7 +19,7 @@ For documentation and examples on how to use Kubitect visit **[kubitect.io](http
 
 ### Authors
 
-[Din Mušić](https://github.com/MusicDin) and [all contributors](https://github.com/MusicDin/terraform-kvm-kubespray/graphs/contributors).
+[Din Mušić](https://github.com/MusicDin) and [all contributors](https://github.com/MusicDin/kubitect/graphs/contributors).
 
 </br>
 

@@ -2,7 +2,7 @@
 
 ??? question "Is your problem not listed here?"
 
-    If the troubleshooting page is missing an error you encountered, please report it on GitHub by [opening an issue](https://github.com/MusicDin/terraform-kvm-kubespray/issues/new).
+    If the troubleshooting page is missing an error you encountered, please report it on GitHub by [opening an issue](https://github.com/MusicDin/kubitect/issues/new).
     By doing so, you will help improve the project and help others find the solution to the same problem faster.
 
 ## General errors

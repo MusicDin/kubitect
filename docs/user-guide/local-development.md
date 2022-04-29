@@ -6,12 +6,12 @@ This document shows how to build a CLI tool manually and how to use the project 
 
 First, you have to clone the project.
 ```sh
-git clone https://github.com/MusicDin/terraform-kvm-kubespray
+git clone https://github.com/MusicDin/kubitect
 ```
 
 Afterwards, move into the cloned project.
 ```sh
-cd terraform-kvm-kubespray
+cd kubitect
 ```
 
 ## Install Kubitect CLI tool

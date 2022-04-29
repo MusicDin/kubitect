@@ -31,7 +31,7 @@ The cluster configuration consists of four parts:
     <tr>
       <td><code>kubitect.url</code></td>
       <td>string</td>
-      <td>https://github.com/MusicDin/terraform-kvm-kubespray</td>
+      <td>https://github.com/MusicDin/kubitect</td>
       <td>No</td>
       <td>URL of the project's git repository.</td>
     </tr>

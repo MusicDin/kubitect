@@ -2,8 +2,8 @@ name: documentation
 on:
   push:
     branches:
-      #- master
-      - feature/multiple-servers
+      - master
+      #- feature/multiple-servers
 
 env:
   PYTHON_VERSION: 3.x

@@ -11,7 +11,7 @@
 #     Git repository.
 #
 kubitect:
-  url: "https://github.com/MusicDin/terraform-kvm-kubespray" # (1)
+  url: "https://github.com/MusicDin/kubitect" # (1)
   version: "2.0.0"
 
 #
