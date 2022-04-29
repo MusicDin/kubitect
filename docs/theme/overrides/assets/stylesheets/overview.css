@@ -1,3 +1,15 @@
+@media (max-width:768px) {
+
+    .card-row {
+      flex-direction: column;
+      margin-right: 10pt;
+    }
+
+    .card-container {
+        padding-right: 10pt;
+    }
+  }
+
 .card {
     width: 100%;
     margin: 10pt;
@@ -25,6 +37,7 @@
     font-weight: bold;
     padding: 10pt;
     border-bottom: 1px solid #aaaaaa;
+    text-align: center;
 }
 
 .card-content-text {
@@ -60,7 +73,6 @@ h3 {
 .feature-list {
     display: flex;
     flex-direction: column;
-
 }
 
 .feature-list div {
@@ -71,6 +83,7 @@ h3 {
 
 .feature-list div.road {
     margin-left: 10pt;
+    margin-right: 10pt;
     height: 20pt;
     width: 2pt;
     border-left: 1px dashed #00e676;
@@ -78,6 +91,7 @@ h3 {
 
 .feature-list div.road.todo {
     margin-left: 10pt;
+    margin-right: 10pt;
     height: 20pt;
     width: 2pt;
     border-left: 1px dashed #aaaaaa;
