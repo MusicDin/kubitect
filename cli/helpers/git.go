@@ -4,6 +4,7 @@ import (
 	"cli/env"
 	"fmt"
 	"os"
+	"regexp"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -25,9 +26,24 @@ func GitClone(path string, url string, version string) error {
 		return fmt.Errorf("Git version not provided.")
 	}
 
+	// Version regex ("v" any number "dot" any number "dot" any number)
+	versionRegex, err := regexp.Compile("^v(\\d+)(.{1}\\d+){2}$")
+	if err != nil {
+		return err
+	}
+
+	// If version matches version regex, set reference name to tag,
+	// otherwise set it to branch.
+	var refName plumbing.ReferenceName
+	if versionRegex.MatchString(version) {
+		refName = plumbing.NewTagReferenceName(version)
+	} else {
+		refName = plumbing.NewBranchReferenceName(version)
+	}
+
 	gitCloneOptions := &git.CloneOptions{
 		URL:               url,
-		ReferenceName:     plumbing.NewBranchReferenceName(version),
+		ReferenceName:     refName,
 		Tags:              git.NoTags,
 		RecurseSubmodules: git.NoRecurseSubmodules,
 		SingleBranch:      true,
@@ -38,7 +54,7 @@ func GitClone(path string, url string, version string) error {
 		gitCloneOptions.Progress = os.Stdout
 	}
 
-	_, err := git.PlainClone(path, false, gitCloneOptions)
+	_, err = git.PlainClone(path, false, gitCloneOptions)
 	if err != nil {
 		return fmt.Errorf("Error cloning project for 'url=%s' and 'version=%s': %w", url, version, err)
 	}
