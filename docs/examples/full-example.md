@@ -12,7 +12,7 @@
 #
 kubitect:
   url: "https://github.com/MusicDin/kubitect" # (1)
-  version: "2.0.1"
+  version: "2.0.2"
 
 #
 # The "hosts" section contains data about the physical servers on which 
@@ -159,12 +159,12 @@ cluster:
 # Kubespray to use and which network plugin and DNS server to install.
 #
 kubernetes:
-  version: "v1.21.6"
+  version: "v1.22.6"
   networkPlugin: calico
   dnsMode: coredns
   kubespray:
     url: "https://github.com/kubernetes-sigs/kubespray.git"
-    version: "v2.17.1"
+    version: "v2.18.1"
   other:
     copyKubeconfig: false
 ```
