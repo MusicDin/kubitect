@@ -123,7 +123,7 @@ function terminalAnimation() {
         await delay(timeBetween)
         await printCommand(terminal, 'tar -xzf kubitect.tar.gz')
         await delay(timeBetween)
-        await printCommand(terminal, 'sudo mv kubitect-cli /usr/local/bin/kubitect')
+        await printCommand(terminal, 'sudo mv kubitect /usr/local/bin/')
         await delay(timeBetween)
         await printCommand(terminal, 'kubitect apply')
         await delay(timeBetween)
