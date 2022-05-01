@@ -83,28 +83,30 @@ func AskUserConfirmation(warning ...any) bool {
 // an invalid cluster directory.
 func VerifyClusterDir(clusterPath string) error {
 
-	if !isClusterDir(clusterPath) {
+	err := verifyClusterDir(clusterPath)
+
+	if err != nil {
 		PrintError("Cluster path points to an invalid cluster directory!")
 
 		if env.Local {
 			PrintError("Are you sure you are in the right directory?")
 		}
-		return fmt.Errorf("Invalid cluster directory.")
+		return err
 	}
 
 	return nil
 }
 
-// IsClusterDir verifies if the provided cluster directory exists and if it
+// verifyClusterDir verifies if the provided cluster directory exists and if it
 // contains necessary directories/files that represent a cluster directory. It
 // returnes true if specific cluster directories are present. Otherwise it
 // returns false.
-func isClusterDir(clusterPath string) bool {
+func verifyClusterDir(clusterPath string) error {
 
 	// Check if cluster directory exists
 	_, err := os.Stat(clusterPath)
 	if err != nil {
-		return false
+		return err
 	}
 
 	// Check if ansible directory exists
@@ -116,13 +118,10 @@ func isClusterDir(clusterPath string) bool {
 			_, err = os.Stat(filepath.Join(clusterPath, path))
 
 			if err != nil {
-				if env.DebugMode {
-					PrintDebug("Directory '%s' in missing!", path)
-				}
-				return false
+				return err
 			}
 		}
 	}
 
-	return true
+	return nil
 }

@@ -44,7 +44,7 @@ func exportConfig() error {
 
 	configPath := filepath.Join(env.ClusterPath, env.DefaultClusterConfigPath)
 
-	err := utils.VerifyClusterDir(env.ClusterName)
+	err := utils.VerifyClusterDir(env.ClusterPath)
 	if err != nil {
 		return fmt.Errorf("Cluster '%s' does not exist: %w", env.ClusterName, err)
 	}
