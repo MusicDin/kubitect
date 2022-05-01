@@ -23,7 +23,7 @@ Verify the installation by checking the Kubitect version.
 ```sh
 kubitect --version
 
-# kubitect version 2.0.2
+# kubitect version v2.0.2
 ```
 
 !!! tip "Tip"
