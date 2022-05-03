@@ -18,7 +18,7 @@ var rootCmd = &cobra.Command{
 	Short: "Kubitect",
 	Long: `Kubitect is a CLI tool that helps you manage multiple Kubernetes
 clusters.`,
-	Version: "2.0.2",
+	Version: env.ConstProjectVersion,
 
 	// This is run when any command is run (also applies to all subcommands).
 	// Flags are in this stage already resolved.

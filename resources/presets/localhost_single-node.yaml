@@ -4,8 +4,8 @@
 # It also defines a dedicated virtual NAT network.
 #
 
-kubitect:
-  version: "v2.0.2"
+#kubitect:
+#  version: "v2.0.3"
 
 hosts:
   - name: localhost

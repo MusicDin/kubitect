@@ -6,13 +6,13 @@ const (
 	ConstProjectHomeEnvName = "KUBITECT_HOME"
 	ConstProjectHomeDir     = ".kubitect"
 	ConstProjectClustersDir = "clusters"
+	ConstProjectUrl         = "https://github.com/MusicDin/kubitect"
+	ConstProjectVersion     = "v2.0.2"
 
 	// default values
 	DefaultClusterName       = "default"
 	DefaultClusterAction     = "create"
 	DefaultClusterConfigPath = "config/kubitect.yaml"
-	DefaultGitProjectUrl     = "https://github.com/MusicDin/kubitect"
-	DefaultGitProjectVersion = "master"
 )
 
 var (

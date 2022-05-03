@@ -198,12 +198,12 @@ func initCluster(clusterPath string) error {
 
 	url, err := config.GetStrValue(env.ConfigPath, "kubitect.url")
 	if err != nil {
-		url = env.DefaultGitProjectUrl
+		url = env.ConstProjectUrl
 	}
 
 	version, err := config.GetStrValue(env.ConfigPath, "kubitect.version")
 	if err != nil {
-		version = env.DefaultGitProjectVersion
+		version = env.ConstProjectVersion
 	}
 
 	if env.DebugMode {
