@@ -19,7 +19,10 @@ var (
 	// Defines required files/directories that are copied from tmp git project.
 	ProjectRequiredFiles = [...]string{
 		"ansible/",
-		"terraform/",
+		"terraform/modules/",
+		"terraform/output.tf",
+		"terraform/variables.tf",
+		"terraform/version.tf",
 		"templates/",
 		"resources/",
 		"scripts/",
