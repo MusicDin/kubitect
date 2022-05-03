@@ -7,7 +7,7 @@ const (
 	ConstProjectHomeDir     = ".kubitect"
 	ConstProjectClustersDir = "clusters"
 	ConstProjectUrl         = "https://github.com/MusicDin/kubitect"
-	ConstProjectVersion     = "v2.0.2"
+	ConstProjectVersion     = "v2.0.3"
 
 	// default values
 	DefaultClusterName       = "default"
