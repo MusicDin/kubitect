@@ -57,98 +57,144 @@ function removeHashtags() {
     })
 };
 
+/*
+ * Landing page terminal
+ */
+
 // terminal animation
 function terminalAnimation() {
 
-    const appendLine = async (target, line) => {
-        target.innerHTML += line + '<br>'
-    }
+    // miliseconds between each output line printed
+    const outputDelay = 50
 
-    // recursively appends given lines to the given target's innerHtml (uses appendLine() function)
-    const appendMultipleLines = async (target, lines, speed) => {
-        if (lines.length !== 0)
-            appendLine(target, lines[0])
-            setTimeout(() => {
-                appendMultipleLines(target, lines.slice(1), speed)
-            }, speed)
-    }
+    // miliseconds between each command typed
+    const commandDelay = 500
 
-    // append command to the target's innterHtml (adds a styled '$' at the beggining)
-    // uses typeSequence to simulate typing the command
-    const printCommand = async (target, command) => {
-        target.innerHTML += '<span class="command-dollar-sign">$</span> '
-        await typeSequence(target, command, 20)
-        target.innerHTML += '<br>'
-    }
+    // miliseconds between each command character typed
+    const commandCharDelay = 20
+    
+    const Output = Symbol("output")
+    const Command = Symbol("command")
 
-    //smoothly appends characters of the given sequence to given target's innerHtml
-    const typeSequence = async (target, sequence, speed) => {
-        if (sequence.length > 0) {
-            target.innerHTML += sequence[0]
-            await delay(speed)
-            await typeSequence(target, sequence.substr(1), speed)
+    const content = [
+        { type: Command, value: "curl -o kubitect.tar.gz -L https://github.com/MusicDin/kubitect/releases/..." },
+        { type: Command, value: "tar -xzf kubitect.tar.gz" },
+        { type: Command, value: "sudo mv kubitect /usr/local/bin/" },
+        { type: Command, value: "kubitect apply" },
+        { type: Output, value: "" },
+        { type: Output, value: "Preparing cluster 'default'..." },
+        { type: Output, value: "Setting up 'main' virtual environment..." },
+        { type: Output, value: "Creating virtual environment..." },
+        { type: Output, value: "Installing pip3 dependencies..." },
+        { type: Output, value: "This can take up to a minute when the virtual environment is initialized for the first time...<br>" },
+        { type: Output, value: "PLAY [localhost]<br>" },
+        { type: Output, value: "TASK [cluster-config/copy : Make sure config directory exists]" },
+        { type: Output, value: "<span style=\"color:green\">ok: [127.0.0.1]</span><br>" },
+        { type: Output, value: "..." }
+    ]
+
+    const delay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // simulate typing by appending characters to the target's innerHtml
+    const typeSequence = async (target, sequence) => {
+
+        for (const char of sequence) {
+
+            target.innerHTML += char
+            await delay(commandCharDelay)
         }
     }
 
-    const delay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
-    
+    // wraps the command into span element and adds "$"" sign in front of it
+    function wrapCommand(command) {
 
-    // miliseconds between each command typed
-    let timeBetween = 500
+        let value = "";
 
-    // get the terminal nativeElement
-    let terminal = document.getElementById('command_line')
+        // add dollar sign
+        value += '<span class="terminal-command-dollar-sign">$ </span>'
 
-    // Prevent animation if terminal element is not found
-    if (terminal == null)
-        return
-    
-    // output lines to be appended at the end of commands
-    const terminalOutputLines = [
-        '',
-        "Preparing cluster 'default'...",
-        "Setting up 'main' virtual environment...",
-        "Creating virtual environment...",
-        "Installing pip3 dependencies...",
-        "This can take up to a minute when the virtual environment is initialized for the first time...<br>",
-        "PLAY [localhost]<br>",
-        "TASK [cluster-config/copy : Make sure config directory exists]",
-        "<span style=\"color:green\">ok: [127.0.0.1]</span><br>",
-        "...",
-    ]
+        // add command element
+        value += '<span class=\"terminal-command\">' + command + '</span>'
 
-    const animate = async () => {
-
-        await printCommand(terminal, 'curl -o kubitect.tar.gz -L https://github.com/MusicDin/kubitect/releases/...')
-        await delay(timeBetween)
-        await printCommand(terminal, 'tar -xzf kubitect.tar.gz')
-        await delay(timeBetween)
-        await printCommand(terminal, 'sudo mv kubitect /usr/local/bin/')
-        await delay(timeBetween)
-        await printCommand(terminal, 'kubitect apply')
-        await delay(timeBetween)
-
-        await appendMultipleLines(terminal, terminalOutputLines, 50)
-
+        return value
     }
 
-    const animated = false
-    const scrollEvent = () => {
-        var element = document.getElementById('terminal');
-        var position = element.getBoundingClientRect();
+    // print terminal content one by one line
+    const printContent = async (target) => {
 
+        for (const line of content) {
+            switch (line.type) {
+
+                case Command:
+
+                    // add empty command element
+                    target.innerHTML += wrapCommand("")
+                    
+                    // get added command element
+                    let cmdElement = target.lastChild
+                    
+                    await typeSequence(cmdElement, line.value)
+                    await delay(commandDelay)
+
+                    target.innerHTML += "<br>"
+                    break
+
+                case Output:
+                    
+                    target.innerHTML += line.value + "<br>"
+                    await delay(outputDelay)
+                    break
+            }
+        }
+    }
+
+    // sets placeholder (transparent) content
+    const setPlaceholder = async(target) => {
+
+        placeholder = ""
+
+        for (const line of content) {
+
+            if (line.type == Command) {
+                placeholder += wrapCommand(line.value)
+            } else {
+                placeholder += line.value
+            }
+
+            placeholder += "<br>"
+        }
+
+        target.innerHTML += placeholder
+    }
+    
+    // event that is triggered on scroll
+    const scrollEvent = () => {
+        
+        let terminal = document.getElementById('terminal');
+        let position = terminal.getBoundingClientRect();
+        
         // check for partial visibility
         if (position.top < window.innerHeight && position.bottom >= 0) {
-            animate()
+            printContent(terminalContent)
             document.getElementById('main-box').removeEventListener('scroll', scrollEvent)
         }
     }
+    
+    let terminalContent = document.getElementById('terminal-content');
+    let terminalPlaceholder = document.getElementById('terminal-placeholder')
+    
+    // Prevent animation if terminal placeholder element is not found
+    if (terminalPlaceholder == null) {
+        return
+    }
 
-    // vieport width lower than 768px --> phone --> wait for scroll
+    setPlaceholder(terminalPlaceholder)
+
+    // vieport width lower than 768px --> mobile --> wait for scroll
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
     if (vw < 768) {
         document.getElementById('main-box').addEventListener('scroll', scrollEvent)
     } else {
-        animate()
+        printContent(terminalContent)
     }
 }
