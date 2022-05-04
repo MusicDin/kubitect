@@ -129,13 +129,22 @@ a#btn_learn-more:hover {
 }
 
 .terminal-command {
+  padding-right: 0.35em;
   word-break: break-all;
   user-select: text;
 }
 
+.terminal-command.terminal-cursor {
+  padding-right: 0;
+  border-right: .35em solid transparent;
+  animation: 
+    blink-cursor .75s step-end infinite;
+}
+
 /* '$' inside the terminal */
 .terminal-command-dollar-sign {
-  color: rgb(5, 241, 52)
+  color: rgb(5, 241, 52);
+  padding-right: 0.5em;
 }
 
 /* mobile devices */
@@ -155,3 +164,15 @@ a#btn_learn-more:hover {
     font-size: 13px;
   }
 }
+
+/* The typewriter cursor effect */
+@keyframes blink-cursor {
+
+  from, to { 
+    border-color: transparent 
+  }
+
+  50% { 
+    border-color: rgba(255, 255, 255, 0.2); 
+  }
+} 

@@ -111,7 +111,7 @@ function terminalAnimation() {
         let value = "";
 
         // add dollar sign
-        value += '<span class="terminal-command-dollar-sign">$ </span>'
+        value += '<span class="terminal-command-dollar-sign">$</span>'
 
         // add command element
         value += '<span class=\"terminal-command\">' + command + '</span>'
@@ -132,9 +132,16 @@ function terminalAnimation() {
                     
                     // get added command element
                     let cmdElement = target.lastChild
+
+                    // add cursor when writing command
+                    cmdElement.classList.add("terminal-cursor")
                     
+                    await delay(commandDelay)
                     await typeSequence(cmdElement, line.value)
                     await delay(commandDelay)
+
+                    // remove cursor when command is "applied"
+                    cmdElement.classList.remove("terminal-cursor")
 
                     target.innerHTML += "<br>"
                     break

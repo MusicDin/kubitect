@@ -1,14 +1,19 @@
+h3 {
+    margin: 0;
+    padding: 0;
+}
+
 @media (max-width:768px) {
 
     .card-row {
-      flex-direction: column;
-      margin-right: 10pt;
+        flex-direction: column;
+        margin-right: 10pt;
     }
 
     .card-container {
         padding-right: 10pt;
     }
-  }
+}
 
 .card {
     width: 100%;
@@ -65,23 +70,19 @@
     display: flex;
 }
 
-h3 {
-    margin: 0;
-    padding: 0;
-}
-
-.feature-list {
+.roadmap {
     display: flex;
     flex-direction: column;
+    margin-top: 16pt;
 }
 
-.feature-list div {
+.roadmap div {
     display: flex;
     flex-direction: row;
     align-items: center;
 }
 
-.feature-list div.road {
+.roadmap div.road {
     margin-left: 10pt;
     margin-right: 10pt;
     height: 20pt;
@@ -89,7 +90,7 @@ h3 {
     border-left: 1px dashed #00e676;
 }
 
-.feature-list div.road.todo {
+.roadmap div.road.todo {
     margin-left: 10pt;
     margin-right: 10pt;
     height: 20pt;
@@ -97,17 +98,21 @@ h3 {
     border-left: 1px dashed #aaaaaa;
 }
 
-.feature-list div img {
+.roadmap .question {
+    color: #999999
+}
+
+.roadmap div img {
     width: 10pt;
     height: 10pt;
     margin: 5pt;
     fill: green !important;
 }
 
-.feature-list div span {
+.roadmap div span {
     margin-left: 10pt;
 }
 
-.feature-list div svg {
+.roadmap div svg {
     fill: green !important;
 }

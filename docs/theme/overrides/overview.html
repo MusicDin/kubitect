@@ -7,8 +7,8 @@
 <link rel="stylesheet" href="/assets/stylesheets/overview.css">
 
 <h2>What is Kubitect?</h2>
-<div>
 
+<div>
     <p>
         Kubitect is an open source project that aims to simplify the <b>deployment</b> and later <b>management of the
         Kubernetes clusters.</b>
@@ -18,7 +18,6 @@
         <b>destroy</b> Kubernetes clusters.
     </p>
     <p>
-
         Under the hood, it uses <a href="https://www.terraform.io/">Terraform</a> along with 
         <a href="https://github.com/dmacvicar/terraform-provider-libvirt">terraform-libvirt-provider</a>
         to deploy virtual machines on target hosts running libvirt.
@@ -27,13 +26,13 @@
     </p>
 </div>
 
-
 <h2>Core goals</h2>
 
 <!-- CARDS Key Benefits-->
 <div class="card-container">
 
     <div class="card-row">
+
         <div class="card">
 
             <div class="card-header">As many clusters on as many hosts</div class="card-header">
@@ -41,10 +40,10 @@
                 With Kubitect, you can set up a variety of cluster topologies, from single-node clusters to complex
                 clusters running on multiple hosts.
             </p>
+
             <div class="card-footer-nav">
                 <img src="/assets/images/network.svg" alt="">
             </div>
-
         </div>
 
         <div class="card">
@@ -57,11 +56,11 @@
             <div class="card-footer-nav">
                 <img src="/assets/images/handshake.svg" alt="">
             </div>
-
         </div>
     </div>
 
     <div class="card-row">
+
         <div class="card">
 
             <div class="card-header">Reliable, scalable and reproducible</div class="card-header">
@@ -74,7 +73,6 @@
             <div class="card-footer-nav">
                 <img src="/assets/images/filelaptop.svg" alt="">
             </div>
-
         </div>
 
         <div class="card">
@@ -88,7 +86,6 @@
             <div class="card-footer-nav">
                 <img src="/assets/images/lab.svg" alt="">
             </div>
-
         </div>
 
     </div>
@@ -96,14 +93,14 @@
 </div>
 
 <h2>Project roadmap</h2>
-<div style="padding-bottom: 16pt">
+
+<div>
     The aim of this project is to combine a robust array of functionalities into a single easy-to-use tool.
     Below is the roadmap of the Kubitect project. If you have an idea that is not listed among these features,
     feel free to <a href="https://github.com/MusicDin/kubitect/issues/new">open an issue</a>.
 </div>
 
-<div class="feature-list">
-
+<div class="roadmap">
 
     <div><img src="/assets/images/checkmark.svg" alt=""><span>Deploy single node clusters</span></div>
 
@@ -135,8 +132,10 @@
     <div><img src="/assets/images/checkmark_gray.svg" alt=""><span>Out of the box storage solution</span></div>
 
     <div class="road todo"></div>
-    <div style="color: #999999"><img src="/assets/images/questionmark_gray.svg" alt=""><span>Any new ideas? <a
-                href="https://github.com/MusicDin/kubitect/issues/new">Open an issue.</a></span></div>
+    <div class="question">
+        <img src="/assets/images/questionmark_gray.svg" alt="">
+        <span>Any new ideas? <a href="https://github.com/MusicDin/kubitect/issues/new">Open an issue.</a></span>
+    </div>
 </div>
 
 {% endblock %}
