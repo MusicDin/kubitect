@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/hashicorp/go-version"
+	"github.com/hashicorp/hc-install/fs"
 	"github.com/hashicorp/hc-install/product"
 	"github.com/hashicorp/hc-install/releases"
 	"github.com/hashicorp/terraform-exec/tfexec"
@@ -55,27 +56,61 @@ func TerraformDestroy(clusterPath string) error {
 // and returns Terraform object.
 func terraformInit(clusterPath string) (*tfexec.Terraform, error) {
 
-	fmt.Printf("Ensuring Terraform '%s' is installed...\n", env.ConstTerraformVersion)
+	fmt.Printf("Ensuring Terraform %s is installed...\n", env.ConstTerraformVersion)
 
 	tfInstallDir := filepath.Join(env.ProjectHomePath, terraformBinDir, env.ConstTerraformVersion)
 	tfProjectDir := filepath.Join(clusterPath, terraformProjectDir)
 
-	// Make sure terraform install directory exists
-	err := os.MkdirAll(tfInstallDir, os.ModePerm)
-	if err != nil {
-		return nil, fmt.Errorf("Failed creating Terraform install directory: %w", err)
-	}
+	// installer := NewInstaller()
 
-	installer := &releases.ExactVersion{
+	// version := version.Must(version.NewVersion(env.ConstTerraformVersion))
+
+	// execPath, err := installer.Ensure(context.Background(), []src.Source{
+	// 	&fs.ExactVersion{
+	// 		Product:    product.Terraform,
+	// 		Version:    version,
+	// 		ExtraPaths: []string{tfInstallDir},
+	// 	},
+	// 	&releases.ExactVersion{
+	// 		Product:    product.Terraform,
+	// 		Version:    version,
+	// 		InstallDir: tfInstallDir,
+	// 	},
+	// })
+
+	fs := &fs.ExactVersion{
 		Product:    product.Terraform,
 		Version:    version.Must(version.NewVersion(env.ConstTerraformVersion)),
-		InstallDir: tfInstallDir,
+		ExtraPaths: []string{tfInstallDir},
 	}
 
-	// Install specific version of Terraform into Terraform install directory.
-	execPath, err := installer.Install(context.Background())
+	execPath, err := fs.Find(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("Error installing Terraform: %w", err)
+
+		fmt.Printf("Terraform %s could not be found locally.\n", env.ConstTerraformVersion)
+		fmt.Printf("Installing Terraform %s in '%s'...\n", env.ConstTerraformVersion, tfInstallDir)
+
+		// Make sure terraform install directory exists
+		err := os.MkdirAll(tfInstallDir, os.ModePerm)
+		if err != nil {
+			return nil, fmt.Errorf("Failed creating Terraform install directory: %w", err)
+		}
+
+		installer := &releases.ExactVersion{
+			Product:    product.Terraform,
+			Version:    version.Must(version.NewVersion(env.ConstTerraformVersion)),
+			InstallDir: tfInstallDir,
+		}
+
+		// Install specific version of Terraform into Terraform install directory.
+		execPath, err = installer.Install(context.Background())
+		if err != nil {
+			return nil, fmt.Errorf("Error installing Terraform: %w", err)
+		}
+
+	} else {
+
+		fmt.Printf("Terraform %s found locally (%s).", env.ConstTerraformVersion, execPath)
 	}
 
 	tf, err := tfexec.NewTerraform(tfProjectDir, execPath)

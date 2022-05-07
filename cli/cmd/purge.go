@@ -68,6 +68,8 @@ func purge() error {
 		return fmt.Errorf("User aborted.")
 	}
 
+	fmt.Printf("Purging '%s' cluster...\n", env.ClusterName)
+
 	// Remove terraform state file
 	err = os.RemoveAll(env.ClusterPath)
 	if err != nil {
