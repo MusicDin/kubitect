@@ -45,7 +45,7 @@ single cluster.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := apply()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	},

@@ -20,7 +20,7 @@ the operation is executed on the 'default' cluster.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := purge()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	},

@@ -16,10 +16,12 @@ var exportConfigCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Export cluster configuration file",
 	Long:  `Command export config prints content of the cluster configuration file.`,
+
 	Run: func(cmd *cobra.Command, args []string) {
 		err := exportConfig()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
 		}
 	},
 }

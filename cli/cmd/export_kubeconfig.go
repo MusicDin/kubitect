@@ -20,6 +20,7 @@ var exportKubeconfigCmd = &cobra.Command{
 		err := exportKubeconfig()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
 		}
 	},
 }
