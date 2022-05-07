@@ -20,12 +20,35 @@ func GetEnv(envKey, defaultValue string) string {
 	return defaultValue
 }
 
-// ForceMove forcfully moves a file or a directory to the specific location.
+func Exists(path string) bool {
+
+	_, err := os.Stat(path)
+	if err != nil {
+
+		if os.IsNotExist(err) {
+			return false
+		}
+		panic(err)
+	}
+	return true
+}
+
+// ForceMove forcibly moves a file or directory to a specified location.
+// First the destination file or directory is removed, and then the contents
+// are moved there.
 func ForceMove(srcPath string, dstPath string) error {
 
 	err := os.RemoveAll(dstPath)
 	if err != nil {
 		return fmt.Errorf("Failed to force remove destination file: %w", err)
+	}
+
+	dstDir := filepath.Dir(dstPath)
+
+	// Create all destination subdirectories if missing.
+	err = os.MkdirAll(dstDir, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("Failed to create dst directory (%s) while moving files: %v", dstDir, err)
 	}
 
 	err = os.Rename(srcPath, dstPath)

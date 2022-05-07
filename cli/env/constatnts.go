@@ -2,12 +2,13 @@ package env
 
 const (
 	// Global constants
-	ConstTerraformVersion   = "1.1.4"
 	ConstProjectHomeEnvName = "KUBITECT_HOME"
 	ConstProjectHomeDir     = ".kubitect"
 	ConstProjectClustersDir = "clusters"
 	ConstProjectUrl         = "https://github.com/MusicDin/kubitect"
 	ConstProjectVersion     = "v2.0.4"
+	ConstTerraformVersion   = "1.1.4"
+	ConstTerraformStatePath = "config/terraform/terraform.tfstate"
 
 	// default values
 	DefaultClusterName       = "default"
@@ -19,9 +20,12 @@ var (
 	// Defines required files/directories that are copied from tmp git project.
 	ProjectRequiredFiles = [...]string{
 		"ansible/",
-		"terraform/",
-		"templates/",
 		"resources/",
+		"templates/",
+		"terraform/modules/",
+		"terraform/output.tf",
+		"terraform/variables.tf",
+		"terraform/versions.tf",
 		"scripts/",
 		"requirements.txt",
 		"LICENSE",

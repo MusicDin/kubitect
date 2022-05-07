@@ -45,6 +45,13 @@ func destroy() error {
 
 	var err error
 
+	tfStatePath := filepath.Join(env.ClusterPath, env.ConstTerraformStatePath)
+
+	// Skip destruction if terraform state file does not exist.
+	if !utils.Exists(tfStatePath) {
+		return fmt.Errorf("Cluster '%s' is already destroyed (or not yet initialized).", env.ClusterName)
+	}
+
 	// Fail if cluster path is not pointing on a valid cluster directory.
 	err = utils.VerifyClusterDir(env.ClusterPath)
 	if err != nil {
@@ -63,6 +70,12 @@ func destroy() error {
 	err = helpers.TerraformDestroy(env.ClusterPath)
 	if err != nil {
 		return err
+	}
+
+	// Remove terraform state file
+	err = os.Remove(tfStatePath)
+	if err != nil {
+		return fmt.Errorf("Failed removing cluster's terraform state file: %v", err)
 	}
 
 	return nil
