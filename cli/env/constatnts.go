@@ -9,6 +9,7 @@ const (
 	ConstProjectVersion     = "v2.0.4"
 	ConstTerraformVersion   = "1.1.4"
 	ConstTerraformStatePath = "config/terraform/terraform.tfstate"
+	ConstKubeconfigPath     = "config/admin.conf"
 
 	// default values
 	DefaultClusterName       = "default"

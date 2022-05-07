@@ -65,11 +65,15 @@ func init() {
 		return env.ProjectApplyActions[:], cobra.ShellCompDirectiveDefault
 	})
 
-	// Auto complete cluster names from project clusters directory
-	// for flag 'cluster'.
+	// Auto complete cluster names for flag 'cluster'.
 	applyCmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		clustersPath := filepath.Join(env.ProjectHomePath, env.ConstProjectClustersDir)
-		return []string{clustersPath}, cobra.ShellCompDirectiveFilterDirs
+
+		clusterNames, err := GetClusters([]ClusterFilter{})
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		return clusterNames, cobra.ShellCompDirectiveNoFileComp
 	})
 }
 

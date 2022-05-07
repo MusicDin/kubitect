@@ -32,11 +32,15 @@ func init() {
 	destroyCmd.PersistentFlags().BoolVar(&env.Local, "local", false, "use a current directory as the cluster path")
 	destroyCmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
 
-	// Auto complete cluster names from project clusters directory
-	// for flag 'cluster'.
+	// Auto complete cluster names of active clusters for flag 'cluster'.
 	destroyCmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		clustersPath := filepath.Join(env.ProjectHomePath, env.ConstProjectClustersDir)
-		return []string{clustersPath}, cobra.ShellCompDirectiveFilterDirs
+
+		clusterNames, err := GetClusters([]ClusterFilter{IsActive})
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		return clusterNames, cobra.ShellCompDirectiveNoFileComp
 	})
 }
 

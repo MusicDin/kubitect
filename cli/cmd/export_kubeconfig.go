@@ -30,19 +30,23 @@ func init() {
 	exportKubeconfigCmd.PersistentFlags().StringVar(&env.ClusterName, "cluster", env.DefaultClusterName, "specify the cluster to be used")
 	exportKubeconfigCmd.PersistentFlags().BoolVar(&env.Local, "local", false, "use a current directory as the cluster path")
 
-	// Auto complete cluster names from project clusters directory
+	// Auto complete cluster names of active clusters that also contain kubeconfig
 	// for the flag 'cluster'.
 	exportKubeconfigCmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		clustersPath := filepath.Join(env.ProjectHomePath, env.ConstProjectClustersDir)
-		return []string{clustersPath}, cobra.ShellCompDirectiveFilterDirs
+
+		clusterNames, err := GetClusters([]ClusterFilter{IsActive, ContainsKubeconfig})
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		return clusterNames, cobra.ShellCompDirectiveNoFileComp
 	})
 }
 
-// exportKubeconfig exports (prints) content of the cluster
-// Kubeconfig file.
+// exportKubeconfig exports (prints) content of the cluster Kubeconfig file.
 func exportKubeconfig() error {
 
-	kubeconfigPath := filepath.Join(env.ClusterPath, "config", "admin.conf")
+	kubeconfigPath := filepath.Join(env.ClusterPath, env.ConstKubeconfigPath)
 
 	err := utils.VerifyClusterDir(env.ClusterPath)
 	if err != nil {
