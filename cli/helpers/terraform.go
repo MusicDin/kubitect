@@ -61,36 +61,20 @@ func terraformInit(clusterPath string) (*tfexec.Terraform, error) {
 	tfInstallDir := filepath.Join(env.ProjectHomePath, terraformBinDir, env.ConstTerraformVersion)
 	tfProjectDir := filepath.Join(clusterPath, terraformProjectDir)
 
-	// installer := NewInstaller()
-
-	// version := version.Must(version.NewVersion(env.ConstTerraformVersion))
-
-	// execPath, err := installer.Ensure(context.Background(), []src.Source{
-	// 	&fs.ExactVersion{
-	// 		Product:    product.Terraform,
-	// 		Version:    version,
-	// 		ExtraPaths: []string{tfInstallDir},
-	// 	},
-	// 	&releases.ExactVersion{
-	// 		Product:    product.Terraform,
-	// 		Version:    version,
-	// 		InstallDir: tfInstallDir,
-	// 	},
-	// })
-
 	fs := &fs.ExactVersion{
 		Product:    product.Terraform,
 		Version:    version.Must(version.NewVersion(env.ConstTerraformVersion)),
 		ExtraPaths: []string{tfInstallDir},
 	}
 
+	// Search for Terraform installation locally before installing it.
 	execPath, err := fs.Find(context.Background())
 	if err != nil {
 
 		fmt.Printf("Terraform %s could not be found locally.\n", env.ConstTerraformVersion)
 		fmt.Printf("Installing Terraform %s in '%s'...\n", env.ConstTerraformVersion, tfInstallDir)
 
-		// Make sure terraform install directory exists
+		// Make sure terraform install directory exists.
 		err := os.MkdirAll(tfInstallDir, os.ModePerm)
 		if err != nil {
 			return nil, fmt.Errorf("Failed creating Terraform install directory: %w", err)
