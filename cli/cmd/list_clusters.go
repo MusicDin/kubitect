@@ -14,6 +14,7 @@ type ClusterFilter uint8
 
 const (
 	IsActive           ClusterFilter = iota
+	IsInactive         ClusterFilter = iota
 	ContainsKubeconfig ClusterFilter = iota
 	ContainsConfig     ClusterFilter = iota
 )
@@ -140,6 +141,13 @@ func filterClusters(clusters []string, filters []ClusterFilter) ([]string, error
 				// To determine if cluster is active, check if terraform state
 				// file exists.
 				if !utils.Exists(filepath.Join(clusterPath, env.ConstTerraformStatePath)) {
+					passedFilters = false
+					break
+				}
+
+			case IsInactive:
+
+				if utils.Exists(filepath.Join(clusterPath, env.ConstTerraformStatePath)) {
 					passedFilters = false
 					break
 				}

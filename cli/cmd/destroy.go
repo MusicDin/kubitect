@@ -13,9 +13,10 @@ import (
 
 var destroyCmd = &cobra.Command{
 	Use:   "destroy",
-	Short: "Destroys the cluster",
+	Short: "Destroy the cluster",
 	Long: `Destroys the cluster. If cluster is not specifed (using --cluster flag) 
 the operation is executed on the 'default' cluster.`,
+
 	Run: func(cmd *cobra.Command, args []string) {
 		err := destroy()
 		if err != nil {
