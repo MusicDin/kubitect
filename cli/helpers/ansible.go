@@ -5,8 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -40,8 +38,8 @@ type AnsiblePlaybookCmd struct {
 	Venv            VirtualEnvironment
 }
 
-// Sets inventory and connection type to localhost before executing
-// ansible playbook.
+// ExecAnsiblePlaybookLocal sets inventory and connection type to localhost
+// before executing the ansible playbook.
 func ExecAnsiblePlaybookLocal(clusterPath string, ansibleCmd *AnsiblePlaybookCmd) error {
 
 	if ansibleCmd == nil {
@@ -110,9 +108,9 @@ func ExecAnsiblePlaybook(clusterPath string, ansibleCmd *AnsiblePlaybookCmd) err
 		playbookOptions.AddExtraVar(keyVar, valueVar)
 	}
 
-	executor := execute.NewDefaultExecute(
-		execute.WithWriteError(io.Writer(os.Stdout)),
-	)
+	executor := &execute.DefaultExecute{
+		CmdRunDir: filepath.Dir(ansibleCmd.PlaybookFile),
+	}
 
 	playbook := &playbook.AnsiblePlaybookCmd{
 		Binary:                     filepath.Join(clusterPath, venvBinDir, ansibleCmd.Venv.Name, "bin", "ansible-playbook"),
@@ -125,6 +123,8 @@ func ExecAnsiblePlaybook(clusterPath string, ansibleCmd *AnsiblePlaybookCmd) err
 	}
 
 	options.AnsibleForceColor()
+	options.AnsibleSetEnv("ANSIBLE_DISPLAY_FAILED_STDERR", "true")
+	options.AnsibleSetEnv("ANSIBLE_DISPLAY_SKIPPED_HOSTS", "false")
 
 	err = playbook.Run(context.TODO())
 	if err != nil {

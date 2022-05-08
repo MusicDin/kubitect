@@ -94,7 +94,7 @@ func terraformInit(clusterPath string) (*tfexec.Terraform, error) {
 
 	} else {
 
-		fmt.Printf("Terraform %s found locally (%s).", env.ConstTerraformVersion, execPath)
+		fmt.Printf("Terraform %s found locally (%s).\n", env.ConstTerraformVersion, execPath)
 	}
 
 	tf, err := tfexec.NewTerraform(tfProjectDir, execPath)
@@ -103,6 +103,7 @@ func terraformInit(clusterPath string) (*tfexec.Terraform, error) {
 	}
 
 	tf.SetStdout(os.Stdout)
+	tf.SetStderr(os.Stderr)
 	// tf.SetColor(true)
 
 	fmt.Println("Initializing Terraform project...")
