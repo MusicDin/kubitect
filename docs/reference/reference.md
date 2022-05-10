@@ -38,7 +38,9 @@ The cluster configuration consists of four parts:
     <tr>
       <td><code>kubitect.version</code></td>
       <td>string</td>
-      <td>master</td>
+      <td>
+        <i>CLI tool version</i>
+      </td>
       <td>No</td>
       <td>Version of the git repository. Can be a branch or a tag.</td>
     </tr>

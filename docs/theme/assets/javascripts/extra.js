@@ -67,8 +67,11 @@ function terminalAnimation() {
     // miliseconds between each output line printed
     const outputDelay = 50
 
-    // miliseconds between each command typed
-    const commandDelay = 500
+    // miliseconds before command is applied
+    const applyCommandDelay = 250
+
+    // miliseconds before command is typed
+    const startCommandDelay = 1000
 
     // miliseconds between each command character typed
     const commandCharDelay = 20
@@ -136,9 +139,9 @@ function terminalAnimation() {
                     // add cursor when writing command
                     cmdElement.classList.add("terminal-cursor")
                     
-                    await delay(commandDelay)
+                    await delay(startCommandDelay)
                     await typeSequence(cmdElement, line.value)
-                    await delay(commandDelay)
+                    await delay(applyCommandDelay)
 
                     // remove cursor when command is "applied"
                     cmdElement.classList.remove("terminal-cursor")
