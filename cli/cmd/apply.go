@@ -314,7 +314,6 @@ func removeNodes(configPath string, infraConfigPath string, nodeType string) err
 			// nodes from being removed again on the next run if Terraform
 			// fails for some reason on the first run.
 			saveTaggedNodes(infraConfigPath, nodes, removedNodes, nodeType)
-			os.Exit(4)
 		}
 	}
 
