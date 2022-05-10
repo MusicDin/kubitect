@@ -87,13 +87,23 @@ variable "cluster_nodeTemplate_ssh_addToKnownHosts" {
   nullable    = false
 }
 
-variable "cluster_nodeTemplate_image_source" {
+variable "cluster_nodeTemplate_os_source" {
   type        = string
-  description = "Image source, which can be path on host's filesystem or URL."
+  description = "OS source, which can be path on host's filesystem or URL."
 
   validation {
-    condition     = length(var.cluster_nodeTemplate_image_source) != 0
-    error_message = "Virtual machine (VM) image source is missing. Please specify local path or URL to the image."
+    condition     = length(var.cluster_nodeTemplate_os_source) != 0
+    error_message = "Node template opersating system (os) source is missing. Please specify local path or URL for the os source."
+  }
+}
+
+variable "cluster_nodeTemplate_os_networkInterface" {
+  type        = string
+  description = "Operating system (os) network interface, which is predefined for the os image."
+
+  validation {
+    condition     = length(var.cluster_nodeTemplate_os_networkInterface) != 0
+    error_message = "Operating system (os) networkInterface is missing. Please specify os network interface."
   }
 }
 
@@ -391,19 +401,6 @@ variable "kubernetes_kubespray_version" {
   description = "The version of Kubespray that will be used to deploy Kubernetes."
 }
 
-variable "kubernetes_kubespray_addons_enabled" {
-  type        = bool
-  description = "If enabled, configured Kubespray addons will be applied."
-  default     = false
-  nullable    = false
-}
-
-variable "kubernetes_kubespray_addons_configPath" {
-  type        = string
-  description = "If Kubespray addons are enabled, addons configuration file on this path will be used."
-  default     = ""
-}
-
 variable "kubernetes_other_copyKubeconfig" {
   type        = bool
   description = "If enabled, kubeconfig (config/admin.conf) will be copied to '~/.kube/' directory."
@@ -411,45 +408,15 @@ variable "kubernetes_other_copyKubeconfig" {
   nullable    = false
 }
 
-
-#
-# Further work required on these variables:
-#
-
-#variable "k8s_dashboard_enabled" {
-#  type        = bool
-#  description = "Sets up Kubernetes dashboard if enabled"
-#  default     = false
-#  nullable    = false
-#}
-
-#variable "k8s_dashboard_rbac_enabled" {
-#  type        = bool
-#  description = "If enabled, Kubernetes dashboard service account will be created"
-#  default     = false
-#  nullable    = false
-#}
-
-#variable "k8s_dashboard_rbac_user" {
-#  type        = string
-#  description = "Kubernetes dashboard service account user"
-#  default     = "admin"
-#  nullable    = false
-#}
-
 #======================================================================================
 # Other internal variables
 #======================================================================================
 
-variable "internal" {
+variable "node_types" {
   type = object({
-    is_bridge         = string
-    network_interface = string
-    vm_types = object({
-      load_balancer = string
-      master        = string
-      worker        = string
-    })
+    load_balancer = string
+    master        = string
+    worker        = string
   })
-  description = "Internal variables passed from parent module."
+  description = "Node types."
 }

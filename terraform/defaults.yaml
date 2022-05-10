@@ -1,0 +1,21 @@
+#
+# The configuration file contains default values for Terraform, 
+# such as the URL of the OS distribution and the corresponding
+# network interface.
+#
+---
+default:
+  distro: ubuntu
+  ssh:
+    privateKeyPath: "../config/.ssh/id_rsa"
+
+distros:
+  - name: ubuntu
+    url: "https://cloud-images.ubuntu.com/releases/focal/release-20220505/ubuntu-20.04-server-cloudimg-amd64.img"
+    networkInterface: "ens3"
+  - name: debian
+    url: "..."
+    networkInterface: "eth0"
+  - name: fedora
+    url: "..."
+    networkInterface: "eth0"

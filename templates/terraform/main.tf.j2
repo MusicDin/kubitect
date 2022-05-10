@@ -8,51 +8,20 @@
 
 # Local variables used in many resources #
 locals {
-  config = yamldecode(file(pathexpand("{{ kubitect_cluster_config_path }}")))
-  ssh_pk_path = (try(local.config.cluster_nodeTemplate_ssh_privateKeyPath, null) != null
-    ? pathexpand(local.config.cluster_nodeTemplate_ssh_privateKeyPath)
-    : pathexpand("../config/.ssh/id_rsa")
-  )
-  internal = {
-    is_bridge = (local.config.cluster.network.mode == "bridge")
-    network_interface = (try(local.config.cluster.nodeTemplate.networkInterface, null) != null
-      ? local.config.cluster.nodeTemplate.networkInterface
-      : local.config.cluster.nodeTemplate.image.distro == "ubuntu" ? "ens3" : "eth0"
-    )
-    vm_types = {
-      load_balancer = "lb"
-      master        = "master"
-      worker        = "worker"
-    }
+
+  # Configuration files
+  # Infra config can be null, as it is created after first initialization
+  # of the cluster.
+  config          = yamldecode(file(var.config_path))
+  defaults_config = yamldecode(file(var.defaults_config_path))
+  infra_config    = try(yamldecode(file(var.infra_config_path)), null)
+
+  node_types = {
+    load_balancer = "lb"
+    master        = "master"
+    worker        = "worker"
   }
 }
-
-
-#=====================================================================================
-# SSH Keys
-#=====================================================================================
-
-# Generates SSH keys if path to private key is not provided. #
-resource "null_resource" "generate_ssh_keys" {
-
-  count = try(local.config.cluster.nodeTemplate.ssh.privateKeyPath, null) == null ? 1 : 0
-
-  provisioner "local-exec" {
-
-    command = <<-EOF
-      dirname $SSH_PK_PATH | xargs mkdir -p
-      if [ ! -e $SSH_PK_PATH ] && [ ! -e $\{SSH_PK_PATH\}.pub ]; then \
-        ssh-keygen -f $SSH_PK_PATH -q -N ""; \
-      fi
-    EOF
-
-    environment = {
-      SSH_PK_PATH = local.ssh_pk_path
-    }
-  }
-
-}
-
 
 #=====================================================================================
 # Providers
@@ -92,6 +61,17 @@ provider "libvirt" {
 # Modules
 #======================================================================================
 
+module "base" {
+
+  source = "./modules/base"
+
+  # Configuration files
+  config          = local.config
+  infra_config    = local.infra_config
+  defaults_config = local.defaults_config
+}
+
+
 {# Check if default host is defined #}
 {% set is_default_host_defined = [] -%}
 {% for item in host_list -%}
@@ -120,9 +100,10 @@ module "host_{{ host_name }}" {
   # General
   cluster_name                             = try(local.config.cluster.name, null)
   cluster_nodeTemplate_user                = try(local.config.cluster.nodeTemplate.user, null)
-  cluster_nodeTemplate_ssh_privateKeyPath  = local.ssh_pk_path
+  cluster_nodeTemplate_ssh_privateKeyPath  = module.base.ssh.privateKeyPath
   cluster_nodeTemplate_ssh_addToKnownHosts = try(local.config.cluster.nodeTemplate.ssh.addToKnownHosts, null)
-  cluster_nodeTemplate_image_source        = try(local.config.cluster.nodeTemplate.image.source, null)
+  cluster_nodeTemplate_os_source           = module.base.os.source
+  cluster_nodeTemplate_os_networkInterface = module.base.os.networkInterface
   cluster_nodeTemplate_updateOnBoot        = try(local.config.cluster.nodeTemplate.updateOnBoot, null)
 
   # Network configuration
@@ -162,17 +143,15 @@ module "host_{{ host_name }}" {
   ]
 
   # Kubernetes & Kubespray
-  kubernetes_version                     = try(local.config.kubernetes.version, null)
-  kubernetes_networkPlugin               = try(local.config.kubernetes.networkPlugin, null)
-  kubernetes_dnsMode                     = try(local.config.kubernetes.dnsMode, null)
-  kubernetes_kubespray_url               = try(local.config.kubernetes.kubespray.url, null)
-  kubernetes_kubespray_version           = try(local.config.kubernetes.kubespray.version, null)
-  kubernetes_kubespray_addons_enabled    = false # try(local.config.kubernetes.kubespray.addons.enabled, null)
-  kubernetes_kubespray_addons_configPath = ""    # try(local.config.kubernetes.kubespray.addons.configPath, null)
-  kubernetes_other_copyKubeconfig        = try(local.config.kubernetes.other.copyKubeconfig, null)
+  kubernetes_version              = try(local.config.kubernetes.version, null)
+  kubernetes_networkPlugin        = try(local.config.kubernetes.networkPlugin, null)
+  kubernetes_dnsMode              = try(local.config.kubernetes.dnsMode, null)
+  kubernetes_kubespray_url        = try(local.config.kubernetes.kubespray.url, null)
+  kubernetes_kubespray_version    = try(local.config.kubernetes.kubespray.version, null)
+  kubernetes_other_copyKubeconfig = try(local.config.kubernetes.other.copyKubeconfig, null)
 
   # Other
-  internal = local.internal
+  node_types = local.node_types
 
   providers = {
     libvirt = libvirt.{{ host_name }}
@@ -192,29 +171,30 @@ module "host_{{ host_name }}" {
 {% endfor -%}
 {% set host_name_list = host_name_list | join(', ') -%}
 
-# Configures k8s cluster using Kubespray #
+# Outputs evaluated cluster information #
 module "output" {
 
   source = "./modules/output"
 
   # VM variables #
-  vm_user              = try(local.config.cluster.nodeTemplate.user, null)
-  vm_ssh_private_key   = local.ssh_pk_path
-  vm_network_interface = local.internal.network_interface
+  vm_user = try(local.config.cluster.nodeTemplate.user, null)
+  vm_ssh  = module.base.ssh
+  vm_os   = module.base.os
+  lb_vip  = try(local.config.cluster.nodes.loadBalancer.vip, null)
 
-  worker_node_label = try(local.config.cluster.nodes.worker.default.label, null)
-  lb_vip            = try(local.config.cluster.nodes.loadBalancer.vip, null)
   lb_nodes = [
     for node in flatten([{{ host_name_list }}]) :
-    node if node.type == local.internal.vm_types.load_balancer
+    node if node.type == local.node_types.load_balancer
   ]
+
   master_nodes = [
     for node in flatten([{{ host_name_list }}]) :
-    node if node.type == local.internal.vm_types.master
+    node if node.type == local.node_types.master
   ]
+
   worker_nodes = [
     for node in flatten([{{ host_name_list }}]) :
-    node if node.type == local.internal.vm_types.worker
+    node if node.type == local.node_types.worker
   ]
 
   # K8s cluster creation depends on all VM modules #
@@ -225,7 +205,8 @@ module "output" {
   ]
 }
 
+# Creates config file containing evaluated information of the created infrastrucutre #
 resource "local_file" "output" {
   content  = replace(yamlencode(module.output), "/((?:^|\n)[\\s-]*)\"([\\w-]+)\":/", "$1$2:")
-  filename = "../config/infrastructure.yaml"
+  filename = var.infra_config_path
 }

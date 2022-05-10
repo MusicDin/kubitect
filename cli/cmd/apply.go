@@ -139,12 +139,12 @@ func apply() error {
 	}
 
 	// Extract required values from tf output
-	sshUser, err := config.GetStrValue(infraConfigPath, "cluster.ssh.user")
+	sshUser, err := config.GetStrValue(infraConfigPath, "cluster.nodeTemplate.user")
 	if err != nil {
 		return err
 	}
 
-	sshPKey, err := config.GetStrValue(infraConfigPath, "cluster.ssh.pkey")
+	sshPKey, err := config.GetStrValue(infraConfigPath, "cluster.nodeTemplate.ssh.privateKeyPath")
 	if err != nil {
 		return err
 	}
@@ -260,17 +260,17 @@ func removeNodes(configPath string, infraConfigPath string, nodeType string) err
 	// Check if infrastructure config exists.
 	_, err := os.Stat(infraConfigPath)
 
-	// Trigger removal if the cluster action is set to 'scale' and if the infrastrcutre
+	// Trigger removal if the cluster action is set to 'scale' and the infrastrcutre
 	// config already exists.
 	if env.ClusterAction == "scale" && err == nil {
 
 		// Extract required values from tf output.
-		sshUser, err := config.GetStrValue(infraConfigPath, "cluster.ssh.user")
+		sshUser, err := config.GetStrValue(infraConfigPath, "cluster.nodeTemplate.user")
 		if err != nil {
 			return err
 		}
 
-		sshPKey, err := config.GetStrValue(infraConfigPath, "cluster.ssh.pkey")
+		sshPKey, err := config.GetStrValue(infraConfigPath, "cluster.nodeTemplate.ssh.privateKeyPath")
 		if err != nil {
 			return err
 		}
@@ -314,7 +314,6 @@ func removeNodes(configPath string, infraConfigPath string, nodeType string) err
 			// nodes from being removed again on the next run if Terraform
 			// fails for some reason on the first run.
 			saveTaggedNodes(infraConfigPath, nodes, removedNodes, nodeType)
-			os.Exit(4)
 		}
 	}
 

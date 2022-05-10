@@ -14,14 +14,20 @@ variable "vm_user" {
   description = "SSH user for VMs"
 }
 
-variable "vm_ssh_private_key" {
-  type        = string
+variable "vm_ssh" {
+  type = object({
+    privateKeyPath = string
+  })
   description = "Location of private ssh key for VMs"
 }
 
-variable "vm_network_interface" {
-  type        = string
-  description = "VM network interface used for Keepalived"
+variable "vm_os" {
+  type = object({
+    distro           = string
+    source           = string
+    networkInterface = string
+  })
+  description = "Operating system (os) information."
 }
 
 #======================================================================================
@@ -35,14 +41,6 @@ variable "worker_nodes" {
     ip   = string
   }))
   description = "Worker nodes info"
-}
-
-# TODO: Should be part of worker_nodes
-variable "worker_node_label" {
-  type        = string
-  description = "Worker node role label"
-  default     = ""
-  nullable    = false
 }
 
 variable "master_nodes" {

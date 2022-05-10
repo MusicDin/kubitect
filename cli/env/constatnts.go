@@ -24,6 +24,7 @@ var (
 		"resources/",
 		"templates/",
 		"terraform/modules/",
+		"terraform/defaults.yaml",
 		"terraform/output.tf",
 		"terraform/variables.tf",
 		"terraform/versions.tf",
