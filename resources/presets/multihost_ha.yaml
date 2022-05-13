@@ -50,9 +50,8 @@ cluster:
       - 1.0.0.1
   nodeTemplate:
     user: k8s
-    image:
+    os:
       distro: ubuntu
-      source: "https://cloud-images.ubuntu.com/releases/focal/release-20220111/ubuntu-20.04-server-cloudimg-amd64.img"
   nodes:
     loadBalancer:
       vip: 10.10.64.200

@@ -21,9 +21,8 @@ cluster:
     user: "k8s"
     ssh:
       addToKnownHosts: true
-    image:
+    os:
       distro: "ubuntu"
-      source: "https://cloud-images.ubuntu.com/releases/focal/release-20220111/ubuntu-20.04-server-cloudimg-amd64.img"
     updateOnBoot: true
   nodes:
     master:
