@@ -14,8 +14,8 @@ distros:
     url: "https://cloud-images.ubuntu.com/releases/focal/release-20220505/ubuntu-20.04-server-cloudimg-amd64.img"
     networkInterface: "ens3"
   - name: debian
-    url: "..."
-    networkInterface: "eth0"
-  - name: fedora
-    url: "..."
-    networkInterface: "eth0"
+    url: "https://cloud.debian.org/images/cloud/bullseye/20220503-998/debian-11-genericcloud-amd64-20220503-998.qcow2"
+    networkInterface: "ens3"
+  #- name: coreos
+  #  url: "https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/35.20220424.3.0/x86_64/fedora-coreos-35.20220424.3.0-qemu.x86_64.qcow2.xz"
+  #  networkInterface: "eth0"
