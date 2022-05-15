@@ -1,19 +1,5 @@
 ---
 
-# Verify that provided configuration exists
-# - name: Verify that provided configuration exists
-#   block:
-#     - name: Get stats of the config file
-#       stat:
-#         path: "{{ config_path }}"
-#       register: config
-
-#     - name: Verify that the configuration file exists
-#       fail:
-#         msg: Cluster configuration file ({{ config_path }}) does not exist.
-#       when:
-#         - config.stat.exists != true
-
 # Verify hosts are present
 
 - name: Fail if hosts are not defined

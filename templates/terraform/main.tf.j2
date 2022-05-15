@@ -49,7 +49,7 @@ provider "libvirt" {
     ":" ~ item.connection.ssh.port if item.connection.ssh.port is defined else "",
     "/system",
     "?keyfile=" ~ ssh_pk_path,
-    "&no_verify=1" if item.connection.ssh.verify is defined and not item.connection.ssh.verify else ""
+    "&no_verify=1" if item.connection.ssh.verify is not defined or not item.connection.ssh.verify else ""
   ]-%} 
   uri   = "{{ provider_uri | join('') }}"
 {% endif %}
