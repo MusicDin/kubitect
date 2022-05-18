@@ -42,7 +42,7 @@ hosts:
       ip: 10.10.40.143 # (7)
       ssh:
         port: 1234  # (8)
-        verify: false # (9)
+        verify: true # (9)
         keyfile: "~/.ssh/id_rsa_server1" # (10)
   - name: remote-server-2
     connection:
@@ -73,14 +73,13 @@ cluster:
       - 1.1.1.1
       - 1.0.0.1
   nodeTemplate:
-    networkInterface: "ens3" # (19)
     user: "k8s"
     ssh:
       privateKeyPath: "~/.ssh/id_rsa_test"
       addToKnownHosts: true
-    image:
+    os:
       distro: "ubuntu"
-      source: "https://cloud-images.ubuntu.com/releases/focal/release-20220111/ubuntu-20.04-server-cloudimg-amd64.img"
+      networkInterface: "ens3" # (19)
     updateOnBoot: true
   nodes:
     loadBalancer:
@@ -194,7 +193,7 @@ kubernetes:
 
 8.  Overrides default SSH port (22).
 
-9.  If set to false, host verification is skipped.
+9.  If true, SSH host is verified. This means that the host must be present in the known SSH hosts.
 
 10. Path to the **passwordless** SSH key used to connect to the remote host.
 
@@ -226,7 +225,7 @@ kubernetes:
 
 19. Specify the network interface used by the virtual machine. In general, this option can be omitted. 
 
-    If you omit it, `ens3` is used for Ubuntu images and `eth0` for all other distributions.
+    If omitted, a network interface from distro preset (`/terraform/defaults.yaml`) is used.
 
 20. Virtual (floating) IP shared between load balancers. 
 

@@ -114,14 +114,13 @@ As mentioned earlier, the `nodeTemplate` subsection is used to define general pr
 
 Required properties are:
 
-+ `user` is the name of the user that will be created on all virtual machines and will also be used for SSH.
-+ `image.distro` defines the type of the used operating system (ubuntu, debian, ...).
-+ `image.source` defines the location of the OS image. It can be either a local file system path or an URL.
++ `user` - the name of the user that will be created on all virtual machines and will also be used for SSH.
 
-Besides the required properties, there are two potentially useful properties:
+Besides the required properties, there are some potentially useful properties:
 
-+ `ssh.addToKnownHosts` - if set to true, all virtual machines will be added to SSH known hosts. If you later destroy the cluster, these virtual machines will also be removed from the known hosts.
-+ `updateOnBoot` - if set to true, all virtual machines are updated at the first boot.
++ `os.distro` - defines the operating system for the nodes (currently ubuntu and debian are supported). By default ubuntu is used.
++ `ssh.addToKnownHosts` - if true, all virtual machines will be added to SSH known hosts. If you later destroy the cluster, these virtual machines will also be removed from the known hosts.
++ `updateOnBoot` - if true, all virtual machines are updated at the first boot.
 
 Our `noteTemplate` subsection now looks like this:
 ```yaml
@@ -131,9 +130,8 @@ cluster:
     user: "k8s"
     ssh:
       addToKnownHosts: true
-    image:
-      distro: "ubuntu"
-      source: "https://cloud-images.ubuntu.com/releases/focal/release-20220111/ubuntu-20.04-server-cloudimg-amd64.img"
+    os:
+      distro: ubuntu
     updateOnBoot: true
 ```
 
@@ -215,9 +213,8 @@ cluster:
     user: "k8s"
     ssh:
       addToKnownHosts: true
-    image:
-      distro: "ubuntu"
-      source: "https://cloud-images.ubuntu.com/releases/focal/release-20220111/ubuntu-20.04-server-cloudimg-amd64.img"
+    os:
+      distro: ubuntu
     updateOnBoot: true
   nodes:
     master:
