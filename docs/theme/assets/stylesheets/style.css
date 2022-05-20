@@ -222,37 +222,24 @@
 
 
 /*
- * CODE BLOCK - Icon
+ * CODE BLOCK - Title
  */
 
- .md-typeset .highlight span.filename {
+.md-typeset .highlight span.filename {
     position: relative;
-    display: block;
-    margin-top: 1em;
-    padding: .5em 1.1764705882em .5em 2.9411764706em;
-    font-weight: 700;
-    font-size: .68rem;
-    border-top-left-radius: .1rem;
-    border-top-right-radius: .1rem
-}
-
-.md-typeset .highlight span.filename+pre {
-    margin-top: 0
-}
-
-.md-typeset .highlight span.filename+pre code {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0
+    padding-left: 5.5ch;
+    color: var(--md-default-fg-color--light);
 }
 
 .md-typeset .highlight span.filename::before {
     position: absolute;
-    left: .9em;
-    height: 1.5em;
-    width: 1.5em;
-    background-color: var(--md-default-fg-color);
-    -webkit-mask-image: url("../assets/images/icon_file-lines.svg");
-    mask-image: url("../assets/images/icon_file-lines.svg");
+    left: 2ch;
+    top: 1.25ch;
+    height: 50%;
+    width: 50%;
+    background-color: var(--md-default-fg-color--light);
+    -webkit-mask-image: url("../images/icon_file-lines.svg");
+    mask-image: url("../images/icon_file-lines.svg");
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-size: contain;

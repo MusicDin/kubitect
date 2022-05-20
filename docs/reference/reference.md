@@ -118,9 +118,11 @@ The cluster configuration consists of four parts:
     <tr>
       <td><code>hosts[*].connection.ssh.verify</code></td>
       <td>boolean</td>
-      <td>true</td>
+      <td>false</td>
       <td></td>
-      <td>If set to true, SSH host is verified.</td>
+      <td>
+        If true, the SSH host is verified, which means that the host must be present in the known SSH hosts.
+      </td>
     </tr>
     <tr>
       <td><code>hosts[*].mainResourcePoolPath</code></td>
@@ -213,21 +215,11 @@ The cluster configuration consists of four parts:
     <tr>
       <td><code>cluster.network.dns</code></td>
       <td>list</td>
-      <td>[<i>Network gateway</i>]</td>
+      <td>Value of <code>network.gateway</code></td>
       <td></td>
       <td>
         DNS used by all created virtual machines.
         If none is provided, gateway is used as a DNS server.
-      </td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodeTemplate.images.networkInterface</code></td>
-      <td>string</td>
-      <td>ens3, if <code>distro</code> is set to ubuntu, otherwise eth0</td>
-      <td></td>
-      <td>
-        Network interface used by virtual machines to connect to the network.
-        Usually for Ubuntu images is ens3 and for most other distros is eth0. 
       </td>
     </tr>
     <tr>
@@ -259,28 +251,42 @@ The cluster configuration consists of four parts:
       </td>
     </tr>
     <tr>
-      <td><code>cluster.nodeTemplate.image.distro</code></td>
+      <td><code>cluster.nodeTemplate.os.distro</code></td>
       <td>string</td>
-      <td>N/A</td>
+      <td>ubuntu</td>
       <td></td>
       <td>
-        Set OS image distribution. Possible values are:
+        Set OS distribution. Possible values are:
         <ul>
           <li><code>ubuntu</code></li>
           <li><code>debian</code></li>
-          <li><code>centos</code></li>
-          <li><code>N/A</code> - For all other distros</li>
+          <li>
+            <code>custom</code> - For all other distros
+            <i>(for development only)</i>
+          </li>
         </ul>
       </td>
     </tr>
     <tr>
-      <td><code>cluster.nodeTemplate.image.source</code></td>
+      <td><code>cluster.nodeTemplate.os.source</code></td>
       <td>string</td>
+      <td>Depends on <code>os.distro</code></td>
       <td></td>
-      <td>Yes</td>
       <td>
         Source of an OS image. 
-        It can be either path on a local file system or a URL to an image.
+        It can be either path on a local file system or an URL of the image.
+        By default, the value from distro preset (<i>/terraform/defaults.yaml</i>)isset, but can be overwritten if needed.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.os.networkInterface</code></td>
+      <td>string</td>
+      <td>Depends on <code>os.distro</code></td>
+      <td></td>
+      <td>
+        Network interface used by virtual machines to connect to the network.
+        Network interface is preconfigured for each OS image (usually ens3 or eth0).
+        By default, the value from distro preset (<i>/terraform/defaults.yaml</i>) is set, but can be overwritten if needed.
       </td>
     </tr>
     <tr>

@@ -2,18 +2,58 @@ name: documentation
 on:
   push:
     branches:
-      - master
-      #- feature/multiple-servers
+      - "release-*"
+      #- master
+  release:
+    types:
+      - published
 
 env:
   PYTHON_VERSION: 3.x
 
 jobs:
-  documentation:
-    name: Build documentation
-    runs-on: ubuntu-latest
-    steps:
 
+  # Documentation is deployed only on the latest release branch or on the new latest
+  # release tag. This prevents bug fixes in older releases from overwriting the latest
+  # documentation.
+  check:
+    name: Check if docs should be deployed
+    runs-on: ubuntu-latest
+    outputs:
+      deploy: ${{ steps.verify.outputs.deploy }}
+    steps:
+      - name: Extract release version from the branch name (or tag)
+        id: branch_version
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const branchName = process.env.GITHUB_REF_NAME
+            const prefix = 'v'
+            const releaseVersion = branchName.substring(branchName.lastIndexOf('-') + 1, branchName.length)
+            return releaseVersion.startsWith(prefix) ? releaseVersion : prefix + releaseVersion
+
+      - name: Get latest repository version
+        id: latest_release_version
+        uses: oprypin/find-latest-tag@v1.1.0
+        with:
+          repository: ${{ github.repository }}
+          prefix: 'v'
+
+      - name: Verify if the latest version contains current branch/tag version
+        id: verify
+        env:
+          LATEST_VERSION: ${{ steps.latest_release_version.outputs.tag }}
+          BRANCH_VERSION: ${{ steps.branch_version.outputs.result }}
+        run: |
+          echo "::set-output name=deploy::${{ contains(env.LATEST_VERSION, env.BRANCH_VERSION) }}"
+
+  documentation:
+    name: Build and deploy docs
+    runs-on: ubuntu-latest
+    needs: check
+    if: needs.check.outputs.deploy == 'true'
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -36,4 +76,5 @@ jobs:
             pymdown-extensions>=9.3
 
       - name: Deploy documentation
-        run: mkdocs gh-deploy --force
+        run: |
+          mkdocs gh-deploy --force

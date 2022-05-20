@@ -34,7 +34,8 @@ A host can be either a local or a remote machine.
     !!! quote ""
 
         If the cluster is set up on the same machine where the command line tool is installed, we specify a host whose connection type is set to `local`.
-        ```yaml
+
+        ```yaml title="kubitect.yaml"
         hosts:
           - name: localhost # Can be anything
             connection:
@@ -46,16 +47,21 @@ A host can be either a local or a remote machine.
     !!! quote ""
 
         When cluster is deployed on the remote machine, the IP address of the remote machine along with the SSH credentails needs to be specified for the host.
-        ```yaml
+
+        ```yaml title="kubitect.yaml"
         hosts:
           - name: my-remote-host
             connection:
               type: remote
               user: myuser
-              ip: 10.10.40.143 # IP address of the remote host
+              ip: 10.10.40.143 # (1)
               ssh:
-                keyfile: "~/.ssh/id_rsa_server1" # Password-less SSH key file
+                keyfile: "~/.ssh/id_rsa_server1" # (2)
         ```
+
+        1. IP address of the remote host.
+
+        2. Path to the **password-less** SSH key file required for establishing connection with the remote host.
 
 In this tutorial we will use only localhost.
 
@@ -65,7 +71,8 @@ The second part of the configuration file consists of the cluster infrastructure
 In this part, all virtual machines are defined along with their properties such as operating system, CPU cores, amount of RAM and so on.
 
 Let's take a look at the following configuration:
-```yaml
+
+```yaml title="kubitect.yaml"
 cluster:
   name: "my-k8s-cluster"
   network:
@@ -98,7 +105,7 @@ Using this mode is mandatory when you set up a cluster that spreads over multipe
 
 To keep this tutorial as simple as possible, we will use the NAT mode, as it does not require a preconfigured bridge interface.
 
-```yaml
+```yaml title="kubitect.yaml"
 cluster:
   ...
   network:
@@ -114,26 +121,25 @@ As mentioned earlier, the `nodeTemplate` subsection is used to define general pr
 
 Required properties are:
 
-+ `user` is the name of the user that will be created on all virtual machines and will also be used for SSH.
-+ `image.distro` defines the type of the used operating system (ubuntu, debian, ...).
-+ `image.source` defines the location of the OS image. It can be either a local file system path or an URL.
++ `user` - the name of the user that will be created on all virtual machines and will also be used for SSH.
 
-Besides the required properties, there are two potentially useful properties:
+Besides the required properties, there are some potentially useful properties:
 
-+ `ssh.addToKnownHosts` - if set to true, all virtual machines will be added to SSH known hosts. If you later destroy the cluster, these virtual machines will also be removed from the known hosts.
-+ `updateOnBoot` - if set to true, all virtual machines are updated at the first boot.
++ `os.distro` - defines the operating system for the nodes (currently ubuntu and debian are supported). By default ubuntu is used.
++ `ssh.addToKnownHosts` - if true, all virtual machines will be added to SSH known hosts. If you later destroy the cluster, these virtual machines will also be removed from the known hosts.
++ `updateOnBoot` - if true, all virtual machines are updated at the first boot.
 
 Our `noteTemplate` subsection now looks like this:
-```yaml
+
+```yaml title="kubitect.yaml"
 cluster:
   ...
   nodeTemplate:
     user: "k8s"
     ssh:
       addToKnownHosts: true
-    image:
-      distro: "ubuntu"
-      source: "https://cloud-images.ubuntu.com/releases/focal/release-20220111/ubuntu-20.04-server-cloudimg-amd64.img"
+    os:
+      distro: ubuntu
     updateOnBoot: true
 ```
 
@@ -148,16 +154,17 @@ In the `nodes` subsection, we can define three types of nodes:
 In this tutorial, we will use only one master node, so internal load balancers are not required. 
 
 The easiest way to explain this part is to look at the actual configuration:
-```yaml
+
+```yaml title="kubitect.yaml"
 cluster:
   ...
   nodes:
     master:
-      default: # Default properties of all master node instances
+      default: # (1)
         ram: 4
         cpu: 2
         mainDiskSize: 32
-      instances: # Master node instances
+      instances: # (2)
         - id: 1
           ip: 192.168.113.10
     worker:
@@ -168,16 +175,27 @@ cluster:
       instances:
         - id: 1
           ip: 192.168.113.21
-          cpu: 4  # Override default vCPU value for this node
-          ram: 8  # Override default amount of RAM for this node
+          cpu: 4  # (3)
+          ram: 8  # (4)
         - id: 7
           ip: 192.168.113.27
-          mac: "52:54:00:00:00:42" # Specify MAC address for this node
+          mac: "52:54:00:00:00:42" # (5)
         - id: 99
-          # If ip property is omitted, node will request an IP address 
-          # from the DHCP server. If mac property is omitted, MAC address
-          # will be auto generated.
+          # (6)
 ```
+
+1.  Default properties of all master node instances.
+
+2.  Master node instances.
+
+3.  Overrides default vCPU value for this node.
+
+4.  Overrides default amount of RAM for this node.
+
+5.  Custom MAC address for this node.
+
+6.  When `ip` property is omitted, node requests an IP address from the DHCP server. 
+    When `mac` property is omitted, MAC address is auto generated.
 
 ### Step 4.4 - Kubernetes properties
 
@@ -187,7 +205,7 @@ It is also important to check if Kubespray supports a specific Kubernetes versio
 
 If you are using a custom Kubespray, you can also specify the URL to a custom Git repository.
 
-```yaml
+```yaml title="kubitect.yaml"
 kubernetes:
   version: "v1.22.6"
   networkPlugin: "calico"
@@ -201,6 +219,7 @@ kubernetes:
 ## Step 5 - Create the cluster
 
 Our final cluster configuration looks like this:
+
 ```yaml title="kubitect.yaml"
 hosts:
   - name: localhost
@@ -208,6 +227,7 @@ hosts:
       type: local
 
 cluster:
+  name: "my-k8s-cluster"
   network:
     mode: "nat"
     cidr: "192.168.113.0/24"
@@ -215,9 +235,8 @@ cluster:
     user: "k8s"
     ssh:
       addToKnownHosts: true
-    image:
-      distro: "ubuntu"
-      source: "https://cloud-images.ubuntu.com/releases/focal/release-20220111/ubuntu-20.04-server-cloudimg-amd64.img"
+    os:
+      distro: ubuntu
     updateOnBoot: true
   nodes:
     master:
@@ -252,7 +271,7 @@ kubernetes:
 ```
 
 Now create the cluster by applying your custom configuration using the *kubitect* command line tool. Also, let's name our cluster `my-first-cluster`.
-```
+```sh
 kubitect apply --cluster my-first-cluster --config kubitect.yaml
 ```
 
