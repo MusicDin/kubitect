@@ -1,7 +1,8 @@
-- hosts: localhost
+- name: Clone Kubespray and generate required configs
+  hosts: localhost
   gather_facts: false
   any_errors_fatal: true
   roles:
     - role: cluster-config/import
+    - role: generate/configs
     - role: kubespray-clone
-    - role: generate-configs

@@ -1,4 +1,5 @@
-- hosts: localhost
+- name: Initialize cluster directory and verify cluster config
+  hosts: localhost
   gather_facts: false
   any_errors_fatal: true
   roles:
@@ -7,4 +8,4 @@
         - "{{ config_path }}"
     - role: cluster-config/import
     - role: cluster-config/verify
-    - role: generate-main-tf
+    - role: generate/initial-files

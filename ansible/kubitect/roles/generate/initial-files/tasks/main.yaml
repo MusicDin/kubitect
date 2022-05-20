@@ -1,0 +1,29 @@
+---
+- name: Generate hosts.ini file containing Kubitect hosts
+  template:
+    src: "{{ templates_dir }}/hosts.ini.j2"
+    dest: "{{ config_dir }}/hosts.ini"
+    lstrip_blocks: true
+
+- name: Create main.tf from template file
+  template:
+    src: "{{ templates_dir }}/terraform/main.tf.j2"
+    dest: ../../terraform/main.tf
+  vars:
+    host_list: "{{ config.hosts }}"
+
+# - name: Ensure SSH directory exists
+#   file:
+#     path: "{{ config_dir }}/.ssh"
+#     state: directory
+#     mode: 0700
+
+# - name: Generate SSH keys
+#   #ignore_errors: true
+#   openssh_keypair:
+#     path: "{{ config_dir }}/.ssh/id_rsa"
+#     type: rsa
+#     size: 4096
+#     state: present
+#     mode: 0600 
+#     force: no

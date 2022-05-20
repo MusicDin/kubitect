@@ -1,0 +1,62 @@
+---
+- name: Include infrastructure config (tf output)
+  include_vars:
+    file: "{{ config_dir }}/infrastructure.yaml"
+    name: infra
+
+- name: Ensure config directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0700
+  loop:
+    - "{{ config_dir }}/haproxy"
+    - "{{ config_dir }}/keepalived"
+    - "{{ config_dir }}/group_vars/all"
+    - "{{ config_dir }}/group_vars/k8s_cluster"
+
+- name: Generate HAProxy config
+  template:
+    src: "{{ templates_dir }}/haproxy/haproxy.cfg.j2"
+    dest: "{{ config_dir }}/haproxy/haproxy.cfg"
+  vars:
+    loadbalancer_vip: "{{ infra.cluster.nodes.loadBalancer.vip }}"
+
+- name: Generate Keepalived configurations
+  template:
+    src: "{{ templates_dir }}/keepalived/keepalived.cfg.j2"
+    dest: "{{ config_dir }}/keepalived/keepalived-{{ item.name }}.cfg"
+  vars:
+    loadbalancer_vip: "{{ infra.cluster.nodes.loadBalancer.vip }}"
+    network_interface: "{{ infra.cluster.nodeTemplate.os.networkInterface }}"
+    priority: "{{ 201 - item.id }}"
+  loop: "{{ infra.cluster.nodes.loadBalancer.instances }}"
+
+- name: Generate Kubespray all.yaml
+  template:
+    src: "{{ templates_dir }}/kubespray/all.yaml.j2"
+    dest: "{{ config_dir }}/group_vars/all/all.yaml"
+    variable_start_string: "<<"
+    variable_end_string: ">>"
+
+- name: Generate Kubespray k8s_cluster.yaml
+  template:
+    src: "{{ templates_dir }}/kubespray/k8s_cluster.yaml.j2"
+    dest: "{{ config_dir }}/group_vars/k8s_cluster/k8s_cluster.yaml"
+    # Preserve Kubespray variables intact
+    variable_start_string: "<<"
+    variable_end_string: ">>"
+    block_start_string: "<%"
+    block_end_string: "%>"
+
+- name: Generate Kubespray etcd.yaml
+  template:
+    src: "{{ templates_dir }}/kubespray/etcd.yaml.j2"
+    dest: "{{ config_dir }}/group_vars/etcd.yaml"
+    #dest: {{ config_dir }}/group_vars/all/etcd.yaml
+
+- name: Generate cluster's nodes.ini
+  template:
+    src: "{{ templates_dir }}/kubespray/nodes.ini.j2"
+    dest: "{{ config_dir }}/nodes.ini"
+    lstrip_blocks: true

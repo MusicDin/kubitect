@@ -8,7 +8,7 @@
 
     - name: Create a copy of the kubeconfig file in a ~/.kube dirctory
       copy:
-        src: "{{ kubitect_cluster_path }}/config/admin.conf"
+        src: "{{ config_dir }}/admin.conf"
         dest: "~/.kube/admin.yaml"
         mode: "0600"
   when:

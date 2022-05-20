@@ -1,4 +1,9 @@
 ---
+
+# Custom config path provided by user. Do not overwrite it, as
+# an empty var means that user did not provide cusotm config.
+#config_path: 
+
 kubitect_home: "~/.kubitect"
 kubitect_cluster_action: "create"
 kubitect_cluster_name: "default"
@@ -9,3 +14,7 @@ kubitect_cluster_config_path: "{{ kubitect_cluster_path }}/config/kubitect.yaml"
 
 # Default cluster config is used when cluster config does not exist.
 kubitect_cluster_default_config_path: "{{ kubitect_cluster_path }}/resources/default/default-cluster.yaml"
+
+# Commonly used directories
+config_dir: "../../config"
+templates_dir: "../../templates"
