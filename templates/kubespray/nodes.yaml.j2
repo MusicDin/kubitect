@@ -1,0 +1,57 @@
+all:
+  hosts:
+  {# Load balancers #}
+  {% if infra.cluster.nodes.loadBalancer.instances is defined %}
+  {% for lb in infra.cluster.nodes.loadBalancer.instances %}
+    {{ lb.name }}:
+      ansible_host: {{ lb.ip }}
+  {% endfor %}
+  {% endif %}
+  {# Master nodes #}
+  {% for master in infra.cluster.nodes.master.instances %}
+    {{ master.name }}: 
+      ansible_host: {{ master.ip }}
+  {% endfor %}
+  {# Worker nodes #}
+  {% if infra.cluster.nodes.worker.instances is defined %}
+  {% for worker in infra.cluster.nodes.worker.instances %}
+    {{ worker.name }}:
+      ansible_host: {{ worker.ip }}
+  {% endfor %}
+  {% endif %}
+
+  children:
+    haproxy:
+      hosts:      
+      {% if infra.cluster.nodes.loadBalancer.instances is defined %}
+      {% for lb in infra.cluster.nodes.loadBalancer.instances %}
+        {{ lb.name }}
+      {% endfor %}
+      {% endif %}
+    etcd:
+      hosts:
+      {% for master in infra.cluster.nodes.master.instances %}
+        {{ master.name }}
+      {% endfor %}
+    k8s_cluster:
+      children:
+        kube_control_plane:
+          hosts:
+            {% for master in infra.cluster.nodes.master.instances %}
+              {{ master.name }}
+            {% endfor %}
+        kube_node:
+          hosts:
+            {% 
+              if infra.cluster.nodes.worker.instances is defined 
+              and infra.cluster.nodes.worker.instances | length > 0 
+            %}
+            {% for worker in infra.cluster.nodes.worker.instances %}
+              {{ worker.name }}
+            {% endfor %}
+            {% else %}
+            {# No worker nodes -> masters also become workers #}
+            {% for master in infra.cluster.nodes.master.instances %}
+              {{ master.name }}
+            {% endfor %}
+            {% endif %}

@@ -44,11 +44,12 @@ func KubitectHostsSetup() error {
 		"kubitect_cluster_path=" + env.ClusterPath,
 	}
 
-	err := helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
-		Venv:         helpers.Venvs.Main,
-		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubitect/hosts-setup.yaml"),
-		Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
-		Extravars:    extravars,
+	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
+		Venv:            helpers.Venvs.Main,
+		PlaybookFile:    filepath.Join(env.ClusterPath, "ansible/kubitect/hosts-setup.yaml"),
+		Inventory:       filepath.Join(env.ClusterPath, "config/hosts.yaml"),
+		ConnectionLocal: true,
+		Extravars:       extravars,
 	})
 
 	if err != nil {
@@ -91,7 +92,7 @@ func KubitectFinalize(sshUser string, sshPKey string) error {
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Main,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubitect/finalize.yaml"),
-		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.ini"),
+		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.yaml"),
 		Become:       true,
 		User:         sshUser,
 		PrivateKey:   sshPKey,
@@ -113,7 +114,7 @@ func HAProxyCreate(sshUser string, sshPKey string) error {
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Main,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/haproxy/haproxy.yaml"),
-		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.ini"),
+		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.yaml"),
 		Become:       true,
 		User:         sshUser,
 		PrivateKey:   sshPKey,
@@ -138,7 +139,7 @@ func KubesprayCreate(sshUser string, sshPKey string, k8sVersion string) error {
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Kubespray,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/cluster.yml"),
-		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.ini"),
+		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.yaml"),
 		Become:       true,
 		User:         sshUser,
 		PrivateKey:   sshPKey,
@@ -164,7 +165,7 @@ func KubesprayUpgrade(sshUser string, sshPKey string, k8sVersion string) error {
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Kubespray,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/upgrade-cluster.yml"),
-		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.ini"),
+		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.yaml"),
 		Become:       true,
 		User:         sshUser,
 		PrivateKey:   sshPKey,
@@ -189,7 +190,7 @@ func KubesprayScale(sshUser string, sshPKey string, k8sVersion string) error {
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Kubespray,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/scale.yml"),
-		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.ini"),
+		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.yaml"),
 		Become:       true,
 		User:         sshUser,
 		PrivateKey:   sshPKey,
@@ -216,7 +217,7 @@ func KubesprayRemoveNodes(sshUser string, sshPKey string, removedNodeNames []str
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Kubespray,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubespray/remove-node.yml"),
-		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.ini"),
+		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.yaml"),
 		Become:       true,
 		User:         sshUser,
 		PrivateKey:   sshPKey,

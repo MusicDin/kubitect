@@ -1,8 +1,8 @@
 ---
-- name: Generate hosts.ini file containing Kubitect hosts
+- name: Generate hosts.yaml file containing Kubitect hosts
   template:
-    src: "{{ templates_dir }}/hosts.ini.j2"
-    dest: "{{ config_dir }}/hosts.ini"
+    src: "{{ templates_dir }}/hosts.yaml.j2"
+    dest: "{{ config_dir }}/hosts.yaml"
     mode: 0600
     lstrip_blocks: true
 
@@ -28,7 +28,6 @@
   stat:
     path: "{{ config_dir }}/.ssh/id_rsa.pub"
   register: ssh_pub_key
-
 
 - name: Generate SSH keys
   #ignore_errors: true

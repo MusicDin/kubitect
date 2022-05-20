@@ -55,8 +55,8 @@
     dest: "{{ config_dir }}/group_vars/etcd.yaml"
     #dest: {{ config_dir }}/group_vars/all/etcd.yaml
 
-- name: Generate cluster's nodes.ini
+- name: Generate cluster's nodes.yaml
   template:
-    src: "{{ templates_dir }}/kubespray/nodes.ini.j2"
-    dest: "{{ config_dir }}/nodes.ini"
+    src: "{{ templates_dir }}/kubespray/nodes.yaml.j2"
+    dest: "{{ config_dir }}/nodes.yaml"
     lstrip_blocks: true
