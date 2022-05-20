@@ -111,6 +111,12 @@ func apply() error {
 		return err
 	}
 
+	// Ensure target hosts meet all the requirements
+	err = playbook.KubitectHostsSetup()
+	if err != nil {
+		return err
+	}
+
 	// Remove nodes (if any nodes are removed).
 	err = removeNodes(env.ConfigPath, infraConfigPath, "worker")
 	if err != nil {

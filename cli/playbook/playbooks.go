@@ -36,6 +36,28 @@ func KubitectInit() error {
 	return nil
 }
 
+// KubitectHostsSetup function calls an Ansible playbook that ensures Kubitect target
+// hosts meet all the requirements before cluster is created.
+func KubitectHostsSetup() error {
+
+	extravars := []string{
+		"kubitect_cluster_path=" + env.ClusterPath,
+	}
+
+	err := helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
+		Venv:         helpers.Venvs.Main,
+		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubitect/hosts-setup.yaml"),
+		Inventory:    filepath.Join(env.ClusterPath, "config/hosts.ini"),
+		Extravars:    extravars,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // KubitectKubespraySetup functions calls an Ansible playbook that prepares Kubespray
 // configuration files (all.yaml, k8s_cluster.yaml, ...) and clones Kubespray
 // git project.

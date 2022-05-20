@@ -3,6 +3,7 @@
   template:
     src: "{{ templates_dir }}/hosts.ini.j2"
     dest: "{{ config_dir }}/hosts.ini"
+    mode: 0600
     lstrip_blocks: true
 
 - name: Create main.tf from template file
@@ -12,18 +13,31 @@
   vars:
     host_list: "{{ config.hosts }}"
 
-# - name: Ensure SSH directory exists
-#   file:
-#     path: "{{ config_dir }}/.ssh"
-#     state: directory
-#     mode: 0700
+- name: Ensure SSH directory exists
+  file:
+    path: "{{ config_dir }}/.ssh"
+    state: directory
+    mode: 0700
 
-# - name: Generate SSH keys
-#   #ignore_errors: true
-#   openssh_keypair:
-#     path: "{{ config_dir }}/.ssh/id_rsa"
-#     type: rsa
-#     size: 4096
-#     state: present
-#     mode: 0600 
-#     force: no
+- name: Check if private SSH key exists
+  stat:
+    path: "{{ config_dir }}/.ssh/id_rsa"
+  register: ssh_key
+
+- name: Check if public SSH key exists
+  stat:
+    path: "{{ config_dir }}/.ssh/id_rsa.pub"
+  register: ssh_pub_key
+
+
+- name: Generate SSH keys
+  #ignore_errors: true
+  openssh_keypair:
+    path: "{{ config_dir }}/.ssh/id_rsa"
+    type: rsa
+    size: 4096
+    state: present
+    mode: 0600 
+    force: yes
+  when:
+    - not ssh_key.stat.exists or not ssh_pub_key.stat.exists
