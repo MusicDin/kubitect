@@ -1,5 +1,5 @@
 #=====================================================================================
-# Evaluate configuration variable
+# Evaluate configuration variables
 #=====================================================================================
 
 locals {
@@ -50,7 +50,7 @@ locals {
     )
   }
 
-  # Evaluate SSH configuration
+  # Evaluate SSH key path
   ssh = {
     privateKeyPath = (
       try(var.config.cluster.nodeTemplate.ssh.privateKeyPath, null) != null
@@ -58,31 +58,4 @@ locals {
       : pathexpand(var.defaults_config.default.ssh.privateKeyPath)
     )
   }
-
-}
-
-
-#=====================================================================================
-# SSH Keys
-#=====================================================================================
-
-# Generates SSH keys if path to the private key is not provided. #
-resource "null_resource" "generate_ssh_keys" {
-
-  count = try(var.config.cluster.nodeTemplate.ssh.privateKeyPath, null) == null ? 1 : 0
-
-  provisioner "local-exec" {
-
-    command = <<-EOF
-      dirname $SSH_PK_PATH | xargs mkdir -p
-      if [ ! -e $SSH_PK_PATH ] && [ ! -e $\{SSH_PK_PATH\}.pub ]; then \
-        ssh-keygen -f $SSH_PK_PATH -q -N ""; \
-      fi
-    EOF
-
-    environment = {
-      SSH_PK_PATH = local.ssh.privateKeyPath
-    }
-  }
-
 }
