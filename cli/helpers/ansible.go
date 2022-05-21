@@ -46,7 +46,7 @@ func ExecAnsiblePlaybookLocal(clusterPath string, ansibleCmd *AnsiblePlaybookCmd
 		return AnsiblePlaybookCmdMissing
 	}
 
-	ansibleCmd.Inventory = "127.0.0.1,"
+	ansibleCmd.Inventory = "localhost,"
 	ansibleCmd.ConnectionLocal = true
 
 	return ExecAnsiblePlaybook(clusterPath, ansibleCmd)
