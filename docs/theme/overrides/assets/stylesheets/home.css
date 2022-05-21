@@ -128,6 +128,11 @@ a#btn_learn-more:hover {
   color: white;
 }
 
+.terminal-output {
+  padding-right: 0.35em;
+  color: rgb(160, 160, 160);
+}
+
 .terminal-command {
   padding-right: 0.35em;
   word-break: break-all;

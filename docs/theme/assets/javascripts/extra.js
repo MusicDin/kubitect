@@ -89,10 +89,13 @@ function terminalAnimation() {
         { type: Output, value: "Setting up 'main' virtual environment..." },
         { type: Output, value: "Creating virtual environment..." },
         { type: Output, value: "Installing pip3 dependencies..." },
-        { type: Output, value: "This can take up to a minute when the virtual environment is initialized for the first time...<br>" },
-        { type: Output, value: "PLAY [localhost]<br>" },
+        { type: Output, value: "This can take up to a minute when the virtual environment is initialized for the first time..." },
+        { type: Output, value: "" },
+        { type: Output, value: "PLAY [Initialize cluster directory and verify cluster config]" },
+        { type: Output, value: "" },
         { type: Output, value: "TASK [cluster-config/copy : Make sure config directory exists]" },
-        { type: Output, value: "<span style=\"color:green\">ok: [127.0.0.1]</span><br>" },
+        { type: Output, value: "<span style=\"color:green\">ok: [localhost]</span>" },
+        { type: Output, value: "" },
         { type: Output, value: "..." }
     ]
 
@@ -117,7 +120,18 @@ function terminalAnimation() {
         value += '<span class="terminal-command-dollar-sign">$</span>'
 
         // add command element
-        value += '<span class=\"terminal-command\">' + command + '</span>'
+        value += '<span class="terminal-command">' + command + '</span>'
+
+        return value
+    }
+
+    // wraps the output into span element
+    function wrapOutput(line) {
+
+        let value = "";
+
+        // add command element
+        value += '<span class="terminal-output">' + line + '</span><br>'
 
         return value
     }
@@ -151,7 +165,7 @@ function terminalAnimation() {
 
                 case Output:
                     
-                    target.innerHTML += line.value + "<br>"
+                    target.innerHTML += wrapOutput(line.value)
                     await delay(outputDelay)
                     break
             }
