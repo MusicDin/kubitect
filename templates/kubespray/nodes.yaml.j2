@@ -11,12 +11,28 @@ all:
   {% for master in infra.cluster.nodes.master.instances %}
     {{ master.name }}: 
       ansible_host: {{ master.ip }}
+      {% if master.labels is defined %}
+      node_labels:
+      {% for label in master.labels %}
+        {% for key, value in label.items() %}
+        {{ key }}: {{ value }}
+        {% endfor %}
+      {% endfor %}
+      {% endif %}
   {% endfor %}
   {# Worker nodes #}
   {% if infra.cluster.nodes.worker.instances is defined %}
   {% for worker in infra.cluster.nodes.worker.instances %}
     {{ worker.name }}:
       ansible_host: {{ worker.ip }}
+      {% if worker.labels is defined %}
+      node_labels:
+      {% for label in worker.labels %}
+        {% for key, value in label.items() %}
+        {{ key }}: {{ value }}
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
   {% endfor %}
   {% endif %}
 
@@ -37,21 +53,43 @@ all:
       children:
         kube_control_plane:
           hosts:
-            {% for master in infra.cluster.nodes.master.instances %}
-              {{ master.name }}
+          {% for master in infra.cluster.nodes.master.instances %}
+            {{ master.name }}
+          {% endfor %}
+          vars:
+          {% if config.cluster.nodes.master.default.labels is defined %}
+            node_labels:
+            {% for label in config.cluster.nodes.master.default.labels %}
+              {% for key, value in label.items() %}
+              {{ key }}: {{ value }}
+              {% endfor %}
             {% endfor %}
+          {% endif %}
         kube_node:
           hosts:
-            {% 
-              if infra.cluster.nodes.worker.instances is defined 
-              and infra.cluster.nodes.worker.instances | length > 0 
-            %}
-            {% for worker in infra.cluster.nodes.worker.instances %}
-              {{ worker.name }}
+          {%
+            if infra.cluster.nodes.worker.instances is defined
+            and infra.cluster.nodes.worker.instances | length > 0
+          %}
+          {% for worker in infra.cluster.nodes.worker.instances %}
+            {{ worker.name }}
+          {% endfor %}
+          {% else %}
+          {# No worker nodes -> masters also become workers #}
+          {% for master in infra.cluster.nodes.master.instances %}
+            {{ master.name }}
+          {% endfor %}
+          {% endif %}
+          vars:
+          {%
+            if infra.cluster.nodes.worker.instances is defined
+            and infra.cluster.nodes.worker.instances | length > 0
+            and config.cluster.nodes.worker.default.labels is defined
+          %}
+            node_labels:
+            {% for label in config.cluster.nodes.worker.default.labels %}
+              {% for key, value in label.items() %}
+              {{ key }}: {{ value }}
+              {% endfor %}
             {% endfor %}
-            {% else %}
-            {# No worker nodes -> masters also become workers #}
-            {% for master in infra.cluster.nodes.master.instances %}
-              {{ master.name }}
-            {% endfor %}
-            {% endif %}
+          {% endif %}
