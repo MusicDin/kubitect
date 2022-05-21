@@ -17,7 +17,7 @@ while [ $TIMEOUT -gt 0 ]; do
     # Execute the command
     echo "$1" | sh
 
-    # After executon exit the script
+    # After execution exit the script
     exit
   fi
   sleep 1

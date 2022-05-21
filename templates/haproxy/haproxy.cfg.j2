@@ -45,6 +45,6 @@ frontend kubernetes
 backend kubernetes-control-plane
         mode tcp
         balance roundrobin
-{% for master in infra.cluster.nodes.master.instances %}
+        {% for master in infra.cluster.nodes.master.instances %}
         server {{ master.name }} {{ master.ip }}:6443 check fall 3 rise 2
-{% endfor %}
+        {% endfor %}

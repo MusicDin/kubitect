@@ -3,13 +3,14 @@
   template:
     src: "{{ templates_dir }}/hosts.yaml.j2"
     dest: "{{ config_dir }}/hosts.yaml"
-    mode: 0600
     lstrip_blocks: true
+    mode: 0600
 
 - name: Create main.tf from template file
   template:
     src: "{{ templates_dir }}/terraform/main.tf.j2"
     dest: ../../terraform/main.tf
+    lstrip_blocks: true
   vars:
     host_list: "{{ config.hosts }}"
 

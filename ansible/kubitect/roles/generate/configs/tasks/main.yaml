@@ -19,6 +19,7 @@
   template:
     src: "{{ templates_dir }}/haproxy/haproxy.cfg.j2"
     dest: "{{ config_dir }}/haproxy/haproxy.cfg"
+    lstrip_blocks: true
   vars:
     loadbalancer_vip: "{{ infra.cluster.nodes.loadBalancer.vip }}"
 

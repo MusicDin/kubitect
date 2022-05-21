@@ -23,35 +23,26 @@ locals {
   }
 }
 
+
 #=====================================================================================
 # Providers
 #=====================================================================================
-{# 
-  Provider uri (localhost): "qemu:///system"
-  Provider uri (remote): "qemu+ssh://<USER>@<IP>:<PORT>/system?keyfile=<PK_PATH>"
-#}
-{% for item in host_list %}
-{% set ssh_pk_path = item.connection.ssh.keyfile if item.connection.ssh.keyfile is defined else default.keyfile_path %}
-{% set ssh_pk_path = ssh_pk_path | replace("~", lookup('env', 'HOME')) %}
+{% for host in host_list %}
 
 provider "libvirt" {
-  alias = "{{ item.name }}"
-{% if item.providerUri is defined %}
-  uri   = "{{ item.providerUri }}"
-{% elif item.connection.type in ["localhost", "local"] %}
+  alias = "{{ host.name }}"
+{% if host.providerUri is defined %}
+  uri   = "{{ host.providerUri }}"
+{% elif host.connection.type in ["localhost", "local"] %}
   uri   = "qemu:///system"
 {% else %}
-  {% set provider_uri=[
-    "qemu+ssh://",
-    item.connection.user,
-    "@",
-    item.connection.ip,
-    ":" ~ item.connection.ssh.port if item.connection.ssh.port is defined else "",
-    "/system",
-    "?keyfile=" ~ ssh_pk_path,
-    "&no_verify=1" if item.connection.ssh.verify is not defined or not item.connection.ssh.verify else ""
-  ]-%} 
-  uri   = "{{ provider_uri | join('') }}"
+  {% set ssh_user = host.connection.user %}
+  {% set ssh_ip = host.connection.ip %}
+  {% set ssh_port = ":"~host.connection.ssh.port if host.connection.ssh.port is defined else "" %}
+  {% set ssh_pk_path = host.connection.ssh.keyfile if host.connection.ssh.keyfile is defined else default.keyfile_path %}
+  {% set ssh_pk_path = ssh_pk_path | replace("~", lookup('env', 'HOME')) %}
+  {% set ssh_verify = "&no_verify=1" if host.connection.ssh.verify is not defined or not host.connection.ssh.verify else "" %}
+  uri   = "qemu+ssh://{{ ssh_user }}@{{ ssh_ip }}{{ ssh_port }}/system?keyfile={{ ssh_pk_path }}{{ ssh_verify }}"
 {% endif %}
 }
 {% endfor %}
@@ -70,22 +61,24 @@ module "base" {
   infra_config    = local.infra_config
   defaults_config = local.defaults_config
 }
-
-
-{# Check if default host is defined #}
-{% set is_default_host_defined = [] -%}
-{% for item in host_list -%}
-  {%- if item.default is defined and item.default == true -%}
-    {{ is_default_host_defined.append(true) }}
-  {%- endif -%}
+{#
+  Check if default host is defined 
+#}
+{% set is_default_host_defined = [] %}
+{% for host in host_list %}
+  {% if host.default is defined and host.default == true %}
+    {{- is_default_host_defined.append(true) -}}
+  {% endif %}
 {% endfor %}
-{% for item in host_list %}
-{% set host_name = item.name %}
-{% set main_resource_pool_path = item.mainResourcePoolPath if item.mainResourcePoolPath is defined else default.resource_pool_path %}
-{% set is_default_host = item.default is defined and item.default == true or is_default_host_defined|length == 0 and loop.first == true %}
-{% set default_selector = " || try(node.host, null) == null" if is_default_host else "" %}
+{#
+  Create module for each host
+#}
+{% for host in host_list %}
+  {% set main_resource_pool_path = host.mainResourcePoolPath if host.mainResourcePoolPath is defined else default.resource_pool_path %}
+  {% set is_default_host = host.default is defined and host.default == true or is_default_host_defined|length == 0 and loop.first == true %}
+  {% set default_selector = " || try(node.host, null) == null" if is_default_host else "" %}
 
-module "host_{{ host_name }}" {
+module "host_{{ host.name }}" {
 
   source = "./modules/host"
 
@@ -94,10 +87,9 @@ module "host_{{ host_name }}" {
 
   # Resource pools
   hosts_mainResourcePoolPath = "{{ main_resource_pool_path }}"
-  hosts_dataResourcePools    = try(local.config.hosts[index(local.config.hosts.*.name, "{{ host_name }}")].dataResourcePools, null)
+  hosts_dataResourcePools    = try(local.config.hosts[index(local.config.hosts.*.name, "{{ host.name }}")].dataResourcePools, null)
 
-
-  # General
+  # Cluster name and node template
   cluster_name                             = try(local.config.cluster.name, null)
   cluster_nodeTemplate_user                = try(local.config.cluster.nodeTemplate.user, null)
   cluster_nodeTemplate_ssh_privateKeyPath  = module.base.ssh.privateKeyPath
@@ -120,7 +112,7 @@ module "host_{{ host_name }}" {
   cluster_nodes_loadBalancer_default_mainDiskSize = try(local.config.cluster.nodes.loadBalancer.default.mainDiskSize, null)
   cluster_nodes_loadBalancer_instances = [
     for node in try(flatten([local.config.cluster.nodes.loadBalancer.instances]), []) : node
-    if node != null && (try(node.host, null) == "{{ host_name }}"{{ default_selector }})
+    if node != null && (try(node.host, null) == "{{ host.name }}"{{ default_selector }})
   ]
 
   # Master node VMs parameters
@@ -129,7 +121,7 @@ module "host_{{ host_name }}" {
   cluster_nodes_master_default_mainDiskSize = try(local.config.cluster.nodes.master.default.mainDiskSize, null)
   cluster_nodes_master_instances = [
     for node in try(flatten([local.config.cluster.nodes.master.instances]), []) : node
-    if node != null && (try(node.host, null) == "{{ host_name }}"{{ default_selector }})
+    if node != null && (try(node.host, null) == "{{ host.name }}"{{ default_selector }})
   ]
 
   # Worker node VMs parameters
@@ -139,7 +131,7 @@ module "host_{{ host_name }}" {
   cluster_nodes_worker_default_label        = try(local.config.cluster.nodes.worker.default.label, null)
   cluster_nodes_worker_instances = [
     for node in try(flatten([local.config.cluster.nodes.worker.instances]), []) : node
-    if node != null && (try(node.host, null) == "{{ host_name }}"{{ default_selector }})
+    if node != null && (try(node.host, null) == "{{ host.name }}"{{ default_selector }})
   ]
 
   # Kubernetes & Kubespray
@@ -154,7 +146,7 @@ module "host_{{ host_name }}" {
   node_types = local.node_types
 
   providers = {
-    libvirt = libvirt.{{ host_name }}
+    libvirt = libvirt.{{ host.name }}
   }
 
 }
@@ -164,12 +156,14 @@ module "host_{{ host_name }}" {
 #================================
 # Infrastructure output
 #================================
-{# Creates a list of host modules. -#}
-{% set host_name_list = [] -%}
-{% for item in host_list -%}
-  {{ host_name_list.append("module.host_"~item.name~".nodes") }}
-{% endfor -%}
-{% set host_name_list = host_name_list | join(', ') -%}
+{# 
+  Creates a list of host modules. 
+#}
+{% set host_name_list = [] %}
+{% for host in host_list %}
+  {{- host_name_list.append("module.host_"~host.name~".nodes") -}}
+{% endfor %}
+{% set host_name_list = host_name_list | join(', ') %}
 
 # Outputs evaluated cluster information #
 module "output" {
@@ -199,9 +193,9 @@ module "output" {
 
   # K8s cluster creation depends on all VM modules #
   depends_on = [
-{% for item in host_list %}
-    module.host_{{ item.name }},
-{% endfor %}
+  {% for host in host_list %}
+    module.host_{{ host.name }},
+  {% endfor %}
   ]
 }
 
