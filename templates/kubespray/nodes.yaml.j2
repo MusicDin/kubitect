@@ -11,12 +11,14 @@ all:
   {% for master in infra.cluster.nodes.master.instances %}
     {{ master.name }}: 
       ansible_host: {{ master.ip }}
-      {% if master.labels is defined %}
+      {% 
+        if master.labels is defined 
+        and master.labels is not none 
+        and master.labels | length > 0
+      %}
       node_labels:
-      {% for label in master.labels %}
-        {% for key, value in label.items() %}
+      {% for key, value in master.labels.items() %}
         {{ key }}: {{ value }}
-        {% endfor %}
       {% endfor %}
       {% endif %}
   {% endfor %}
@@ -25,14 +27,16 @@ all:
   {% for worker in infra.cluster.nodes.worker.instances %}
     {{ worker.name }}:
       ansible_host: {{ worker.ip }}
-      {% if worker.labels is defined %}
+      {% 
+        if worker.labels is defined 
+        and worker.labels is not none 
+        and worker.labels | length > 0
+      %}
       node_labels:
-      {% for label in worker.labels %}
-        {% for key, value in label.items() %}
+      {% for key, value in worker.labels.items() %}
         {{ key }}: {{ value }}
-        {% endfor %}
       {% endfor %}
-    {% endif %}
+      {% endif %}
   {% endfor %}
   {% endif %}
 
@@ -57,12 +61,14 @@ all:
             {{ master.name }}
           {% endfor %}
           vars:
-          {% if config.cluster.nodes.master.default.labels is defined %}
+          {%
+            if config.cluster.nodes.master.default.labels is defined
+            and config.cluster.nodes.master.default.labels is not none
+            and config.cluster.nodes.master.default.labels | length > 0
+          %}
             node_labels:
-            {% for label in config.cluster.nodes.master.default.labels %}
-              {% for key, value in label.items() %}
+            {% for key, value in config.cluster.nodes.master.default.labels.items() %}
               {{ key }}: {{ value }}
-              {% endfor %}
             {% endfor %}
           {% endif %}
         kube_node:
@@ -85,11 +91,11 @@ all:
             if infra.cluster.nodes.worker.instances is defined
             and infra.cluster.nodes.worker.instances | length > 0
             and config.cluster.nodes.worker.default.labels is defined
+            and config.cluster.nodes.worker.default.labels is not none
+            and config.cluster.nodes.worker.default.labels | length > 0
           %}
             node_labels:
-            {% for label in config.cluster.nodes.worker.default.labels %}
-              {% for key, value in label.items() %}
+            {% for key, value in config.cluster.nodes.worker.default.labels.items() %}
               {{ key }}: {{ value }}
-              {% endfor %}
             {% endfor %}
           {% endif %}

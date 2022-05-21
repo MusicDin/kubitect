@@ -271,6 +271,7 @@ variable "cluster_nodes_master_instances" {
       pool : string
       size : number
     })))
+    labels = optional(map(any))
   }))
   description = "Master node instances (control plane)"
 
@@ -342,7 +343,7 @@ variable "cluster_nodes_worker_instances" {
       pool : string
       size : number
     })))
-    #label   = optional(string)
+    labels = optional(map(any))
   }))
   description = "Worker node instances."
 

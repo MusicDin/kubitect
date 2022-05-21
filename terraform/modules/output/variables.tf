@@ -36,18 +36,20 @@ variable "vm_os" {
 
 variable "worker_nodes" {
   type = list(object({
-    id   = number
-    name = string
-    ip   = string
+    id     = number
+    name   = string
+    ip     = string
+    labels = map(any)
   }))
   description = "Worker nodes info"
 }
 
 variable "master_nodes" {
   type = list(object({
-    id   = number
-    name = string
-    ip   = string
+    id     = number
+    name   = string
+    ip     = string
+    labels = map(any)
   }))
   description = "Master nodes info"
 

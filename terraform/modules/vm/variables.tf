@@ -168,3 +168,10 @@ variable "vm_ip" {
     error_message = "Invalid IP address provided to VM.\nPlease check the following variables:\n - 'lb_nodes',\n - 'master_nodes',\n - 'worker_nodes'.\n\nNote that setting IP to 'null' causes random valid IP to be generated."
   }
 }
+
+variable "vm_labels" {
+  type        = map(any)
+  description = "Node labels"
+  default     = {}
+  nullable    = false
+}
