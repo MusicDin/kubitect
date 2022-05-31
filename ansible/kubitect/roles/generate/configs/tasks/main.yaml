@@ -37,6 +37,7 @@
   template:
     src: "{{ templates_dir }}/kubespray/all.yaml.j2"
     dest: "{{ config_dir }}/group_vars/all/all.yaml"
+    # Preserve Kubespray variables intact
     variable_start_string: "<<"
     variable_end_string: ">>"
 
