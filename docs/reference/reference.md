@@ -6,12 +6,16 @@ hide:
 
 <h1 align="center">Reference</h1>
 
-The cluster configuration consists of four parts:
+This document contains a reference of the Kubitect configuration file in four sections and documents all possible configuration properties.
 
-+ `kubitect` - project metadata.
-+ `hosts` - a list of physical hosts (local or remote).
-+ `cluster` - cluster infrastructure configuration. Virtual machine properties, node types to install, and the host on which to install the nodes.
-+ `kubernetes` - Kubernetes and Kubespray configuration. Versions, addons and other Kubernetes related settings.
+The configuration sections are as follows:
+
++ `kubitect` - Project metadata.
++ `hosts` - A list of physical hosts (local or remote).
++ `cluster` - Configuration of the cluster infrastructure. Virtual machine properties, node types to install, and the host on which to install the nodes.
++ `kubernetes` - Configuration of Kubernetes and Kubespray. Versions, addons and other Kubernetes related settings.
+
+Each configuration property is documented with 5 columns: Property name, description, type, default value and is the property required.
 
 !!! note "Note"
 
@@ -213,16 +217,6 @@ The cluster configuration consists of four parts:
       </td>
     </tr>
     <tr>
-      <td><code>cluster.network.dns</code></td>
-      <td>list</td>
-      <td>Value of <code>network.gateway</code></td>
-      <td></td>
-      <td>
-        DNS used by all created virtual machines.
-        If none is provided, gateway is used as a DNS server.
-      </td>
-    </tr>
-    <tr>
       <td><code>cluster.nodeTemplate.user</code></td>
       <td>string</td>
       <td>user</td>
@@ -287,6 +281,16 @@ The cluster configuration consists of four parts:
         Network interface used by virtual machines to connect to the network.
         Network interface is preconfigured for each OS image (usually ens3 or eth0).
         By default, the value from distro preset (<i>/terraform/defaults.yaml</i>) is set, but can be overwritten if needed.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.dns</code></td>
+      <td>list</td>
+      <td>Value of <code>network.gateway</code></td>
+      <td></td>
+      <td>
+        Custom DNS list used by all created virtual machines.
+        If none is provided, network gateway is used.
       </td>
     </tr>
     <tr>

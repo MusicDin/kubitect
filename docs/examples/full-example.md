@@ -69,9 +69,6 @@ cluster:
     cidr: "10.10.64.0/24" # (15)
     gateway: 10.10.64.1 # (16)
     bridge: br0 # (17)
-    dns: # (18)
-      - 1.1.1.1
-      - 1.0.0.1
   nodeTemplate:
     user: "k8s"
     ssh:
@@ -80,6 +77,9 @@ cluster:
     os:
       distro: "ubuntu"
       networkInterface: "ens3" # (19)
+    dns: # (18)
+      - 1.1.1.1
+      - 1.0.0.1
     updateOnBoot: true
   nodes:
     loadBalancer:
@@ -220,8 +220,8 @@ kubernetes:
     This field is mandatory if the network mode is set to `bridge`.
     If the network mode is set to `nat`, this field can be omitted.
 
-18. Set custom DNS for nodes. 
-    If omitted, gateway is also used as DNS.
+18. Set custom DNS list for all nodes.
+    If omitted, network gateway is also used as a DNS.
 
 19. Specify the network interface used by the virtual machine. In general, this option can be omitted. 
 
