@@ -10,6 +10,6 @@ bridges:
     addresses: [${vm_cidr}]
     gateway4: ${network_gateway}
     nameservers:
-      addresses: [${network_dns_list}]
+      addresses: [${vm_dns_list}]
     dhcp4: false
     dhcp6: false

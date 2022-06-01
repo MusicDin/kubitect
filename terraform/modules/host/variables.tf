@@ -87,6 +87,13 @@ variable "cluster_nodeTemplate_ssh_addToKnownHosts" {
   nullable    = false
 }
 
+variable "cluster_nodeTemplate_dns" {
+  type        = list(string)
+  description = "List of DNS servers used by virtual machines."
+  default     = []
+  nullable    = false
+}
+
 variable "cluster_nodeTemplate_os_source" {
   type        = string
   description = "OS source, which can be path on host's filesystem or URL."
@@ -149,14 +156,6 @@ variable "cluster_network_gateway" {
 variable "cluster_network_bridge" {
   type        = string
   description = "Network (virtual) bridge."
-}
-
-
-variable "cluster_network_dns" {
-  type        = list(string)
-  description = "List of DNS servers used by virtual machines."
-  default     = []
-  nullable    = false
 }
 
 #======================================================================================

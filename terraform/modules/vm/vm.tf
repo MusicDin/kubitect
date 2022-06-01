@@ -22,7 +22,7 @@ data "template_file" "cloud_init_network_tpl" {
     network_interface = var.vm_network_interface
     network_bridge    = var.network_bridge
     network_gateway   = var.network_gateway
-    network_dns_list  = length(var.network_dns_list) == 0 ? var.network_gateway : join(", ", var.network_dns_list)
+    vm_dns_list       = length(var.vm_dns_list) == 0 ? var.network_gateway : join(", ", var.vm_dns_list)
     vm_cidr           = var.vm_ip == null ? "" : "${var.vm_ip}/${split("/", var.network_cidr)[1]}"
   }
 }

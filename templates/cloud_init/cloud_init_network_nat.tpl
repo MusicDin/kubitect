@@ -4,4 +4,4 @@ ethernets:
   ${network_interface}:
     dhcp4: true
     nameservers:
-      addresses: [${network_dns_list}]
+      addresses: [${vm_dns_list}]
