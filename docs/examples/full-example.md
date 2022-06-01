@@ -122,7 +122,9 @@ cluster:
       default:
         ram: 16
         cpu: 4
-        label: node # (27)
+        labels: # (27)
+         - custom-label: "This is a custom default node label"
+         - node-role.kubernetes.io/node: # (28)
         # Default dataDisks are NOT YET supported
         # dataDisks: # (29)
         #  - name: rook-disk # (30)
@@ -149,6 +151,9 @@ cluster:
         - id: 3
           ip: 10.10.64.103
           ram: 64
+          labels:
+            - custom-label: "Overwrite default node label" # (34)
+            - instance-label: "Node label, only for this instance"
         - id: 4
           host: remote-server-2
         - id: 5
@@ -244,9 +249,9 @@ kubernetes:
 26. Name of the host where instance should be created.
     If omitted the default host is used.
 
-27. Worker nodes label.
+27. Default worker node labels.
 
-28. Overrides default data disks for this node.
+28. Label sets worker nodes role to `node`.
 
 29. Default data disks (attached to each worker node).
 
@@ -258,3 +263,5 @@ kubernetes:
     Note that each node receives a data disk of a specific size.
 
 33. Overrides default data disks for this node.
+
+34. Node labels defined for specific instances take precedence over default labels with the same key, so this label overrides the default label.

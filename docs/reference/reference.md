@@ -401,6 +401,15 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>Size of the main disk (in GiB) that is attached to a master node.</td>
     </tr>
     <tr>
+      <td><code>cluster.nodes.master.default.labels</code></td>
+      <td>dictionary</td>
+      <td></td>
+      <td></td>
+      <td>
+        Array of default node labels that are applied to all master nodes.
+      </td>
+    </tr>
+    <tr>
       <td><code>cluster.nodes.master.instances[*].id</code></td>
       <td>number</td>
       <td></td>
@@ -472,6 +481,15 @@ Each configuration property is documented with 5 columns: Property name, descrip
       </td>
     </tr>
     <tr>
+      <td><code>cluster.nodes.master.instances[*].labels</code></td>
+      <td>dictionary</td>
+      <td></td>
+      <td></td>
+      <td>
+        Array of node labels that are applied to this specific master node.
+      </td>
+    </tr>
+    <tr>
       <td><code>cluster.nodes.worker.default.ram</code></td>
       <td>number</td>
       <td>8</td>
@@ -493,11 +511,11 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>Size of the main disk (in GiB) that is attached to a worker node.</td>
     </tr>
     <tr>
-      <td><code>cluster.nodes.worker.default.label</code></td>
-      <td>string</td>
+      <td><code>cluster.nodes.worker.default.labels</code></td>
+      <td>dictionary</td>
       <td></td>
       <td></td>
-      <td>Default label for worker nodes.</td>
+      <td>Array of default node labels that are applied to all worker nodes.</td>
     </tr>
     <tr>
       <td><code>cluster.nodes.worker.instances[*].id</code></td>
@@ -569,7 +587,16 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>
         Size of the additional data disk (in GiB) that is attached to the worker node.
       </td>
-    </tr>    
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].labels</code></td>
+      <td>dictionary</td>
+      <td></td>
+      <td></td>
+      <td>
+        Array of node labels that are applied to this specific worker node.
+      </td>
+    </tr>
   </tbody>
 </table>
 
