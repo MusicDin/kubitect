@@ -338,7 +338,17 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>Yes</td>
       <td>
         Unique numeric identifier of a load balancer instance.
-        It has to be a number between 0 and 200, because the priority of a load balancer is calculated out of its ID.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.instances[*].priority</code></td>
+      <td>number</td>
+      <td>10</td>
+      <td></td>
+      <td>
+        Keepalived priority of the load balancer.
+        A load balancer with the highest priority becomes the leader (active). 
+        The priority can be set to any number between 0 and 255.
       </td>
     </tr>
     <tr>
