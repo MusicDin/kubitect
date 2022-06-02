@@ -683,8 +683,8 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>false</td>
       <td></td>
       <td>
-        If set to true, Kubeconfig of a new cluster will be copied to the `~/.kube/admin.conf`. 
-        Please note that setting this to true can result in overwriting file on target location.
+        When this property is set to true, the kubeconfig of a new cluster is copied to the <code>~/.kube/config</code>.
+        Please note that setting this property to true may cause the existing file at the destination to be overwritten.
       </td>
     </tr>
   </tbody>
