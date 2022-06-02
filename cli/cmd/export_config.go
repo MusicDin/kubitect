@@ -30,7 +30,7 @@ func init() {
 	exportCmd.AddCommand(exportConfigCmd)
 
 	exportConfigCmd.PersistentFlags().StringVar(&env.ClusterName, "cluster", env.DefaultClusterName, "specify the cluster to be used")
-	exportConfigCmd.PersistentFlags().BoolVar(&env.Local, "local", false, "use a current directory as the cluster path")
+	exportConfigCmd.PersistentFlags().BoolVarP(&env.Local, "local", "l", false, "use a current directory as the cluster path")
 
 	// Auto complete cluster names of clusters that contain Kubitect config
 	// for the flag 'cluster'

@@ -30,7 +30,7 @@ func init() {
 	rootCmd.AddCommand(destroyCmd)
 
 	destroyCmd.PersistentFlags().StringVar(&env.ClusterName, "cluster", env.DefaultClusterName, "specify the cluster to be used")
-	destroyCmd.PersistentFlags().BoolVar(&env.Local, "local", false, "use a current directory as the cluster path")
+	destroyCmd.PersistentFlags().BoolVarP(&env.Local, "local", "l", false, "use a current directory as the cluster path")
 	destroyCmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
 
 	// Auto complete cluster names of active clusters for flag 'cluster'.

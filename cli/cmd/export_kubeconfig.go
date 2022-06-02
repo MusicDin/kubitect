@@ -29,7 +29,7 @@ func init() {
 	exportCmd.AddCommand(exportKubeconfigCmd)
 
 	exportKubeconfigCmd.PersistentFlags().StringVar(&env.ClusterName, "cluster", env.DefaultClusterName, "specify the cluster to be used")
-	exportKubeconfigCmd.PersistentFlags().BoolVar(&env.Local, "local", false, "use a current directory as the cluster path")
+	exportKubeconfigCmd.PersistentFlags().BoolVarP(&env.Local, "local", "l", false, "use a current directory as the cluster path")
 
 	// Auto complete cluster names of active clusters that also contain kubeconfig
 	// for the flag 'cluster'.
