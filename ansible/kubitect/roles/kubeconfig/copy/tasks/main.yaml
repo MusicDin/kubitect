@@ -6,10 +6,10 @@
         path: "~/.kube"
         state: directory
 
-    - name: Create a copy of the kubeconfig file in a ~/.kube dirctory
+    - name: Copy kubeconfig file to a ~/.kube dirctory
       copy:
         src: "{{ config_dir }}/admin.conf"
-        dest: "~/.kube/admin.yaml"
+        dest: "~/.kube/config"
         mode: "0600"
   when:
     - config.kubernetes.other.copyKubeconfig is defined
