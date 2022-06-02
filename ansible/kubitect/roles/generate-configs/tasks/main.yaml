@@ -28,7 +28,7 @@
     dest: ../../config/keepalived/keepalived-{{ item.name }}.cfg
   vars:
     loadbalancer_vip: "{{ infra.cluster.nodes.loadBalancer.vip }}"
-    network_interface: "{{ infra.cluster.networkInterface }}"
+    network_interface: "{{ config.cluster.network.bridge if config.cluster.network.mode == 'bridge' else infra.cluster.nodeTemplate.os.networkInterface }}"
     priority: "{{ 201 - item.id }}"
   loop: "{{ infra.cluster.nodes.loadBalancer.instances }}"
 
