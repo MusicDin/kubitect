@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/apenella/go-ansible v1.1.5
 	github.com/go-git/go-git/v5 v5.4.2
-	github.com/hashicorp/hc-install v0.3.1
+	github.com/hashicorp/hc-install v0.3.2
 	github.com/hashicorp/terraform-exec v0.16.0
 	github.com/spf13/cobra v1.4.0
 )
