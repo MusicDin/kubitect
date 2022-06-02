@@ -1,0 +1,12 @@
+---
+
+# Verify hosts are present
+
+- name: Fail if OS distro is not valid
+  fail:
+    msg: |
+      cluster.nodeTemplate.distro.
+      {{ config_example_hosts }}
+  when:
+    - config.cluster.nodeTemplate.os.distro is defined
+    - config.cluster.nodeTemplate.os.distro in valid_distros

@@ -211,8 +211,8 @@ variable "cluster_nodes_loadBalancer_instances" {
 
   validation {
     condition = (
-      alltrue([for node in var.cluster_nodes_loadBalancer_instances : (node.id >= 0 && node.id <= 200)])
-      && compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.id])) == distinct(compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.id])))
+      # alltrue([for node in var.cluster_nodes_loadBalancer_instances : (node.priority >= 0 && node.priority <= 255)]) &&
+      compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.id])) == distinct(compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.id])))
       && compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.mac])) == distinct(compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.mac])))
       && compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.ip])) == distinct(compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.ip])))
     )

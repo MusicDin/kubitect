@@ -28,9 +28,13 @@
     src: "{{ templates_dir }}/keepalived/keepalived.cfg.j2"
     dest: "{{ config_dir }}/keepalived/keepalived-{{ item.name }}.cfg"
   vars:
+    cfg_instance: "{{ config.cluster.nodes.loadBalancer.instances | selectattr( 'id', 'equalto', item.id ) | first }}"
+    cfg_network_mode: "{{ config.cluster.network.mode }}"
+    cfg_network_bridge: "{{ config.cluster.network.bridge | default( 'none' ) }}"
+    inf_network_interface: "{{ infra.cluster.nodeTemplate.os.networkInterface }}"
     loadbalancer_vip: "{{ infra.cluster.nodes.loadBalancer.vip }}"
-    network_interface: "{{ infra.cluster.nodeTemplate.os.networkInterface }}"
-    priority: "{{ 201 - item.id }}"
+    priority: "{{ cfg_instance.priority | default( default.loadBalancerPriority ) }}"
+    network_interface: "{{ cfg_network_bridge if cfg_network_mode == 'bridge' else inf_network_interface }}"
   loop: "{{ infra.cluster.nodes.loadBalancer.instances }}"
 
 - name: Generate Kubespray all.yaml

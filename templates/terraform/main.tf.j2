@@ -39,7 +39,7 @@ provider "libvirt" {
   {% set ssh_user = host.connection.user %}
   {% set ssh_ip = host.connection.ip %}
   {% set ssh_port = ":"~host.connection.ssh.port if host.connection.ssh.port is defined else "" %}
-  {% set ssh_pk_path = host.connection.ssh.keyfile if host.connection.ssh.keyfile is defined else default.keyfile_path %}
+  {% set ssh_pk_path = host.connection.ssh.keyfile if host.connection.ssh.keyfile is defined else default.keyfilePath %}
   {% set ssh_pk_path = ssh_pk_path | replace("~", lookup('env', 'HOME')) %}
   {% set ssh_verify = "&no_verify=1" if host.connection.ssh.verify is not defined or not host.connection.ssh.verify else "" %}
   uri   = "qemu+ssh://{{ ssh_user }}@{{ ssh_ip }}{{ ssh_port }}/system?keyfile={{ ssh_pk_path }}{{ ssh_verify }}"
@@ -74,7 +74,7 @@ module "base" {
   Create module for each host
 #}
 {% for host in host_list %}
-  {% set main_resource_pool_path = host.mainResourcePoolPath if host.mainResourcePoolPath is defined else default.resource_pool_path %}
+  {% set main_resource_pool_path = host.mainResourcePoolPath if host.mainResourcePoolPath is defined else default.resourcePoolPath %}
   {% set is_default_host = host.default is defined and host.default == true or is_default_host_defined|length == 0 and loop.first == true %}
   {% set default_selector = " || try(node.host, null) == null" if is_default_host else "" %}
 
