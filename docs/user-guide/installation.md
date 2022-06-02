@@ -6,7 +6,7 @@ Before starting with installation, make sure you meet all the [requirements](./r
 
 After all requirements are met, download the Kubitect command line tool.
 ```sh
-curl -o kubitect.tar.gz -L https://github.com/MusicDin/kubitect/releases/download/v2.0.4/kubitect-v2.0.4-linux-amd64.tar.gz
+curl -o kubitect.tar.gz -L https://github.com/MusicDin/kubitect/releases/download/v2.0.6/kubitect-v2.0.6-linux-amd64.tar.gz
 ```
 
 Unpack `tar.gz` file.
@@ -23,7 +23,7 @@ Verify the installation by checking the Kubitect version.
 ```sh
 kubitect --version
 
-# kubitect version v2.0.4
+# kubitect version v2.0.6
 ```
 
 !!! tip "Tip"
