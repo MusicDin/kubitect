@@ -678,7 +678,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>Kubespray version. Version is used to checkout into appropriate branch.</td>
     </tr>
     <tr>
-      <td><code>kubernetes.kubespray.other.copyKubeconfig</code></td>
+      <td><code>kubernetes.other.copyKubeconfig</code></td>
       <td>boolean</td>
       <td>false</td>
       <td></td>
