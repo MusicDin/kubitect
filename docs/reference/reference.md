@@ -219,7 +219,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
     <tr>
       <td><code>cluster.nodeTemplate.user</code></td>
       <td>string</td>
-      <td>user</td>
+      <td>k8s</td>
       <td></td>
       <td>User created on each virtual machine.</td>
     </tr>
