@@ -105,25 +105,26 @@ func apply() error {
 		return err
 	}
 
-	// Execute the project ansible playbook.
+	// Execute ansible playbook that verifies configuration file and generates
+	// hosts inventory file.
 	err = playbook.KubitectInit()
 	if err != nil {
 		return err
 	}
 
-	// Ensure target hosts meet all the requirements
+	// Ensure target hosts meet all the requirements.
 	err = playbook.KubitectHostsSetup()
 	if err != nil {
 		return err
 	}
 
-	// Remove nodes (if any nodes are removed).
+	// Remove nodes (if any nodes are removed from the configuration).
 	err = removeNodes(env.ConfigPath, infraConfigPath, "worker")
 	if err != nil {
 		return err
 	}
 
-	// Apply terraform if cluster action equals 'create' or 'scale'.
+	// Apply terraform if the cluster action equals to 'create' or 'scale'.
 	if utils.StrArrayContains([]string{"create", "scale"}, env.ClusterAction) {
 
 		err = helpers.TerraformApply(env.ClusterPath)
@@ -144,7 +145,6 @@ func apply() error {
 		return err
 	}
 
-	// Extract required values from tf output
 	sshUser, err := config.GetStrValue(infraConfigPath, "cluster.nodeTemplate.user")
 	if err != nil {
 		return err

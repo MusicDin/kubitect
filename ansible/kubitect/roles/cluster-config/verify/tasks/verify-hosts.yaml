@@ -5,52 +5,54 @@
 - name: Fail if hosts are not defined
   fail:
     msg: |
-      Target 'hosts' are missing in the configuration. 
+      The value of 'hosts' is undefined.
+      At least one host must be specified in the configuration.
       {{ config_example_hosts }}
   when:
-    - config.hosts is not defined
+    - not config.hosts | default(none)
 
 # Verify host names
 
-- name: Fail if host is missing a name
+- name: Fail if any host is missing a name
   fail:
     msg: |
-      Host is missing a 'name' argument.
+      One of the hosts has undefined 'name'.
+      All hosts must have a unique name.
+  loop: "{{ config.hosts }}"
   when:
     - item.name is not defined
-  loop: "{{ config.hosts }}"
 
 - name: Fail if hosts names are not unique
+  vars:
+    hosts_count: "{{ config.hosts | length }}"
   fail:
     msg: |
-      Hosts names must be unique. 
+      The names of the hosts are not unique!
       {{ config_example_hosts }}
   when: 
     - config.hosts | map(attribute='name') | unique | length | string != hosts_count
-  vars:
-    hosts_count: "{{ config.hosts | length }}"
 
 # Verify connection type
 
 - name: Fail if host is missing a connection type
   fail:
     msg: |
-      Host with name '{{ item.name }}' is missing a 'connection.type' argument!
+      The host ({{ item.name }}) has 'connection.type' undefined!
+  loop: "{{ config.hosts }}"
   when:
     - item.connection.type is not defined
-  loop: "{{ config.hosts }}"
 
 - name: Fail if host's connection type has an invalid value
   fail:
     msg: |
-      Host with name '{{ item.name }}' has an invalid value
-      '{{ item.connection.type }}' for 'connection.type' attribute!
+      The host ({{ item.name }}) has an invalid 'connection.type' value ({{ item.connection.type }}).
+      ({{ item.connection.type }})!
       Valid values are: [ local, remote ]
+  loop: "{{ config.hosts }}"
   when: 
     - item.connection.type != 'local'
     - item.connection.type != 'localhost'
     - item.connection.type != 'remote'
-  loop: "{{ config.hosts }}"
 
 - name: Fail if multiple hosts have connection type 'local' or 'localhost'
   fail:
@@ -62,26 +64,84 @@
 - name: Fail if remote host is missing a user attribute
   fail:
     msg: |
-      Host with name '{{ item.name }}' is missing a 'connection.user' attribute.
-      Remote host username is mandatory in order to establish SSH connection with it.
-  when:
-    - item.connection.type == 'remote' and item.connection.user is not defined
+      The remote host ({{ item.name }}) has 'connection.user' undefined!
+      The user of the remote host is required to establish an SSH connection with it.
   loop: "{{ config.hosts }}"
+  when:
+    - item.connection.type == 'remote'
+    - item.connection.user is not defined
 
-- name: Fail if remote host is missing an IP attribute
+- name: Fail if remote host IP address is not defined
   fail:
     msg: |
-      Host with name '{{ item.name }}' is missing a 'connection.ip' attribute.
-      Remote host IP address is mandatory to establish SSH connection with it.
-  when:
-    - item.connection.type == 'remote' and item.connection.ip is not defined
+      The remote host ({{ item.name }}) has 'connection.ip' undefined!
+      The IP address of the remote host is required to establish an SSH connection with it.
   loop: "{{ config.hosts }}"
+  when:
+    - item.connection.type == 'remote' 
+    - not item.connection.ip | default(none)
+
+- name: Fail if remote host IP address is invalid
+  fail:
+    msg: |
+      The remote host ({{ item.name }}) has an invalid 'connection.ip' value ({{ item.connection.ip }})!
+  loop: "{{ config.hosts }}"
+  when:
+    - item.connection.type == 'remote'
+    - item.connection.ip is defined
+    - not item.connection.ip | ansible.utils.ipaddr
 
 # Verify default
 
 - name: Fail if there are multiple default hosts
   fail:
     msg: |
-      Only one host can be marked as default!
+      Multiple hosts are marked as default!
+      Only one host can be marked as the default host.
   when:
     - config.hosts | selectattr('default', 'defined') | selectattr('default', 'eq', true) | length > 1
+
+# Verify resource pools
+
+- name: Fail if main resource pool is an empty string
+  fail:
+    msg: |
+      The host ({{ item.name }}) has an invalid 'mainResourcePoolPath' value!
+      The main resource pool path cannot be an empty string.
+  loop: "{{ config.hosts }}"
+  when: 
+    - item.mainResourcePoolPath is defined
+    - item.mainResourcePoolPath is none or item.mainResourcePoolPath | length == 0
+
+- name: Verify data resource pools
+  block:
+    - name: Fail if data resource pool without a name exists
+      fail:
+        msg: |
+          The host ({{ item.name }}) has a data resource pool with no name!
+          Make sure that each data resource pool has a name.
+      loop: "{{ config.hosts }}"
+      when: 
+        - item.dataResourcePools | length != item.dataResourcePools | selectattr('name', 'defined') | rejectattr('name', 'none') | length
+
+    - name: Fail if data resource pool names are not unique
+      fail:
+        msg: |
+          The host ({{ item.name }}) contains data resource pools with duplicate names!
+          Make sure that the data resource pool names on the same host are unique.
+      loop: "{{ config.hosts }}"
+      when: 
+        - item.dataResourcePools | length != item.dataResourcePools | map(attribute='name') | unique | length
+
+    - name: Fail if data resource pool without a path exists
+      fail:
+        msg: |
+          The host ({{ item.name }}) has a data resource pool with no path!
+          Make sure that a path is set for each data resource pool.
+      loop: "{{ config.hosts }}"
+      when: 
+        - item.dataResourcePools | length != item.dataResourcePools | selectattr('path', 'defined') | rejectattr('path', 'none') | length
+  when: 
+    - item.dataResourcePools is defined
+    - item.dataResourcePools is not none
+  

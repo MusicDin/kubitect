@@ -26,11 +26,6 @@ variable "hosts_mainResourcePoolPath" {
   description = "Path where main resource pool will be initialized."
   default     = "/var/lib/libvirt/pools/"
   nullable    = false
-
-  validation {
-    condition     = length(var.hosts_mainResourcePoolPath) != 0
-    error_message = "Main resource pool path cannot be empty."
-  }
 }
 
 variable "hosts_dataResourcePools" {
@@ -41,11 +36,6 @@ variable "hosts_dataResourcePools" {
   description = "Location where main resource pool will be initialized."
   default     = []
   nullable    = false
-
-  validation {
-    condition     = length(var.hosts_dataResourcePools.*.name) == length(distinct(var.hosts_dataResourcePools.*.name))
-    error_message = "Duplicate data resource pool name found!\nMake sure that the data resource pool names on the same host are unique."
-  }
 }
 
 #======================================================================================
@@ -55,7 +45,6 @@ variable "hosts_dataResourcePools" {
 variable "cluster_name" {
   type        = string
   description = "Cluster name used as a prefix for various cluster component names."
-  default     = "vm"
   nullable    = false
 }
 
@@ -66,18 +55,13 @@ variable "cluster_name" {
 variable "cluster_nodeTemplate_user" {
   type        = string
   description = "Username used to SSH to the virtual machines."
-  default     = "user"
+  default     = "k8s"
   nullable    = false
 }
 
 variable "cluster_nodeTemplate_ssh_privateKeyPath" {
   type        = string
   description = "Location of private SSH key that will be used for virtual machines."
-
-  #validation {
-  #  condition     = fileexists(var.cluster_nodeTemplate_ssh_privateKeyPath) && fileexists("${var.cluster_nodeTemplate_ssh_privateKeyPath}.pub")
-  #  error_message = "Invalid path to private and/or public SSH key. \n\nPrivate and public key must both exist. Public key should be on the same path as the private key, but with '.pub' suffix."
-  #}
 }
 
 variable "cluster_nodeTemplate_ssh_addToKnownHosts" {
@@ -97,21 +81,11 @@ variable "cluster_nodeTemplate_dns" {
 variable "cluster_nodeTemplate_os_source" {
   type        = string
   description = "OS source, which can be path on host's filesystem or URL."
-
-  validation {
-    condition     = length(var.cluster_nodeTemplate_os_source) != 0
-    error_message = "Node template opersating system (os) source is missing. Please specify local path or URL for the os source."
-  }
 }
 
 variable "cluster_nodeTemplate_os_networkInterface" {
   type        = string
   description = "Operating system (os) network interface, which is predefined for the os image."
-
-  validation {
-    condition     = length(var.cluster_nodeTemplate_os_networkInterface) != 0
-    error_message = "Operating system (os) networkInterface is missing. Please specify os network interface."
-  }
 }
 
 variable "cluster_nodeTemplate_updateOnBoot" {
@@ -130,21 +104,11 @@ variable "cluster_network_mode" {
   description = "Network mode."
   default     = "nat"
   nullable    = false
-
-  validation {
-    condition     = contains(["nat", "route", "bridge"], var.cluster_network_mode)
-    error_message = "Variable 'network_mode' is invalid.\nPossible values are: [\"nat\", \"route\", \"bridge\"]."
-  }
 }
 
 variable "cluster_network_cidr" {
   type        = string
   description = "Network CIDR."
-
-  validation {
-    condition     = can(regex("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}/([1-9]|[1-2][0-9]|3[0-2])$", var.cluster_network_cidr))
-    error_message = "Invalid network CIDR."
-  }
 }
 
 variable "cluster_network_gateway" {
@@ -165,15 +129,6 @@ variable "cluster_network_bridge" {
 variable "cluster_nodes_loadBalancer_vip" {
   type        = string
   description = "HAProxy load balancer virtual IP address (VIP)."
-
-  /*
-  validation {
-    condition = (
-      cidrhost(var.network_cidr, 0) == cidrhost("${var.lb_vip}/${split("/", var.network_cidr)[1]}", 0)
-    )
-    error_message = "HAProxy load balancer virtual IP address (VIP) has to be within network CIDR."
-  }
-  */
 }
 
 variable "cluster_nodes_loadBalancer_default_cpu" {
@@ -208,16 +163,6 @@ variable "cluster_nodes_loadBalancer_instances" {
     mainDiskSize = optional(number)
   }))
   description = "HAProxy load balancer node instances."
-
-  validation {
-    condition = (
-      # alltrue([for node in var.cluster_nodes_loadBalancer_instances : (node.priority >= 0 && node.priority <= 255)]) &&
-      compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.id])) == distinct(compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.id])))
-      && compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.mac])) == distinct(compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.mac])))
-      && compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.ip])) == distinct(compact(tolist([for node in var.cluster_nodes_loadBalancer_instances : node.ip])))
-    )
-    error_message = "HAProxy load balancer nodes configuration is incorrect. Make sure that:\n - every ID is unique and that it's value is between 0 and 200,\n - every MAC and IP address is unique or null."
-  }
 }
 
 #======================================================================================
@@ -273,16 +218,6 @@ variable "cluster_nodes_master_instances" {
     labels = optional(map(any))
   }))
   description = "Master node instances (control plane)"
-
-  validation {
-    condition = (
-      compact(tolist([for node in var.cluster_nodes_master_instances : node.id])) == distinct(compact(tolist([for node in var.cluster_nodes_master_instances : node.id])))
-      && compact(tolist([for node in var.cluster_nodes_master_instances : node.mac])) == distinct(compact(tolist([for node in var.cluster_nodes_master_instances : node.mac])))
-      && compact(tolist([for node in var.cluster_nodes_master_instances : node.ip])) == distinct(compact(tolist([for node in var.cluster_nodes_master_instances : node.ip])))
-      # && length(var.cluster_nodes_master_instances) % 2 != 0
-    )
-    error_message = "Master nodes configuration is incorrect. Make sure that: \n - number of master nodes is odd (not divisible by 2),\n - every ID is unique,\n - every MAC and IP address is unique or null."
-  }
 }
 
 #======================================================================================
@@ -345,15 +280,6 @@ variable "cluster_nodes_worker_instances" {
     labels = optional(map(any))
   }))
   description = "Worker node instances."
-
-  validation {
-    condition = (
-      compact(tolist([for node in var.cluster_nodes_worker_instances : node.id])) == distinct(compact(tolist([for node in var.cluster_nodes_worker_instances : node.id])))
-      && compact(tolist([for node in var.cluster_nodes_worker_instances : node.mac])) == distinct(compact(tolist([for node in var.cluster_nodes_worker_instances : node.mac])))
-      && compact(tolist([for node in var.cluster_nodes_worker_instances : node.ip])) == distinct(compact(tolist([for node in var.cluster_nodes_worker_instances : node.ip])))
-    )
-    error_message = "Worker nodes configuration is incorrect. Make sure that:\n - every ID is unique,\n - every MAC and IP address is unique or null."
-  }
 }
 
 #======================================================================================
@@ -370,11 +296,6 @@ variable "kubernetes_networkPlugin" {
   description = "The overlay network plugin used by Kubernetes cluster."
   default     = "calico"
   nullable    = false
-
-  validation {
-    condition     = contains(["flannel", "weave", "calico", "cilium", "canal", "kube-router"], var.kubernetes_networkPlugin)
-    error_message = "Variable 'k8s_network_plugin' is invalid.\nPossible values are: [\"flannel\", \"weave\", \"calico\", \"cilium\", \"canal\", \"kube-router\"]."
-  }
 }
 
 variable "kubernetes_dnsMode" {
@@ -382,11 +303,6 @@ variable "kubernetes_dnsMode" {
   description = "The DNS service used by Kubernetes cluster (coredns/kubedns)."
   default     = "coredns"
   nullable    = false
-
-  validation {
-    condition     = contains(["coredns", "kubedns"], var.kubernetes_dnsMode)
-    error_message = "Variable 'k8s_dns_mode' is invalid.\nPossible values are: [\"coredns\", \"kubedns\"]."
-  }
 }
 
 variable "kubernetes_kubespray_url" {

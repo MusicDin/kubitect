@@ -1,0 +1,53 @@
+---
+- name: Fail if Kubernetes section is missing in config
+  fail:
+    msg: |
+      The value of 'kubernetes' is undefined.
+  when:
+    - not config.kubernetes | default(none)
+
+- name: Fail if Kubernetes version is not defined
+  fail:
+    msg: |
+      The value of 'kubernetes.version' is undefined!
+      The kubernetes version is required.
+  when:
+    - not config.kubernetes.version | default(none)
+
+- name: Fail if network plugin is invalid
+  fail:
+    msg: |
+      The value of 'kubernetes.networkPlugin' is invalid ({{ config.kubernetes.networkPlugin }})!
+      Valid values are:
+        {{ valid_network_plugins }}
+  when:
+    - config.kubernetes.networkPlugin is defined
+    - config.kubernetes.networkPlugin not in valid_network_plugins
+        
+- name: Fail if Kubernetes DNS mode is invalid
+  fail:
+    msg: |
+      The value of 'kubernetes.dnsMode' is invalid ({{ config.kubernetes.dnsMode }})!
+      Valid values are:
+        {{ valid_dns_modes }}
+  when:
+    - config.kubernetes.dnsMode is defined
+    - config.kubernetes.dnsMode not in valid_dns_modes
+
+- name: Verify Kubespray configuration
+  block: 
+    - name: Fail if Kubespray version is not defined
+      fail:
+        msg: |
+          The value of 'kubernetes.kubespray.version' is undefined!
+          Kubespray version is required.
+      when:
+        - not config.kubernetes.kubespray.version | default(none)
+
+    - name: Fail if Kubespray URL is invalid
+      fail:
+        msg: |
+          The value of 'kubernetes.kubespray.url' is invalid (none)!
+      when:
+        - config.kubernetes.kubespray.url is defined
+        - config.kubernetes.kubespray.url is none

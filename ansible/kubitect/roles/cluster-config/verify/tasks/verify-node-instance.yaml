@@ -1,0 +1,143 @@
+---
+- name: Verify node's common properties
+  block:
+    - name: Fail if node's ID is not defined
+      fail:
+        msg: |
+          One of the 'cluster.nodes.{{ type }}.instances' has 'id' undefined.
+          Each node instance must have an ID defined and it must be a non-negative integer.
+      when:
+        - node.id is not defined
+
+    - name: Fail if node's ID is invalid
+      fail:
+        msg: |
+          One of the 'cluster.nodes.{{ type }}.instances' has an invalid 'id' value ({{ node.id }}).
+          The node ID must be a non-negative integer.
+      when:
+        - (node.id is none) or (node.id | int is not number) or (node.id | int < 0)
+
+    - name: Fail if node's MAC address is invalid
+      fail:
+        msg: |
+          The {{ type }} node instance (with id {{ node.id }}) has an invalid 'mac' value ({{ node.mac }}).
+      when:
+        - node.mac is defined
+        - (node.mac is none) or (node.mac is not ansible.utils.mac)
+
+    - name: Fail if node's IP is outside network range
+      fail:
+        msg: |
+          The {{ type }} node instance (with id {{ node.id }}) has an invalid 'ip' value ({{ node.ip }}).
+          Node's IP must be an usable IP address within a specified network range ({{ config.cluster.network.cidr }}).
+          Usable IP addresses:
+            {{ config.cluster.network.cidr | ansible.utils.ipaddr( 'range_usable' ) }}
+      when:
+        - node.ip is defined
+        - not config.cluster.network.cidr | ansible.utils.network_in_usable( node.ip )
+
+    - name: Fail if node's CPU value is invalid
+      fail:
+        msg: |
+          The {{ type }} node instance (with id {{ node.id }}) has an invalid 'cpu' value ({{ node.cpu }}).
+          The CPU value must be an integer greater than 0.
+      when:
+        - node.cpu is defined
+        - (node.cpu | int is not number) or (node.cpu | int <= 0)
+
+    - name: Fail if node's RAM value is invalid
+      fail:
+        msg: |
+          The {{ type }} node instance (with id {{ node.id }}) has an invalid 'ram' value ({{ node.ram }}).
+          The RAM value must be an integer greater than 0.
+      when:
+        - node.ram is defined
+        - (node.ram | int is not number) or (node.ram | int <= 0)
+
+    - name: Fail if node's main disk size value is invalid
+      fail:
+        msg: |
+          The {{ type }} node instance (with id {{ node.id }}) has an invalid 'mainDiskSize' value ({{ node.mainDiskSize }}).
+          The main disk size value must be an integer greater than 0.
+      when:
+        - node.mainDiskSize is defined
+        - (node.mainDiskSize | int is not number) or (node.mainDiskSize | int <= 0)
+
+    - name: Fail if node's host is invalid
+      fail:
+        msg: |
+          The {{ type }} node instance (with id {{ node.id }}) has an invalid 'host' value ({{ node.host }}).
+          The host that is referenced by the node instance does not exist!
+          The host value must reference a defined host by its name.
+          Defined hosts are:
+            {{ config.hosts | map(attribute='name') | list }}
+      when:
+        - node.host is defined
+        - (node.host is none) or (node.host not in config.hosts | map(attribute='name') | list)
+
+- name: Verify node's data disks
+  block:
+    - name: Fail if node's data disk name is undefined
+      fail:
+        msg: |
+          The {{ type }} node instance (with id {{ node.id }}) contains a data disk with undefined name.
+      loop: "{{ node.dataDisks if node.dataDisks else [] }}"
+      when:
+        - not item.name | default(none)
+    
+    - name: Fail if data disks names are not unique
+      fail:
+        msg: |
+          The {{ type }} node instance (with id {{ node.id }}) contains multiple data disk with the same name.
+          All data disk names for a given node instance must be unique.
+      when:
+        - node.dataDisks
+        - node.dataDisks | map(attribute='name') | unique | length != node.dataDisks | length
+
+    - name: Fail if node's data disk size is invalid
+      fail:
+        msg: |
+          The {{ type }} node instance (with id {{ node.id }}) contains an invalid data disk ({{ item.name }}).
+          The data disk has an invalid size ({{ item.size | default(none) }})!
+          The data disk size must be an integer greater than 0.
+      loop: "{{ node.dataDisks if node.dataDisks else [] }}"
+      when:
+        - (not item.size | default(none)) or (item.size | int <= 0)
+      
+    - name: Fail if node's data disk pool is invalid
+      vars:
+        node_host: "{{ node.host | default( config.hosts[0].name ) }}"
+        node_host_dataDiskPools: "{{ config.hosts | selectattr('name', 'equalto', node_host) | map(attribute='dataResourcePools') }}"
+        node_host_dataDiskPoolNames: "{{ node_host_dataDiskPools | default([]) | flatten | map(attribute='name') }}"
+      fail:
+        msg: |
+          The {{ type }} node instance (with id {{ node.id }}) contains an invalid data disk ({{ item.name }}).
+          The data disk references an invalid data resource pool ({{ item.pool | default(none) }})!
+          Defined data resource pools for node's host ({{ node_host }}) are:
+            {{ node_host_dataDiskPoolNames }}
+      loop: "{{ node.dataDisks if node.dataDisks else [] }}"
+      when:
+        - (not item.pool | default(none)) or (item.pool not in node_host_dataDiskPoolNames)
+  when:
+    - type in ['worker', 'master']
+    - node.dataDisks is defined
+
+- name: Verify load balancer priority
+  block:
+    - name: Fail if load balancer priority is invalid
+      fail:
+        msg: |
+          The {{ type }} node instance (with id {{ node.id }}) has an invalid 'priority' value (none).
+      when: 
+        - node.priority is defined
+        - node.priority is none
+
+    - name: Fail if load balancer priority is invalid
+      fail:
+        msg: |
+          The {{ type }} node instance (with id {{ node.id }}) has an invalid 'priority' value ({{ node.priority }}).
+          The load balancer priority must be an integer between 0 and 255.
+      when:
+        - node.priority | default(0) < 0 or node.priority | default(0) > 255
+  when:
+    - type == 'loadBalancer'

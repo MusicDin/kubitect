@@ -1,0 +1,55 @@
+---
+- name: Fail if node type is invalid
+  fail:
+    msg: |
+      CRITICAL: Provided node type ({{ type }}) is invalid!
+  when:
+    - type not in ["master", "worker", "loadBalancer"]
+
+- name: Verify {{ type }} node instances
+  include_tasks: verify-node-instance.yaml
+  loop: "{{ nodes.instances if nodes.instances else [] }}"
+  loop_control:
+    loop_var: node
+
+- name: Verify default values
+  block:
+    - name: Fail if default CPU value is invalid
+      fail:
+        msg: |
+          The value of 'cluster.nodes.{{ type }}.default.cpu' is invalid ({{ nodes.default.cpu }})!
+          Default CPU value must be an integer larger then 0.
+      when:
+        - nodes.default.cpu is defined
+        - (nodes.default.cpu | int is not number) or (nodes.default.cpu | int <= 0)
+  
+    - name: Fail if default RAM value is invalid
+      fail:
+        msg: |
+          The value of 'cluster.nodes.{{ type }}.default.ram' is invalid ({{ nodes.default.ram }})!
+          Default RAM value must be an integer larger then 0.
+      when:
+        - nodes.default.ram is defined
+        - (nodes.default.ram | int is not number) or (nodes.default.ram | int <= 0)
+    
+    - name: Fail if (default) main disk size is invalid
+      fail:
+        msg: |
+          The value of 'cluster.nodes.{{ type }}.default.mainDiskSize' is invalid ({{ nodes.default.mainDiskSize }})!
+          Default main disk size value must be an integer larger then 0.
+      when:
+        - nodes.default.mainDiskSize is defined
+        - (nodes.default.mainDiskSize | int is not number) or (nodes.default.mainDiskSize | int <= 0)
+  when:
+    - nodes.default | default(none)
+
+- name: Fail if node IDs are not unique
+  fail:
+    msg: |
+      Multiple {{ type }} node instances have the same ID.
+      Node instances of a single type must have a unique ID.
+  when:
+    - nodes.instances | default(none)
+    - nodes.instances | length != nodes.instances | map(attribute='id') | unique | length
+
+

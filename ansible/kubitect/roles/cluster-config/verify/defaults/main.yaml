@@ -1,4 +1,29 @@
 ---
+valid_os_distros:
+  - ubuntu
+  - debian
+  - custom
+
+valid_network_modes:
+  - nat
+  - bridge
+  - route
+
+valid_network_plugins:
+  - flannel
+  - weave
+  - calico
+  - cilium
+  - canal
+  - kube-router
+
+valid_dns_modes:  
+  - coredns
+  - kubedns
+
+#regex:
+#  string: "^[a-zA-Z0-9-_]+$"
+
 config_example_hosts: |
   
   Please see the following example:

@@ -1,12 +1,242 @@
 ---
+- name: Verify cluster name
+  block:
+    - name: Fail if cluster name is not defined
+      fail:
+        msg: |
+          The value of 'cluster.name' is undefined!
+          The cluster name is required.
+      when:
+        - config.cluster.name is not defined
 
-# Verify hosts are present
+    - name: Fail if cluster name is invalid
+      fail:
+        msg: |
+          The value of 'cluster.name' is invalid.
+          The cluster name can contain only characters [a-Z], - and _.
+      when:
+        - config.cluster.name is not regex( "^[a-zA-Z0-9-_]+$" )
 
-- name: Fail if OS distro is not valid
-  fail:
-    msg: |
-      cluster.nodeTemplate.distro.
-      {{ config_example_hosts }}
+# -- Network -- #
+
+- name: Verify network configuration
+  block:
+    - name: Fail if network mode is not defined
+      fail:
+        msg: |
+          The value of 'cluster.network.mode' is undefined!
+          The network mode is required.
+      when:
+        - config.cluster.network.mode is not defined
+
+    - name: Fail if network mode is invalid
+      fail:
+        msg: |
+          The value of 'config.cluster.network.mode' is invalid ({{ config.cluster.network.mode }}).
+          Valid network modes are:
+            {{ valid_network_modes }}
+      when:
+        - config.cluster.network.mode not in valid_network_modes
+
+    - name: Fail if network CIDR is not defined
+      fail:
+        msg: |
+          The value of 'cluster.network.cidr' is undefined!
+          The network CIDR is required.
+      when:
+        - not config.cluster.network.cidr | default(none)
+
+    - name: Fail if network CIDR is invalid
+      fail:
+        msg: |
+          The value of 'config.cluster.network.cidr' is invalid ({{ config.cluster.network.cidr }})!
+      when:
+        - not config.cluster.network.cidr | ansible.utils.ipaddr
+
+    - name: Fail if network mode is set to bridge and network bridge is not defined 
+      fail:
+        msg: |
+          The value of 'cluster.network.bridge' is undefined.
+          Network bridge must be defined if the network mode is set to 'bridge'!
+      when:
+        - config.cluster.network.mode == 'bridge'
+        - not config.cluster.network.bridge | default(none)
+
+    - name: Fail if network gateway is not in network range
+      fail:
+        msg: |
+          The value of 'cluster.network.gateway' is invalid ({{ config.cluster.network.gateway }})!
+          The network gateway must be a usable IP address within a specified network range ({{ config.cluster.network.cidr }}).
+          Usable IP addresses:
+            {{ config.cluster.network.cidr | ansible.utils.ipaddr( 'range_usable' ) }}
+      when:
+        - config.cluster.network.gateway is defined
+        - not config.cluster.network.cidr | ansible.utils.network_in_usable( config.cluster.network.gateway ) 
+      
+# -- Node template -- #
+
+- name: Verify node template OS properties.
+  block:
+    - name: Fail if OS distro is invalid
+      fail:
+        msg: |
+          The value of 'cluster.nodeTemplate.os.distro' is invalid ({{ config.cluster.nodeTemplate.os.distro }})!
+          Valid values are:
+            {{ valid_os_distros }}
+      when:
+        - config.cluster.nodeTemplate.os.distro is defined
+        - config.cluster.nodeTemplate.os.distro not in valid_os_distros
+
+    - name: Fail if OS network interface is invalid
+      fail:
+        msg: |
+          The value of 'cluster.nodeTemplate.os.networkInterface' is invalid!
+          The network interface cannot be an empty string.
+      when:
+        - config.cluster.nodeTemplate.os.networkInterface is defined
+        - (config.cluster.nodeTemplate.os.networkInterface is none) or (config.cluster.nodeTemplate.os.networkInterface | length == 0)
+    
+    - name: Fail if OS source is invalid
+      fail:
+        msg: |
+          The value of 'cluster.nodeTemplate.os.source' is invalid.
+          The OS source cannot be an empty string. It must be either a local path or a URL pointing to an OS image.
+      when:
+        - config.cluster.nodeTemplate.os.source is defined
+        - (config.cluster.nodeTemplate.os.source is none) or (config.cluster.nodeTemplate.os.source | length == 0)
+
+- name: Verify node template SSH keys exist
+  block:        
+    - name: Check if SSH keys exist
+      stat:
+        path: "{{ item }}"
+      register: ssh_keys
+      loop:
+        - "{{ config.cluster.nodeTemplate.ssh.privateKeyPath }}"
+        - "{{ config.cluster.nodeTemplate.ssh.privateKeyPath }}.pub"
+
+    - name: Fail if SSH keys do not exist
+      fail:
+        msg: |
+          The value of 'cluster.nodeTemplate.ssh.privateKeyPath' is invalid.
+          SSH key '{{ item.item }}' does not exist!
+          Ensure that provided private key exists and that public key with '.pub' 
+          suffix is in the same directory.
+      when:
+        - item.stat.exists is false
+      loop: "{{ ssh_keys.results }}"
+      loop_control:
+        label: "{{ item.item }}"
   when:
-    - config.cluster.nodeTemplate.os.distro is defined
-    - config.cluster.nodeTemplate.os.distro in valid_distros
+    - config.cluster.nodeTemplate.ssh.privateKeyPath is defined
+    - config.cluster.nodeTemplate.ssh.privateKeyPath is not none
+
+# - name: Verify note template DNS records
+#   block:
+#     - name: Fail if node template DNS records are not valid IP addresses
+#       fail:
+#         msg: |
+#           The value of 'cluster.nodeTemplate.dns' contains an invalid DNS record ({{ item }}).
+#       loop: "{{ config.cluster.nodeTemplate.dns }}"
+#       when:
+#         - item is defined
+#         - not item | ansible.utils.ipaddr
+#   when:
+#     - config.cluster.nodeTemplate.dns is defined
+#     - config.cluster.nodeTemplate.dns is not none
+
+# -- Nodes -- #
+
+- name: Verify master nodes common properties
+  include_tasks: verify-node-group.yaml
+  vars:
+    type: master
+    nodes: "{{ config.cluster.nodes.master }}"
+
+- name: Verify worker nodes common properties
+  include_tasks: verify-node-group.yaml
+  vars:
+    type: worker
+    nodes: "{{ config.cluster.nodes.worker }}"
+
+- name: Verify load balancer nodes common properties
+  include_tasks: verify-node-group.yaml
+  vars:
+    type: loadBalancer
+    nodes: "{{ config.cluster.nodes.loadBalancer }}"
+
+- name: Verify number of master nodes is odd
+  block:
+    - name: Fail if at least one master node instance is not defined
+      fail:
+        msg: |
+          Master node instances are not defined!
+          At least one master node instance must be defined.
+      when:
+        - not config.cluster.nodes.master.instances | default(none)
+
+    - name: Fail if number of master instances is even
+      fail:
+        msg: |
+          Number of master node instances ({{ config.cluster.nodes.master.instances | length }}) is even!
+          Number of master node instances must be odd (1, 3, 5, ...).
+      when:
+        - config.cluster.nodes.master.instances | length % 2 == 0
+
+- name: Verify load balancer VIP
+  block:
+    - name: Fail if more then 1 LB is configured and VIP is not defined
+      fail:
+        msg: |
+          The value  'cluster.nodes.loadBalancer.vip' in undefined!
+          When more then 1 load balancer is configured, a virtual/floating IP 
+          for the load balancers needs to be configured.
+      when:
+        - config.cluster.nodes.loadBalancer.vip is not defined
+        - config.cluster.nodes.loadBalancer.instances | length > 1
+
+    - name: Fail if VIP is outside network range
+      fail:
+        msg: |
+          The value of 'cluster.nodes.loadBalancer.vip' is invalid ({{ config.cluster.nodes.loadBalancer.vip }})!
+          Load balancer virtual/floating IP must be an usable IP address within a specified network range ({{ config.cluster.network.cidr }}).
+          Usable IP addresses:
+            {{ config.cluster.network.cidr | ansible.utils.ipaddr( 'range_usable' ) }}
+      when:
+        - config.cluster.nodes.loadBalancer.vip is defined
+        - not config.cluster.network.cidr | ansible.utils.network_in_usable( config.cluster.nodes.loadBalancer.vip ) 
+  when:
+    - config.cluster.nodes.loadBalancer.instances | default(none)
+
+- name: Verify all defined IP and MAC addresses are unique
+  vars:
+    master_nodes: "{{ config.cluster.nodes.master.instances if config.cluster.nodes.master.instances | default(none) else [] }}"
+    worker_nodes: "{{ config.cluster.nodes.worker.instances if config.cluster.nodes.worker.instances | default(none) else [] }}"
+    lb_nodes: "{{ config.cluster.nodes.loadBalancer.instances if config.cluster.nodes.loadBalancer.instances | default(none) else [] }}"
+    lb_vip: "{{ [config.cluster.nodes.loadBalancer.vip] if config.cluster.nodes.loadBalancer.vip | default(none) else [] }}"
+    master_ips: "{{ master_nodes | selectattr('ip', 'defined') | map(attribute='ip') | list }}"
+    worker_ips: "{{ worker_nodes | selectattr('ip', 'defined') | map(attribute='ip') | list }}"
+    lb_ips: "{{ lb_nodes | selectattr('ip', 'defined') | map(attribute='ip') | list }}"
+    master_macs: "{{ master_nodes | selectattr('mac', 'defined') | map(attribute='mac') | list }}"
+    worker_macs: "{{ worker_nodes | selectattr('mac', 'defined') | map(attribute='mac') | list }}"
+    lb_macs: "{{ lb_nodes | selectattr('mac', 'defined') | map(attribute='mac') | list }}"
+    ips: "{{ master_ips + worker_ips + lb_ips + lb_vip }}"
+    macs: "{{ master_macs + worker_macs + lb_macs }}"
+  block:
+    - name: Fail if duplicate IP addresses are found
+      fail:
+        msg: |
+          Multiple node instaces have the same IP address defined ({{ item }}).
+          IP addresses of all node instances must be unique (including a load balancer VIP).
+      loop: "{{ ips | unique }}"
+      when:
+        - ips | select('equalto', item) | list | length > 1
+
+    - name: Fail if duplicate MAC addresses are found
+      fail:
+        msg: |
+          Multiple node instaces have the same MAC address defined ({{ item }}).
+          MAC addresses of all node instances must be unique.
+      loop: "{{ macs | unique }}"
+      when:
+        - macs | select('equalto', item) | list | length > 1

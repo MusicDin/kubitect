@@ -53,14 +53,6 @@ variable "network_bridge" {
 variable "network_gateway" {
   type        = string
   description = "Network gateway (used only when network mode is 'bridge')"
-
-  validation {
-    condition = (
-      var.network_gateway == null
-      || can(regex("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}$", var.network_gateway))
-    )
-    error_message = "Invalid network gateway IPv4 address."
-  }
 }
 
 variable "network_cidr" {
@@ -128,45 +120,24 @@ variable "vm_main_disk_size" {
 }
 
 variable "vm_data_disks" {
+  # If pool does not exist, null is passed.
+  # If no additional disks need to be created, an empty array ([]) is passed.
   type = list(object({
     name : string
     size : number
     pool : string
   }))
   description = "Additional data disks attached to the virtual machine"
-
-  # If pool does not exist, null is passed.
-  # If no additional disks need to be created, an empty array ([]) is passed.
-  validation {
-    condition     = var.vm_data_disks != null
-    error_message = "At least one of the node instances is referencing a data resource pool that does not exist."
-  }
 }
 
 variable "vm_mac" {
   type        = string
   description = "The MAC address of the virtual machine"
-
-  validation {
-    condition = (
-      var.vm_mac == null
-      || can(regex("^([0-9A-Fa-f]){2}(:[0-9A-Fa-f]{2}){5}$", var.vm_mac))
-    )
-    error_message = "Invalid MAC address provided to VM.\nPlease check the following variables:\n - 'lb_nodes',\n - 'master_nodes',\n - 'worker_nodes'.\n\nNote that setting MAC to 'null' causes random valid MAC to be generated."
-  }
 }
 
 variable "vm_ip" {
   type        = string
   description = "The IP address of the virtual machine"
-
-  validation {
-    condition = (
-      var.vm_ip == null
-      || can(regex("^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}$", var.vm_ip))
-    )
-    error_message = "Invalid IP address provided to VM.\nPlease check the following variables:\n - 'lb_nodes',\n - 'master_nodes',\n - 'worker_nodes'.\n\nNote that setting IP to 'null' causes random valid IP to be generated."
-  }
 }
 
 variable "vm_labels" {
