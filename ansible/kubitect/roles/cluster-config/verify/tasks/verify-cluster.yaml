@@ -151,19 +151,20 @@
     - config.cluster.nodeTemplate.ssh.privateKeyPath is defined
     - config.cluster.nodeTemplate.ssh.privateKeyPath is not none
 
-# - name: Verify note template DNS records
-#   block:
-#     - name: Fail if node template DNS records are not valid IP addresses
-#       fail:
-#         msg: |
-#           The value of 'cluster.nodeTemplate.dns' contains an invalid DNS record ({{ item }}).
-#       loop: "{{ config.cluster.nodeTemplate.dns }}"
-#       when:
-#         - item is defined
-#         - not item | ansible.utils.ipaddr
-#   when:
-#     - config.cluster.nodeTemplate.dns is defined
-#     - config.cluster.nodeTemplate.dns is not none
+- name: Verify node template DNS records
+  block:
+    - name: Fail if node template DNS records are not valid IP addresses
+      fail:
+        msg: |
+          The value of 'cluster.nodeTemplate.dns' contains an invalid DNS record ({{ item }}).
+          Every DNS record must be a valid IP address.
+      loop: "{{ config.cluster.nodeTemplate.dns if config.cluster.nodeTemplate.dns else [] }}"
+      when:
+        - item is defined
+        - not item | ansible.utils.ipaddr
+  when:
+    - config.cluster.nodeTemplate.dns is defined
+    - config.cluster.nodeTemplate.dns is not none
 
 # -- Nodes -- #
 
