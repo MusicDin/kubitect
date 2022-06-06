@@ -105,6 +105,26 @@
         - config.cluster.nodeTemplate.os.source is defined
         - (config.cluster.nodeTemplate.os.source is none) or (config.cluster.nodeTemplate.os.source | length == 0)
 
+    - name: Verify all OS properties are set if OS distro is set to custom
+      block:
+        - name: Fail if OS source is undefined
+          fail:
+            msg: |
+              The value of 'cluster.nodeTemplate.os.source' is undefined.
+              The OS source must be defined if OS distro is set to 'custom'.
+          when:            
+            - config.cluster.nodeTemplate.os.source is not defined
+
+        - name: Fail if OS network interface is undefined
+          fail:
+            msg: |
+              The value of 'cluster.nodeTemplate.os.networkInterface' is undefined.
+              The OS networkInterface must be defined if OS distro is set to 'custom'.
+          when:            
+            - config.cluster.nodeTemplate.os.networkInterface is not defined
+      when:
+        - config.cluster.nodeTemplate.os.distro == 'custom'
+
 - name: Verify node template SSH keys exist
   block:        
     - name: Check if SSH keys exist
