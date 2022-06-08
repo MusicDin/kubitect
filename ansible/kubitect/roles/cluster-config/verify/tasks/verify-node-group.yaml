@@ -8,7 +8,7 @@
 
 - name: Verify {{ type }} node instances
   include_tasks: verify-node-instance.yaml
-  loop: "{{ nodes.instances if nodes.instances else [] }}"
+  loop: "{{ nodes.instances if ( nodes.instances | default(none) ) else [] }}"
   loop_control:
     loop_var: node
 

@@ -172,19 +172,19 @@
   include_tasks: verify-node-group.yaml
   vars:
     type: master
-    nodes: "{{ config.cluster.nodes.master }}"
+    nodes: "{{ config.cluster.nodes.master | default([]) }}"
 
 - name: Verify worker nodes common properties
   include_tasks: verify-node-group.yaml
   vars:
     type: worker
-    nodes: "{{ config.cluster.nodes.worker }}"
+    nodes: "{{ config.cluster.nodes.worker | default([]) }}"
 
 - name: Verify load balancer nodes common properties
   include_tasks: verify-node-group.yaml
   vars:
     type: loadBalancer
-    nodes: "{{ config.cluster.nodes.loadBalancer }}"
+    nodes: "{{ config.cluster.nodes.loadBalancer | default([]) }}"
 
 - name: Verify number of master nodes is odd
   block:
