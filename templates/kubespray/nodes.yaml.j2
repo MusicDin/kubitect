@@ -16,7 +16,7 @@ all:
       node_labels:
       {% set labels = def_master_labels | combine(master.labels | default({})) %}
       {% for key, value in labels.items() %}
-        {{ key }}: {{ value }}
+        {{ key }}: {{ value | default("") }}
       {% endfor %}
   {% endfor %}
   {# Worker nodes #}
@@ -27,11 +27,10 @@ all:
       node_labels:
       {% set labels = def_worker_labels | combine(worker.labels | default({})) %}
       {% for key, value in labels.items() %}
-        {{ key }}: {{ value }}
+        {{ key }}: {{ value | default("") }}
       {% endfor %}
     {% endfor %}
   {% endif %}
-
   children:
     haproxy:
       hosts:      
