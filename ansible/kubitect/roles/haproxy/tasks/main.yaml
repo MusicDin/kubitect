@@ -1,0 +1,100 @@
+---
+- name: Include infrastructure config (tf output)
+  include_vars:
+    file: "{{ config_dir }}/infrastructure.yaml"
+    name: infra
+
+- name: Set load balancer facts
+  set_fact:
+    lb_ips: "{{ infra.cluster.nodes.loadBalancer.instances | map(attribute='ip') }}"
+    lb_vip: "{{ infra.cluster.nodes.loadBalancer.vip }}"
+
+- name: Get OS release
+  raw: cat /etc/os-release
+  register: os_release
+  changed_when: false
+  environment: {}
+
+- name: Install Python3
+  raw:
+    apt update -q && \
+    DEBIAN_FRONTEND=noninteractive apt install -q -y python3
+  environment: {}
+  when:
+    - "'Ubuntu' in os_release.stdout"
+    - "'Debian' in os_release.stdout"
+
+- name: Configure SELinux on CentOS
+  raw:
+    yum -q -y install python3-policycoreutils && \
+    semanage port -a -t http_port_t -p tcp 6443
+  environment: {}
+  when:
+    - "'CentOS' in os_release.stdout"
+
+- name: Allow binding non-local IP
+  sysctl:
+    name: net.ipv4.ip_nonlocal_bind
+    state: present
+    value: 1
+    reload: true
+
+  # When VIP is not set to one of the HAProxy node IPs then Keepalived is required.
+- name: Setup Keepalived
+  block:
+    - name: Ensure Keepalived is installed
+      package:
+        name: keepalived
+        state: present
+
+    - name: Configure Keepalived
+      copy:
+        src: ../../config/keepalived/keepalived-{{ inventory_hostname }}.cfg
+        dest: /etc/keepalived/keepalived.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify:
+        - Restart Keepalived
+
+    - name: Start and enable Keepalived
+      service:
+        name: keepalived
+        state: started
+        enabled: true
+  when:
+    - lb_vip not in lb_ips
+
+  # When VIP is one of the HAProxy node IPs Keepalived must be removed.
+- name: Remove Keepalived
+  block:
+    - name: Ensure Keepalived is removed
+      package:
+        name: keepalived
+        state: absent
+  when:
+    - lb_vip in lb_ips
+
+- name: Setup HAProxy
+  block:
+    - name: Ensure HAProxy is installed
+      package:
+        name: haproxy
+        state: present
+
+    - name: Configure HAProxy
+      copy:
+        src: ../../config/haproxy/haproxy.cfg
+        dest: /etc/haproxy/haproxy.cfg
+        owner: root
+        group: root
+        mode: 0644
+      notify:
+        - Restart HAProxy
+
+    - name: Start and enable HAProxy
+      service:
+        name: haproxy
+        state: started
+        enabled: true
+

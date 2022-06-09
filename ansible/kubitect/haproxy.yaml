@@ -1,0 +1,5 @@
+- name: Configure HAProxy nodes
+  hosts: haproxy
+  gather_facts: false
+  roles:
+    - role: haproxy

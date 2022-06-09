@@ -16,7 +16,7 @@ all:
       node_labels:
       {% set labels = def_master_labels | combine(master.labels | default({})) %}
       {% for key, value in labels.items() %}
-        {{ key }}: {{ value if value else "" }}
+        {{ key }}: {{ value if value else '""' }}
       {% endfor %}
   {% endfor %}
   {# Worker nodes #}
@@ -27,7 +27,7 @@ all:
       node_labels:
       {% set labels = def_worker_labels | combine(worker.labels | default({})) %}
       {% for key, value in labels.items() %}
-        {{ key }}: {{ value if value else "" }}
+        {{ key }}: {{ value if value else '""' }}
       {% endfor %}
     {% endfor %}
   {% endif %}

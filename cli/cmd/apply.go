@@ -164,7 +164,7 @@ func apply() error {
 	switch env.ClusterAction {
 	case "create":
 
-		err = playbook.HAProxyCreate(sshUser, sshPKey)
+		err = playbook.HAProxySetup(sshUser, sshPKey)
 		if err != nil {
 			return err
 		}
@@ -182,6 +182,11 @@ func apply() error {
 		}
 
 	case "scale":
+
+		err = playbook.HAProxySetup(sshUser, sshPKey)
+		if err != nil {
+			return err
+		}
 
 		playbook.KubesprayScale(sshUser, sshPKey, k8sVersion)
 		if err != nil {

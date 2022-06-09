@@ -107,13 +107,13 @@ func KubitectFinalize(sshUser string, sshPKey string) error {
 	return nil
 }
 
-// HAProxyCreate function calls an Ansible playbook that configures HAProxy
+// HAProxySetup function calls an Ansible playbook that configures HAProxy
 // load balancers.
-func HAProxyCreate(sshUser string, sshPKey string) error {
+func HAProxySetup(sshUser string, sshPKey string) error {
 
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Main,
-		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/haproxy/haproxy.yaml"),
+		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubitect/haproxy.yaml"),
 		Inventory:    filepath.Join(env.ClusterPath, "config/nodes.yaml"),
 		Become:       true,
 		User:         sshUser,
