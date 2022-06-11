@@ -208,6 +208,7 @@ hosts:
       type: local
 
 cluster:
+  name: "my-k8s-cluster"
   network:
     mode: "nat"
     cidr: "192.168.113.0/24"
