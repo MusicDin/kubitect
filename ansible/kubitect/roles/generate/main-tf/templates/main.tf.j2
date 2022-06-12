@@ -128,19 +128,10 @@ module "host_{{ host.name }}" {
   cluster_nodes_worker_default_cpu          = try(local.config.cluster.nodes.worker.default.cpu, null)
   cluster_nodes_worker_default_ram          = try(local.config.cluster.nodes.worker.default.ram, null)
   cluster_nodes_worker_default_mainDiskSize = try(local.config.cluster.nodes.worker.default.mainDiskSize, null)
-  cluster_nodes_worker_default_label        = try(local.config.cluster.nodes.worker.default.label, null)
   cluster_nodes_worker_instances = [
     for node in try(flatten([local.config.cluster.nodes.worker.instances]), []) : node
     if node != null && (try(node.host, null) == "{{ host.name }}"{{ default_selector }})
   ]
-
-  # Kubernetes & Kubespray
-  kubernetes_version              = try(local.config.kubernetes.version, null)
-  kubernetes_networkPlugin        = try(local.config.kubernetes.networkPlugin, null)
-  kubernetes_dnsMode              = try(local.config.kubernetes.dnsMode, null)
-  kubernetes_kubespray_url        = try(local.config.kubernetes.kubespray.url, null)
-  kubernetes_kubespray_version    = try(local.config.kubernetes.kubespray.version, null)
-  kubernetes_other_copyKubeconfig = try(local.config.kubernetes.other.copyKubeconfig, null)
 
   # Other
   node_types = local.node_types

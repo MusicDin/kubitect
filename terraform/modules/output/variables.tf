@@ -37,7 +37,6 @@ variable "worker_nodes" {
     id     = number
     name   = string
     ip     = string
-    labels = map(any)
   }))
   description = "Worker nodes info"
 }
@@ -47,7 +46,6 @@ variable "master_nodes" {
     id     = number
     name   = string
     ip     = string
-    labels = map(any)
   }))
   description = "Master nodes info"
 }

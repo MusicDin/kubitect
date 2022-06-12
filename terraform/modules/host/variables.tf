@@ -215,7 +215,6 @@ variable "cluster_nodes_master_instances" {
       pool : string
       size : number
     })))
-    labels = optional(map(any))
   }))
   description = "Master node instances (control plane)"
 }
@@ -256,13 +255,6 @@ variable "cluster_nodes_worker_default_dataDisks" {
   nullable    = false
 }
 
-variable "cluster_nodes_worker_default_label" {
-  type        = string
-  description = "Worker node role label."
-  default     = ""
-  nullable    = false
-}
-
 variable "cluster_nodes_worker_instances" {
   type = list(object({
     id           = number
@@ -277,51 +269,8 @@ variable "cluster_nodes_worker_instances" {
       pool : string
       size : number
     })))
-    labels = optional(map(any))
   }))
   description = "Worker node instances."
-}
-
-#======================================================================================
-# General Kubernetes configuration
-#======================================================================================
-
-variable "kubernetes_version" {
-  type        = string
-  description = "The version of Kuberenetes that will be deployed."
-}
-
-variable "kubernetes_networkPlugin" {
-  type        = string
-  description = "The overlay network plugin used by Kubernetes cluster."
-  default     = "calico"
-  nullable    = false
-}
-
-variable "kubernetes_dnsMode" {
-  type        = string
-  description = "The DNS service used by Kubernetes cluster (coredns/kubedns)."
-  default     = "coredns"
-  nullable    = false
-}
-
-variable "kubernetes_kubespray_url" {
-  type        = string
-  description = "The Git repository URL to clone Kubespray from."
-  default     = "https://github.com/kubernetes-sigs/kubespray.git"
-  nullable    = false
-}
-
-variable "kubernetes_kubespray_version" {
-  type        = string
-  description = "The version of Kubespray that will be used to deploy Kubernetes."
-}
-
-variable "kubernetes_other_copyKubeconfig" {
-  type        = bool
-  description = "If enabled, kubeconfig (config/admin.conf) will be copied to '~/.kube/' directory."
-  default     = false
-  nullable    = false
 }
 
 #======================================================================================

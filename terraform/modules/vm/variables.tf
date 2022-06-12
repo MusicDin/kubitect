@@ -139,10 +139,3 @@ variable "vm_ip" {
   type        = string
   description = "The IP address of the virtual machine"
 }
-
-variable "vm_labels" {
-  type        = map(any)
-  description = "Node labels"
-  default     = {}
-  nullable    = false
-}

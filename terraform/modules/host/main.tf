@@ -106,7 +106,6 @@ module "lb_module" {
   vm_id                = each.value.id
   vm_mac               = each.value.mac
   vm_ip                = each.value.ip
-  vm_labels            = null
 
   # Dependancy takes care that resource pool is not removed before volumes are #
   # Also network must be created before VM is initialized #
@@ -153,7 +152,6 @@ module "master_module" {
   vm_id                = each.value.id
   vm_mac               = each.value.mac
   vm_ip                = each.value.ip
-  vm_labels            = each.value.labels
 
   # Dependancy takes care that resource pool is not removed before volumes are #
   # Also network must be created before VM is initialized #
@@ -200,7 +198,6 @@ module "worker_module" {
   vm_id                = each.value.id
   vm_mac               = each.value.mac
   vm_ip                = each.value.ip
-  vm_labels            = each.value.labels
 
   # Dependancy takes care that resource pool is not removed before volumes are #
   # Also network must be created before VM is initialized #
