@@ -69,7 +69,7 @@ credentials_dir: "{{ inventory_dir }}/credentials"
 
 # Choose network plugin (cilium, calico, weave or flannel. Use cni for generic cni plugin)
 # Can also be set to 'cloud', which lets the cloud provider setup appropriate routing
-kube_network_plugin: "<< config.kubernetes.networkPlugin >>"
+kube_network_plugin: "<< config.kubernetes.networkPlugin | default( default.k8s.networkPlugin ) >>"
 
 # Setting multi_networking to true will install Multus: https://github.com/intel/multus-cni
 kube_network_plugin_multus: false
@@ -164,7 +164,7 @@ cluster_name: cluster.local
 # Subdomains of DNS domain to be resolved via /etc/resolv.conf for hostnet pods
 ndots: 2
 # Can be coredns, coredns_dual, manual or none
-dns_mode: "<< config.kubernetes.dnsMode >>"
+dns_mode: "<< config.kubernetes.dnsMode | default ( default.k8s.dnsMode ) >>"
 # Set manual server if using a custom cluster DNS server
 # manual_dns_server: 10.x.x.x
 # Enable nodelocal dns cache

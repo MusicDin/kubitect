@@ -1,0 +1,7 @@
+---
+default:
+  kubespray:
+    url: https://github.com/kubernetes-sigs/kubespray.git
+  k8s:
+    networkPlugin: calico
+    dnsMode: coredns

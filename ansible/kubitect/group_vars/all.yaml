@@ -17,4 +17,3 @@ kubitect_cluster_default_config_path: "{{ kubitect_cluster_path }}/resources/def
 
 # Commonly used directories
 config_dir: "../../config"
-templates_dir: "../../templates"
