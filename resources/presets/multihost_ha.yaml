@@ -8,7 +8,7 @@
 #
 
 #kubitect:
-#  version: "v2.0.3"
+#  version: "v2.1.0"
 
 hosts:
   - name: host1

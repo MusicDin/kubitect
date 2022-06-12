@@ -6,7 +6,7 @@ const (
 	ConstProjectHomeDir     = ".kubitect"
 	ConstProjectClustersDir = "clusters"
 	ConstProjectUrl         = "https://github.com/MusicDin/kubitect"
-	ConstProjectVersion     = "v2.0.4"
+	ConstProjectVersion     = "v2.1.0"
 	ConstTerraformVersion   = "1.2.2"
 	ConstTerraformStatePath = "config/terraform/terraform.tfstate"
 	ConstKubeconfigPath     = "config/admin.conf"
@@ -22,13 +22,13 @@ var (
 	ProjectRequiredFiles = [...]string{
 		"ansible/",
 		"resources/",
-		"templates/",
 		"terraform/modules/",
+		"terraform/templates/",
+		"terraform/scripts/",
 		"terraform/defaults.yaml",
 		"terraform/output.tf",
 		"terraform/variables.tf",
 		"terraform/versions.tf",
-		"scripts/",
 		"requirements.txt",
 		"LICENSE",
 	}
