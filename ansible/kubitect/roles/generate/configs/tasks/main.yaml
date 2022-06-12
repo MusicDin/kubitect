@@ -1,41 +1,12 @@
 ---
-- name: Include infrastructure config (tf output)
-  include_vars:
-    file: "{{ config_dir }}/infrastructure.yaml"
-    name: infra
-
 - name: Ensure config directories exist
   file:
     path: "{{ item }}"
     state: directory
     mode: 0700
   loop:
-    - "{{ config_dir }}/haproxy"
-    - "{{ config_dir }}/keepalived"
     - "{{ config_dir }}/group_vars/all"
     - "{{ config_dir }}/group_vars/k8s_cluster"
-
-- name: Generate HAProxy config
-  template:
-    src: "{{ templates_dir }}/haproxy/haproxy.cfg.j2"
-    dest: "{{ config_dir }}/haproxy/haproxy.cfg"
-    lstrip_blocks: true
-  vars:
-    loadbalancer_vip: "{{ infra.cluster.nodes.loadBalancer.vip }}"
-
-- name: Generate Keepalived configurations
-  template:
-    src: "{{ templates_dir }}/keepalived/keepalived.cfg.j2"
-    dest: "{{ config_dir }}/keepalived/keepalived-{{ item.name }}.cfg"
-  vars:
-    cfg_instance: "{{ config.cluster.nodes.loadBalancer.instances | selectattr( 'id', 'equalto', item.id ) | first }}"
-    cfg_network_mode: "{{ config.cluster.network.mode }}"
-    cfg_network_bridge: "{{ config.cluster.network.bridge | default( 'none' ) }}"
-    inf_network_interface: "{{ infra.cluster.nodeTemplate.os.networkInterface }}"
-    loadbalancer_vip: "{{ infra.cluster.nodes.loadBalancer.vip }}"
-    priority: "{{ cfg_instance.priority | default( default.loadBalancerPriority ) }}"
-    network_interface: "{{ cfg_network_bridge if cfg_network_mode == 'bridge' else inf_network_interface }}"
-  loop: "{{ infra.cluster.nodes.loadBalancer.instances }}"
 
 - name: Generate Kubespray all.yaml
   template:

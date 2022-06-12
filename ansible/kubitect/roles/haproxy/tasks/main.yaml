@@ -1,14 +1,4 @@
 ---
-- name: Include infrastructure config (tf output)
-  include_vars:
-    file: "{{ config_dir }}/infrastructure.yaml"
-    name: infra
-
-- name: Set load balancer facts
-  set_fact:
-    lb_ips: "{{ infra.cluster.nodes.loadBalancer.instances | map(attribute='ip') }}"
-    lb_vip: "{{ infra.cluster.nodes.loadBalancer.vip }}"
-
 - name: Get OS release
   raw: cat /etc/os-release
   register: os_release
@@ -39,62 +29,8 @@
     value: 1
     reload: true
 
-  # When VIP is not set to one of the HAProxy node IPs then Keepalived is required.
 - name: Setup Keepalived
-  block:
-    - name: Ensure Keepalived is installed
-      package:
-        name: keepalived
-        state: present
+  include_tasks: configure_keepalived.yaml
 
-    - name: Configure Keepalived
-      copy:
-        src: ../../config/keepalived/keepalived-{{ inventory_hostname }}.cfg
-        dest: /etc/keepalived/keepalived.conf
-        owner: root
-        group: root
-        mode: 0644
-      notify:
-        - Restart Keepalived
-
-    - name: Start and enable Keepalived
-      service:
-        name: keepalived
-        state: started
-        enabled: true
-  when:
-    - lb_vip not in lb_ips
-
-  # When VIP is one of the HAProxy node IPs Keepalived must be removed.
-- name: Remove Keepalived
-  block:
-    - name: Ensure Keepalived is removed
-      package:
-        name: keepalived
-        state: absent
-  when:
-    - lb_vip in lb_ips
-
-- name: Setup HAProxy
-  block:
-    - name: Ensure HAProxy is installed
-      package:
-        name: haproxy
-        state: present
-
-    - name: Configure HAProxy
-      copy:
-        src: ../../config/haproxy/haproxy.cfg
-        dest: /etc/haproxy/haproxy.cfg
-        owner: root
-        group: root
-        mode: 0644
-      notify:
-        - Restart HAProxy
-
-    - name: Start and enable HAProxy
-      service:
-        name: haproxy
-        state: started
-        enabled: true
-
+- name: Setup Keepalived
+  include_tasks: configure_haproxy.yaml

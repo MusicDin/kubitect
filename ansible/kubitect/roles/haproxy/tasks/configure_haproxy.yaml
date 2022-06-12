@@ -1,0 +1,24 @@
+---
+- name: Ensure HAProxy is installed
+  package:
+    name: haproxy
+    state: present
+
+- name: Create HAProxy config
+  vars:
+    control_plane_instances: "{{ infra.cluster.nodes.master.instances }}"
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: 0644
+    lstrip_blocks: true
+  notify:
+    - Restart HAProxy
+
+- name: Start and enable HAProxy
+  service:
+    name: haproxy
+    state: started
+    enabled: true

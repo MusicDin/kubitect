@@ -2,4 +2,6 @@
   hosts: haproxy
   gather_facts: false
   roles:
+    - role: config/cluster/import
+    - role: config/infra/import
     - role: haproxy

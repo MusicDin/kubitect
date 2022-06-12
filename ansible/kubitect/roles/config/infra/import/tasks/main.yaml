@@ -1,0 +1,5 @@
+---
+- name: Include infrastructure config (tf output)
+  include_vars:
+    file: "{{ config_dir }}/infrastructure.yaml"
+    name: infra

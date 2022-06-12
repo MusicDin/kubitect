@@ -1,3 +1,7 @@
+
+{% set cfg_lbs = config.cluster.nodes.loadBalancer.instances | default([]) %}
+{% set cfg_masters = config.cluster.nodes.master.instances | default([]) %}
+{% set cfg_workers = config.cluster.nodes.worker.instances | default([]) %}
 {% set def_master_labels = config.cluster.nodes.master.default.labels | default({}) %}
 {% set def_worker_labels = config.cluster.nodes.worker.default.labels | default({}) %}
 all:
@@ -5,30 +9,40 @@ all:
   {# Load balancers #}
   {% if infra.cluster.nodes.loadBalancer.instances is defined %}
     {% for lb in infra.cluster.nodes.loadBalancer.instances %}
+    {% set cfg_lb = cfg_lbs | selectattr("id", "equalto", lb.id) | first %}
     {{ lb.name }}:
       ansible_host: {{ lb.ip }}
+      {% if cfg_lb.priority is defined %}
+      priority: {{ cfg_lb.priority }}
+      {% endif %}
     {% endfor %}
   {% endif %}
   {# Master nodes #}
   {% for master in infra.cluster.nodes.master.instances %}
+  {% set cfg_master = cfg_masters | selectattr("id", "equalto", master.id) | first %}
     {{ master.name }}: 
       ansible_host: {{ master.ip }}
+      {% set labels = def_master_labels | combine(cfg_master.labels | default({})) %}
+      {% if labels.items() | length > 0 %}
       node_labels:
-      {% set labels = def_master_labels | combine(master.labels | default({})) %}
-      {% for key, value in labels.items() %}
-        {{ key }}: {{ value if value else '""' }}
-      {% endfor %}
+        {% for key, value in labels.items() %}
+        {{ key }}: {{ value }}
+        {% endfor %}
+      {% endif %}
   {% endfor %}
   {# Worker nodes #}
   {% if infra.cluster.nodes.worker.instances is defined %}
     {% for worker in infra.cluster.nodes.worker.instances %}
+    {% set cfg_worker = cfg_workers | selectattr("id", "equalto", worker.id) | first %}
     {{ worker.name }}:
       ansible_host: {{ worker.ip }}
+      {% set labels = def_worker_labels | combine(cfg_worker.labels | default({})) %}
+      {% if labels.items() | length > 0 %}
       node_labels:
-      {% set labels = def_worker_labels | combine(worker.labels | default({})) %}
-      {% for key, value in labels.items() %}
-        {{ key }}: {{ value if value else '""' }}
-      {% endfor %}
+        {% for key, value in labels.items() %}
+        {{ key }}: {{ value }}
+        {% endfor %}
+      {% endif %}
     {% endfor %}
   {% endif %}
   children:

@@ -11,5 +11,5 @@
   any_errors_fatal: true
   become: false
   roles:
-    - role: cluster-config/import
+    - role: config/cluster/import
     - role: kubeconfig/copy

@@ -3,6 +3,7 @@
   gather_facts: false
   any_errors_fatal: true
   roles:
-    - role: cluster-config/import
+    - role: config/cluster/import
+    - role: config/infra/import
     - role: generate/configs
     - role: kubespray-clone

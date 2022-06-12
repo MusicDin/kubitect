@@ -1,0 +1,5 @@
+- name: Configure HAProxy nodes
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - role: test
