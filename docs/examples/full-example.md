@@ -12,7 +12,7 @@
 #
 kubitect:
   url: "https://github.com/MusicDin/kubitect" # (1)
-  version: "v2.0.5"
+  version: "v2.1.0"
 
 #
 # The "hosts" section contains data about the physical servers on which 
