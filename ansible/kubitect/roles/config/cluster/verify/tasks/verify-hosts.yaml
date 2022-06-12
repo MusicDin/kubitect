@@ -22,6 +22,15 @@
   when:
     - item.name is not defined
 
+- name: Fail if cluster name is invalid
+  fail:
+    msg: |
+      One of the hosts has invalid 'name' ({{ item.name }}).
+      The host name can contain only characters [a-Z], numbers [0-9], underscores [_] and hyphens [-].
+  loop: "{{ config.hosts }}"
+  when:
+    - item.name is not regex( regex.names_normal )
+
 - name: Fail if hosts names are not unique
   vars:
     hosts_count: "{{ config.hosts | length }}"

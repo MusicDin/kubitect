@@ -12,10 +12,10 @@
     - name: Fail if cluster name is invalid
       fail:
         msg: |
-          The value of 'cluster.name' is invalid.
-          The cluster name can contain only characters [a-Z], - and _.
+          The value of 'cluster.name' is invalid ({{ config.cluster.name }}).
+          The cluster name can contain only characters [a-z], numbers [0-9] and hyphens [-].
       when:
-        - config.cluster.name is not regex( "^[a-zA-Z0-9-_]+$" )
+        - config.cluster.name is not regex( regex.names_strict )
 
 # -- Network -- #
 
