@@ -8,4 +8,6 @@
         - "{{ config_path }}"
     - role: config/cluster/import
     - role: config/cluster/verify
-    - role: generate/initial-files
+    - role: generate/inventory/hosts
+    - role: generate/main-tf
+    - role: generate/ssh-keys

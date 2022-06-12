@@ -1,19 +1,4 @@
 ---
-- name: Generate hosts.yaml file containing Kubitect hosts
-  template:
-    src: "{{ templates_dir }}/hosts.yaml.j2"
-    dest: "{{ config_dir }}/hosts.yaml"
-    lstrip_blocks: true
-    mode: 0600
-
-- name: Create main.tf from template file
-  template:
-    src: "{{ templates_dir }}/terraform/main.tf.j2"
-    dest: ../../terraform/main.tf
-    lstrip_blocks: true
-  vars:
-    host_list: "{{ config.hosts }}"
-
 - name: Ensure SSH directory exists
   file:
     path: "{{ config_dir }}/.ssh"
@@ -31,7 +16,6 @@
   register: ssh_pub_key
 
 - name: Generate SSH keys
-  #ignore_errors: true
   openssh_keypair:
     path: "{{ config_dir }}/.ssh/id_rsa"
     type: rsa

@@ -1,0 +1,8 @@
+---
+- name: Create main.tf from template file
+  template:
+    src: main.tf.j2
+    dest: ../../terraform/main.tf
+    lstrip_blocks: true
+  vars:
+    host_list: "{{ config.hosts }}"

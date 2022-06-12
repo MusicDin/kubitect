@@ -199,7 +199,8 @@ module "output" {
   ]
 }
 
-# Creates config file containing evaluated information of the created infrastrucutre #
+# Creates a configuration file that contains evaluated 
+# information about the created infrastructure.
 resource "local_file" "output" {
   content  = replace(yamlencode(module.output), "/((?:^|\n)[\\s-]*)\"([\\w-]+)\":/", "$1$2:")
   filename = var.infra_config_path

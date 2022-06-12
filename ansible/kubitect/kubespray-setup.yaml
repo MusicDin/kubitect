@@ -5,5 +5,5 @@
   roles:
     - role: config/cluster/import
     - role: config/infra/import
-    - role: generate/configs
-    - role: kubespray-clone
+    - role: generate/inventory/nodes
+    - role: kubespray

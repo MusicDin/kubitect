@@ -1,0 +1,6 @@
+---
+- name: Generate cluster's nodes.yaml
+  template:
+    src: nodes.yaml.j2
+    dest: "{{ config_dir }}/nodes.yaml"
+    lstrip_blocks: true

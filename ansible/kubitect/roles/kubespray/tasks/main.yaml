@@ -1,5 +1,14 @@
 ---
-- name: Ensure config directories exist
+- name: Clone Kubespray git project
+  git:
+    repo: "{{ config.kubernetes.kubespray.url }}"
+    version: "{{ config.kubernetes.kubespray.version }}"
+    dest: "{{ kubitect_cluster_path }}/ansible/kubespray"
+    single_branch: yes
+    depth: 1
+    force: yes
+
+- name: Ensure group_vars directories exist
   file:
     path: "{{ item }}"
     state: directory
@@ -10,7 +19,7 @@
 
 - name: Generate Kubespray all.yaml
   template:
-    src: "{{ templates_dir }}/kubespray/all.yaml.j2"
+    src: all.yaml.j2
     dest: "{{ config_dir }}/group_vars/all/all.yaml"
     # Preserve Kubespray variables intact
     variable_start_string: "<<"
@@ -18,7 +27,7 @@
 
 - name: Generate Kubespray k8s_cluster.yaml
   template:
-    src: "{{ templates_dir }}/kubespray/k8s_cluster.yaml.j2"
+    src: k8s_cluster.yaml.j2
     dest: "{{ config_dir }}/group_vars/k8s_cluster/k8s_cluster.yaml"
     # Preserve Kubespray variables intact
     variable_start_string: "<<"
@@ -28,12 +37,6 @@
 
 - name: Generate Kubespray etcd.yaml
   template:
-    src: "{{ templates_dir }}/kubespray/etcd.yaml.j2"
+    src: etcd.yaml.j2
     dest: "{{ config_dir }}/group_vars/etcd.yaml"
     #dest: {{ config_dir }}/group_vars/all/etcd.yaml
-
-- name: Generate cluster's nodes.yaml
-  template:
-    src: "{{ templates_dir }}/kubespray/nodes.yaml.j2"
-    dest: "{{ config_dir }}/nodes.yaml"
-    lstrip_blocks: true
