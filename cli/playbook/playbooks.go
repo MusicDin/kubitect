@@ -111,6 +111,10 @@ func KubitectFinalize(sshUser string, sshPKey string) error {
 // load balancers.
 func HAProxySetup(sshUser string, sshPKey string) error {
 
+	extravars := []string{
+		"kubitect_cluster_path=" + env.ClusterPath,
+	}
+
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Main,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubitect/haproxy.yaml"),
@@ -119,6 +123,7 @@ func HAProxySetup(sshUser string, sshPKey string) error {
 		User:         sshUser,
 		PrivateKey:   sshPKey,
 		Timeout:      3000,
+		Extravars:    extravars,
 	})
 
 	if err != nil {
