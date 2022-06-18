@@ -107,16 +107,22 @@ variable "vm_id" {
 variable "vm_cpu" {
   type        = number
   description = "The number of vCPU allocated to the virtual machine"
+  default     = 2
+  nullable    = false
 }
 
 variable "vm_ram" {
   type        = number
   description = "The amount of RAM allocated to the virtual machine"
+  default     = 4
+  nullable    = false
 }
 
 variable "vm_main_disk_size" {
   type        = number
   description = "The amount of main (os) disk (in GiB) allocated to the virtual machine"
+  default     = 32
+  nullable    = false
 }
 
 variable "vm_data_disks" {

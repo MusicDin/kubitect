@@ -134,22 +134,16 @@ variable "cluster_nodes_loadBalancer_vip" {
 variable "cluster_nodes_loadBalancer_default_cpu" {
   type        = number
   description = "The default number of vCPU allocated to the HAProxy load balancer."
-  default     = 1
-  nullable    = false
 }
 
 variable "cluster_nodes_loadBalancer_default_ram" {
   type        = number
   description = "The default amount of RAM (in GiB) allocated to the HAProxy load balancer."
-  default     = 4
-  nullable    = false
 }
 
 variable "cluster_nodes_loadBalancer_default_mainDiskSize" {
   type        = number
   description = "Size of the main disk (in GiB) that is attached to the HAProxy load balancer."
-  default     = 16
-  nullable    = false
 }
 
 variable "cluster_nodes_loadBalancer_instances" {
@@ -172,22 +166,16 @@ variable "cluster_nodes_loadBalancer_instances" {
 variable "cluster_nodes_master_default_cpu" {
   type        = number
   description = "The default number of vCPU allocated to the master node."
-  default     = 1
-  nullable    = false
 }
 
 variable "cluster_nodes_master_default_ram" {
   type        = number
   description = "The default amount of RAM (in GiB) allocated to the master node."
-  default     = 4
-  nullable    = false
 }
 
 variable "cluster_nodes_master_default_mainDiskSize" {
   type        = number
   description = "Size of the main disk (in GiB) that is attached to the master node."
-  default     = 16
-  nullable    = false
 }
 
 variable "cluster_nodes_master_default_dataDisks" {
@@ -226,22 +214,16 @@ variable "cluster_nodes_master_instances" {
 variable "cluster_nodes_worker_default_cpu" {
   type        = number
   description = "The default number of vCPU allocated to the worker node."
-  default     = 2
-  nullable    = false
 }
 
 variable "cluster_nodes_worker_default_ram" {
   type        = number
   description = "The default amount of RAM (in GiB) allocated to the worker node."
-  default     = 8
-  nullable    = false
 }
 
 variable "cluster_nodes_worker_default_mainDiskSize" {
   type        = number
   description = "Size of the main disk (in GiB) that is attached to the worker node."
-  default     = 32
-  nullable    = false
 }
 
 variable "cluster_nodes_worker_default_dataDisks" {
