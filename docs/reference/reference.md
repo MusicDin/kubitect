@@ -63,20 +63,33 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <th>Description</th>
     </tr>
     <tr>
-      <td><code>hosts[*].name</code></td>
+      <td><code>hosts[*].connection.ip</code></td>
       <td>string</td>
       <td></td>
-      <td>Yes</td>
-      <td>Custom server name used to link nodes with physical hosts.</td>
+      <td>Yes, if <code>connection.type</code> is set to <code>remote</code></td>
+      <td>IP address is used to SSH into the remote machine.</td>
     </tr>
     <tr>
-      <td><code>hosts[*].default</code></td>
+      <td><code>hosts[*].connection.ssh.keyfile</code></td>
       <td>string</td>
+      <td>~/.ssh/id_rsa</td>
+      <td></td>
+      <td>Path to the keyfile that is used to SSH into the remote machine</td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].connection.ssh.port</code></td>
+      <td>number</td>
+      <td>22</td>
+      <td></td>
+      <td>The port number of SSH protocol for remote machine.</td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].connection.ssh.verify</code></td>
+      <td>boolean</td>
       <td>false</td>
       <td></td>
       <td>
-        Nodes where host is not specified will be installed on default host. 
-        The first host in the list is used as a default host if none is marked as a default.
+        If true, the SSH host is verified, which means that the host must be present in the known SSH hosts.
       </td>
     </tr>
     <tr>
@@ -99,43 +112,6 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>Username is used to SSH into the remote machine.</td>
     </tr>
     <tr>
-      <td><code>hosts[*].connection.ip</code></td>
-      <td>string</td>
-      <td></td>
-      <td>Yes, if <code>connection.type</code> is set to <code>remote</code></td>
-      <td>IP address is used to SSH into the remote machine.</td>
-    </tr>
-    <tr>
-      <td><code>hosts[*].connection.ssh.port</code></td>
-      <td>number</td>
-      <td>22</td>
-      <td></td>
-      <td>The port number of SSH protocol for remote machine.</td>
-    </tr>
-    <tr>
-      <td><code>hosts[*].connection.ssh.keyfile</code></td>
-      <td>string</td>
-      <td>~/.ssh/id_rsa</td>
-      <td></td>
-      <td>Path to the keyfile that is used to SSH into the remote machine</td>
-    </tr>
-    <tr>
-      <td><code>hosts[*].connection.ssh.verify</code></td>
-      <td>boolean</td>
-      <td>false</td>
-      <td></td>
-      <td>
-        If true, the SSH host is verified, which means that the host must be present in the known SSH hosts.
-      </td>
-    </tr>
-    <tr>
-      <td><code>hosts[*].mainResourcePoolPath</code></td>
-      <td>string</td>
-      <td>/var/lib/libvirt/pools/</td>
-      <td></td>
-      <td>Path to the resource pool used for main virtual machine volumes.</td>
-    </tr>
-    <tr>
       <td><code>hosts[*].dataResourcePools[*].name</code></td>
       <td>string</td>
       <td></td>
@@ -151,6 +127,30 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td></td>
       <td></td>
       <td>Host path to the location where data resource pool is created.</td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].default</code></td>
+      <td>string</td>
+      <td>false</td>
+      <td></td>
+      <td>
+        Nodes where host is not specified will be installed on default host. 
+        The first host in the list is used as a default host if none is marked as a default.
+      </td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].name</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes</td>
+      <td>Custom server name used to link nodes with physical hosts.</td>
+    </tr>
+    <tr>
+      <td><code>hosts[*].mainResourcePoolPath</code></td>
+      <td>string</td>
+      <td>/var/lib/libvirt/pools/</td>
+      <td></td>
+      <td>Path to the resource pool used for main virtual machine volumes.</td>
     </tr>
   </tbody>
 </table>
@@ -174,18 +174,15 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>Yes</td>
       <td>Custom cluster name that is used as a prefix for various cluster components.</td>
     </tr>
+    <!-- Cluster network -->
     <tr>
-      <td><code>cluster.network.mode</code></td>
+      <td><code>cluster.network.bridge</code></td>
       <td>string</td>
-      <td>nat</td>
-      <td>Yes</td>
+      <td>virbr0</td>
+      <td></td>
       <td>
-        Network mode. Possible values are:
-        <ul>
-          <li><code>nat</code> - Creates virtual local network.</li>
-          <li><code>bridge</code> - Uses preconfigured bridge interface on the machine (Only bridge mode supports multiple hosts).</li>
-          <li><code>route</code> - Creates virtual local network, but does not apply NAT.</li>
-        </ul>
+        By default virbr0 is set as a name of virtual bridge.
+        In case network mode is set to bridge, name of the preconfigured bridge needs to be set here.
       </td>
     </tr>
     <tr>
@@ -207,108 +204,33 @@ Each configuration property is documented with 5 columns: Property name, descrip
       </td>
     </tr>
     <tr>
-      <td><code>cluster.network.bridge</code></td>
+      <td><code>cluster.network.mode</code></td>
       <td>string</td>
-      <td>virbr0</td>
-      <td></td>
+      <td>nat</td>
+      <td>Yes</td>
       <td>
-        By default virbr0 is set as a name of virtual bridge.
-        In case network mode is set to bridge, name of the preconfigured bridge needs to be set here.
-      </td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodeTemplate.user</code></td>
-      <td>string</td>
-      <td>k8s</td>
-      <td></td>
-      <td>User created on each virtual machine.</td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodeTemplate.ssh.privateKeyPath</code></td>
-      <td>string</td>
-      <td></td>
-      <td></td>
-      <td>
-        Path to private key that is later used to SSH into each virtual machine.
-        On the same path with <code>.pub</code> prefix needs to be present public key.
-        If this value is not set, SSH key will be generated in <code>./config/.ssh/</code> directory.
-      </td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodeTemplate.ssh.addToKnownHosts</code></td>
-      <td>boolean</td>
-      <td>true</td>
-      <td></td>
-      <td>
-        If set to true, each virtual machine will be added to the known hosts on the machine where the project is being run.
-        Note that all machines will also be removed from known hosts when destroying the cluster.
-      </td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodeTemplate.os.distro</code></td>
-      <td>string</td>
-      <td>ubuntu</td>
-      <td></td>
-      <td>
-        Set OS distribution. Possible values are:
+        Network mode. Possible values are:
         <ul>
-          <li><code>ubuntu</code></li>
-          <li><code>debian</code></li>
-          <li>
-            <code>custom</code> - For all other distros
-            <i>(for development only)</i>
-          </li>
+          <li><code>nat</code> - Creates virtual local network.</li>
+          <li><code>bridge</code> - Uses preconfigured bridge interface on the machine (Only bridge mode supports multiple hosts).</li>
+          <li><code>route</code> - Creates virtual local network, but does not apply NAT.</li>
         </ul>
       </td>
     </tr>
+    <!-- Cluster nodes (loadBalancer) -->
     <tr>
-      <td><code>cluster.nodeTemplate.os.source</code></td>
-      <td>string</td>
-      <td>Depends on <code>os.distro</code></td>
+      <td><code>cluster.nodes.loadBalancer.default.cpu</code></td>
+      <td>number</td>
+      <td>2</td>
       <td></td>
-      <td>
-        Source of an OS image. 
-        It can be either path on a local file system or an URL of the image.
-        By default, the value from distro preset (<i>/terraform/defaults.yaml</i>)isset, but can be overwritten if needed.
-      </td>
+      <td>Default number of vCPU allocated to a load balancer instance.</td>
     </tr>
     <tr>
-      <td><code>cluster.nodeTemplate.os.networkInterface</code></td>
-      <td>string</td>
-      <td>Depends on <code>os.distro</code></td>
+      <td><code>cluster.nodes.loadBalancer.default.mainDiskSize</code></td>
+      <td>number</td>
+      <td>32</td>
       <td></td>
-      <td>
-        Network interface used by virtual machines to connect to the network.
-        Network interface is preconfigured for each OS image (usually ens3 or eth0).
-        By default, the value from distro preset (<i>/terraform/defaults.yaml</i>) is set, but can be overwritten if needed.
-      </td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodeTemplate.dns</code></td>
-      <td>list</td>
-      <td>Value of <code>network.gateway</code></td>
-      <td></td>
-      <td>
-        Custom DNS list used by all created virtual machines.
-        If none is provided, network gateway is used.
-      </td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodeTemplate.updateOnBoot</code></td>
-      <td>boolean</td>
-      <td>true</td>
-      <td></td>
-      <td>If set to true, the operating system will be updated when it boots.</td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.loadBalancer.vip</code></td>
-      <td>string</td>
-      <td></td>
-      <td>Yes, if more then one instance of load balancer is specified.</td>
-      <td>
-        Virtual IP (floating IP) is the static IP used by load balancers to provide a fail-over.
-        Each load balancer still has its own IP beside the shared one.
-      </td>
+      <td>Size of the main disk (in GiB) that is attached to a load balancer instance.</td>
     </tr>
     <tr>
       <td><code>cluster.nodes.loadBalancer.default.ram</code></td>
@@ -318,18 +240,11 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>Default amount of RAM (in GiB) allocated to a load balancer instance.</td>
     </tr>
     <tr>
-      <td><code>cluster.nodes.loadBalancer.default.cpu</code></td>
+      <td><code>cluster.nodes.loadBalancer.instances[*].cpu</code></td>
       <td>number</td>
-      <td>1</td>
       <td></td>
-      <td>Default number of vCPU allocated to a load balancer instance.</td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.loadBalancer.default.mainDiskSize</code></td>
-      <td>number</td>
-      <td>16</td>
       <td></td>
-      <td>Size of the main disk (in GiB) that is attached to a load balancer instance.</td>
+      <td>Overrides a default value for that specific instance.</td>
     </tr>
     <tr>
       <td><code>cluster.nodes.loadBalancer.instances[*].id</code></td>
@@ -338,17 +253,6 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>Yes</td>
       <td>
         Unique numeric identifier of a load balancer instance.
-      </td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.loadBalancer.instances[*].priority</code></td>
-      <td>number</td>
-      <td>10</td>
-      <td></td>
-      <td>
-        Keepalived priority of the load balancer.
-        A load balancer with the highest priority becomes the leader (active). 
-        The priority can be set to any number between 0 and 255.
       </td>
     </tr>
     <tr>
@@ -369,20 +273,6 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>MAC used by the instance. If it is not set, it will be generated.</td>
     </tr>
     <tr>
-      <td><code>cluster.nodes.loadBalancer.instances[*].ram</code></td>
-      <td>number</td>
-      <td></td>
-      <td></td>
-      <td>Overrides a default value for the RAM for that instance.</td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.loadBalancer.instances[*].cpu</code></td>
-      <td>number</td>
-      <td></td>
-      <td></td>
-      <td>Overrides a default value for that specific instance.</td>
-    </tr>
-    <tr>
       <td><code>cluster.nodes.loadBalancer.instances[*].mainDiskSize</code></td>
       <td>number</td>
       <td></td>
@@ -390,25 +280,40 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>Overrides a default value for that specific instance.</td>
     </tr>
     <tr>
-      <td><code>cluster.nodes.master.default.ram</code></td>
+      <td><code>cluster.nodes.loadBalancer.instances[*].priority</code></td>
       <td>number</td>
-      <td>4</td>
+      <td>10</td>
       <td></td>
-      <td>Default amount of RAM (in GiB) allocated to a master node.</td>
+      <td>
+        Keepalived priority of the load balancer.
+        A load balancer with the highest priority becomes the leader (active). 
+        The priority can be set to any number between 0 and 255.
+      </td>
     </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.instances[*].ram</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for the RAM for that instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.vip</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes, if more then one instance of load balancer is specified.</td>
+      <td>
+        Virtual IP (floating IP) is the static IP used by load balancers to provide a fail-over.
+        Each load balancer still has its own IP beside the shared one.
+      </td>
+    </tr>
+    <!-- Cluster nodes (master) -->
     <tr>
       <td><code>cluster.nodes.master.default.cpu</code></td>
       <td>number</td>
-      <td>1</td>
+      <td>2</td>
       <td></td>
       <td>Default number of vCPU allocated to a master node.</td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.master.default.mainDiskSize</code></td>
-      <td>number</td>
-      <td>16</td>
-      <td></td>
-      <td>Size of the main disk (in GiB) that is attached to a master node.</td>
     </tr>
     <tr>
       <td><code>cluster.nodes.master.default.labels</code></td>
@@ -420,45 +325,21 @@ Each configuration property is documented with 5 columns: Property name, descrip
       </td>
     </tr>
     <tr>
-      <td><code>cluster.nodes.master.instances[*].id</code></td>
+      <td><code>cluster.nodes.master.default.mainDiskSize</code></td>
       <td>number</td>
+      <td>32</td>
       <td></td>
-      <td>Yes</td>
-      <td>Unique numeric identifier of a master node.</td>
+      <td>Size of the main disk (in GiB) that is attached to a master node.</td>
     </tr>
     <tr>
-      <td><code>cluster.nodes.master.instances[*].ip</code></td>
-      <td>string</td>
-      <td></td>
-      <td></td>
-      <td>
-        If an IP is set for an instance then the instance will use it as a static IP.
-        Otherwise it will try to request an IP from a DHCP server.
-      </td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.master.instances[*].mac</code></td>
-      <td>string</td>
-      <td></td>
-      <td></td>
-      <td>MAC used by the instance. If it is not set, it will be generated.</td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.master.instances[*].ram</code></td>
+      <td><code>cluster.nodes.master.default.ram</code></td>
       <td>number</td>
+      <td>4</td>
       <td></td>
-      <td></td>
-      <td>Overrides a default value for the RAM for that instance.</td>
+      <td>Default amount of RAM (in GiB) allocated to a master node.</td>
     </tr>
     <tr>
       <td><code>cluster.nodes.master.instances[*].cpu</code></td>
-      <td>number</td>
-      <td></td>
-      <td></td>
-      <td>Overrides a default value for that specific instance.</td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.master.instances[*].mainDiskSize</code></td>
       <td>number</td>
       <td></td>
       <td></td>
@@ -491,51 +372,14 @@ Each configuration property is documented with 5 columns: Property name, descrip
       </td>
     </tr>
     <tr>
-      <td><code>cluster.nodes.master.instances[*].labels</code></td>
-      <td>dictionary</td>
-      <td></td>
-      <td></td>
-      <td>
-        Array of node labels that are applied to this specific master node.
-      </td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.worker.default.ram</code></td>
-      <td>number</td>
-      <td>8</td>
-      <td></td>
-      <td>Default amount of RAM (in GiB) allocated to a worker node.</td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.worker.default.cpu</code></td>
-      <td>number</td>
-      <td>2</td>
-      <td></td>
-      <td>Default number of vCPU allocated to a worker node.</td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.worker.default.mainDiskSize</code></td>
-      <td>number</td>
-      <td>32</td>
-      <td></td>
-      <td>Size of the main disk (in GiB) that is attached to a worker node.</td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.worker.default.labels</code></td>
-      <td>dictionary</td>
-      <td></td>
-      <td></td>
-      <td>Array of default node labels that are applied to all worker nodes.</td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.worker.instances[*].id</code></td>
+      <td><code>cluster.nodes.master.instances[*].id</code></td>
       <td>number</td>
       <td></td>
       <td>Yes</td>
-      <td>Unique numeric identifier of a worker node.</td>
+      <td>Unique numeric identifier of a master node.</td>
     </tr>
     <tr>
-      <td><code>cluster.nodes.worker.instances[*].ip</code></td>
+      <td><code>cluster.nodes.master.instances[*].ip</code></td>
       <td>string</td>
       <td></td>
       <td></td>
@@ -545,28 +389,66 @@ Each configuration property is documented with 5 columns: Property name, descrip
       </td>
     </tr>
     <tr>
-      <td><code>cluster.nodes.worker.instances[*].mac</code></td>
+      <td><code>cluster.nodes.master.instances[*].labels</code></td>
+      <td>dictionary</td>
+      <td></td>
+      <td></td>
+      <td>
+        Array of node labels that are applied to this specific master node.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.instances[*].mac</code></td>
       <td>string</td>
       <td></td>
       <td></td>
       <td>MAC used by the instance. If it is not set, it will be generated.</td>
     </tr>
     <tr>
-      <td><code>cluster.nodes.worker.instances[*].ram</code></td>
-      <td>number</td>
-      <td></td>
-      <td></td>
-      <td>Overrides a default value for the RAM for that instance.</td>
-    </tr>
-    <tr>
-      <td><code>cluster.nodes.worker.instances[*].cpu</code></td>
+      <td><code>cluster.nodes.master.instances[*].mainDiskSize</code></td>
       <td>number</td>
       <td></td>
       <td></td>
       <td>Overrides a default value for that specific instance.</td>
     </tr>
     <tr>
-      <td><code>cluster.nodes.worker.instances[*].mainDiskSize</code></td>
+      <td><code>cluster.nodes.master.instances[*].ram</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for the RAM for that instance.</td>
+    </tr>
+    <!-- Cluster nodes (worker) -->
+    <tr>
+      <td><code>cluster.nodes.worker.default.cpu</code></td>
+      <td>number</td>
+      <td>2</td>
+      <td></td>
+      <td>Default number of vCPU allocated to a worker node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.default.labels</code></td>
+      <td>dictionary</td>
+      <td></td>
+      <td></td>
+      <td>Array of default node labels that are applied to all worker nodes.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.default.mainDiskSize</code></td>
+      <td>number</td>
+      <td>32</td>
+      <td></td>
+      <td>Size of the main disk (in GiB) that is attached to a worker node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.default.ram</code></td>
+      <td>number</td>
+      <td>4</td>
+      <td></td>
+      <td>Default amount of RAM (in GiB) allocated to a worker node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].cpu</code></td>
       <td>number</td>
       <td></td>
       <td></td>
@@ -599,6 +481,23 @@ Each configuration property is documented with 5 columns: Property name, descrip
       </td>
     </tr>
     <tr>
+      <td><code>cluster.nodes.worker.instances[*].id</code></td>
+      <td>number</td>
+      <td></td>
+      <td>Yes</td>
+      <td>Unique numeric identifier of a worker node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].ip</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        If an IP is set for an instance then the instance will use it as a static IP.
+        Otherwise it will try to request an IP from a DHCP server.
+      </td>
+    </tr>
+    <tr>
       <td><code>cluster.nodes.worker.instances[*].labels</code></td>
       <td>dictionary</td>
       <td></td>
@@ -606,6 +505,112 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>
         Array of node labels that are applied to this specific worker node.
       </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].mac</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>MAC used by the instance. If it is not set, it will be generated.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].mainDiskSize</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for that specific instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].ram</code></td>
+      <td>number</td>
+      <td></td>
+      <td></td>
+      <td>Overrides a default value for the RAM for that instance.</td>
+    </tr>
+    <!-- Cluster node template -->
+    <tr>
+      <td><code>cluster.nodeTemplate.dns</code></td>
+      <td>list</td>
+      <td>Value of <code>network.gateway</code></td>
+      <td></td>
+      <td>
+        Custom DNS list used by all created virtual machines.
+        If none is provided, network gateway is used.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.os.distro</code></td>
+      <td>string</td>
+      <td>ubuntu</td>
+      <td></td>
+      <td>
+        Set OS distribution. Possible values are:
+        <ul>
+          <li><code>ubuntu</code></li>
+          <li><code>debian</code></li>
+          <li>
+            <code>custom</code> - For all other distros
+            <i>(for development only)</i>
+          </li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.os.networkInterface</code></td>
+      <td>string</td>
+      <td>Depends on <code>os.distro</code></td>
+      <td></td>
+      <td>
+        Network interface used by virtual machines to connect to the network.
+        Network interface is preconfigured for each OS image (usually ens3 or eth0).
+        By default, the value from distro preset (<i>/terraform/defaults.yaml</i>) is set, but can be overwritten if needed.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.os.source</code></td>
+      <td>string</td>
+      <td>Depends on <code>os.distro</code></td>
+      <td></td>
+      <td>
+        Source of an OS image. 
+        It can be either path on a local file system or an URL of the image.
+        By default, the value from distro preset (<i>/terraform/defaults.yaml</i>)isset, but can be overwritten if needed.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.ssh.addToKnownHosts</code></td>
+      <td>boolean</td>
+      <td>true</td>
+      <td></td>
+      <td>
+        If set to true, each virtual machine will be added to the known hosts on the machine where the project is being run.
+        Note that all machines will also be removed from known hosts when destroying the cluster.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.ssh.privateKeyPath</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        Path to private key that is later used to SSH into each virtual machine.
+        On the same path with <code>.pub</code> prefix needs to be present public key.
+        If this value is not set, SSH key will be generated in <code>./config/.ssh/</code> directory.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.updateOnBoot</code></td>
+      <td>boolean</td>
+      <td>true</td>
+      <td></td>
+      <td>If set to true, the operating system will be updated when it boots.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodeTemplate.user</code></td>
+      <td>string</td>
+      <td>k8s</td>
+      <td></td>
+      <td>User created on each virtual machine.</td>
     </tr>
   </tbody>
 </table>
@@ -622,30 +627,6 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <th>Default value</th>
       <th>Required?</th>
       <th>Description</th>
-    </tr>
-    <tr>
-      <td><code>kubernetes.version</code></td>
-      <td>string</td>
-      <td></td>
-      <td>Yes</td>
-      <td>Kubernetes version that will be installed.</td>
-    </tr>
-    <tr>
-      <td><code>kubernetes.networkPlugin</code></td>
-      <td>string</td>
-      <td>calico</td>
-      <td></td>
-      <td>
-        Network plugin used within a Kubernetes cluster. Possible values are: 
-        <ul>
-          <li><code>flannel</code></li>
-          <li><code>weave</code></li>
-          <li><code>calico</code></li>
-          <li><code>cilium</code></li>
-          <li><code>canal</code></li>
-          <li><code>kube-router</code></li>
-        </ul>
-      </td>
     </tr>
     <tr>
       <td><code>kubernetes.dnsMode</code></td>
@@ -678,6 +659,23 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>Kubespray version. Version is used to checkout into appropriate branch.</td>
     </tr>
     <tr>
+      <td><code>kubernetes.networkPlugin</code></td>
+      <td>string</td>
+      <td>calico</td>
+      <td></td>
+      <td>
+        Network plugin used within a Kubernetes cluster. Possible values are: 
+        <ul>
+          <li><code>flannel</code></li>
+          <li><code>weave</code></li>
+          <li><code>calico</code></li>
+          <li><code>cilium</code></li>
+          <li><code>canal</code></li>
+          <li><code>kube-router</code></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
       <td><code>kubernetes.other.copyKubeconfig</code></td>
       <td>boolean</td>
       <td>false</td>
@@ -686,6 +684,13 @@ Each configuration property is documented with 5 columns: Property name, descrip
         When this property is set to true, the kubeconfig of a new cluster is copied to the <code>~/.kube/config</code>.
         Please note that setting this property to true may cause the existing file at the destination to be overwritten.
       </td>
+    </tr>
+    <tr>
+      <td><code>kubernetes.version</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes</td>
+      <td>Kubernetes version that will be installed.</td>
     </tr>
   </tbody>
 </table>
