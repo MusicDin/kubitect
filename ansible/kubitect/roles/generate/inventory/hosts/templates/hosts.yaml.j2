@@ -21,6 +21,6 @@ all:
       hosts:
       {% if config.hosts is defined %}
       {% for host in config.hosts %}
-        {{ host.name }}
+        {{ host.name }}:
       {% endfor %}
       {% endif %}
