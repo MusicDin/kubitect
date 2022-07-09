@@ -4,6 +4,7 @@
 {% set cfg_workers = config.cluster.nodes.worker.instances | default([]) %}
 {% set def_master_labels = config.cluster.nodes.master.default.labels | default({}) %}
 {% set def_worker_labels = config.cluster.nodes.worker.default.labels | default({}) %}
+{% set def_worker_taints = config.cluster.nodes.worker.default.taints | default([]) %}
 all:
   hosts:
   {# Load balancers #}
@@ -41,6 +42,13 @@ all:
       node_labels:
         {% for key, value in labels.items() %}
         {{ key }}: {{ value }}
+        {% endfor %}
+      {% endif %}
+      {% set taints = def_worker_taints + (cfg_worker.taints | default([])) %}
+      {% if taints | length > 0 %}
+      node_taints:
+        {% for value in taints %}
+        - "{{ value }}"
         {% endfor %}
       {% endif %}
     {% endfor %}
