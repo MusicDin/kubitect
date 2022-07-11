@@ -55,7 +55,6 @@ variable "cluster_name" {
 variable "cluster_nodeTemplate_user" {
   type        = string
   description = "Username used to SSH to the virtual machines."
-  default     = "k8s"
   nullable    = false
 }
 

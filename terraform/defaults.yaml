@@ -5,6 +5,7 @@
 #
 ---
 default:
+  user: k8s
   distro: ubuntu
   ssh:
     privateKeyPath: "../config/.ssh/id_rsa"

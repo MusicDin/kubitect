@@ -75,6 +75,15 @@
       
 # -- Node template -- #
 
+- name: Verify user
+  fail:
+    msg: |
+      The value of 'cluster.nodeTemplate.user' is invalid!
+      User cannot be an empty string.
+  when:
+    - config.cluster.nodeTemplate.user is defined
+    - (config.cluster.nodeTemplate.user is none) or (config.cluster.nodeTemplate.user | length == 0)
+
 - name: Verify node template OS properties.
   block:
     - name: Fail if OS distro is invalid

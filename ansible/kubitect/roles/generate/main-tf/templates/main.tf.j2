@@ -91,7 +91,7 @@ module "host_{{ host.name }}" {
 
   # Cluster name and node template
   cluster_name                             = try(local.config.cluster.name, null)
-  cluster_nodeTemplate_user                = try(local.config.cluster.nodeTemplate.user, null)
+  cluster_nodeTemplate_user                = module.base.user
   cluster_nodeTemplate_ssh_privateKeyPath  = module.base.ssh.privateKeyPath
   cluster_nodeTemplate_ssh_addToKnownHosts = try(local.config.cluster.nodeTemplate.ssh.addToKnownHosts, null)
   cluster_nodeTemplate_dns                 = try(local.config.cluster.nodeTemplate.dns, null)
@@ -162,7 +162,7 @@ module "output" {
   source = "./modules/output"
 
   # VM variables #
-  vm_user = try(local.config.cluster.nodeTemplate.user, null)
+  vm_user = module.base.user
   vm_ssh  = module.base.ssh
   vm_os   = module.base.os
   lb_vip  = try(local.config.cluster.nodes.loadBalancer.vip, null)

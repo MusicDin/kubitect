@@ -4,6 +4,13 @@
 
 locals {
 
+  # VM user
+  user = (
+    try(var.config.cluster.nodeTemplate.user, null) != null
+    ? var.config.cluster.nodeTemplate.user
+    : var.defaults_config.default.user
+  )
+
   # Precedence: kubitect.yaml > infrastructure.yaml > defaults.yaml
   # Note: Cannot be part of locals.distro, as distro section is then "self-referencing"
   os_distro = (
