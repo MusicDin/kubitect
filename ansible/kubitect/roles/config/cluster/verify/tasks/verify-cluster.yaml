@@ -123,6 +123,7 @@
           when:            
             - config.cluster.nodeTemplate.os.networkInterface is not defined
       when:
+        - config.cluster.nodeTemplate.os.distro is defined
         - config.cluster.nodeTemplate.os.distro == 'custom'
 
 - name: Verify node template SSH keys exist

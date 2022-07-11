@@ -102,7 +102,6 @@ variable "cluster_nodeTemplate_updateOnBoot" {
 variable "cluster_network_mode" {
   type        = string
   description = "Network mode."
-  default     = "nat"
   nullable    = false
 }
 
