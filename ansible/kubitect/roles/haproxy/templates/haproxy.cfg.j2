@@ -45,3 +45,25 @@ backend kubernetes-control-plane
         {% for master in control_plane_instances %}
         server {{ master.name }} {{ master.ip }}:6443 check fall 3 rise 2
         {% endfor %}
+
+{% for fport in forward_ports %}
+frontend forward-{{ fport.name }}
+        bind *:{{ fport.srcPort }}
+        option tcplog
+        mode tcp
+        default_backend forward-{{ fport.name }}
+
+backend forward-{{ fport.name }}
+        mode tcp
+        balance roundrobin
+        {% if infra.cluster.nodes.worker.instances | default([]) | length > 0 %}
+        {% for worker in worker_instances %}
+        server {{ worker.name }} {{ worker.ip }}:{{ fport.dstPort }} check
+        {% endfor %}
+        {% else %}
+        {% for master in control_plane_instances %}
+        server {{ master.name }} {{ master.ip }}:{{ fport.dstPort }} check
+        {% endfor %}
+        {% endif %}
+
+{% endfor %}

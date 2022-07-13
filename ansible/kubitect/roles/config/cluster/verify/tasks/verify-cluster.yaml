@@ -219,7 +219,7 @@
     - name: Fail if more then 1 LB is configured and VIP is not defined
       fail:
         msg: |
-          The value  'cluster.nodes.loadBalancer.vip' in undefined!
+          The value 'cluster.nodes.loadBalancer.vip' in undefined!
           When more then 1 load balancer is configured, a virtual/floating IP 
           for the load balancers needs to be configured.
       when:
@@ -238,6 +238,60 @@
         - not config.cluster.network.cidr | ansible.utils.network_in_usable( config.cluster.nodes.loadBalancer.vip ) 
   when:
     - config.cluster.nodes.loadBalancer.instances | default(none)
+
+- name: Verify load balancer port forwarding
+  vars:
+    forwardPorts: "{{ config.cluster.nodes.loadBalancer.forwardPorts if config.cluster.nodes.loadBalancer.forwardPorts | default(none) else [] }}" 
+  block: 
+    - name: Fail if port name is invalid
+      fail:
+        msg: |
+          The value 'cluster.nodes.loadBalancer.forwardPorts' has a port with an invalid name ({{ item.name | default(none) }})!
+          Each port must have a 'name' property defined.
+          Port name must be a non-empty string that can contain characters [a-z], numbers [0-9] and hyphens [-].
+      loop: "{{ forwardPorts }}"
+      when:
+        - not item.name | default(none) or item.name is not regex( regex.names_strict )
+
+    - name: Fail if port names are unique
+      fail:
+        msg: |
+          The value 'cluster.nodes.loadBalancer.forwardPorts' has multiple ports with the same name ({{ item }})!
+          Port names must be unique.
+      loop: "{{ forwardPorts | map(attribute='name') | unique }}"
+      when:
+        - forwardPorts | selectattr('name', 'equalto', item) | length > 1
+
+    - name: Fail if source port is invalid
+      fail:
+        msg: |
+          The value 'cluster.nodes.loadBalancer.forwardPorts' has a port with an invalid source port value ({{ item.srcPort | default(none) }})!
+          Each port must have a 'srcPort' property defined.
+          Source port can be any number between 1 and 65353, excluding reserved ports: {{ reserved_ports }}.
+      loop: "{{ forwardPorts }}"
+      when:
+        - (not item.srcPort | default(none)) or (item.srcPort is not regex( regex.non_negative_number )) or (item.srcPort < 1) or (item.srcPort > 65353) or (item.srcPort in reserved_ports)
+
+    - name: Fail if source ports are not unique
+      fail:
+        msg: |
+          The value 'cluster.nodes.loadBalancer.forwardPorts' has multiple ports with the same source port value ({{ item }})!
+          Source ports must be unique.
+      loop: "{{ forwardPorts | map(attribute='srcPort') |unique }}"
+      when:
+        - forwardPorts | selectattr('srcPort', 'equalto', item) | length > 1
+
+    - name: Fail if destination port is invalid
+      fail:
+        msg: |
+          The value 'cluster.nodes.loadBalancer.forwardPorts' has a port with an invalid destination port value ({{ item.dstPort | default(none) }})!
+          Each port must have a 'dstPort' property defined.
+          Destination port can be any number between 1 and 65353.
+      loop: "{{ forwardPorts }}"
+      when:
+        - (not item.dstPort | default(none)) or (item.dstPort is not regex( regex.non_negative_number )) or (item.dstPort < 1) or (item.dstPort > 65353)
+  when:
+    - forwardPorts | default(none)
 
 - name: Verify all defined IP and MAC addresses are unique
   vars:

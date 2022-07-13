@@ -21,7 +21,13 @@ valid_dns_modes:
   - coredns
   - kubedns
 
+reserved_ports:
+  - 6443 # K8s API server
+  - 22   # SSH
+
 regex:
+  # Allow non negative number 
+  non_negative_number: "^[0-9]+$"
   # Allow a-z (lower case only), numbers (0-9) and hyphens (-)
   names_strict: "^[a-z0-9-]+$"
   # Allow a-Z, numbers (0-9), underscores (_) and hyphens (-)
