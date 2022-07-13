@@ -262,34 +262,46 @@
       when:
         - forwardPorts | selectattr('name', 'equalto', item) | length > 1
 
-    - name: Fail if source port is invalid
+    - name: Fail if incoming port is invalid
       fail:
         msg: |
-          The value 'cluster.nodes.loadBalancer.forwardPorts' has a port with an invalid source port value ({{ item.srcPort | default(none) }})!
-          Each port must have a 'srcPort' property defined.
-          Source port can be any number between 1 and 65353, excluding reserved ports: {{ reserved_ports }}.
+          The value 'cluster.nodes.loadBalancer.forwardPorts' has a port with an invalid incoming port value ({{ item.port | default(none) }})!
+          Each port must have a 'port' property defined.
+          Incoming port can be any number between 1 and 65353, excluding reserved ports: {{ reserved_ports }}.
       loop: "{{ forwardPorts }}"
       when:
-        - (not item.srcPort | default(none)) or (item.srcPort is not regex( regex.non_negative_number )) or (item.srcPort < 1) or (item.srcPort > 65353) or (item.srcPort in reserved_ports)
+        - (not item.port | default(none)) or (item.port is not regex( regex.non_negative_number )) or (item.port < 1) or (item.port > 65353) or (item.port in reserved_ports)
 
-    - name: Fail if source ports are not unique
+    - name: Fail if incoming ports are not unique
       fail:
         msg: |
-          The value 'cluster.nodes.loadBalancer.forwardPorts' has multiple ports with the same source port value ({{ item }})!
-          Source ports must be unique.
-      loop: "{{ forwardPorts | map(attribute='srcPort') |unique }}"
+          The value 'cluster.nodes.loadBalancer.forwardPorts' has multiple ports with the same incoming port value ({{ item }})!
+          Incoming ports must be unique.
+      loop: "{{ forwardPorts | map(attribute='port') |unique }}"
       when:
-        - forwardPorts | selectattr('srcPort', 'equalto', item) | length > 1
+        - forwardPorts | selectattr('port', 'equalto', item) | length > 1
 
-    - name: Fail if destination port is invalid
+    - name: Fail if target port is invalid
       fail:
         msg: |
-          The value 'cluster.nodes.loadBalancer.forwardPorts' has a port with an invalid destination port value ({{ item.dstPort | default(none) }})!
-          Each port must have a 'dstPort' property defined.
-          Destination port can be any number between 1 and 65353.
+          The value 'cluster.nodes.loadBalancer.forwardPorts' has a port with an invalid 'targetPort' value ({{ item.targetPort | default(none) }})!
+          Target port can be any number between 1 and 65353.
+          By default, the target port is set to the same value as the incoming port ('port').
       loop: "{{ forwardPorts }}"
       when:
-        - (not item.dstPort | default(none)) or (item.dstPort is not regex( regex.non_negative_number )) or (item.dstPort < 1) or (item.dstPort > 65353)
+        - item.targetPort is defined
+        - (item.targetPort is not regex( regex.non_negative_number )) or (item.targetPort < 1) or (item.targetPort > 65353)
+
+    - name: Fail if target is invalid
+      fail:
+        msg: |
+          The value 'cluster.nodes.loadBalancer.forwardPorts' has a port with an invalid target value ({{ item.target | default(none) }})!
+          Valid target values are: {{ valid_forward_port_targets }}.
+          By default, the target is set to 'workers'.
+      loop: "{{ forwardPorts }}"
+      when:
+        - item.target is defined
+        - item.target not in valid_forward_port_targets
   when:
     - forwardPorts | default(none)
 

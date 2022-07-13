@@ -48,21 +48,31 @@ backend kubernetes-control-plane
 
 {% for fport in forward_ports %}
 frontend forward-{{ fport.name }}
-        bind *:{{ fport.srcPort }}
+        bind *:{{ fport.port }}
         option tcplog
         mode tcp
         default_backend forward-{{ fport.name }}
 
+{% set targetPort = fport.targetPort if fport.targetPort | default(none) else fport.port %}
+{% set target = fport.target | default( default.forwardPortsTarget ) %}
 backend forward-{{ fport.name }}
         mode tcp
         balance roundrobin
-        {% if infra.cluster.nodes.worker.instances | default([]) | length > 0 %}
-        {% for worker in worker_instances %}
-        server {{ worker.name }} {{ worker.ip }}:{{ fport.dstPort }} check
-        {% endfor %}
-        {% else %}
+        {#
+          Forward to master nodes, if target is set to masters or all, 
+          or if there is no worker nodes in the cluster 
+        #}
+        {% if target in ['masters', 'all'] or worker_instances | default([]) | length == 0 %}
         {% for master in control_plane_instances %}
-        server {{ master.name }} {{ master.ip }}:{{ fport.dstPort }} check
+        server {{ master.name }} {{ master.ip }}:{{ targetPort }} check
+        {% endfor %}
+        {% endif %}
+        {# 
+          Forward to worker nodes, if target is set to workers or all 
+        #}
+        {% if target in ['workers', 'all'] %}
+        {% for worker in worker_instances %}
+        server {{ worker.name }} {{ worker.ip }}:{{ targetPort }} check
         {% endfor %}
         {% endif %}
 

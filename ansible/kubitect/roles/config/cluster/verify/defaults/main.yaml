@@ -21,6 +21,11 @@ valid_dns_modes:
   - coredns
   - kubedns
 
+valid_forward_port_targets:
+  - masters
+  - workers
+  - all
+
 reserved_ports:
   - 6443 # K8s API server
   - 22   # SSH
