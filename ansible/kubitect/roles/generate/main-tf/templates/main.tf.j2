@@ -94,7 +94,6 @@ module "host_{{ host.name }}" {
   cluster_nodeTemplate_user                = module.base.user
   cluster_nodeTemplate_ssh_privateKeyPath  = module.base.ssh.privateKeyPath
   cluster_nodeTemplate_ssh_addToKnownHosts = try(local.config.cluster.nodeTemplate.ssh.addToKnownHosts, null)
-  cluster_nodeTemplate_dns                 = try(local.config.cluster.nodeTemplate.dns, null)
   cluster_nodeTemplate_os_source           = module.base.os.source
   cluster_nodeTemplate_os_networkInterface = module.base.os.networkInterface
   cluster_nodeTemplate_updateOnBoot        = try(local.config.cluster.nodeTemplate.updateOnBoot, null)
@@ -104,6 +103,7 @@ module "host_{{ host.name }}" {
   cluster_network_cidr    = try(local.config.cluster.network.cidr, null)
   cluster_network_gateway = try(local.config.cluster.network.gateway, null)
   cluster_network_bridge  = try(local.config.cluster.network.bridge, null)
+  cluster_network_dns     = try(local.config.cluster.network.dns, null)
 
   # HAProxy load balancer VMs parameters
   cluster_nodes_loadBalancer_vip                  = try(local.config.cluster.nodes.loadBalancer.vip, null)

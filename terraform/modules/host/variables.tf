@@ -70,13 +70,6 @@ variable "cluster_nodeTemplate_ssh_addToKnownHosts" {
   nullable    = false
 }
 
-variable "cluster_nodeTemplate_dns" {
-  type        = list(string)
-  description = "List of DNS servers used by virtual machines."
-  default     = []
-  nullable    = false
-}
-
 variable "cluster_nodeTemplate_os_source" {
   type        = string
   description = "OS source, which can be path on host's filesystem or URL."
@@ -104,9 +97,9 @@ variable "cluster_network_mode" {
   nullable    = false
 }
 
-variable "cluster_network_cidr" {
+variable "cluster_network_bridge" {
   type        = string
-  description = "Network CIDR."
+  description = "Network (virtual) bridge."
 }
 
 variable "cluster_network_gateway" {
@@ -115,9 +108,16 @@ variable "cluster_network_gateway" {
   default     = null
 }
 
-variable "cluster_network_bridge" {
+variable "cluster_network_cidr" {
   type        = string
-  description = "Network (virtual) bridge."
+  description = "Network CIDR."
+}
+
+variable "cluster_network_dns" {
+  type        = list(string)
+  description = "List of DNS servers used by virtual machines."
+  default     = []
+  nullable    = false
 }
 
 #======================================================================================

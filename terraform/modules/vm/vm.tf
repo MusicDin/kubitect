@@ -10,19 +10,16 @@ data "local_file" "ssh_public_key" {
 
 # Network bridge configuration (for cloud-init) #
 data "template_file" "cloud_init_network_tpl" {
-  template = file(!var.is_bridge
-    ? "./templates/cloud_init/cloud_init_network_nat.tpl"
-    : (var.vm_ip != null
-      ? "./templates/cloud_init/cloud_init_network_bridge_static.tpl"
-      : "./templates/cloud_init/cloud_init_network_bridge_dhcp.tpl"
-    )
+  template = file(var.vm_ip != null
+    ? "./templates/cloud_init/cloud_init_network_static.tpl"
+    : "./templates/cloud_init/cloud_init_network_dhcp.tpl"
   )
 
   vars = {
     network_interface = var.vm_network_interface
     network_bridge    = var.network_bridge
     network_gateway   = var.network_gateway
-    vm_dns_list       = length(var.vm_dns_list) == 0 ? var.network_gateway : join(", ", var.vm_dns_list)
+    vm_dns_list       = length(var.network_dns) == 0 ? var.network_gateway : join(", ", var.network_dns)
     vm_cidr           = var.vm_ip == null ? "" : "${var.vm_ip}/${split("/", var.network_cidr)[1]}"
   }
 }
@@ -81,14 +78,14 @@ resource "libvirt_domain" "vm_domain" {
 
   cloudinit = libvirt_cloudinit_disk.cloud_init.id
 
-  qemu_agent = var.is_bridge
+  qemu_agent = true
 
   # Network configuration #
   network_interface {
     network_id     = var.network_id
     mac            = var.vm_mac
     addresses      = var.vm_ip != null ? [var.vm_ip] : null
-    bridge         = var.is_bridge ? var.network_bridge : null
+    bridge         = var.network_bridge
     wait_for_lease = true
   }
 
@@ -140,7 +137,7 @@ resource "libvirt_domain" "vm_domain" {
 # Remove DHCP lease from network after VM destruction #
 resource "null_resource" "remove_dhcp_lease" {
 
-  count = !var.is_bridge ? 1 : 0
+  count = var.network_mode != "bridge" ? 1 : 0
 
   triggers = {
     libvirt_provider_uri = var.libvirt_provider_uri

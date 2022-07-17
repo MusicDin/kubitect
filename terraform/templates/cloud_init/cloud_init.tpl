@@ -10,6 +10,7 @@ users:
     ssh_authorized_keys:
       - ${ssh_public_key}
 
+package_update: true
 package_upgrade: ${update}
 
 packages:
