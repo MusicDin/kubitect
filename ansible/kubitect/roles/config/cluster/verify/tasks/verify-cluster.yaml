@@ -239,6 +239,19 @@
   when:
     - config.cluster.nodes.loadBalancer.instances | default(none)
 
+- name: Fail if virtual router ID is invalid
+  vars:
+    vrid: "{{ config.cluster.nodes.loadBalancer.virtualRouterId | default(none) }}"
+  fail:
+    msg: |
+      The value of 'cluster.nodes.loadBalancer.virtualRouterId' is invalid ({{ vrid }})!
+      Virtual router ID must be an arbitrary number between 0 and 255.
+      Default virtual router ID is 51.
+  when:
+    - vrid is defined
+    - vrid
+    - (vrid is not regex( regex.non_negative_number )) or (vrid | int < 0) or (vrid | int > 255)
+
 - name: Verify load balancer port forwarding
   vars:
     forwardPorts: "{{ config.cluster.nodes.loadBalancer.forwardPorts if config.cluster.nodes.loadBalancer.forwardPorts | default(none) else [] }}" 

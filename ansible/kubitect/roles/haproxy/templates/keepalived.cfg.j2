@@ -12,7 +12,7 @@ vrrp_script check_haproxy {
 vrrp_instance VI_01 {
     state BACKUP
     interface {{ network_interface }}
-    virtual_router_id 51
+    virtual_router_id {{ virtual_router_id }}
     priority {{ priority | default( default.priority ) }}
     advert_int 1
 
