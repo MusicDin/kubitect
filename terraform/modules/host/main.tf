@@ -89,7 +89,6 @@ module "lb_module" {
   network_bridge   = var.cluster_network_bridge
   network_gateway  = var.cluster_network_gateway != null ? var.cluster_network_gateway : cidrhost(var.cluster_network_cidr, 1)
   network_cidr     = var.cluster_network_cidr
-  network_dns      = var.cluster_network_dns
 
   # Load balancer specific variables #
   vm_name              = "${var.cluster_name}-${var.node_types.load_balancer}-${each.value.id}"
@@ -99,6 +98,7 @@ module "lb_module" {
   vm_ssh_private_key   = var.cluster_nodeTemplate_ssh_privateKeyPath
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
   vm_network_interface = var.cluster_nodeTemplate_os_networkInterface
+  vm_dns               = var.cluster_nodeTemplate_dns
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_loadBalancer_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_loadBalancer_default_ram
   vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_loadBalancer_default_mainDiskSize
@@ -136,7 +136,6 @@ module "master_module" {
   network_bridge   = var.cluster_network_bridge
   network_gateway  = var.cluster_network_gateway != null ? var.cluster_network_gateway : cidrhost(var.cluster_network_cidr, 1)
   network_cidr     = var.cluster_network_cidr
-  network_dns      = var.cluster_network_dns
 
   # Master node specific variables #
   vm_name              = "${var.cluster_name}-${var.node_types.master}-${each.value.id}"
@@ -146,6 +145,7 @@ module "master_module" {
   vm_ssh_private_key   = var.cluster_nodeTemplate_ssh_privateKeyPath
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
   vm_network_interface = var.cluster_nodeTemplate_os_networkInterface
+  vm_dns               = var.cluster_nodeTemplate_dns
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_master_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_master_default_ram
   vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_master_default_mainDiskSize
@@ -183,7 +183,6 @@ module "worker_module" {
   network_bridge   = var.cluster_network_bridge
   network_gateway  = var.cluster_network_gateway != null ? var.cluster_network_gateway : cidrhost(var.cluster_network_cidr, 1)
   network_cidr     = var.cluster_network_cidr
-  network_dns      = var.cluster_network_dns
 
   # Worker node specific variables #
   vm_name              = "${var.cluster_name}-${var.node_types.worker}-${each.value.id}"
@@ -193,6 +192,7 @@ module "worker_module" {
   vm_ssh_private_key   = var.cluster_nodeTemplate_ssh_privateKeyPath
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
   vm_network_interface = var.cluster_nodeTemplate_os_networkInterface
+  vm_dns               = var.cluster_nodeTemplate_dns
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_worker_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_worker_default_ram
   vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_worker_default_mainDiskSize

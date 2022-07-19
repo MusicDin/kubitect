@@ -80,6 +80,13 @@ variable "cluster_nodeTemplate_os_networkInterface" {
   description = "Operating system (os) network interface, which is predefined for the os image."
 }
 
+variable "cluster_nodeTemplate_dns" {
+  type        = list(string)
+  description = "List of DNS servers used by virtual machines."
+  default     = []
+  nullable    = false
+}
+
 variable "cluster_nodeTemplate_updateOnBoot" {
   type        = bool
   description = "Update system on boot."
@@ -111,13 +118,6 @@ variable "cluster_network_gateway" {
 variable "cluster_network_cidr" {
   type        = string
   description = "Network CIDR."
-}
-
-variable "cluster_network_dns" {
-  type        = list(string)
-  description = "List of DNS servers used by virtual machines."
-  default     = []
-  nullable    = false
 }
 
 #======================================================================================

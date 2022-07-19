@@ -51,11 +51,6 @@ variable "network_cidr" {
   description = "Network CIDR"
 }
 
-variable "network_dns" {
-  type        = list(string)
-  description = "List of DNS servers used by VMs"
-}
-
 # ==================================== #
 # VM variables                         #
 # ==================================== #
@@ -87,6 +82,11 @@ variable "vm_ssh_private_key" {
 variable "vm_ssh_known_hosts" {
   type        = bool
   description = "Add virtual machine SSH known hosts"
+}
+
+variable "vm_dns" {
+  type        = list(string)
+  description = "List of DNS servers used by VMs"
 }
 
 variable "vm_update" {
