@@ -129,7 +129,6 @@
         msg: |
           The {{ type }} node instance (with id {{ node.id }}) has an invalid 'priority' value (none).
       when: 
-        - node.priority is defined
         - node.priority is none
 
     - name: Fail if load balancer priority is invalid
@@ -138,6 +137,8 @@
           The {{ type }} node instance (with id {{ node.id }}) has an invalid 'priority' value ({{ node.priority }}).
           The load balancer priority must be an integer between 0 and 255.
       when:
-        - node.priority | default(0) < 0 or node.priority | default(0) > 255
+        - node.priority is not regex( regex.non_negative_number ) or node.priority | int < 0 or node.priority | int > 255
   when:
     - type == 'loadBalancer'
+    - node.priority is defined
+

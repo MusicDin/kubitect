@@ -283,7 +283,7 @@
           Incoming port can be any number between 1 and 65353, excluding reserved ports: {{ reserved_ports }}.
       loop: "{{ forwardPorts }}"
       when:
-        - (not item.port | default(none)) or (item.port is not regex( regex.non_negative_number )) or (item.port < 1) or (item.port > 65353) or (item.port in reserved_ports)
+        - (not item.port | default(none)) or (item.port | int < 1) or (item.port | int > 65353) or (item.port in reserved_ports)
 
     - name: Fail if incoming ports are not unique
       fail:
@@ -303,7 +303,7 @@
       loop: "{{ forwardPorts }}"
       when:
         - item.targetPort is defined
-        - (item.targetPort is not regex( regex.non_negative_number )) or (item.targetPort < 1) or (item.targetPort > 65353)
+        - (item.targetPort | int < 1) or (item.targetPort | int > 65353)
 
     - name: Fail if target is invalid
       fail:

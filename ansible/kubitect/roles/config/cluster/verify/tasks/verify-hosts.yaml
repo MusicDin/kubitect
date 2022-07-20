@@ -100,6 +100,18 @@
     - item.connection.ip is defined
     - not item.connection.ip | ansible.utils.ipaddr
 
+- name: Fail if remote host's SSH port is invalid
+  fail:
+    msg: |
+      The remote host ({{ item.name }}) has an invalid 'connection.ssh.port' value ({{ item.connection.ssh.port }})!
+      The SSH port can be any number between 1 and 65353.
+      By default, SSH port 22 is used.
+  loop: "{{ config.hosts }}"
+  when:
+    - item.connection.type == 'remote'
+    - item.connection.ssh.port is defined
+    - (not item.connection.ssh.port) or (item.connection.ssh.port | int < 1) or (item.connection.ssh.port | int > 65353)
+
 # Verify default
 
 - name: Fail if there are multiple default hosts
