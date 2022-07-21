@@ -43,15 +43,15 @@ cluster:
   name: my-cluster
   network:
     mode: bridge
-    cidr: "10.10.64.0/24"
+    cidr: 10.10.64.0/24
     bridge: br0
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
   nodeTemplate:
     user: k8s
     os:
-      distro: ubuntu
+      distro: ubuntu22
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
   nodes:
     loadBalancer:
       vip: 10.10.64.200
@@ -100,8 +100,8 @@ cluster:
           host: host3
 
 kubernetes:
-  version: "v1.22.6"
+  version: v1.23.7
   networkPlugin: calico
   dnsMode: coredns
   kubespray:
-    version: "v2.18.1"
+    version: v2.19.0

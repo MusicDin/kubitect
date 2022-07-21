@@ -4,25 +4,22 @@
 # It also defines a dedicated virtual NAT network.
 #
 
-#kubitect:
-#  version: "v2.1.0"
-
 hosts:
   - name: localhost
     connection:
       type: local
 
 cluster:
-  name: "local-k8s-cluster"
+  name: local-k8s-cluster
   network:
-    mode: "nat"
-    cidr: "192.168.113.0/24"
+    mode: nat
+    cidr: 192.168.113.0/24
   nodeTemplate:
-    user: "k8s"
+    user: k8s
     ssh:
       addToKnownHosts: true
     os:
-      distro: "ubuntu"
+      distro: ubuntu22
     updateOnBoot: true
   nodes:
     master:
@@ -35,9 +32,6 @@ cluster:
           ip: 192.168.113.10
 
 kubernetes:
-  version: "v1.22.6"
-  networkPlugin: "calico"
-  dnsMode: "coredns"
+  version: v1.23.7
   kubespray:
-    url: "https://github.com/kubernetes-sigs/kubespray.git"
-    version: "v2.18.1"
+    version: v2.19.0

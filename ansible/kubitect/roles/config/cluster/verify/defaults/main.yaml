@@ -1,7 +1,10 @@
 ---
 valid_os_distros:
   - ubuntu
+  - ubuntu22
+  - ubuntu20
   - debian
+  - debian11
   - custom
 
 valid_network_modes:
