@@ -25,19 +25,34 @@ theme:
         name: Switch to light mode
 
   features:
+    - content.code.annotate
+    #- content.tabs.link
+    - navigation.expand
+    - navigation.indexes
     - navigation.instant
-    - navigation.tracking
+    - navigation.sections
     - navigation.tabs
     - navigation.top
-    - navigation.sections
+    - navigation.tracking
     - search.highlight
     - search.share
     - search.suggest
-    - content.code.annotate
-    #- content.tabs.link
 
   icon:
-    repo: fontawesome/brands/github
+    repo: octicons/mark-github-16
+    admonition:
+      note: octicons/pencil-24
+      abstract: octicons/checklist-24
+      info: octicons/info-24
+      tip: octicons/light-bulb-24
+      success: octicons/check-24
+      question: octicons/question-24
+      warning: octicons/alert-24
+      failure: octicons/x-24
+      danger: octicons/zap-24
+      bug: octicons/bug-24
+      example: octicons/beaker-24
+      quote: octicons/quote-24
 
 extra_css:
   - theme/assets/stylesheets/style.css
@@ -56,6 +71,7 @@ markdown_extensions:
   - md_in_html
   - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.inlinehilite
 
   # Content tabs
   - pymdownx.tabbed:
@@ -66,22 +82,51 @@ markdown_extensions:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg # Page tree
 
+  # - pymdownx.highlight:
+  #     linenums: true
+  #     anchor_linenums: true
+  #     linenums_style: pymdownx-inline
+
+  - toc:
+      permalink: "&#128279;&#xFE0E;" # Link symbol
+      permalink_title: Anchor link
 
 nav:
   - Home: index.md
-  - User guide:
-      - Overview: user-guide/overview.md
-      - Installation: user-guide/installation.md
-      - Quick start: user-guide/quick-start.md
-      - Getting started: user-guide/getting-started.md
-      - Cluster management: user-guide/cluster-management.md
+  - Getting started:
+      - Introduction: getting-started/introduction.md
+      - Requirements: getting-started/requirements.md
+      - Installation: getting-started/installation.md
+      - Quick start: getting-started/quick-start.md
+      - Getting started (step-by-step): getting-started/getting-started.md
       - Other:
-          - Requirements: user-guide/requirements.md
-          - Local development: user-guide/local-development.md
-          - Troubleshooting: user-guide/troubleshooting.md
-  - Reference: reference/reference.md
+          - Local development: getting-started/other/local-development.md
+          - Troubleshooting: getting-started/other/troubleshooting.md
+  - User guide:
+      - Before you begin: user-guide/before-you-begin.md
+      - Configuration:
+          - Hosts: user-guide/configuration/hosts.md
+          - Cluster name: user-guide/configuration/cluster-name.md
+          - Cluster network: user-guide/configuration/cluster-network.md
+          - Cluster node template: user-guide/configuration/cluster-node-template.md
+          - Cluster nodes: user-guide/configuration/cluster-nodes.md
+          - Kubernetes: user-guide/configuration/kubernetes.md
+          - Addons: user-guide/configuration/addons.md
+      - Cluster Management:
+          - Creating the cluster: user-guide/management/creating.md
+          - Upgrading the cluster: user-guide/management/upgrading.md
+          - Scaling the cluster: user-guide/management/scaling.md
+          - Destroying the cluster: user-guide/management/destroying.md
+      - Reference:
+          - Configuration reference: user-guide/reference/configuration.md
+          - CLI tool reference: user-guide/reference/cli.md
   - Examples:
-      #- Load balancing: user-guide/load-balancer.md
-      - Single node cluster: examples/single-node-cluster.md
-      - Bridged network: examples/bridged-network.md
-      - Full example: examples/full-example.md
+      - Cluster Topologies:
+        - Single node cluster: examples/single-node-cluster.md
+        - Multi-worker cluster: examples/multi-worker-cluster.md
+        - Multi-master cluster: examples/multi-master-cluster.md
+        - Highly available (HA) cluster: examples/ha-cluster.md
+      - Other:
+        - Accessing the cluster: examples/accessing-cluster.md
+        - Network bridge: examples/network-bridge.md
+        - Full example: examples/full-example.md

@@ -203,7 +203,7 @@
  * NAVIGATION - links
  */
 
- [data-md-color-scheme=slate] .md-nav__source {
+[data-md-color-scheme=slate] .md-nav__source {
     color: var(--md-header-text-color)
 }
 
@@ -255,4 +255,27 @@
 /* Disable table line breaks */
 .md-typeset td code {
     word-break: normal 
+}
+
+/* Click tip */
+details:not([open]) > summary > i.click-tip:after {
+    color: gray;
+    content: "(Click to expand)";
+}
+
+details[open] > summary > i.click-tip:after {
+    color: gray;
+    content: "(Click to collapse)";
+}
+
+/* Mobile devices */
+@media (max-width:768px) {  
+
+    img.mobile-w-100 {
+        width: 100%;
+    }
+
+    img.mobile-w-75 {
+        width: 75%;
+    }
 }

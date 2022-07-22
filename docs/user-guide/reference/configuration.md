@@ -1,10 +1,10 @@
 ---
 hide:
-  - navigation
+  # - navigation
   - toc
 ---
 
-<h1 align="center">Reference</h1>
+<h1 align="center">Configuration reference</h1>
 
 This document contains a reference of the Kubitect configuration file in four sections and documents all possible configuration properties.
 
@@ -13,13 +13,15 @@ The configuration sections are as follows:
 + `kubitect` - Project metadata.
 + `hosts` - A list of physical hosts (local or remote).
 + `cluster` - Configuration of the cluster infrastructure. Virtual machine properties, node types to install, and the host on which to install the nodes.
-+ `kubernetes` - Configuration of Kubernetes and Kubespray. Versions, addons and other Kubernetes related settings.
++ `kubernetes` - Kubernetes and Kubespray configuration.
++ `plugins` - Configurable plugins and applications.
 
 Each configuration property is documented with 5 columns: Property name, description, type, default value and is the property required.
 
 !!! note "Note"
 
     `[*]` annotates an array.
+
 
 ## *Kubitect* section
 
@@ -206,7 +208,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
     <tr>
       <td><code>cluster.network.mode</code></td>
       <td>string</td>
-      <td>nat</td>
+      <td></td>
       <td>Yes</td>
       <td>
         Network mode. Possible values are:
@@ -236,8 +238,44 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td><code>cluster.nodes.loadBalancer.default.ram</code></td>
       <td>number</td>
       <td>4</td>
-      <td>Yes</td>
+      <td></td>
       <td>Default amount of RAM (in GiB) allocated to a load balancer instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.forwardPorts[*].name</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Yes, if port is configured</td>
+      <td>Unique name of the forwarded port.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.forwardPorts[*].port</code></td>
+      <td>number</td>
+      <td></td>
+      <td>Yes, if port is configured</td>
+      <td>Incoming port is the port on which a load balancer listens for the incoming traffic.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.forwardPorts[*].targetPort</code></td>
+      <td>number</td>
+      <td><i>Incoming port value</i></td>
+      <td></td>
+      <td>Target port is the port on which a load balancer forwards traffic.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.forwardPorts[*].target</code></td>
+      <td>string</td>
+      <td>workers</td>
+      <td></td>
+      <td>
+        Target is a group of nodes on which a load balancer forwards traffic.
+        Possible targets are:
+        <ul>
+          <li><code>masters</code></li>
+          <li><code>workers</code></li>
+          <li><code>all</code></li>
+        </ul>
+      </td>
     </tr>
     <tr>
       <td><code>cluster.nodes.loadBalancer.instances[*].cpu</code></td>
@@ -245,6 +283,16 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td></td>
       <td></td>
       <td>Overrides a default value for that specific instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.instances[*].host</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        Name of the host on which the instance is deployed. 
+        If the name is not specified, the instance is deployed on the default host.
+      </td>
     </tr>
     <tr>
       <td><code>cluster.nodes.loadBalancer.instances[*].id</code></td>
@@ -305,6 +353,16 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>
         Virtual IP (floating IP) is the static IP used by load balancers to provide a fail-over.
         Each load balancer still has its own IP beside the shared one.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.loadBalancer.virtualRouterId</code></td>
+      <td>number</td>
+      <td>51</td>
+      <td></td>
+      <td>
+        Virtual router ID identifies the group of VRRP routers.
+        It can be any number between 0 and 255 and should be unique among different clusters.
       </td>
     </tr>
     <!-- Cluster nodes (master) -->
@@ -369,6 +427,16 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td></td>
       <td>
         Size of the additional data disk (in GiB) that is attached to the master node.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.master.instances[*].host</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        Name of the host on which the instance is deployed. 
+        If the name is not specified, the instance is deployed on the default host.
       </td>
     </tr>
     <tr>
@@ -478,6 +546,16 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td></td>
       <td>
         Size of the additional data disk (in GiB) that is attached to the worker node.
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].host</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        Name of the host on which the instance is deployed. 
+        If the name is not specified, the instance is deployed on the default host.
       </td>
     </tr>
     <tr>
@@ -616,7 +694,6 @@ Each configuration property is documented with 5 columns: Property name, descrip
 </table>
 
 
-
 ## *Kubernetes* section
 
 <table>
@@ -691,6 +768,30 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td></td>
       <td>Yes</td>
       <td>Kubernetes version that will be installed.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+## *Addons* section
+
+<table>
+  <tbody>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Default value</th>
+      <th>Required?</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td><code>addons.kubespray</code></td>
+      <td>dictionary</td>
+      <td></td>
+      <td></td>
+      <td>
+        Kubespray addons configuration.
+      </td>
     </tr>
   </tbody>
 </table>

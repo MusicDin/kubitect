@@ -80,7 +80,7 @@ function terminalAnimation() {
     const Command = Symbol("command")
 
     const content = [
-        { type: Command, value: "curl -o kubitect.tar.gz -L https://github.com/MusicDin/kubitect/releases/..." },
+        { type: Command, value: "curl -o kubitect.tar.gz -L https://dl.kubitect.io/linux/amd64/latest" },
         { type: Command, value: "tar -xzf kubitect.tar.gz" },
         { type: Command, value: "sudo mv kubitect /usr/local/bin/" },
         { type: Command, value: "kubitect apply" },

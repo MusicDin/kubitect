@@ -87,7 +87,7 @@ h3 {
     margin-right: 10pt;
     height: 20pt;
     width: 2pt;
-    border-left: 1px dashed #00e676;
+    border-left: 3px dotted #00e676;
 }
 
 .roadmap div.road.todo {
@@ -95,7 +95,7 @@ h3 {
     margin-right: 10pt;
     height: 20pt;
     width: 2pt;
-    border-left: 1px dashed #aaaaaa;
+    border-left: 3px dotted #aaaaaa;
 }
 
 .roadmap .question {

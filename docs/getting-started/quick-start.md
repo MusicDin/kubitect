@@ -1,18 +1,21 @@
 <h1 align="center">Quick start</h1>
 
+<div align=center>
+  <img
+    class="mobile-w-100"
+    src="/assets/images/topology-1m1w-arch.png" 
+    alt="Arhitecture of the cluster with one master and one worker node"
+    width="75%">
+</div>
+
 ### Step 1 - Create the cluster
 
-Run the following command to create the default cluster.
-Cluster will be created in `~/.kubitect/clusters/default/` directory.
+Run the following command to apply the default cluster configuration, which creates a cluster with **one master and one worker node**.
+Generated cluster configuration files will be stored in `~/.kubitect/clusters/default/` directory.
 
 ```
 kubitect apply
 ```
-
-!!! note "Note"
-
-    Using a `--cluster` option, you can provide custom cluster name.
-    This way multiple clusters can be created.
 
 ### Step 2 - Export kubeconfig
 

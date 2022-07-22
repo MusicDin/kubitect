@@ -6,12 +6,14 @@ Before starting with installation, make sure you meet all the [requirements](./r
 
 After all requirements are met, download the Kubitect command line tool.
 ```sh
-curl -o kubitect.tar.gz -L https://github.com/MusicDin/kubitect/releases/download/v2.1.0/kubitect-v2.1.0-linux-amd64.tar.gz
+curl -o kubitect.tar.gz -L https://dl.kubitect.io/linux/amd64/latest
 ```
 
 !!! note "Note"
+    
+    The download URL is a combination of the operating system type, system architecture and version of Kubitect (`https://dl.kubitect.io/<os>/<arch>/<version>`).
 
-    To see all release packages check the [release page](https://github.com/MusicDin/kubitect/releases/latest).
+    All releases can be found on [GitHub release page](https://github.com/MusicDin/kubitect/releases).
 
 Unpack `tar.gz` file.
 ```sh
@@ -36,9 +38,21 @@ kubitect --version
 
 ## Enable shell autocomplete
 
-For example, to enable automplete for `bash`, run the following command.
+To load completions in your current shell session (`bash`):
 ```sh
 echo 'source <(kubitect completion bash)' >> ~/.bashrc
 ```
 
-Then reload your shell.
+To load completions for every new session, execute once:
+```sh
+kubitect completion bash > /etc/bash_completion.d/kubitect
+```
+
+!!! tip "Tip"
+
+    For all supported shells run: `kubitect completion -h`
+
+    For shell specific instructions run:
+    <code>
+    kubitect completion <i>shell</i> -h
+    </code>
