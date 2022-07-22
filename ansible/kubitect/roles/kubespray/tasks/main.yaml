@@ -43,7 +43,7 @@
 
 - name: Generate Kubespray addons.yaml
   vars:
-    addons: "{{ config.plugins.kubespray | default(none) }}"
+    addons: "{{ config.addons.kubespray | default(none) }}"
   template:
     src: addons.yaml.j2
     dest: "{{ config_dir }}/group_vars/k8s_cluster/addons.yaml"
