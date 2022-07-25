@@ -1,22 +1,22 @@
 [tag 2.1.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.1.0
 
-<h1 align="center">Plugins</h1>
+<h1 align="center">Addons</h1>
 
 ## Configuration
 
-### Kubespray plugins
+### Kubespray addons
 
 :material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
 
-Kubespray provides many useful configurable plugins, such as [Ingress-NGINX controller](https://kubernetes.github.io/ingress-nginx/), [MetalLB](https://metallb.io/), and so on.
+Kubespray offers many useful configurable addons, such as the [Ingress-NGINX controller](https://kubernetes.github.io/ingress-nginx/), [MetalLB](https://metallb.io/), and so on.
 
-Kubespray plugins can be configured in Kubitect under the `plugins.kubespray` property.
-Configuration of the Kubespray plugins is exactly the same as the default Kubespray addons configuration, as Kubitect only copies provided configuration into Kubespray's group variables during the cluster creation.
+Kubespray addons can be configured in Kubitect under the `addons.kubespray` property.
+The configuration of Kubespray addons is exactly the same as the default configuration of Kubespray addons, since Kubitect simply copies the provided configuration into Kubespray's group variables when the cluster is created.
 
-All available Kubespray plugins can be found in the [Kubespray's addons sample](https://github.com/kubernetes-sigs/kubespray/blob/master/inventory/sample/group_vars/k8s_cluster/addons.yml), while most of them are documented in [Kubespray's official documentation](https://kubespray.io/).
+All available Kubespray addons can be found in the [Kubespray addons sample](https://github.com/kubernetes-sigs/kubespray/blob/master/inventory/sample/group_vars/k8s_cluster/addons.yml), while most of them are documented in the [official Kubespray documentation](https://kubespray.io/).
 
 ```yaml
-plugins:
+addons:
   kubespray:
 
     # Nginx ingress controller deployment
