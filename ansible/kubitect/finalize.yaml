@@ -2,14 +2,40 @@
   hosts: kube_control_plane[0]
   gather_facts: false
   any_errors_fatal: true
-  roles: 
-    - role: kubeconfig/fetch
+  tasks:
+    - name: Fetch Kubeconfig
+      fetch:
+        src: "/etc/kubernetes/admin.conf"
+        dest: "{{ config_dir }}/admin.conf"
+        flat: true
 
-- name: Copy kubeconfig to ~/.kube directory
+- name: Copy kubeconfig and change its permissions
   hosts: localhost
   gather_facts: false
   any_errors_fatal: true
   become: false
+
   roles:
     - role: config/cluster/import
-    - role: kubeconfig/copy
+
+  tasks:
+    - name: Change fetched Kubeconfig permissions
+      file:
+        path: "{{ config_dir }}/admin.conf"
+        mode: 0600
+
+    - name: Copy Kubeconfig
+      block:
+        - name: Make sure ~/.kube directory exists
+          file:
+            path: "~/.kube"
+            state: directory
+
+        - name: Copy kubeconfig file to a ~/.kube dirctory
+          copy:
+            src: "{{ config_dir }}/admin.conf"
+            dest: "~/.kube/config"
+            mode: 0600
+      when:
+        - config.kubernetes.other.copyKubeconfig is defined
+        - config.kubernetes.other.copyKubeconfig == true

@@ -1,7 +1,0 @@
----
-- name: Fetch Kubeconfig
-  fetch:
-    src: "/etc/kubernetes/admin.conf"
-    dest: "{{ config_dir }}/admin.conf"
-    mode: "0600"
-    flat: true

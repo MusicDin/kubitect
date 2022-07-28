@@ -4,3 +4,4 @@
     src: nodes.yaml.j2
     dest: "{{ config_dir }}/nodes.yaml"
     lstrip_blocks: true
+    mode: 0600
