@@ -34,18 +34,30 @@ variable "vm_os" {
 
 variable "worker_nodes" {
   type = list(object({
-    id     = number
-    name   = string
-    ip     = string
+    id   = number
+    name = string
+    ip   = string
+    data_disks = list(object({
+      name = string
+      size = number
+      pool = string
+      dev  = string
+    }))
   }))
   description = "Worker nodes info"
 }
 
 variable "master_nodes" {
   type = list(object({
-    id     = number
-    name   = string
-    ip     = string
+    id   = number
+    name = string
+    ip   = string
+    data_disks = list(object({
+      name = string
+      size = number
+      pool = string
+      dev  = string
+    }))
   }))
   description = "Master nodes info"
 }

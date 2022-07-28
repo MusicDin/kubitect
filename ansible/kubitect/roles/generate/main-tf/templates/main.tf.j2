@@ -196,3 +196,23 @@ resource "local_file" "output" {
   content  = replace(yamlencode(module.output), "/((?:^|\n)[\\s-]*)\"([\\w-]+)\":/", "$1$2:")
   filename = var.infra_config_path
 }
+
+# Removes temporary resources created during execution. #
+resource "null_resource" "cleanup" {
+
+  triggers = {
+    ts = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOF
+      rm -r ../config/tmp
+    EOF
+
+    on_failure = continue
+  }
+
+  depends_on = [
+    local_file.output
+  ]
+}
