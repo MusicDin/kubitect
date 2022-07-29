@@ -1,3 +1,0 @@
-- name: Setup Rook
-  include_tasks: configure_haproxy.yaml
-  # when: config.addons.rook.enabled

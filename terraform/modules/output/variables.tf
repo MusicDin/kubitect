@@ -37,7 +37,7 @@ variable "worker_nodes" {
     id   = number
     name = string
     ip   = string
-    data_disks = list(object({
+    dataDisks = list(object({
       name = string
       size = number
       pool = string
@@ -52,7 +52,7 @@ variable "master_nodes" {
     id   = number
     name = string
     ip   = string
-    data_disks = list(object({
+    dataDisks = list(object({
       name = string
       size = number
       pool = string
