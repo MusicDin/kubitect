@@ -1,0 +1,39 @@
+- name: Add Helm repository for Rook
+  kubernetes.core.helm_repository:
+    name: rook-release
+    repo_url: https://charts.rook.io/release
+
+- name: Make sure config/helm directory exists
+  file:
+    path: "{{ config_dir }}/helm"
+    state: directory
+    mode: 0700
+
+- name: Template Rook cluster Helm chart values
+  template:
+    src: rook-cluster.yaml.j2
+    dest: "{{ config_dir }}/helm/rook-cluster-values.yaml"
+    mode: 0644
+    lstrip_blocks: true
+
+- name: Ensure rook-operator helm chart is installed
+  kubernetes.core.helm:
+    name: rook-operator
+    chart_ref: rook-release/rook-ceph
+    update_repo_cache: true
+    create_namespace: true
+    release_namespace: rook-ceph
+    kubeconfig: "{{ config_dir }}/admin.conf"
+    wait: true
+
+- name: Ensure rook-ceph-cluster helm chart is installed
+  kubernetes.core.helm:
+    name: rook-ceph-cluster
+    chart_ref: "rook-release/rook-ceph-cluster"
+    update_repo_cache: true
+    create_namespace: true
+    release_namespace: rook-ceph
+    values_files:
+      - "{{ config_dir }}/helm/rook-cluster-values.yaml"
+    kubeconfig: "{{ config_dir }}/admin.conf"
+    wait: true
