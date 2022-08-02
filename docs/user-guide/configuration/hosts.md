@@ -104,11 +104,11 @@ hosts:
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 &ensp;
-:octicons-file-symlink-file-24: Default: `/var/lib/libvirt/pools/`
+:octicons-file-symlink-file-24: Default: `/var/lib/libvirt/images/`
 
 The main resource pool path defines the location on the host where main disks (volumes) are created for each node provisioned on that particular host.
 Because the main resource pool contains volumes on which the node's operating system and all required packages are installed, it is recommended that the main resource pool is created on fast storage devices such as SSD disks.
-By default, main disk pool path is set to `/var/lib/libvirt/pools/`.
+By default, main disk pool path is set to `/var/lib/libvirt/images/`.
 
 ```yaml
 hosts:
@@ -117,7 +117,7 @@ hosts:
     mainResourcePoolPath: /mnt/ssd/kubitect/ # (2)
 ```
 
-1. Because the main resource pool path for this host is not set, the default path (`/var/lib/libvirt/pools/`) is used.
+1. Because the main resource pool path for this host is not set, the default path (`/var/lib/libvirt/images/`) is used.
 
 2. The main resource pool path is set for this host, so the node's main disks are created in this location.
 
@@ -142,7 +142,7 @@ hosts:
   - name: host2 
     dataResourcePools:
       - name: rook-pool
-        path: /var/lib/libvirt/pools/
+        path: /var/lib/libvirt/images/
 ```
 
 

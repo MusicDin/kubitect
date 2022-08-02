@@ -274,7 +274,7 @@
 
     !!! failure "Error"
 
-        Error: error deleting storage pool: failed to remove pool '/var/lib/libvirt/pools/local-k8s-cluster-main-resource-pool': Directory not empty
+        Error: error deleting storage pool: failed to remove pool '/var/lib/libvirt/images/local-k8s-cluster-main-resource-pool': Directory not empty
 
 === ":material-information-outline: Explanation"
 
@@ -298,7 +298,7 @@
 
         #  Name         Path
         # -------------------------------------------------------------------------------------
-        #  base_volume  /var/lib/libvirt/pools/local-k8s-cluster-main-resource-pool/base_volume
+        #  base_volume  /var/lib/libvirt/images/local-k8s-cluster-main-resource-pool/base_volume
         ```
 
         3. Delete listed volumes from the pool.

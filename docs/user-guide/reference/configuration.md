@@ -150,7 +150,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
     <tr>
       <td><code>hosts[*].mainResourcePoolPath</code></td>
       <td>string</td>
-      <td>/var/lib/libvirt/pools/</td>
+      <td>/var/lib/libvirt/images/</td>
       <td></td>
       <td>Path to the resource pool used for main virtual machine volumes.</td>
     </tr>

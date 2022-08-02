@@ -58,4 +58,4 @@ config_example_hosts: |
         ssh:
           port: 1234
           keyfile: "~/.ssh/id_rsa"
-      resourcePoolPath: "/var/lib/libvirt/pools/"
+      resourcePoolPath: "/var/lib/libvirt/images/"

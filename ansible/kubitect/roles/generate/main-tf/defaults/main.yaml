@@ -1,5 +1,5 @@
 ---
 default:
-  resourcePoolPath: "/var/lib/libvirt/pools/"
+  resourcePoolPath: "/var/lib/libvirt/images/"
   # Remote hosts default keyfile location
   keyfilePath: "~/.ssh/id_rsa"

@@ -24,7 +24,7 @@ variable "libvirt_provider_uri" {
 variable "hosts_mainResourcePoolPath" {
   type        = string
   description = "Path where main resource pool will be initialized."
-  default     = "/var/lib/libvirt/pools/"
+  default     = "/var/lib/libvirt/images/"
   nullable    = false
 }
 
