@@ -2,7 +2,7 @@
 - name: Verify if node passes node selector
   set_fact:
     node_matched: false
-  loop: "{{ nodeSelector | dict2items }}"
+  loop: "{{ node_selector | dict2items }}"
   when:
     - item.value | default(none)
     - node.labels[item.key] != item.value

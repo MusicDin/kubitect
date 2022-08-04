@@ -40,14 +40,14 @@
           when:
             - diff_keys | length == 0
       when:
-        - data_disk_selector | length != 0
+        - node_selector | length != 0
 
     - name: Use all worker nodes as Rook nodes
       set_fact:
         use_all_nodes: true
         rook_nodes: "{{ nodes | map(attribute='name') }}"
       when:
-        - data_disk_selector | length == 0
+        - node_selector | length == 0
 
     - name: Set initial value for Rook OSD nodes
       set_fact:
