@@ -1,0 +1,14 @@
+---
+- name: Verify if node passes node selector
+  set_fact:
+    node_matched: false
+  loop: "{{ nodeSelector | dict2items }}"
+  when:
+    - item.value | default(none)
+    - node.labels[item.key] != item.value
+
+- name: Add Rook node if node selector is matched
+  set_fact:
+    rook_nodes: "{{ rook_nodes | default([]) + [ node.name ] }}"
+  when:
+    - node_matched | default(true) != false

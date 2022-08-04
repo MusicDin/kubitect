@@ -9,7 +9,7 @@
         dest: "{{ config_dir }}/admin.conf"
         flat: true
 
-- name: Copy kubeconfig and change its permissions
+- name: Finalize cluster deployment
   hosts: localhost
   gather_facts: false
   any_errors_fatal: true
@@ -17,6 +17,11 @@
 
   roles:
     - role: config/cluster/import
+    - role: config/infra/import
+    - role: addons/rook
+      when:
+        - config.addons.rook.enabled is defined
+        - config.addons.rook.enabled == true
 
   tasks:
     - name: Change fetched Kubeconfig permissions
