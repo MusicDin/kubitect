@@ -30,7 +30,7 @@ type Node struct {
 	Id        int    `yaml:"id"`
 	Ip        string `yaml:"ip"`
 	Name      string `yaml:"name"`
-	IsRemoved bool   `yaml:"removed"` // Tag nodes as removed after removal
+	IsRemoved bool   `yaml:"removed"` // Tag node as 'removed' after its removal
 }
 
 // applyCmd represents the apply command
@@ -100,7 +100,13 @@ func apply() error {
 	}
 
 	// Prepare main virtual environment.
-	err = helpers.SetupVirtualEnironment(env.ClusterPath, helpers.Venvs.Main)
+	err = helpers.SetupVirtualEnvironment(env.ClusterPath, helpers.Venvs.Main)
+	if err != nil {
+		return err
+	}
+
+	// Install ansible galaxy requirements.
+	err = helpers.InstallGalaxyRequirements(env.ClusterPath, "requirements.yaml", helpers.Venvs.Main)
 	if err != nil {
 		return err
 	}
@@ -140,7 +146,7 @@ func apply() error {
 	}
 
 	// Prepare Kubespray's virtual environment.
-	err = helpers.SetupVirtualEnironment(env.ClusterPath, helpers.Venvs.Kubespray)
+	err = helpers.SetupVirtualEnvironment(env.ClusterPath, helpers.Venvs.Kubespray)
 	if err != nil {
 		return err
 	}
@@ -271,7 +277,7 @@ func removeNodes(configPath string, infraConfigPath string, nodeType string) err
 	// Check if infrastructure config exists.
 	_, err := os.Stat(infraConfigPath)
 
-	// Trigger removal if the cluster action is set to 'scale' and the infrastrcutre
+	// Trigger removal if the cluster action is set to 'scale' and the infrastructure
 	// config already exists.
 	if env.ClusterAction == "scale" && err == nil {
 
@@ -387,7 +393,7 @@ func getRemovedNodes(configPath string, infraConfigPath string, nodeType string)
 	return removedNodes, nil
 }
 
-// saveTaggedNodes function taggs removed nodes and saves them into provided
+// saveTaggedNodes function tags removed nodes and saves them into provided
 // config file.
 func saveTaggedNodes(configPath string, nodes []Node, removedNodes []Node, nodeType string) error {
 
