@@ -103,13 +103,13 @@
         Add the current user to the `libvirt` and `kvm` groups if needed:
         ```sh
         # Add current user to groups
-        sudo usermod -aG libvirt,kvm `id -un`
+        sudo adduser $USER libvirt
+        sudo adduser $USER kvm
 
         # Verify groups are added
         id -nG
 
         # Reload user session
-        su - `id -un`
         ```
 
 ### Error creating libvirt domain

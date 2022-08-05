@@ -32,3 +32,8 @@ If the host is a remote server:
     + `libvirt-daemon-system`
 
     After installation, add user to the `kvm` and `libvirt` groups.
+
+    ```sh
+    sudo adduser $USER kvm
+    sudo adduser $USER libvirt
+    ```
