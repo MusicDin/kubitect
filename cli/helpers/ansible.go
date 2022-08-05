@@ -46,17 +46,20 @@ func InstallGalaxyRequirements(clusterPath string, requirementsPath string, venv
 
 	fmt.Println("Installing Ansible Galaxy requirements...")
 
-	cmd := exec.Command("ansible-galaxy", "install", "-r", requirementsPath)
-	cmd.Path = filepath.Join(clusterPath, env.ConstVenvBinDir, venv.Name, "bin", "ansible-galaxy")
-	cmd.Dir = clusterPath
+	venvPath := filepath.Join(clusterPath, env.ConstVenvBinDir, venv.Name)
+	ansibleGalaxyPath := filepath.Join(venvPath, "bin", "ansible-galaxy")
+	collectionPath := filepath.Join(clusterPath, "ansible", "collections")
+
+	cmd := exec.Command(ansibleGalaxyPath, "collection", "install", "-p", collectionPath, "-r", requirementsPath)
 
 	if env.DebugMode {
 		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 	}
 
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("Failed to install Ansible Galaxy requirements: %w", err)
+		return fmt.Errorf("Failed to install ansible-galaxy requirements: %w", err)
 	}
 
 	return nil

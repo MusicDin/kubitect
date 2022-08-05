@@ -106,7 +106,7 @@ func apply() error {
 	}
 
 	// Install ansible galaxy requirements.
-	err = helpers.InstallGalaxyRequirements(env.ClusterPath, "requirements.yaml", helpers.Venvs.Main)
+	err = helpers.InstallGalaxyRequirements(env.ClusterPath, "ansible/kubitect/requirements.yaml", helpers.Venvs.Main)
 	if err != nil {
 		return err
 	}

@@ -19,7 +19,7 @@ var Venvs = struct {
 }{
 	Main: VirtualEnvironment{
 		Name:             "main",
-		RequirementsPath: "requirements.txt",
+		RequirementsPath: "ansible/kubitect/requirements.txt",
 	},
 	Kubespray: VirtualEnvironment{
 		Name:             "kubespray",
@@ -60,6 +60,7 @@ func createVirtualEnvironment(clusterPath string, venvName string) error {
 
 	if env.DebugMode {
 		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 	}
 
 	err := cmd.Run()
@@ -82,6 +83,7 @@ func installPipRequirements(clusterPath string, venv VirtualEnvironment) error {
 
 	if env.DebugMode {
 		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 	}
 
 	err := cmd.Run()
