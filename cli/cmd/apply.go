@@ -105,12 +105,6 @@ func apply() error {
 		return err
 	}
 
-	// Install ansible galaxy requirements.
-	err = helpers.InstallGalaxyRequirements(env.ClusterPath, "ansible/kubitect/requirements.yaml", helpers.Venvs.Main)
-	if err != nil {
-		return err
-	}
-
 	// Execute ansible playbook that verifies configuration file and generates
 	// hosts inventory file.
 	err = playbook.KubitectInit()

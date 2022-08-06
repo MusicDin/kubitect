@@ -5,8 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -38,31 +36,6 @@ type AnsiblePlaybookCmd struct {
 	Timeout         int
 	Extravars       []string
 	Venv            VirtualEnvironment
-}
-
-// InstallGalaxyRequirements installs specified ansible-galaxy requirements
-// into given virtual environment.
-func InstallGalaxyRequirements(clusterPath string, requirementsPath string, venv VirtualEnvironment) error {
-
-	fmt.Println("Installing Ansible Galaxy requirements...")
-
-	venvPath := filepath.Join(clusterPath, env.ConstVenvBinDir, venv.Name)
-	ansibleGalaxyPath := filepath.Join(venvPath, "bin", "ansible-galaxy")
-	collectionPath := filepath.Join(clusterPath, "ansible", "collections")
-
-	cmd := exec.Command(ansibleGalaxyPath, "collection", "install", "-p", collectionPath, "-r", requirementsPath)
-
-	if env.DebugMode {
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-	}
-
-	err := cmd.Run()
-	if err != nil {
-		return fmt.Errorf("Failed to install ansible-galaxy requirements: %w", err)
-	}
-
-	return nil
 }
 
 // ExecAnsiblePlaybookLocal sets inventory and connection type to localhost
