@@ -70,26 +70,26 @@ cephClusterSpec:
         cpu: "2000m"
         memory: "2Gi"
       requests:
-        cpu: "500m"
-        memory: "512Mi"
+        cpu: "250m"
+        memory: "256Mi"
     osd:
       limits:
         cpu: "2000m"
-        memory: "4Gi"
+        memory: "2Gi"
       requests:
-        cpu: "500m"
-        memory: "512Mi"
+        cpu: "250m"
+        memory: "256Mi"
     prepareosd:
       limits:
         cpu: "500m"
         memory: "512Mi"
       requests:
-        cpu: "200m"
+        cpu: "100m"
         memory: "64Mi"
 
   removeOSDsIfOutAndSafeToRemove: true
   storage:
-    useAllNodes: {{ use_all_devices and use_all_nodes }}
+    useAllNodes: {{ use_all_devices }}
     useAllDevices: {{ use_all_devices }}
     {% if not use_all_devices %}
     nodes:

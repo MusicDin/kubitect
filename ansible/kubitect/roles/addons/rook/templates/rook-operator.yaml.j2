@@ -1,3 +1,54 @@
-logLevel: DEBUG
+{% set env = namespace(nodeAffinity="") %}
+{% for key, value in config.addons.rook.nodeSelector | default({}) | items %}
+  {% set env.nodeAffinity = env.nodeAffinity + (key~'='~value~';') %}
+{% endfor %}
+
+logLevel: INFO
+hostpathRequiresPrivileged: false
+
+disableDeviceHotplug: false
+enableDiscoveryDaemon: true
+discover:
+  nodeAffinity: {{ env.nodeAffinity }}
+
 csi:
   provisionerReplicas: {{ replication_count }}
+  provisionerNodeAffinity: {{ env.nodeAffinity }}
+  pluginNodeAffinity: {{ env.nodeAffinity }}
+  allowUnsupportedVersion: false
+
+  csiRBDProvisionerResource: |
+    - name : csi-provisioner
+      resource:
+        requests:
+          memory: 128Mi
+          cpu: 100m
+        limits:
+          memory: 256Mi
+          cpu: 200m
+    - name : csi-rbdplugin
+      resource:
+        requests:
+          memory: 256Mi
+          cpu: 150m
+        limits:
+          memory: 1Gi
+          cpu: 500m
+
+  csiCephFSProvisionerResource: |
+    - name : csi-provisioner
+      resource:
+        requests:
+          memory: 128Mi
+          cpu: 100m
+        limits:
+          memory: 256Mi
+          cpu: 200m
+    - name : csi-cephfsplugin
+      resource:
+        requests:
+          memory: 256Mi
+          cpu: 150m
+        limits:
+          memory: 1Gi
+          cpu: 500m

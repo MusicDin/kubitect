@@ -1,6 +1,7 @@
 ---
 - name: Add Helm repository for Rook
   kubernetes.core.helm_repository:
+    binary_path: "{{ helm.bin }}"
     name: rook-release
     repo_url: https://charts.rook.io/release
 
@@ -34,6 +35,7 @@
 
 - name: Ensure rook-operator helm chart is installed
   kubernetes.core.helm:
+    binary_path: "{{ helm.bin }}"
     name: rook-operator
     chart_ref: rook-release/rook-ceph
     update_repo_cache: true
@@ -46,6 +48,7 @@
 
 - name: Ensure rook-ceph-cluster helm chart is installed
   kubernetes.core.helm:
+    binary_path: "{{ helm.bin }}"
     name: rook-ceph-cluster
     chart_ref: "rook-release/rook-ceph-cluster"
     update_repo_cache: true
