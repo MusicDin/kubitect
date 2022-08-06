@@ -1,0 +1,33 @@
+---
+- name: Get stats of the current cluster config file
+  stat:
+    path: "{{ helm.bin }}"
+  register: helm_bin
+
+- name: Ensure Helm binary is installed
+  block:
+    - name: Ensure Helm binary dir exists
+      file:
+        path: "{{ helm.bin | dirname }}"
+        state: directory
+        mode: 0700
+
+    - name: Unarchive Helm
+      unarchive:
+        src: "{{ helm.url }}"
+        dest: "{{ helm.bin | dirname }}"
+        mode: 0700
+        remote_src: true
+        include: linux-{{ arch }}/helm
+
+    - name: Move downloaded Helm binary
+      command: "mv {{ helm.bin | dirname }}/linux-{{ arch }}/helm {{ helm.bin }}"
+
+    - name: Delete extracted Helm directory
+      ignore_errors: true
+      file:
+        state: absent
+        force: true
+        path: "{{ helm.bin | dirname }}/linux-{{ arch }}"
+  when:
+    - helm_bin.stat.exists == false

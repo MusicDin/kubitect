@@ -17,11 +17,6 @@
 
   roles:
     - role: config/cluster/import
-    - role: config/infra/import
-    - role: addons/rook
-      when:
-        - config.addons.rook.enabled is defined
-        - config.addons.rook.enabled == true
 
   tasks:
     - name: Change fetched Kubeconfig permissions
@@ -44,3 +39,28 @@
       when:
         - config.kubernetes.other.copyKubeconfig is defined
         - config.kubernetes.other.copyKubeconfig == true
+
+- name: Install addons
+  hosts: localhost
+  gather_facts: false
+  any_errors_fatal: true
+  become: false
+
+  pre_tasks:
+    - name: Get system architecture fact
+      setup:
+        filter:
+          - ansible_architecture
+
+    - name: Resolve system architecture
+      set_fact:
+        arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}"
+
+  roles:
+    - role: config/cluster/import
+    - role: config/infra/import
+    - role: addons/helm
+    - role: addons/rook
+      when:
+        - config.addons.rook.enabled is defined
+        - config.addons.rook.enabled == true

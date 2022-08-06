@@ -17,3 +17,4 @@ kubitect_cluster_default_config_path: "{{ kubitect_cluster_path }}/resources/def
 
 # Commonly used directories
 config_dir: "../../config"
+bin_dir: "{{ kubitect_home }}/bin"
