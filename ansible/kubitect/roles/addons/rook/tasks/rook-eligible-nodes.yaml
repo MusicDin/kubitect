@@ -33,7 +33,7 @@
             s_keys: "{{ node_selector.keys() | list }}"
             diff_keys: "{{ s_keys | difference(n_keys) }}"
           include_tasks: rook-node-selector-filter.yaml
-          loop: "{{ nodes_labels }}"
+          loop: "{{ nodes_labels | default([]) }}"
           loop_control:
             loop_var: node
             label: "{{ node.name }}"
