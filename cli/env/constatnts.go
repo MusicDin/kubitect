@@ -30,7 +30,6 @@ var (
 		"terraform/output.tf",
 		"terraform/variables.tf",
 		"terraform/versions.tf",
-		"requirements.txt",
 		"LICENSE",
 	}
 
