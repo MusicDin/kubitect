@@ -201,19 +201,10 @@ resource "local_file" "output" {
 # Removes temporary resources created during execution. #
 resource "null_resource" "cleanup" {
 
-  triggers = {
-    ts = timestamp()
-  }
-
   provisioner "local-exec" {
-    command = <<-EOF
-      rm -r ../config/tmp
-    EOF
-
+    command    = "rm -r ../config/tmp"
+    when       = destroy
     on_failure = continue
   }
 
-  depends_on = [
-    local_file.output
-  ]
 }

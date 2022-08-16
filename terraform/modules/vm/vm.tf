@@ -178,7 +178,10 @@ resource "null_resource" "data_disks_mapping" {
   for_each = { for disk in var.vm_data_disks : disk.name => disk }
 
   triggers = {
-    ts = timestamp()
+    disk_name           = each.key
+    disk_size           = each.value.size
+    disk_pool           = each.value.pool
+    disk_mapping_exists = fileexists("${local.disk_mapping_dir}/${var.vm_name}-${each.key}-data-disk.dev")
   }
 
   provisioner "local-exec" {
