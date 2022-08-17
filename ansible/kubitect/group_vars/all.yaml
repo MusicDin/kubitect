@@ -1,20 +1,13 @@
 ---
 
-# Custom config path provided by user. Do not overwrite it, as
-# an empty var means that user did not provide custom config.
-#config_path: 
-
-kubitect_home: "~/.kubitect"
-kubitect_cluster_action: "create"
-kubitect_cluster_name: "default"
-kubitect_cluster_path: "{{ kubitect_home }}/clusters/{{ kubitect_cluster_name }}"
-
-# Location where cluster config is saved
-kubitect_cluster_config_path: "{{ kubitect_cluster_path }}/config/kubitect.yaml"
-
-# Default cluster config is used when cluster config does not exist.
-kubitect_cluster_default_config_path: "{{ kubitect_cluster_path }}/resources/default/default-cluster.yaml"
+# Custom config path provided by user. Empty (undefined) var
+# means that the user did not provide custom config.
+#config_path:
 
 # Commonly used directories
-config_dir: "../../config"
-bin_dir: "{{ kubitect_home }}/bin"
+cluster_dir: "{{ playbook_dir }}/../.."
+config_dir: "{{ cluster_dir }}/config"
+bin_dir: "{{ cluster_dir }}/bin"
+
+# Location where cluster config is saved
+kubitect_cluster_config_path: "{{ config_dir }}/kubitect.yaml"

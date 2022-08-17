@@ -6,6 +6,11 @@
     node_selector: "{{ config.addons.rook.nodeSelector | default({}) }}"
     data_disk_selector: "{{ config.addons.rook.dataDiskSelector | default([]) }}"
   block:
+    - name: Set initial values for Rook variables
+      set_fact:
+        nodes_labels: []
+        rook_nodes: []
+
     - name: Get node labels for each node
       set_fact:
         nodes_labels: >-
@@ -33,7 +38,7 @@
             s_keys: "{{ node_selector.keys() | list }}"
             diff_keys: "{{ s_keys | difference(n_keys) }}"
           include_tasks: rook-node-selector-filter.yaml
-          loop: "{{ nodes_labels | default([]) }}"
+          loop: "{{ nodes_labels }}"
           loop_control:
             loop_var: node
             label: "{{ node.name }}"

@@ -1,4 +1,4 @@
 helm_version: v3.9.2
 helm:
   bin: "{{ bin_dir }}/helm/{{ helm_version }}/helm"
-  url: "https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz"
+  url: "https://get.helm.sh/helm-{{ helm_version }}-linux-{{ arch }}.tar.gz"

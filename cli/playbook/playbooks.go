@@ -11,12 +11,7 @@ import (
 // snapshot and generates Terraform main script.
 func KubitectInit() error {
 
-	extravars := []string{
-		"kubitect_home=" + env.ProjectHomePath,
-		"kubitect_cluster_action=" + env.ClusterAction,
-		"kubitect_cluster_name=" + env.ClusterName,
-		"kubitect_cluster_path=" + env.ClusterPath,
-	}
+	extravars := []string{}
 
 	// Set custom config path if provided.
 	if env.IsCustomConfig {
@@ -40,16 +35,11 @@ func KubitectInit() error {
 // hosts meet all the requirements before cluster is created.
 func KubitectHostsSetup() error {
 
-	extravars := []string{
-		"kubitect_cluster_path=" + env.ClusterPath,
-	}
-
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:            helpers.Venvs.Main,
 		PlaybookFile:    filepath.Join(env.ClusterPath, "ansible/kubitect/hosts-setup.yaml"),
 		Inventory:       filepath.Join(env.ClusterPath, "config/hosts.yaml"),
 		ConnectionLocal: true,
-		Extravars:       extravars,
 	})
 
 	if err != nil {
@@ -64,14 +54,9 @@ func KubitectHostsSetup() error {
 // git project.
 func KubitectKubespraySetup() error {
 
-	extravars := []string{
-		"kubitect_cluster_path=" + env.ClusterPath,
-	}
-
 	err := helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Main,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubitect/kubespray-setup.yaml"),
-		Extravars:    extravars,
 	})
 
 	if err != nil {
@@ -85,10 +70,6 @@ func KubitectKubespraySetup() error {
 // cluster installation.
 func KubitectFinalize(sshUser string, sshPKey string) error {
 
-	extravars := []string{
-		"kubitect_cluster_path=" + env.ClusterPath,
-	}
-
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Main,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubitect/finalize.yaml"),
@@ -97,7 +78,6 @@ func KubitectFinalize(sshUser string, sshPKey string) error {
 		User:         sshUser,
 		PrivateKey:   sshPKey,
 		Timeout:      3000,
-		Extravars:    extravars,
 	})
 
 	if err != nil {
@@ -111,10 +91,6 @@ func KubitectFinalize(sshUser string, sshPKey string) error {
 // load balancers.
 func HAProxySetup(sshUser string, sshPKey string) error {
 
-	extravars := []string{
-		"kubitect_cluster_path=" + env.ClusterPath,
-	}
-
 	err := helpers.ExecAnsiblePlaybook(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Main,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubitect/haproxy.yaml"),
@@ -123,7 +99,6 @@ func HAProxySetup(sshUser string, sshPKey string) error {
 		User:         sshUser,
 		PrivateKey:   sshPKey,
 		Timeout:      3000,
-		Extravars:    extravars,
 	})
 
 	if err != nil {
