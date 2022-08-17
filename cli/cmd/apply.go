@@ -315,7 +315,19 @@ func removeNodes(configPath string, infraConfigPath string, nodeType string) err
 				return fmt.Errorf("User aborted.")
 			}
 
-			// Remove Kubespray nodes
+			// Ensure Kubespray is cloned.
+			err = playbook.KubitectKubespraySetup("setup_only")
+			if err != nil {
+				return err
+			}
+
+			// Ensure Kubespray's virtual environment is prepared.
+			err = helpers.SetupVirtualEnvironment(env.ClusterPath, helpers.Venvs.Kubespray)
+			if err != nil {
+				return err
+			}
+
+			// Remove Kubespray nodes.
 			err = playbook.KubesprayRemoveNodes(sshUser, sshPKey, removedNodeNames)
 			if err != nil {
 				return err
