@@ -6,7 +6,7 @@ hide:
 
 <h1 align="center">Configuration reference</h1>
 
-This document contains a reference of the Kubitect configuration file in four sections and documents all possible configuration properties.
+This document contains a reference of the Kubitect configuration file and documents all possible configuration properties.
 
 The configuration sections are as follows:
 
@@ -14,7 +14,7 @@ The configuration sections are as follows:
 + `hosts` - A list of physical hosts (local or remote).
 + `cluster` - Configuration of the cluster infrastructure. Virtual machine properties, node types to install, and the host on which to install the nodes.
 + `kubernetes` - Kubernetes and Kubespray configuration.
-+ `plugins` - Configurable plugins and applications.
++ `addons` - Configurable addons and applications.
 
 Each configuration property is documented with 5 columns: Property name, description, type, default value and is the property required.
 
