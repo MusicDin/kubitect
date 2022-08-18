@@ -413,11 +413,11 @@ Each configuration property is documented with 5 columns: Property name, descrip
     <tr>
       <td><code>cluster.nodes.master.instances[*].dataDisks[*].pool</code></td>
       <td>string</td>
-      <td></td>
+      <td>main</td>
       <td></td>
       <td>
-        Name of the data resource pool where the additional data disk is created. 
-        Referenced resource pool must be specified on the same host.
+        Name of the data resource pool where the additional data disk is created.
+        Referenced resource pool must be configure on the same host.
       </td>
     </tr>
     <tr>
@@ -532,11 +532,11 @@ Each configuration property is documented with 5 columns: Property name, descrip
     <tr>
       <td><code>cluster.nodes.worker.instances[*].dataDisks[*].pool</code></td>
       <td>string</td>
-      <td></td>
+      <td>main</td>
       <td></td>
       <td>
-        Name of the data resource pool where the additional data disk is created. 
-        Referenced resource pool must be specified on the same host.
+        Name of the data resource pool where the additional data disk is created.
+        Referenced resource pool must be configure on the same host.
       </td>
     </tr>
     <tr>
