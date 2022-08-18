@@ -168,8 +168,9 @@ The VM's storage can be expanded by creating additional disks, also called data 
 This can be particularly useful when using storage solutions such as Rook.
 For example, Rook can be configured to use empty disks on worker nodes to create reliable distributed storage. 
 
-To configure data disks with Kubitect, a data resource pool must be configured for a host on which a VM using a configured data disk is deployed.
-In addition, data disks must be linked to a specific data resource pool, because multiple data resource pools can be configured.
+Data disks in Kubitect must be configured separately for each node instance.
+They must also be connected to a resource pool, which can be either a main resource pool or a custom data resource pool.
+In this example, we have defined a custom data resource pool named `data-pool` on each host running worker nodes.
 
 ```yaml title="ha.yaml" 
 hosts:
