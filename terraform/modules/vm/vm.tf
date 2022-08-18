@@ -20,7 +20,7 @@ locals {
     network_gateway   = var.network_gateway,
     vm_dns_list       = local.vm_dns_list,
     vm_cidr           = var.vm_ip == null ? "" : "${var.vm_ip}/${split("/", var.network_cidr)[1]}",
-    extra_bridges     = var.extra_bridges})
+    vm_extra_bridges     = var.vm_extra_bridges})
 
   cloud_init_network_dhcp = templatefile("./templates/cloud_init/cloud_init_network_dhcp.tpl", {
     network_interface = var.vm_network_interface,
@@ -94,7 +94,7 @@ resource "libvirt_domain" "vm_domain" {
 
   # Extra network bridges #
   dynamic network_interface {
-    for_each = var.extra_bridges
+    for_each = var.vm_extra_bridges
     content {
       bridge = network_interface.value.bridge
     }

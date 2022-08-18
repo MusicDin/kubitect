@@ -51,17 +51,6 @@ variable "network_cidr" {
   description = "Network CIDR"
 }
 
-variable "extra_bridges" {
-  type = list(object({
-    bridge           = string
-    networkInterface = string
-    ipCidr           = string
-  }))
-  description = "Additional network bridges."
-  nullable = false
-  default  = []
-}
-
 # ==================================== #
 # VM variables                         #
 # ==================================== #
@@ -159,4 +148,15 @@ variable "vm_mac" {
 variable "vm_ip" {
   type        = string
   description = "The IP address of the virtual machine"
+}
+
+variable "vm_extra_bridges" {
+  type = list(object({
+    bridge           = string
+    networkInterface = string
+    ipCidr           = string
+  }))
+  description = "Additional network bridges."
+  nullable = false
+  default  = []
 }
