@@ -185,7 +185,7 @@ module "worker_module" {
   network_cidr    = var.cluster_network_cidr
 
   # Worker node specific variables #
-  vm_name              = "${var.cluster_name}-${var.node_types.worker}-${each.value.id}"
+  vm_name              = each.value.name != null ? "${var.cluster_name}-${each.value.name}" : "${var.cluster_name}-${var.node_types.worker}-${each.value.id}"
   vm_type              = var.node_types.worker
   vm_user              = var.cluster_nodeTemplate_user
   vm_update            = var.cluster_nodeTemplate_updateOnBoot

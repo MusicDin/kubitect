@@ -238,6 +238,7 @@ variable "cluster_nodes_worker_default_dataDisks" {
 variable "cluster_nodes_worker_instances" {
   type = list(object({
     id           = number
+    name         = optional(string)
     host         = optional(string)
     mac          = optional(string)
     ip           = optional(string)
