@@ -179,7 +179,7 @@ variable "cluster_nodes_master_default_mainDiskSize" {
 variable "cluster_nodes_master_default_dataDisks" {
   type = list(object({
     name : string
-    pool : string
+    pool : optional(string)
     size : number
   }))
   description = "List of additional data disks that are attached to the master node."
@@ -198,7 +198,7 @@ variable "cluster_nodes_master_instances" {
     mainDiskSize = optional(number)
     dataDisks = optional(list(object({
       name : string
-      pool : string
+      pool : optional(string)
       size : number
     })))
   }))
@@ -227,7 +227,7 @@ variable "cluster_nodes_worker_default_mainDiskSize" {
 variable "cluster_nodes_worker_default_dataDisks" {
   type = list(object({
     name : string
-    pool : string
+    pool : optional(string)
     size : number
   }))
   description = "List of additional data disks that are attached to the worker node."
@@ -246,7 +246,7 @@ variable "cluster_nodes_worker_instances" {
     mainDiskSize = optional(number)
     dataDisks = optional(list(object({
       name : string
-      pool : string
+      pool : optional(string)
       size : number
     })))
   }))

@@ -130,12 +130,10 @@ variable "vm_main_disk_size" {
 }
 
 variable "vm_data_disks" {
-  # If pool does not exist, null is passed.
-  # If no additional disks need to be created, an empty array ([]) is passed.
   type = list(object({
     name : string
     size : number
-    pool : string
+    pool : optional(string)
   }))
   description = "Additional data disks attached to the virtual machine"
 }
