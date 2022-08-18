@@ -55,7 +55,7 @@ func init() {
 	rootCmd.AddCommand(applyCmd)
 
 	applyCmd.PersistentFlags().StringVarP(&env.ConfigPath, "config", "c", "", "specify path to the cluster config file")
-	applyCmd.PersistentFlags().StringVarP(&env.ClusterAction, "action", "a", env.DefaultClusterAction, "specify cluster action")
+	applyCmd.PersistentFlags().StringVarP(&env.ClusterAction, "action", "a", env.DefaultClusterAction, "specify cluster action [create, upgrade, scale]")
 	applyCmd.PersistentFlags().StringVar(&env.ClusterName, "cluster", env.DefaultClusterName, "specify the cluster to be used")
 	applyCmd.PersistentFlags().BoolVarP(&env.Local, "local", "l", false, "use a current directory as the cluster path")
 	applyCmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")

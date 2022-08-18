@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"cli/env"
+	"cli/utils"
 	"context"
 	"fmt"
 	"os"
@@ -25,6 +26,21 @@ func TerraformApply(clusterPath string) error {
 	tf, err := terraformInit(clusterPath)
 	if err != nil {
 		return err
+	}
+
+	// run a terraform plan first and get user confirmation to continue
+	changes, err := tf.Plan(context.Background())
+	if err != nil {
+		return fmt.Errorf("Error running Terraform apply: %w", err)
+	}
+
+	// Ask user for permission if there are any changes
+	if changes {
+		warning := "Proceed with terraform apply?"
+		confirm := utils.AskUserConfirmation(warning)
+		if !confirm {
+			return fmt.Errorf("User aborted.")
+		}
 	}
 
 	err = tf.Apply(context.Background())
