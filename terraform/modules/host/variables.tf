@@ -249,6 +249,11 @@ variable "cluster_nodes_worker_instances" {
       pool : string
       size : number
     })))
+    extraBridges = optional(list(object({
+      bridge            : string
+      networkInterface  : string
+      ipCidr            : string
+    })))
   }))
   description = "Worker node instances."
 }

@@ -8,3 +8,7 @@ ethernets:
     gateway4: ${network_gateway}
     nameservers:
       addresses: [${vm_dns_list}]
+%{ for interface in extra_bridges ~}
+  ${interface.networkInterface}:
+    addresses: [${interface.ipCidr}]
+%{ endfor ~}
