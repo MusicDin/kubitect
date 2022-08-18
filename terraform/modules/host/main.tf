@@ -33,8 +33,8 @@ resource "libvirt_pool" "data_resource_pools" {
   name = "${var.cluster_name}-${each.key}-data-resource-pool"
   type = "dir"
   path = (each.value.path == null
-    ? pathexpand("/var/lib/libvirt/images/${var.cluster_name}-data-resource-pool")
-    : pathexpand("${trimsuffix(each.value.path, "/")}/${var.cluster_name}-data-resource-pool")
+    ? pathexpand("/var/lib/libvirt/images/${var.cluster_name}-${each.key}-data-resource-pool")
+    : pathexpand("${trimsuffix(each.value.path, "/")}/${var.cluster_name}-${each.key}-data-resource-pool")
   )
 }
 
