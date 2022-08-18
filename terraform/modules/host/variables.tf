@@ -31,9 +31,9 @@ variable "hosts_mainResourcePoolPath" {
 variable "hosts_dataResourcePools" {
   type = list(object({
     name : string
-    path : string
+    path : optional(string)
   }))
-  description = "Location where main resource pool will be initialized."
+  description = "Additional data resource pools."
   default     = []
   nullable    = false
 }

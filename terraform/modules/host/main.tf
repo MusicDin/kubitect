@@ -32,7 +32,10 @@ resource "libvirt_pool" "data_resource_pools" {
 
   name = "${var.cluster_name}-${each.key}-data-resource-pool"
   type = "dir"
-  path = pathexpand("${trimsuffix(each.value.path, "/")}/${var.cluster_name}-data-resource-pool")
+  path = (each.value.path == null
+    ? pathexpand("/var/lib/libvirt/images/${var.cluster_name}-data-resource-pool")
+    : pathexpand("${trimsuffix(each.value.path, "/")}/${var.cluster_name}-data-resource-pool")
+  )
 }
 
 # Creates base OS image for nodes in a cluster #
