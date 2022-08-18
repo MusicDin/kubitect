@@ -793,5 +793,34 @@ Each configuration property is documented with 5 columns: Property name, descrip
         Kubespray addons configuration.
       </td>
     </tr>
+    <tr>
+      <td><code>addons.rook.dataDiskSelector</code></td>
+      <td>list</td>
+      <td></td>
+      <td></td>
+      <td>
+        List of disk names that Rook may use for distributed storage.
+        By default, all data disks can be used.
+      </td>
+    </tr>
+    <tr>
+      <td><code>addons.rook.enabled</code></td>
+      <td>boolean</td>
+      <td>false</td>
+      <td></td>
+      <td>
+        Enable Rook addon.
+      </td>
+    </tr>
+    <tr>
+      <td><code>addons.rook.nodeSelector</code></td>
+      <td>dictionary</td>
+      <td></td>
+      <td></td>
+      <td>
+        Dictionary containing node labels ("key: value").
+        Rook is deployed on the nodes that match all the given labels.
+      </td>
+    </tr>
   </tbody>
 </table>
