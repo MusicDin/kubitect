@@ -149,7 +149,7 @@ module "master_module" {
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_master_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_master_default_ram
   vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_master_default_mainDiskSize
-  vm_data_disks        = each.value.dataDisks != null ? (length(setintersection(each.value.dataDisks.*.pool, keys(libvirt_pool.data_resource_pools))) == length(distinct(each.value.dataDisks.*.pool)) ? each.value.dataDisks : null) : []
+  vm_data_disks        = [for disk in each.value.dataDisks : disk if disk.pool == null || disk.pool == "main" || length(setintersection(keys(libvirt_pool.data_resource_pools), [disk.pool])) == 1]
   vm_id                = each.value.id
   vm_mac               = each.value.mac
   vm_ip                = each.value.ip
@@ -196,13 +196,13 @@ module "worker_module" {
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_worker_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_worker_default_ram
   vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_worker_default_mainDiskSize
-  vm_data_disks        = each.value.dataDisks != null ? (length(setintersection(each.value.dataDisks.*.pool, keys(libvirt_pool.data_resource_pools))) == length(distinct(each.value.dataDisks.*.pool)) ? each.value.dataDisks : null) : []
+  vm_data_disks        = [for disk in each.value.dataDisks : disk if disk.pool == null || disk.pool == "main" || length(setintersection(keys(libvirt_pool.data_resource_pools), [disk.pool])) == 1]
   vm_id                = each.value.id
   vm_mac               = each.value.mac
   vm_ip                = each.value.ip
 
-  # Dependancy takes care that resource pool is not removed before volumes are #
-  # Also network must be created before VM is initialized #
+  # Dependancies takes care that resource pool is not removed before volumes are.
+  # Also network must be created before VM is initialized.
   depends_on = [
     module.network_module,
     libvirt_pool.main_resource_pool,
