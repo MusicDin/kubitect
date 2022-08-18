@@ -153,15 +153,6 @@
       loop: "{{ config.hosts }}"
       when: 
         - item.dataResourcePools | length != item.dataResourcePools | map(attribute='name') | unique | length
-
-    - name: Fail if data resource pool without a path exists
-      fail:
-        msg: |
-          The host ({{ item.name }}) has a data resource pool with no path!
-          Make sure that a path is set for each data resource pool.
-      loop: "{{ config.hosts }}"
-      when: 
-        - item.dataResourcePools | length != item.dataResourcePools | selectattr('path', 'defined') | rejectattr('path', 'none') | length
   when: 
     - item.dataResourcePools is defined
     - item.dataResourcePools is not none

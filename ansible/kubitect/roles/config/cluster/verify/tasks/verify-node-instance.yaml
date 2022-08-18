@@ -114,10 +114,11 @@
           The {{ type }} node instance (with id {{ node.id }}) contains an invalid data disk ({{ item.name }}).
           The data disk references an invalid data resource pool ({{ item.pool | default(none) }})!
           Defined data resource pools for node's host ({{ node_host }}) are:
-            {{ node_host_dataDiskPoolNames }}
+            {{ [ "main" ] + node_host_dataDiskPoolNames }}
       loop: "{{ node.dataDisks if node.dataDisks else [] }}"
       when:
-        - (not item.pool | default(none)) or (item.pool not in node_host_dataDiskPoolNames)
+        - item.pool | default(none)
+        - item.pool not in ([ "main" ] + node_host_dataDiskPoolNames)
   when:
     - type in ['worker', 'master']
     - node.dataDisks is defined
