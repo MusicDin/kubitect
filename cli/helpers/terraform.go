@@ -28,18 +28,20 @@ func TerraformApply(clusterPath string) error {
 		return err
 	}
 
-	// run a terraform plan first and get user confirmation to continue
-	changes, err := tf.Plan(context.Background())
-	if err != nil {
-		return fmt.Errorf("Error running Terraform apply: %w", err)
-	}
+	// run 'terraform plan' first to show changes
+	if !env.AutoApprove {
+		changes, err := tf.Plan(context.Background())
+		if err != nil {
+			return fmt.Errorf("Error running Terraform apply: %w", err)
+		}
 
-	// Ask user for permission if there are any changes
-	if changes {
-		warning := "Proceed with terraform apply?"
-		confirm := utils.AskUserConfirmation(warning)
-		if !confirm {
-			return fmt.Errorf("User aborted.")
+		// Ask user for permission if there are any changes
+		if changes {
+			warning := "Proceed with terraform apply?"
+			confirm := utils.AskUserConfirmation(warning)
+			if !confirm {
+				return fmt.Errorf("User aborted.")
+			}
 		}
 	}
 
