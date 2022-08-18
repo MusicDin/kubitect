@@ -1,5 +1,6 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 [tag 2.1.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.1.0
+[tag 2.2.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.2.0
 
 <h1 align="center">Cluster nodes</h1>
 
@@ -57,7 +58,7 @@ cluster:
 
 For each instance there is a set of predefined properties that can be set.
 Some properties apply for all node types, while some properties are specific for a certain node type.
-Properties that apply for all node types, are refered to as *common properties*.
+Properties that apply for all node types, are referred to as *common properties*.
 
 #### Instance ID
 
@@ -268,13 +269,17 @@ The following properties can be configured only for control plane or worker node
 
 #### Data disks
 
-:material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
+:material-tag-arrow-up-outline: [v2.2.0][tag 2.2.0]
 
-By default only a main disk (volume) is attached to every instance, so additional disks may be required.
-For example, a [Rook](https://rook.io/) can be easily configured to use all empty disks attached to the virtual machine to form a storage cluster.
+By default, only a main disk (volume) is attached to each provisioned virtual machine.
+Since the main disk already contains an operating system, so it may not be suitable for storing data.
+Therefore, additional disks might be required.
+For example, a [Rook](https://rook.io/) can be easily configured to use all the empty disks attached to the virtual machine to form a storage cluster.
 
-Each data disk must have a name, a size (in GiB), and the name of the [data resource pool](../hosts/#data-resource-pools) in which it is created.
-Note that the data disk name must be unique among all data disks for a given instance.
+A name and size (in GiB) must be configured for each data disk.
+By default, data disks are created in the main resource pool.
+To create a data disk in a custom [data resource pool](../hosts/#data-resource-pools), the pool property can be set to the name of the desired data resource pool.
+Also note that the data disk name must be unique among all data disks for a given instance.
 
 ```yaml
 cluster:
@@ -283,10 +288,17 @@ cluster:
       instances:
         - id: 1
           dataDisks:
+            - name: data-volume
+              pool: main # (1)
+              size: 256
             - name: rook-volume
-              pool: rook-pool
+              pool: rook-pool # (2)
               size: 512
 ```
+
+1. When `pool` property is omitted or set to `main`, the data disk is created in the main resource pool.
+
+2. Custom [data resource pool](../hosts/#data-resource-pools) must be configured in the hosts section.
 
 !!! note "Note"
 
