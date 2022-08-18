@@ -126,12 +126,12 @@ hosts:
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
 Data resource pools define **additional resource pools** (*besides the required main resource pool*).
-They are useful in situations where multiple disks need to be attached to the node's virtual machines.
 For example, main disks contain the OS image and should be created on fast storage devices, while data resource pools can be used to attach additional virtual disks that can be created on slower storage devices such as HDDs.
 
-Multiple data resource pools can be defined and each pool must contain a unique name (on a specific host) and a path under which it is created.
-The name of the data resource pool is used to associate virtual disks defined in the node configuration with the actual data resource pool.
-
+Multiple data resource pools can be defined on each host.
+Each configured pool must have a unique name on a particular host.
+The data resource pool name is used to associate the virtual disks defined in the node configuration with the actual data resource pool.
+The path of the data resources is set to `/var/lib/libvirt/images` by default, but can be easily configured with the `path` property.
 
 ```yaml
 hosts:
@@ -139,12 +139,10 @@ hosts:
     dataResourcePools:
       - name: rook-pool
         path: /mnt/hdd/kubitect/pools/
-  - name: host2 
-    dataResourcePools:
-      - name: rook-pool
-        path: /var/lib/libvirt/images/
+      - name: data-pool # (1)
 ```
 
+1. If the path of the resource pool is not specified, it is created under the path `/var/lib/libvirt/images/`.
 
 ## Example usage
 

@@ -126,7 +126,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
     <tr>
       <td><code>hosts[*].dataResourcePools[*].path</code></td>
       <td>string</td>
-      <td></td>
+      <td>/var/lib/libvirt/images/</td>
       <td></td>
       <td>Host path to the location where data resource pool is created.</td>
     </tr>
