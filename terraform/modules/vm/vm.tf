@@ -12,19 +12,18 @@ data "local_file" "ssh_public_key" {
 }
 
 locals {
-  # Network bridge configuration (for cloud-init) #
-  vm_dns_list       = length(var.vm_dns) == 0 ? var.network_gateway : join(", ", var.vm_dns)
-
-  cloud_init_network_static = templatefile("./templates/cloud_init/cloud_init_network_static.tpl", {
-    network_interface = var.vm_network_interface,
-    network_gateway   = var.network_gateway,
-    vm_dns_list       = local.vm_dns_list,
-    vm_cidr           = var.vm_ip == null ? "" : "${var.vm_ip}/${split("/", var.network_cidr)[1]}",
-    vm_extra_bridges     = var.vm_extra_bridges})
-
-  cloud_init_network_dhcp = templatefile("./templates/cloud_init/cloud_init_network_dhcp.tpl", {
-    network_interface = var.vm_network_interface,
-    vm_dns_list       = local.vm_dns_list})
+  # Network configuration (for cloud-init) #
+  cloud_init_network = templatefile(
+    var.vm_ip != null ? 
+      "./templates/cloud_init/cloud_init_network_static.tpl" : "./templates/cloud_init/cloud_init_network_dhcp.tpl", 
+    {
+      network_interface = var.vm_network_interface,
+      network_gateway   = var.network_gateway,
+      vm_dns_list       = length(var.vm_dns) == 0 ? var.network_gateway : join(", ", var.vm_dns),
+      vm_cidr           = try("${var.vm_ip}/${split("/", var.network_cidr)[1]}", ""),
+      vm_extra_bridges  = var.vm_extra_bridges
+    }
+  )
 }
 
 # Cloud-init configuration template #
@@ -44,7 +43,7 @@ resource "libvirt_cloudinit_disk" "cloud_init" {
   name           = "${var.vm_name}-cloud-init.iso"
   pool           = var.main_resource_pool_name
   user_data      = data.template_file.cloud_init_tpl.rendered
-  network_config = var.vm_ip != null ? local.cloud_init_network_static : local.cloud_init_network_dhcp
+  network_config = local.cloud_init_network
 }
 
 #================================
