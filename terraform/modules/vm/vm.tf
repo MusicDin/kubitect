@@ -79,6 +79,10 @@ resource "libvirt_domain" "vm_domain" {
   memory    = var.vm_ram * 1024 # GiB -> MiB
   autostart = true
 
+  cpu {
+    mode = var.vm_cpuMode
+  }
+
   cloudinit = libvirt_cloudinit_disk.cloud_init.id
 
   qemu_agent = true

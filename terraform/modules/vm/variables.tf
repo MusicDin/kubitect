@@ -108,6 +108,13 @@ variable "vm_id" {
   description = "Unique VM id used to differentiate VMs of the same type."
 }
 
+variable "vm_cpuMode" {
+  type        = string
+  description = "The libvirt CPU emulation mode."
+  default     = "custom"
+  nullable    = false
+}
+
 variable "vm_cpu" {
   type        = number
   description = "The number of vCPU allocated to the virtual machine"
