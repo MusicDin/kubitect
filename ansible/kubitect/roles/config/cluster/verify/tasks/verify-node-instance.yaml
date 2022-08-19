@@ -107,7 +107,7 @@
     - name: Fail if node's data disk pool is invalid
       vars:
         node_host: "{{ node.host | default( config.hosts[0].name ) }}"
-        node_host_dataDiskPools: "{{ config.hosts | selectattr('name', 'equalto', node_host) | map(attribute='dataResourcePools') }}"
+        node_host_dataDiskPools: "{{ config.hosts | selectattr('name', 'equalto', node_host) | map(attribute='dataResourcePools', default=[]) }}"
         node_host_dataDiskPoolNames: "{{ node_host_dataDiskPools | default([]) | flatten | map(attribute='name') }}"
       fail:
         msg: |
