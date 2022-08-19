@@ -4,6 +4,15 @@
   any_errors_fatal: true
   roles:
     - role: config/cluster/import
+      tags:
+        - setup_only
+
     - role: config/infra/import
+      tags:
+        - setup_only
+
     - role: generate/inventory/nodes
+
     - role: kubespray
+      tags:
+        - setup_only
