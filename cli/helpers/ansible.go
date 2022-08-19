@@ -28,7 +28,7 @@ var (
 type AnsiblePlaybookCmd struct {
 	PlaybookFile    string // "clusterPath/PlaybookFile"
 	Inventory       string
-	Tags            string
+	Tags            []string
 	User            string
 	PrivateKey      string
 	Become          bool
@@ -92,7 +92,7 @@ func ExecAnsiblePlaybook(clusterPath string, ansibleCmd *AnsiblePlaybookCmd) err
 
 	playbookOptions := &playbook.AnsiblePlaybookOptions{
 		Inventory: ansibleCmd.Inventory,
-		Tags:      ansibleCmd.Tags,
+		Tags:      strings.Join(ansibleCmd.Tags, ","),
 	}
 
 	if env.DebugMode {

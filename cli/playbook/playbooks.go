@@ -52,11 +52,12 @@ func KubitectHostsSetup() error {
 // KubitectKubespraySetup functions calls an Ansible playbook that prepares Kubespray
 // configuration files (all.yaml, k8s_cluster.yaml, ...) and clones Kubespray
 // git project.
-func KubitectKubespraySetup() error {
+func KubitectKubespraySetup(tags ...string) error {
 
 	err := helpers.ExecAnsiblePlaybookLocal(env.ClusterPath, &helpers.AnsiblePlaybookCmd{
 		Venv:         helpers.Venvs.Main,
 		PlaybookFile: filepath.Join(env.ClusterPath, "ansible/kubitect/kubespray-setup.yaml"),
+		Tags:         tags,
 	})
 
 	if err != nil {
