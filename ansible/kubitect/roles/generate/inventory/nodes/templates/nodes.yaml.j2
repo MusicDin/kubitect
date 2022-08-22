@@ -31,7 +31,7 @@ all:
         {{ key }}: {{ value }}
         {% endfor %}
       {% endif %}
-      {% set taints = def_master_taints + (cfg_master.taints | default([])) %}
+      {% set taints = (def_master_taints + (cfg_master.taints | default([]))) | unique %}
       {% if taints | length > 0 %}
       node_taints:
         {% for value in taints %}
@@ -52,7 +52,7 @@ all:
         {{ key }}: {{ value }}
         {% endfor %}
       {% endif %}
-      {% set taints = def_worker_taints + (cfg_worker.taints | default([])) %}
+      {% set taints = (def_worker_taints + (cfg_worker.taints | default([]))) | unique %}
       {% if taints | length > 0 %}
       node_taints:
         {% for value in taints %}
