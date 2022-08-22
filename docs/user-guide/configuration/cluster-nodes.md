@@ -1,5 +1,6 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 [tag 2.1.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.1.0
+[tag 2.2.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.2.0
 
 <h1 align="center">Cluster nodes</h1>
 
@@ -336,6 +337,30 @@ cluster:
     - `#!yaml label-key-1: new-label-value-1`
     - `#!yaml label-key-2: def-label-value-2`
 
+#### Node taints
+
+:material-tag-arrow-up-outline: [v2.2.0][tag 2.2.0]
+
+Node taints are configured as a list of strings in the format `key=value:effect`.
+Similar to node labels, taints can only be applied to control plane (master) and worker nodes.
+
+Taints can be set for a specific instance or as a default value for all instances.
+Taints set for a particular instance are merged with the default taints and duplicate entries are removed.
+
+```yaml
+cluster:
+  nodes:
+    <node-type>: # (1)
+      default:
+        taints:
+          - "key1=value1:NoSchedule"
+      instances:
+        - id: 1
+          taints:
+            - "key2=value2:NoExecute"
+```
+
+1. Node taints can only be applied to **control plane** (master) and **worker** nodes.
 
 ### Load balancer properties
 
