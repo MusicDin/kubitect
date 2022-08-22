@@ -8,7 +8,7 @@ This includes the properties of the operating system (OS), DNS, and virtual mach
 
 ## Configuration
 
-### Virtual machnine user
+### Virtual machine user
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 &ensp;
@@ -25,7 +25,9 @@ cluster:
     user: kubitect
 ```
 
-### OS distribution
+### Operating system (OS)
+
+#### OS distribution
 
 :material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
 &ensp;
@@ -33,20 +35,8 @@ cluster:
 
 The operating system for virtual machines can be specified in the node template.
 Currently, either Ubuntu or Debian can be configured.
-
 By default, the Ubuntu distribution is installed on all virtual machines.
 To use Debian instead, set `os.distro` property to Debian.
-Images for Ubuntu are obtained from the [Ubuntu cloud image repository](https://cloud-images.ubuntu.com/) and for Debian from the [Debian cloud image repository](https://cloud.debian.org/images/cloud/).
-
-Preset distributions are the following:
-
-+ `ubuntu` - Latest Ubuntu 22.04 release. (*default*)
-+ `ubuntu22` - Ubuntu 22.04 release *2022-07-12*.
-+ `ubuntu20` - Ubuntu 20.04 release *2022-07-11*.
-+ `debian` - Latest Debian 11 release.
-+ `debian11` - Debian 11 release *2022-07-11*.
-
-
 
 ```yaml
 cluster:
@@ -55,9 +45,23 @@ cluster:
       distro: debian # (1)
 ```
 
-1. The distribution `ubuntu` is used by default.
+1. By default, `ubuntu` is used.
 
-To use a custom Ubuntu or Debian image, specify its source.
+Available OS distribution presets are the following:
+
++ `ubuntu` - Latest Ubuntu 22.04 release. (*default*)
++ `ubuntu22` - Ubuntu 22.04 release *2022-07-12*.
++ `ubuntu20` - Ubuntu 20.04 release *2022-07-11*.
++ `debian` - Latest Debian 11 release.
++ `debian11` - Debian 11 release *2022-07-11*.
+
+Ubuntu images are downloaded from the [Ubuntu cloud image repository](https://cloud-images.ubuntu.com/) and Debian images are downloaded from the [Debian cloud image repository](https://cloud.debian.org/images/cloud/).
+
+#### Custom OS source
+
+:material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
+
+If the presets do not meet your needs, you can also use a custom Ubuntu or Debian image by simply specifying the image source.
 The source of an image can be either a local path on a system or an URL pointing to the image download.
 
 ```yaml
@@ -66,6 +70,22 @@ cluster:
     os:
       distro: ubuntu
       source: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+```
+
+#### Primary OS network interface
+
+:material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
+
+When a virtual machine is created, the network interface names are evaluated deterministically.
+Therefore, Kubitect should use the correct network interface names for all available presets.
+
+However, if you want to instruct Kubitect to use a specific network interface as primary, set its name as the value of the `os.networkInterface` property.
+
+```yaml
+cluster:
+  nodeTemplate:
+    os:
+      networkInterface: ens3
 ```
 
 ### Custom DNS list
