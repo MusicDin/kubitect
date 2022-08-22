@@ -11,7 +11,7 @@ all:
   {# Load balancers #}
   {% if infra.cluster.nodes.loadBalancer.instances is defined %}
     {% for lb in infra.cluster.nodes.loadBalancer.instances %}
-    {% set cfg_lb = cfg_lbs | selectattr("id", "equalto", lb.id) | first %}
+    {% set cfg_lb = cfg_lbs | selectattr("id", "equalto", lb.id | string) | first %}
     {{ lb.name }}:
       ansible_host: {{ lb.ip }}
       {% if cfg_lb.priority is defined %}
@@ -21,7 +21,7 @@ all:
   {% endif %}
   {# Master nodes #}
   {% for master in infra.cluster.nodes.master.instances %}
-  {% set cfg_master = cfg_masters | selectattr("id", "equalto", master.id) | first %}
+  {% set cfg_master = cfg_masters | selectattr("id", "equalto", master.id | string) | first %}
     {{ master.name }}: 
       ansible_host: {{ master.ip }}
       {% set labels = def_master_labels | combine(cfg_master.labels | default({})) %}
@@ -42,7 +42,7 @@ all:
   {# Worker nodes #}
   {% if infra.cluster.nodes.worker.instances is defined %}
     {% for worker in infra.cluster.nodes.worker.instances %}
-    {% set cfg_worker = cfg_workers | selectattr("id", "equalto", worker.id) | first %}
+    {% set cfg_worker = cfg_workers | selectattr("id", "equalto", worker.id | string) | first %}
     {{ worker.name }}:
       ansible_host: {{ worker.ip }}
       {% set labels = def_worker_labels | combine(cfg_worker.labels | default({})) %}
