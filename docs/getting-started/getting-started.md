@@ -230,6 +230,10 @@ kubernetes:
 
 ## Step 5 - Create the cluster
 
+!!! tip "Tip"
+
+    If you encounter any issues during the installation, please refer to the [troubleshooting](../other/troubleshooting) page first.
+
 Our final cluster configuration looks like this:
 
 ```yaml title="kubitect.yaml"
@@ -283,9 +287,12 @@ Also, let's name our cluster `my-first-cluster`.
 kubitect apply --cluster my-first-cluster --config kubitect.yaml
 ```
 
+When the configuration is applied, the Terraform plan shows the changes Terraform wants to make to your infrastructure.
+User confirmation of the plan is required before Kubitect begins creating the cluster.
+
 !!! tip "Tip"
 
-    If you encounter any issues during the installation, please refer to the [troubleshooting](../other/troubleshooting) page first.
+    To skip the user confirmation step, the flag `--auto-approve` can be used.
 
 When the cluster is applied, it is created in Kubitect's home directory, which has the following structure.
 ```
