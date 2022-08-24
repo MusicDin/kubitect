@@ -102,6 +102,7 @@ module "lb_module" {
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
   vm_network_interface = var.cluster_nodeTemplate_os_networkInterface
   vm_dns               = var.cluster_nodeTemplate_dns
+  vm_cpuMode           = var.cluster_nodeTemplate_cpuMode
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_loadBalancer_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_loadBalancer_default_ram
   vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_loadBalancer_default_mainDiskSize
@@ -149,6 +150,7 @@ module "master_module" {
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
   vm_network_interface = var.cluster_nodeTemplate_os_networkInterface
   vm_dns               = var.cluster_nodeTemplate_dns
+  vm_cpuMode           = var.cluster_nodeTemplate_cpuMode
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_master_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_master_default_ram
   vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_master_default_mainDiskSize
@@ -196,6 +198,7 @@ module "worker_module" {
   vm_ssh_known_hosts   = var.cluster_nodeTemplate_ssh_addToKnownHosts
   vm_network_interface = var.cluster_nodeTemplate_os_networkInterface
   vm_dns               = var.cluster_nodeTemplate_dns
+  vm_cpuMode           = var.cluster_nodeTemplate_cpuMode
   vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_worker_default_cpu
   vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_worker_default_ram
   vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_worker_default_mainDiskSize

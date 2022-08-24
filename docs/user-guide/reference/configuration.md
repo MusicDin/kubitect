@@ -607,6 +607,15 @@ Each configuration property is documented with 5 columns: Property name, descrip
     </tr>
     <!-- Cluster node template -->
     <tr>
+      <td><code>cluster.nodeTemplate.cpuMode</code></td>
+      <td>string</td>
+      <td>custom</td>
+      <td></td>
+      <td>
+        Guest virtual machine CPU mode.
+      </td>
+    </tr>
+    <tr>
       <td><code>cluster.nodeTemplate.dns</code></td>
       <td>list</td>
       <td>Value of <code>network.gateway</code></td>

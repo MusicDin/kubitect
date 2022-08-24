@@ -176,6 +176,16 @@
     - config.cluster.nodeTemplate.dns is defined
     - config.cluster.nodeTemplate.dns is not none
 
+- name: Fail if node template CPU mode is invalid
+  fail:
+    msg: |
+      The value of 'cluster.nodeTemplate.cpuMode' is invalid ({{ config.cluster.nodeTemplate.cpuMode }}).
+      Valid CPU modes are:
+        {{ valid_cpu_modes }}
+  when:
+    - config.cluster.nodeTemplate.cpuMode | default(none)
+    - not config.cluster.nodeTemplate.cpuMode in valid_cpu_modes
+
 # -- Nodes -- #
 
 - name: Verify master nodes common properties
