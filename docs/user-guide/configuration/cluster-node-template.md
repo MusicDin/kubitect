@@ -1,5 +1,6 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 [tag 2.1.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.1.0
+[tag 2.2.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.2.0
 
 <h1 align="center">Cluster node template</h1>
 
@@ -86,6 +87,26 @@ cluster:
 
 1. IP addresses `1.1.1.1` and `1.0.0.1` represent CloudFlare's primary and secondary public DNS resolvers, respectively.
 
+### CPU mode
+
+:material-tag-arrow-up-outline: [v2.2.0][tag 2.2.0]
+&ensp;
+:octicons-file-symlink-file-24: Default: `custom`
+
+The CPU mode property can be used to simplify the configuration of a guest CPU to be as close as possible to the host CPU.
+Consult the [libvirt documentation](https://libvirt.org/formatdomain.html#cpu-model-and-topology) to learn about all available CPU modes:
+
++ `custom` (default)
++ `host-model`
++ `host-passthrough`
++ `maximum`
+
+
+```yaml
+cluster:
+  nodeTemplate:
+    cpuMode: host-passthrough
+```
 
 ### SSH options
 
