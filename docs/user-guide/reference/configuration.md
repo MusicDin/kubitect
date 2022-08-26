@@ -803,16 +803,6 @@ Each configuration property is documented with 5 columns: Property name, descrip
       </td>
     </tr>
     <tr>
-      <td><code>addons.rook.dataDiskSelector</code></td>
-      <td>list</td>
-      <td></td>
-      <td></td>
-      <td>
-        List of disk names that Rook may use for distributed storage.
-        By default, all data disks can be used.
-      </td>
-    </tr>
-    <tr>
       <td><code>addons.rook.enabled</code></td>
       <td>boolean</td>
       <td>false</td>
