@@ -122,11 +122,14 @@ nav:
           - CLI tool reference: user-guide/reference/cli.md
   - Examples:
       - Cluster Topologies:
-        - Single node cluster: examples/single-node-cluster.md
-        - Multi-worker cluster: examples/multi-worker-cluster.md
-        - Multi-master cluster: examples/multi-master-cluster.md
-        - Highly available (HA) cluster: examples/ha-cluster.md
+          - Single node cluster: examples/single-node-cluster.md
+          - Multi-worker cluster: examples/multi-worker-cluster.md
+          - Multi-master cluster: examples/multi-master-cluster.md
+          - Highly available (HA) cluster: examples/ha-cluster.md
+      - Storage:
+          - Rook cluster: examples/rook-cluster.md
+          - Restricting Rook deployment: examples/rook-cluster-selectors.md
       - Other:
-        - Accessing the cluster: examples/accessing-cluster.md
-        - Network bridge: examples/network-bridge.md
-        - Full example: examples/full-example.md
+          - Accessing the cluster: examples/accessing-cluster.md
+          - Network bridge: examples/network-bridge.md
+          - Full example: examples/full-example.md
