@@ -17,7 +17,7 @@
     rook_osd_nodes_count: "{{ rook_osd_nodes | length }}"
     mon_count: "{{ max_mon_count if rook_nodes_count | int >= max_mon_count else rook_nodes_count }}"
     mgr_count: "{{ max_mgr_count if rook_nodes_count | int >= max_mgr_count else rook_nodes_count }}"
-    replication_count: "{{ max_replication_count if rook_osd_nodes_count| int >= max_replication_count else rook_osd_nodes_count }}"
+    replication_count: "{{ max_replication_count if rook_osd_nodes_count | int >= max_replication_count else rook_osd_nodes_count }}"
   block:
     - name: Template Rook cluster Helm chart values
       template:
@@ -57,4 +57,4 @@
     values_files:
       - "{{ config_dir }}/helm/rook-cluster-values.yaml"
     kubeconfig: "{{ config_dir }}/admin.conf"
-    wait: true
+    # wait: true

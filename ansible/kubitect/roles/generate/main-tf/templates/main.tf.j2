@@ -198,14 +198,3 @@ resource "local_file" "output" {
   filename        = var.infra_config_path
   file_permission = 0600
 }
-
-# Removes temporary resources created during execution. #
-resource "null_resource" "cleanup" {
-
-  provisioner "local-exec" {
-    command    = "rm -r ../config/tmp"
-    when       = destroy
-    on_failure = continue
-  }
-
-}

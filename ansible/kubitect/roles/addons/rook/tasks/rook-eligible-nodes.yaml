@@ -4,12 +4,13 @@
     # Deploy only on worker nodes. If worker nodes are not set, use only master nodes.
     nodes: "{{ infra.cluster.nodes.worker.instances | default( infra.cluster.nodes.master.instances ) }}"
     node_selector: "{{ config.addons.rook.nodeSelector | default({}) }}"
-    data_disk_selector: "{{ config.addons.rook.dataDiskSelector | default([]) }}"
   block:
     - name: Set initial values for Rook variables
       set_fact:
+        use_all_nodes: false
         nodes_labels: []
         rook_nodes: []
+        rook_osd_nodes: []
 
     - name: Get node labels for each node
       set_fact:
@@ -28,10 +29,6 @@
 
     - name: Extract Rook nodes based on node selector
       block:
-        - name: Prevent use of all nodes for Rook deployment
-          set_fact:
-            use_all_nodes: false
-
         - name: Filter Rook nodes with node selector
           vars:
             n_keys: "{{ node.labels.keys() | list }}"
@@ -54,41 +51,6 @@
       when:
         - node_selector | length == 0
 
-    - name: Set initial value for Rook OSD nodes
-      set_fact:
-        use_all_devices: true
-        rook_osd_nodes: []
-
-      # rook_osd_nodes => List of {name: <NodeName>, devices: [<DevName>]}
-      #
-      # [ Example ]
-      # rook_osd_nodes:
-      #   - name: local-worker-1
-      #     devices:
-      #       - vdb
-      #   - name: local-worker-2
-      #     devices:
-      #       - vdb
-      #       - vdc
-      #
-    - name: Extract OSD nodes based on the Rook device filter
-      set_fact:
-        use_all_devices: false
-        rook_osd_nodes: >-
-          {{ 
-            rook_osd_nodes | default([]) + 
-            [{ 'name': item.name, 'devices': item.dataDisks | selectattr('name', 'in', data_disk_selector) | map(attribute='dev') }] 
-          }}
-      loop: "{{ nodes }}"
-      loop_control:
-        label: "{{ item.name }}"
-      when:
-        - data_disk_selector | length != 0
-        - item.name in rook_nodes
-        - item.dataDisks | default(none)
-        - item.dataDisks | length > 0
-        - item.dataDisks | map(attribute='name') | intersect(data_disk_selector) | length > 0
-
     - name: Extract OSD nodes based on attached disks
       set_fact:
         rook_osd_nodes: "{{ rook_osd_nodes | default([]) + [ item.name ] }}"
@@ -96,7 +58,6 @@
       loop_control:
         label: "{{ item.name }}"
       when:
-        - data_disk_selector | length == 0
         - item.name in rook_nodes
         - item.dataDisks | default(none)
         - item.dataDisks | length > 0
