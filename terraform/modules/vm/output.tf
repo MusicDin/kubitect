@@ -9,7 +9,6 @@ output "vm_info" {
         name = disk.name
         size = disk.size
         pool = disk.pool == null ? "main" : disk.pool
-        dev  = trim(data.local_file.data_disks_mapping[disk.name].content, "\n")
     }]
   }
   description = "VM's info"

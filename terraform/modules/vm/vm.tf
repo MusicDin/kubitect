@@ -1,7 +1,3 @@
-locals {
-  disk_mapping_dir = "../config/tmp/disk-mapping"
-}
-
 #================================
 # Cloud-init
 #================================
@@ -177,52 +173,6 @@ resource "null_resource" "remove_dhcp_lease" {
 
     on_failure = continue
   }
-}
-
-# Save data disk name to device name mappings #
-resource "null_resource" "data_disks_mapping" {
-
-  for_each = { for disk in var.vm_data_disks : disk.name => disk }
-
-  triggers = {
-    disk_name           = each.key
-    disk_size           = each.value.size
-    disk_pool           = each.value.pool
-    disk_mapping_exists = fileexists("${local.disk_mapping_dir}/${var.vm_name}-${each.key}-data-disk.dev")
-  }
-
-  provisioner "local-exec" {
-
-    command = <<-EOF
-      mkdir -p $DIR
-      virsh --connect $URI domblklist --domain $VM_NAME \
-        | grep $VM_NAME-$DISK_NAME-data-disk | cut -d' ' -f 2 \
-        > $DIR/$VM_NAME-$DISK_NAME-data-disk.dev
-    EOF
-
-    environment = {
-      URI       = var.libvirt_provider_uri
-      DIR       = local.disk_mapping_dir
-      VM_NAME   = var.vm_name
-      DISK_NAME = each.key
-    }
-  }
-
-  depends_on = [
-    libvirt_domain.vm_domain
-  ]
-}
-
-# Read disk-device name mapping files #
-data "local_file" "data_disks_mapping" {
-
-  for_each = { for disk in var.vm_data_disks : disk.name => disk }
-
-  filename = "${local.disk_mapping_dir}/${var.vm_name}-${each.key}-data-disk.dev"
-
-  depends_on = [
-    null_resource.data_disks_mapping
-  ]
 }
 
 #================================

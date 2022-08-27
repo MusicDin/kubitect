@@ -89,18 +89,8 @@ cephClusterSpec:
 
   removeOSDsIfOutAndSafeToRemove: true
   storage:
-    useAllNodes: {{ use_all_devices }}
-    useAllDevices: {{ use_all_devices }}
-    {% if not use_all_devices %}
-    nodes:
-      {% for node in rook_osd_nodes %}
-      - name: {{ node.name }}
-        devices:
-        {% for dev in node.devices %}
-          - name: {{ dev }}
-        {% endfor %}
-      {% endfor %}
-    {% endif %}
+    useAllNodes: true
+    useAllDevices: true
 
 cephBlockPools:
   - name: ceph-blockpool

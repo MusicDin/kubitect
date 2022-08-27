@@ -53,9 +53,15 @@ addons:
     enabled: true
 ```
 
+Rook is deployed only on worker nodes.
+When a cluster is created without worker nodes, Kubitect attempts to install Rook on the master node.
+
+In addition to enabling the Rook addon, **at least one [data disk](../cluster-nodes#data-disks)** must be attached to a node suitable for Rook deployment.
+If Kubitect determines that no data disks are available for Rook, it will simply skip installing Rook.
+
 By default, Rook uses all available data disks attached to worker nodes and converts them to distributed storage.
 Similarly, all worker nodes are used for Rook deployment.
-To restrict on which nodes Rook resources can be deployed or which disks can be used by Rook, the Node Selector can be used together with the Data Disk Selector.
+To restrict on which nodes Rook resources can be deployed, the node selector can be used.
 
 #### Node selector
 
@@ -67,23 +73,4 @@ addons:
   rook:
     nodeSelector:
       rook: true
-```
-
-#### Data disk selector
-
-!!! Warning "Warning"
-
-    The data disk selector is evaluated during the initial setup of the cluster.
-    This prevents additional data disks that are later attached to the virtual machines from being detected by Rook.
-    Therefore, changes to the data disk scheme after the initial setup of the cluster can result in unexpected behavior.
-
-In addition to the node selector, Rook can be restricted to use only specific data disks attached to VMs.
-The data disk selector is a list of strings, more specifically disk names, that instructs Rook to use only disks with those names.
-
-```yaml
-addons:
-  rook:
-    dataDiskSelector:
-      - rook
-      - rook-disk
 ```

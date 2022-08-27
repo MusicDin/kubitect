@@ -41,7 +41,6 @@ variable "worker_nodes" {
       name = string
       size = number
       pool = string
-      dev  = string
     }))
   }))
   description = "Worker nodes info"
@@ -56,7 +55,6 @@ variable "master_nodes" {
       name = string
       size = number
       pool = string
-      dev  = string
     }))
   }))
   description = "Master nodes info"
