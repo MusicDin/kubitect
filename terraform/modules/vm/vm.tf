@@ -90,7 +90,6 @@ resource "libvirt_domain" "vm_domain" {
   network_interface {
     network_id     = var.network_id
     mac            = var.vm_mac
-    addresses      = var.vm_ip != null ? [var.vm_ip] : null
     bridge         = var.network_bridge
     wait_for_lease = true
   }
@@ -137,41 +136,6 @@ resource "libvirt_domain" "vm_domain" {
     inline = [
       "while ! sudo grep \"Cloud-init .* finished\" /var/log/cloud-init.log; do echo \"Waiting for cloud-init to finish...\"; sleep 2; done"
     ]
-  }
-}
-
-# Remove DHCP lease from network after VM destruction #
-resource "null_resource" "remove_dhcp_lease" {
-
-  count = var.network_mode != "bridge" ? 1 : 0
-
-  triggers = {
-    libvirt_provider_uri = var.libvirt_provider_uri
-    network_id           = libvirt_domain.vm_domain.network_interface.0.network_id
-    vm_mac               = libvirt_domain.vm_domain.network_interface.0.mac
-    vm_ip                = libvirt_domain.vm_domain.network_interface.0.addresses.0
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<-EOF
-      virsh \
-      --connect $URI \
-      net-update $NETWORK_ID \
-      delete ip-dhcp-host "<host mac='$VM_MAC' ip='$VM_IP'/>" \
-      --live \
-      --config \
-      --parent-index 0
-    EOF
-
-    environment = {
-      URI        = self.triggers.libvirt_provider_uri
-      NETWORK_ID = self.triggers.network_id
-      VM_MAC     = self.triggers.vm_mac
-      VM_IP      = self.triggers.vm_ip
-    }
-
-    on_failure = continue
   }
 }
 
