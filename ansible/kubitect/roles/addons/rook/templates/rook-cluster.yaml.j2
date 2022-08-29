@@ -2,6 +2,10 @@ operatorNamespace: rook-ceph
 
 toolbox:
   enabled: true
+  {% set rook_version = config.addons.rook.version | default(none) %}
+  {% if rook_version %}
+  image: rook/ceph:{{ rook_version }}
+  {% endif %}
   resources:
     limits:
       cpu: "500m"
