@@ -821,5 +821,15 @@ Each configuration property is documented with 5 columns: Property name, descrip
         Rook is deployed on the nodes that match all the given labels.
       </td>
     </tr>
+    <tr>
+      <td><code>addons.rook.version</code></td>
+      <td>string</td>
+      <td></td>
+      <td></td>
+      <td>
+        Rook version.
+        By default, the latest release version is used.
+      </td>
+    </tr>
   </tbody>
 </table>

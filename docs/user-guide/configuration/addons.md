@@ -74,3 +74,14 @@ addons:
     nodeSelector:
       rook: true
 ```
+
+#### Version
+
+By default, the latest (`master`) Rook version is used.
+To use a specific version of Rook, set the `addons.rook.version` property to the desired version.
+
+```yaml
+addons:
+  rook:
+    version: v1.9.9
+```
