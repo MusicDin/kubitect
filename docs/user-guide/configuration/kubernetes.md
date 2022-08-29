@@ -1,4 +1,5 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
+[tag 2.2.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.2.0
 
 <h1 align="center">Kubernetes configuration</h1>
 
@@ -104,6 +105,22 @@ By default, this option is disabled, as it can overwrite an existing file.
 kubernetes:
   other:
     copyKubeconfig: true
+```
+
+### Auto renew control plane certificates
+
+:material-tag-arrow-up-outline: [v2.2.0][tag 2.2.0]
+&ensp;
+:octicons-file-symlink-file-24: Default: `false`
+
+Control plane certificates are valid for 1 year and are renewed each time the cluster is upgraded.
+In some rare cases, this can cause clusters that are not upgraded frequently to stop working properly.
+Therefore, the control plane certificates can be renewed automatically on the first Monday of each month by setting the `autoRenewCertificates` property to true.
+
+```yaml
+kubernetes:
+  other:
+    autoRenewCertificates: true
 ```
 
 ## Example usage
