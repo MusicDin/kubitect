@@ -762,6 +762,15 @@ Each configuration property is documented with 5 columns: Property name, descrip
       </td>
     </tr>
     <tr>
+      <td><code>kubernetes.other.autoRenewCertificates</code></td>
+      <td>boolean</td>
+      <td>false</td>
+      <td></td>
+      <td>
+        When this property is set to true, control plane certificates are renewed first Monday of each month.
+      </td>
+    </tr>
+    <tr>
       <td><code>kubernetes.other.copyKubeconfig</code></td>
       <td>boolean</td>
       <td>false</td>
