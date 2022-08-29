@@ -3,6 +3,14 @@
   {% set env.nodeAffinity = env.nodeAffinity + (key~'='~value~';') %}
 {% endfor %}
 
+image:
+  repository: rook/ceph
+  {% set rook_version = config.addons.rook.version | default(none) %}
+  {% if rook_version %}
+  tag: {{ rook_version }}
+  {% endif %}
+  pullPolicy: IfNotPresent
+
 logLevel: INFO
 hostpathRequiresPrivileged: false
 
