@@ -152,7 +152,7 @@ variable "cluster_nodes_loadBalancer_default_mainDiskSize" {
 
 variable "cluster_nodes_loadBalancer_instances" {
   type = list(object({
-    id           = number
+    id           = string
     host         = optional(string)
     mac          = optional(string)
     ip           = optional(string)
@@ -195,7 +195,7 @@ variable "cluster_nodes_master_default_dataDisks" {
 
 variable "cluster_nodes_master_instances" {
   type = list(object({
-    id           = number
+    id           = string
     host         = optional(string)
     mac          = optional(string)
     ip           = optional(string)
@@ -243,7 +243,7 @@ variable "cluster_nodes_worker_default_dataDisks" {
 
 variable "cluster_nodes_worker_instances" {
   type = list(object({
-    id           = number
+    id           = string
     host         = optional(string)
     mac          = optional(string)
     ip           = optional(string)

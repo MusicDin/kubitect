@@ -5,7 +5,7 @@
       fail:
         msg: |
           One of the 'cluster.nodes.{{ type }}.instances' has 'id' undefined.
-          Each node instance must have an ID defined and it must be a non-negative integer.
+          Each {{ type }} node instance must have a unique ID defined.
       when:
         - node.id is not defined
 
@@ -13,9 +13,9 @@
       fail:
         msg: |
           One of the 'cluster.nodes.{{ type }}.instances' has an invalid 'id' value ({{ node.id }}).
-          The node ID must be a non-negative integer.
+          The node ID must be a non-empty string that can contain characters [a-z], numbers [0-9] and hyphens [-].
       when:
-        - (node.id is none) or (node.id | int is not number) or (node.id | int < 0)
+        - (node.id is none) or (node.id is not regex( regex.names_strict ))
 
     - name: Fail if node's MAC address is invalid
       fail:
