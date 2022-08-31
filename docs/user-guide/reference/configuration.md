@@ -296,11 +296,11 @@ Each configuration property is documented with 5 columns: Property name, descrip
     </tr>
     <tr>
       <td><code>cluster.nodes.loadBalancer.instances[*].id</code></td>
-      <td>number</td>
+      <td>string</td>
       <td></td>
       <td>Yes</td>
       <td>
-        Unique numeric identifier of a load balancer instance.
+        Unique identifier of a load balancer instance.
       </td>
     </tr>
     <tr>
@@ -441,10 +441,10 @@ Each configuration property is documented with 5 columns: Property name, descrip
     </tr>
     <tr>
       <td><code>cluster.nodes.master.instances[*].id</code></td>
-      <td>number</td>
+      <td>string</td>
       <td></td>
       <td>Yes</td>
-      <td>Unique numeric identifier of a master node.</td>
+      <td>Unique identifier of a master node.</td>
     </tr>
     <tr>
       <td><code>cluster.nodes.master.instances[*].ip</code></td>
@@ -560,10 +560,10 @@ Each configuration property is documented with 5 columns: Property name, descrip
     </tr>
     <tr>
       <td><code>cluster.nodes.worker.instances[*].id</code></td>
-      <td>number</td>
+      <td>string</td>
       <td></td>
       <td>Yes</td>
-      <td>Unique numeric identifier of a worker node.</td>
+      <td>Unique identifier of a worker node.</td>
     </tr>
     <tr>
       <td><code>cluster.nodes.worker.instances[*].ip</code></td>
