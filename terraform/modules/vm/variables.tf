@@ -104,7 +104,7 @@ variable "vm_name" {
 }
 
 variable "vm_id" {
-  type        = number
+  type        = string
   description = "Unique VM id used to differentiate VMs of the same type."
 }
 

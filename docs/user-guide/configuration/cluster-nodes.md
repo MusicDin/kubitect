@@ -1,6 +1,7 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 [tag 2.1.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.1.0
 [tag 2.2.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.2.0
+[tag 2.3.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.3.0
 
 <h1 align="center">Cluster nodes</h1>
 
@@ -62,11 +63,11 @@ Properties that apply for all node types, are referred to as *common properties*
 
 #### Instance ID
 
-:material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
+:material-tag-arrow-up-outline: [v2.3.0][tag 2.3.0]
 &ensp;
 :material-alert-circle-outline: Required
 
-Each instance in the cluster must have a ID, which can be any positive number and must be unique among all instances within the same node type.
+Each instance in the cluster must have an ID that must be unique among all instances of the same node type.
 The instance ID is used as a suffix for the name of each node.
 
 ```yaml
@@ -75,7 +76,7 @@ cluster:
     <node-type>:
       instances:
         - id: 1
-        - id: 2
+        - id: compute-1
         - id: 77
 ```
 

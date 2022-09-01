@@ -11,6 +11,7 @@
   loop: "{{ nodes.instances if ( nodes.instances | default(none) ) else [] }}"
   loop_control:
     loop_var: node
+    label: "{{ type }}-{{ node.id | default(none) }}"
 
 - name: Verify default values
   block:
@@ -22,7 +23,7 @@
       when:
         - nodes.default.cpu is defined
         - (nodes.default.cpu | int is not number) or (nodes.default.cpu | int <= 0)
-  
+
     - name: Fail if default RAM value is invalid
       fail:
         msg: |
@@ -31,7 +32,7 @@
       when:
         - nodes.default.ram is defined
         - (nodes.default.ram | int is not number) or (nodes.default.ram | int <= 0)
-    
+
     - name: Fail if (default) main disk size is invalid
       fail:
         msg: |
@@ -43,13 +44,21 @@
   when:
     - nodes.default | default(none)
 
-- name: Fail if node IDs are not unique
-  fail:
-    msg: |
-      Multiple {{ type }} node instances have the same ID.
-      Node instances of a single type must have a unique ID.
-  when:
-    - nodes.instances | default(none)
-    - nodes.instances | length != nodes.instances | map(attribute='id') | unique | length
+- name: Verify node IDs
+  vars:
+    ids: "{{ nodes.instances | default(none) | map(attribute='id') | map('string') | list }}"
+  block:
+    - name: Extract duplicate ids
+      set_fact:
+        duplicate_ids: "{{ duplicate_ids | default([]) + [item] }}"
+      loop: "{{ ids | unique }}"
+      when:
+        - ids | select("equalto", item) | list | length > 1
 
-
+    - name: Fail if node IDs are not unique
+      fail:
+        msg: |
+          Multiple {{ type }} node instances have the same ID ({{ duplicate_ids | join(', ') }}).
+          Each node instance of a single type must have a unique ID.
+      when:
+        - duplicate_ids | default([]) | length > 0

@@ -34,7 +34,7 @@ variable "vm_os" {
 
 variable "worker_nodes" {
   type = list(object({
-    id   = number
+    id   = string
     name = string
     ip   = string
     dataDisks = list(object({
@@ -48,7 +48,7 @@ variable "worker_nodes" {
 
 variable "master_nodes" {
   type = list(object({
-    id   = number
+    id   = string
     name = string
     ip   = string
     dataDisks = list(object({
@@ -62,7 +62,7 @@ variable "master_nodes" {
 
 variable "lb_nodes" {
   type = list(object({
-    id   = number
+    id   = string
     name = string
     ip   = string
   }))
