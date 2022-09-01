@@ -132,7 +132,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
     </tr>
     <tr>
       <td><code>hosts[*].default</code></td>
-      <td>string</td>
+      <td>boolean</td>
       <td>false</td>
       <td></td>
       <td>
@@ -397,6 +397,15 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>Default amount of RAM (in GiB) allocated to a master node.</td>
     </tr>
     <tr>
+      <td><code>cluster.nodes.master.default.taints</code></td>
+      <td>list</td>
+      <td></td>
+      <td></td>
+      <td>
+        List of default node taints that are applied to all master nodes.
+      </td>
+    </tr>
+    <tr>
       <td><code>cluster.nodes.master.instances[*].cpu</code></td>
       <td>number</td>
       <td></td>
@@ -486,6 +495,15 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td></td>
       <td>Overrides a default value for the RAM for that instance.</td>
     </tr>
+    <tr>
+      <td><code>cluster.nodes.master.instances[*].taints</code></td>
+      <td>list</td>
+      <td></td>
+      <td></td>
+      <td>
+        List of node taints that are applied to this specific master node.
+      </td>
+    </tr>
     <!-- Cluster nodes (worker) -->
     <tr>
       <td><code>cluster.nodes.worker.default.cpu</code></td>
@@ -514,6 +532,15 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>4</td>
       <td></td>
       <td>Default amount of RAM (in GiB) allocated to a worker node.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.default.taints</code></td>
+      <td>list</td>
+      <td></td>
+      <td></td>
+      <td>
+        List of default node taints that are applied to all worker nodes.
+      </td>
     </tr>
     <tr>
       <td><code>cluster.nodes.worker.instances[*].cpu</code></td>
@@ -604,6 +631,15 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td></td>
       <td></td>
       <td>Overrides a default value for the RAM for that instance.</td>
+    </tr>
+    <tr>
+      <td><code>cluster.nodes.worker.instances[*].taints</code></td>
+      <td>list</td>
+      <td></td>
+      <td></td>
+      <td>
+        List of node taints that are applied to this specific worker node.
+      </td>
     </tr>
     <!-- Cluster node template -->
     <tr>
