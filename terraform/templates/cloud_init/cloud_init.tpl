@@ -17,4 +17,5 @@ packages:
   - qemu-guest-agent
 
 runcmd:
+  - [ systemctl, enable, qemu-guest-agent.service ]
   - [ systemctl, start, qemu-guest-agent.service ]
