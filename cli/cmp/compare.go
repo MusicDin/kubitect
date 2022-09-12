@@ -7,7 +7,6 @@ import (
 )
 
 const (
-	ROOT_NODE     = "cmp"
 	TAG_OPTION_ID = "id"
 )
 
@@ -32,7 +31,9 @@ func Compare(a, b interface{}) (*DiffNode, error) {
 	c := NewComparator()
 	c.diff = NewNode()
 
-	err := c.compare(c.diff, ROOT_NODE, reflect.ValueOf(a), reflect.ValueOf(b))
+	err := c.compare(c.diff, c.TagName, reflect.ValueOf(a), reflect.ValueOf(b))
+
+	c.diff = c.diff.getChild(c.TagName)
 
 	return c.diff, err
 }
