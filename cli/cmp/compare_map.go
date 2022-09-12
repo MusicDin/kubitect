@@ -37,7 +37,7 @@ func (c *Comparator) cmpMap(parent *DiffNode, key interface{}, a, b reflect.Valu
 
 // addPlainMap recursively adds all elements of the map to the diff tree
 // by comparing them to a nil value.
-func (c *Comparator) addPlainMap(a DiffType, p *DiffNode, key interface{}, v reflect.Value) error {
+func (c *Comparator) addPlainMap(a ActionType, p *DiffNode, key interface{}, v reflect.Value) error {
 	if a != CREATE && a != DELETE {
 		return fmt.Errorf("Invalid action: %v", a)
 	}

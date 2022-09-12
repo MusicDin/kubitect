@@ -12,40 +12,33 @@ var (
 	red    = color.New(color.FgRed).SprintFunc()
 	yellow = color.New(color.FgYellow).SprintFunc()
 	green  = color.New(color.FgHiGreen).SprintFunc()
+	blue   = color.New(color.FgHiBlue).SprintFunc()
 	none   = color.New(color.Reset).SprintFunc()
 )
 
-type DiffType int
+type ActionType int
 
 const (
-	NIL  DiffType = iota // Unknown
-	NONE                 // No change
+	NIL  ActionType = iota // Unknown
+	NONE                   // No change
 	CREATE
 	DELETE
 	MODIFY
 )
 
 type DiffNode struct {
-	key    string
-	parent *DiffNode
-	nodes  []*DiffNode
-	leafs  []*DiffLeaf
-	action DiffType
-}
-
-type DiffLeaf struct {
-	key    string
-	parent *DiffNode
-	before interface{}
-	after  interface{}
-	action DiffType
+	key      string
+	parent   *DiffNode
+	children []*DiffNode
+	action   ActionType
+	before   interface{}
+	after    interface{}
 }
 
 // NewNode returns new node.
 func NewNode() *DiffNode {
 	node := &DiffNode{
-		nodes: make([]*DiffNode, 0),
-		leafs: make([]*DiffLeaf, 0),
+		children: make([]*DiffNode, 0),
 	}
 	return node
 }
@@ -57,31 +50,28 @@ func (n *DiffNode) AddNode(key interface{}) *DiffNode {
 	node.parent = n
 	node.action = NIL
 
-	n.nodes = append(n.nodes, node)
+	n.children = append(n.children, node)
 
 	return node
 }
 
 // AddLeaf returns a new leaf that is linked to the current node.
-func (n *DiffNode) AddLeaf(a DiffType, key, before, after interface{}) {
+func (n *DiffNode) AddLeaf(a ActionType, key, before, after interface{}) {
+	node := NewNode()
+	node.key = toString(key)
+	node.parent = n
+	node.action = a
+	node.before = before
+	node.after = after
 
-	leaf := &DiffLeaf{
-		key:    toString(key),
-		parent: n,
-		action: a,
-		after:  after,
-		before: before,
-	}
-
-	n.leafs = append(n.leafs, leaf)
+	n.children = append(n.children, node)
 
 	n.setActionToRoot(a)
 }
 
 // setActionToRoot recursively propagates action across parent
-// nodes (to root node).
-func (n *DiffNode) setActionToRoot(a DiffType) {
-
+// nodes (to the root node).
+func (n *DiffNode) setActionToRoot(a ActionType) {
 	switch n.action {
 	case CREATE:
 		if a == DELETE {
@@ -109,22 +99,127 @@ func (n *DiffNode) setActionToRoot(a DiffType) {
 }
 
 // setActionToRoot recursively propagates action across all children
-// nodes and leafs.
-func (n *DiffNode) setActionToLeafs(a DiffType) {
-
+// nodes.
+func (n *DiffNode) setActionToLeafs(a ActionType) {
 	n.action = a
 
-	for _, l := range n.leafs {
-		l.action = a
-	}
-
-	for _, v := range n.nodes {
+	for _, v := range n.children {
 		v.setActionToLeafs(a)
 	}
 }
 
-func (n *DiffNode) getNode(key string) *DiffNode {
-	for _, v := range n.nodes {
+// ToYaml returns the result of comparison in JSON format.
+func (n *DiffNode) ToJson() string {
+	return n.toJson(-2, false)
+}
+
+// ToYaml returns the result of comparison in YAML format.
+func (n *DiffNode) ToYaml() string {
+	return n.toYaml(-2, false)
+}
+
+// toJson recursively creates a string of differences in YAML format.
+func (n *DiffNode) toYaml(depth int, tagList bool) string {
+	var output string
+
+	key := n.stringKey() + ": "
+	indent := evalIndent(depth)
+	isList := isListIndex(n.key)
+
+	if tagList {
+		indent = indent[:len(indent)-2]
+		indent += "- "
+	}
+
+	if n.isLeaf() {
+		val := n.stringValue()
+		return fmt.Sprintf("%s%s%s\n", indent, key, val)
+	}
+
+	if !isList && depth >= 0 {
+		output += fmt.Sprintf("%s%s\n", indent, key)
+	}
+
+	for i, k := range n.sortChildrenKeys() {
+		v := n.getChild(k)
+		tagList = isList && i == 0
+		output += v.toYaml(depth+1, tagList)
+	}
+
+	return output
+}
+
+// toJson recursively creates a string of differences in JSON format.
+func (n *DiffNode) toJson(depth int, isListElem bool) string {
+	var output string
+
+	indent := evalIndent(depth)
+	key := n.stringKey() + ": "
+	value := n.stringValue()
+
+	// Leaf
+	if len(n.children) == 0 {
+		return fmt.Sprintf("%s%s%s,\n", indent, key, value)
+	}
+
+	keys := n.sortChildrenKeys()
+	isList := isListIndex(keys[0])
+
+	if isListElem {
+		output += fmt.Sprintf("%s{\n", indent)
+	} else if isList {
+		output += fmt.Sprintf("%s%s[\n", indent, key)
+	} else {
+		output += fmt.Sprintf("%s%s{\n", indent, key)
+	}
+
+	for _, k := range keys {
+		v := n.getChild(k)
+
+		output += v.toJson(depth+1, isList)
+	}
+
+	if isList {
+		output += fmt.Sprintf("%s],\n", indent)
+	} else {
+		output += fmt.Sprintf("%s},\n", indent)
+	}
+
+	return output
+}
+
+// stringKey returns node's key as a string.
+func (n *DiffNode) stringKey() string {
+	switch n.action {
+	case CREATE:
+		return green(n.key)
+	case DELETE:
+		return red(n.key)
+	default:
+		return n.key
+	}
+}
+
+// stringValue returns node's value change as a string.
+func (l *DiffNode) stringValue() string {
+	bv := formatValue(l.before)
+	av := formatValue(l.after)
+
+	switch l.action {
+	case CREATE:
+		return green(av)
+	case DELETE:
+		return red(bv)
+	case MODIFY:
+		return yellow(fmt.Sprintf("%v -> %v", bv, av))
+	default:
+		return bv
+	}
+}
+
+// getChild returns a child node that matches a key and nil otherwise.
+func (n *DiffNode) getChild(key string) *DiffNode {
+	for _, v := range n.children {
 		if v.key == key {
 			return v
 		}
@@ -132,10 +227,10 @@ func (n *DiffNode) getNode(key string) *DiffNode {
 	return nil
 }
 
-func (n *DiffNode) getNodeKeys() []string {
-	keys := make([]string, len(n.nodes))
+func (n *DiffNode) sortChildrenKeys() []string {
+	keys := make([]string, len(n.children))
 
-	for i, v := range n.nodes {
+	for i, v := range n.children {
 		keys[i] += v.key
 	}
 
@@ -143,24 +238,8 @@ func (n *DiffNode) getNodeKeys() []string {
 	return keys
 }
 
-func (n *DiffNode) getLeaf(key string) *DiffLeaf {
-	for _, v := range n.leafs {
-		if v.key == key {
-			return v
-		}
-	}
-	return nil
-}
-
-func (n *DiffNode) getLeafKeys() []string {
-	keys := make([]string, len(n.leafs))
-
-	for i, v := range n.leafs {
-		keys[i] += v.key
-	}
-
-	sort.Strings(keys)
-	return keys
+func (n *DiffNode) isLeaf() bool {
+	return len(n.children) == 0
 }
 
 func (n *DiffNode) getPath() string {
@@ -170,91 +249,12 @@ func (n *DiffNode) getPath() string {
 	return n.parent.getPath() + "." + n.key
 }
 
-func (l *DiffLeaf) getPath() string {
-	if l.parent == nil {
-		return l.key
-	}
-	return l.parent.getPath() + "." + l.key
-}
-
-// Print outputs differences in YAML format.
-func (n *DiffNode) Print() {
-	fmt.Print(n.string(-1, false))
-}
-
-// string recursively creates an output of differences in YAML format.
-func (n *DiffNode) string(depth int, isListElem bool) string {
-	var output string
-
-	if len(n.leafs) > 0 {
-		keys := n.getLeafKeys()
-		isList := isListIndex(keys[0])
-
-		for _, k := range keys {
-			v := n.getLeaf(k)
-
-			indent := evalIndent(depth, isListElem)
-			isListElem = false
-
-			s := v.toString(isList)
-			output += fmt.Sprintf("%s%s\n", indent, s)
-		}
-	}
-
-	if len(n.nodes) > 0 {
-		keys := n.getNodeKeys()
-		isList := isListIndex(keys[0])
-
-		for _, k := range keys {
-			v := n.getNode(k)
-
-			indent := evalIndent(depth, isListElem)
-			isListElem = false
-
-			if !isList && depth >= 0 {
-				s := v.toString(isList)
-				output += fmt.Sprintf("%s%s\n", indent, s)
-			}
-			output += v.string(depth+1, isList)
-		}
-	}
-
-	return output
-}
-
-// toString returns node's key as a string.
-func (n *DiffNode) toString(isList bool) string {
-	if isList {
-		return ""
-	}
-
-	switch n.action {
-	case CREATE:
-		return green(fmt.Sprintf("%s:", n.key))
-	case DELETE:
-		return red(fmt.Sprintf("%s:", n.key))
+func formatValue(v interface{}) string {
+	switch v.(type) {
+	case string:
+		return fmt.Sprintf("\"%v\"", v)
 	default:
-		return fmt.Sprintf("%s:", n.key)
-	}
-}
-
-// toString returns leaf's key and value as a string.
-func (l *DiffLeaf) toString(isList bool) string {
-	var key string
-
-	if !isList {
-		key = l.key + ": "
-	}
-
-	switch l.action {
-	case CREATE:
-		return green(fmt.Sprintf("%s%v", key, l.after))
-	case DELETE:
-		return red(fmt.Sprintf("%s%v", key, l.before))
-	case MODIFY:
-		return fmt.Sprintf("%s%v", key, yellow(fmt.Sprintf("%v -> %v", l.before, l.after)))
-	default:
-		return fmt.Sprintf("%s%v", key, l.before)
+		return fmt.Sprintf("%v", v)
 	}
 }
 
@@ -267,17 +267,17 @@ func isListIndex(k interface{}) bool {
 
 // evalIndent returns an indentation (for yaml) based on the given depth.
 // If isList is set to true, it will include yaml list identifier (-).
-func evalIndent(d int, tagList bool) string {
+func evalIndent(depth int) string {
 	var indent string
 
-	for i := 0; i < d*2; i++ {
+	for i := 0; i < depth*2; i++ {
 		indent += " "
 	}
 
-	if tagList {
-		indent = indent[:len(indent)-2]
-		indent += "- "
-	}
+	// if tagList {
+	// 	indent = indent[:len(indent)-2]
+	// 	indent += "- "
+	// }
 
 	return indent
 }

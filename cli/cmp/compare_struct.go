@@ -45,7 +45,7 @@ func (c *Comparator) cmpStruct(parent *DiffNode, key interface{}, a, b reflect.V
 
 // addPlainStruct recursively adds all elements of the struct to the diff tree
 // by comparing them to a nil value.
-func (c *Comparator) addPlainStruct(a DiffType, n *DiffNode, k interface{}, v reflect.Value) error {
+func (c *Comparator) addPlainStruct(a ActionType, n *DiffNode, k interface{}, v reflect.Value) error {
 	if a != CREATE && a != DELETE {
 		return fmt.Errorf("Invalid action: %v", a)
 	}
