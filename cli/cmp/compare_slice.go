@@ -10,7 +10,7 @@ const respectSliceOrder = false
 var emptySlice = reflect.TypeOf(([]interface{})(nil))
 
 func (c *Comparator) cmpSlice(parent *DiffNode, key interface{}, a, b reflect.Value) error {
-	node := parent.AddNode(key)
+	node := parent.addNode(key)
 
 	if a.Kind() == reflect.Invalid && b.Kind() == reflect.Invalid {
 		return nil

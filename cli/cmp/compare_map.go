@@ -6,7 +6,7 @@ import (
 )
 
 func (c *Comparator) cmpMap(parent *DiffNode, key interface{}, a, b reflect.Value) error {
-	node := parent.AddNode(key)
+	node := parent.addNode(key)
 
 	if a.Kind() == reflect.Invalid {
 		return c.addPlainMap(CREATE, node, key, b)

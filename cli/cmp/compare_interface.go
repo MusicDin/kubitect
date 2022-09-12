@@ -7,11 +7,11 @@ import (
 
 func (c *Comparator) cmpInterface(parent *DiffNode, key interface{}, a, b reflect.Value) error {
 	if a.Kind() == reflect.Invalid {
-		parent.AddLeaf(CREATE, key, nil, exportInterface(b))
+		parent.addLeaf(CREATE, key, nil, exportInterface(b))
 	}
 
 	if b.Kind() == reflect.Invalid {
-		parent.AddLeaf(DELETE, key, exportInterface(a), nil)
+		parent.addLeaf(DELETE, key, exportInterface(a), nil)
 		return nil
 	}
 

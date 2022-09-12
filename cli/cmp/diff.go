@@ -27,8 +27,8 @@ func NewNode() *DiffNode {
 	return node
 }
 
-// AddNode returns a new node that is linked to the current node.
-func (n *DiffNode) AddNode(key interface{}) *DiffNode {
+// addNode returns a new node that is linked to the current node.
+func (n *DiffNode) addNode(key interface{}) *DiffNode {
 	node := NewNode()
 	node.key = toString(key)
 	node.parent = n
@@ -39,8 +39,8 @@ func (n *DiffNode) AddNode(key interface{}) *DiffNode {
 	return node
 }
 
-// AddLeaf returns a new leaf that is linked to the current node.
-func (n *DiffNode) AddLeaf(a ActionType, key, before, after interface{}) {
+// addLeaf returns a new leaf that is linked to the current node.
+func (n *DiffNode) addLeaf(a ActionType, key, before, after interface{}) {
 	node := NewNode()
 	node.key = toString(key)
 	node.parent = n

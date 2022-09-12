@@ -8,7 +8,7 @@ import (
 const skipPrivateFields = false
 
 func (c *Comparator) cmpStruct(parent *DiffNode, key interface{}, a, b reflect.Value) error {
-	node := parent.AddNode(key)
+	node := parent.addNode(key)
 
 	if a.Kind() == reflect.Invalid {
 		return c.addPlainStruct(CREATE, node, key, b)

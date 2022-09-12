@@ -7,12 +7,12 @@ import (
 
 func (c *Comparator) cmpInt(parent *DiffNode, key interface{}, a, b reflect.Value) error {
 	if a.Kind() == reflect.Invalid {
-		parent.AddLeaf(CREATE, key, nil, exportInterface(b))
+		parent.addLeaf(CREATE, key, nil, exportInterface(b))
 		return nil
 	}
 
 	if b.Kind() == reflect.Invalid {
-		parent.AddLeaf(DELETE, key, exportInterface(a), nil)
+		parent.addLeaf(DELETE, key, exportInterface(a), nil)
 		return nil
 	}
 
@@ -21,11 +21,11 @@ func (c *Comparator) cmpInt(parent *DiffNode, key interface{}, a, b reflect.Valu
 	}
 
 	if a.Int() != b.Int() {
-		parent.AddLeaf(MODIFY, key, a.Int(), b.Int())
+		parent.addLeaf(MODIFY, key, a.Int(), b.Int())
 		return nil
 	}
 
-	parent.AddLeaf(NONE, key, a.Int(), b.Int())
+	parent.addLeaf(NONE, key, a.Int(), b.Int())
 
 	return nil
 }
