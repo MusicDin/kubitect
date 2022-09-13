@@ -5,10 +5,6 @@ import (
 	"reflect"
 )
 
-const respectSliceOrder = false
-
-var emptySlice = reflect.TypeOf(([]interface{})(nil))
-
 func (c *Comparator) cmpSlice(parent *DiffNode, key interface{}, a, b reflect.Value) error {
 	node := parent.addNode(key)
 
@@ -45,7 +41,7 @@ func (c *Comparator) cmpSliceByIndex(n *DiffNode, key interface{}, a, b reflect.
 	for i := 0; i < a.Len(); i++ {
 		ai := a.Index(i)
 
-		if (respectSliceOrder && !containsAtIndex(b, ai, i)) || (!respectSliceOrder && !contains(b, ai, &matched)) {
+		if (c.RespectSliceOrder && !containsAtIndex(b, ai, i)) || (!c.RespectSliceOrder && !contains(b, ai, &matched)) {
 			pairs.addA(toSliceKey(i), &ai)
 		} else {
 			pairs.addA(toSliceKey(i), &ai)
@@ -58,11 +54,11 @@ func (c *Comparator) cmpSliceByIndex(n *DiffNode, key interface{}, a, b reflect.
 	for i := 0; i < b.Len(); i++ {
 		bi := b.Index(i)
 
-		if respectSliceOrder && !containsAtIndex(a, bi, i) {
+		if c.RespectSliceOrder && !containsAtIndex(a, bi, i) {
 			pairs.addB(toSliceKey(i), &bi)
 		}
 
-		if !respectSliceOrder && !contains(a, bi, &matched) {
+		if !c.RespectSliceOrder && !contains(a, bi, &matched) {
 			j := a.Len() + missingCount
 			pairs.addB(toSliceKey(j), &bi)
 			missingCount++

@@ -10,32 +10,34 @@ const (
 	TAG_OPTION_ID = "id"
 )
 
+type CompareFunc func(*DiffNode, interface{}, reflect.Value, reflect.Value) error
+
 type Comparator struct {
-	diff    *DiffNode
-	TagName string
+	TagName           string
+	RespectSliceOrder bool
+	SkipPrivateFields bool
 }
 
 func NewComparator() *Comparator {
-	c := &Comparator{
+	return &Comparator{
 		TagName: "cmp",
 	}
-
-	return c
 }
 
-type CompareFunc func(*DiffNode, interface{}, reflect.Value, reflect.Value) error
+// Compare initializes default comparator, compares given values
+// and returns a comparison tree.
+func Compare(a, b interface{}) (*DiffNode, error) {
+	c := NewComparator()
+	return c.Compare(a, b)
+}
 
 // Compare compares the given elements of the same type and returns
 // a comparison tree.
-func Compare(a, b interface{}) (*DiffNode, error) {
-	c := NewComparator()
-	c.diff = NewNode()
-
-	err := c.compare(c.diff, c.TagName, reflect.ValueOf(a), reflect.ValueOf(b))
-
-	c.diff = c.diff.getChild(c.TagName)
-
-	return c.diff, err
+func (c *Comparator) Compare(a, b interface{}) (*DiffNode, error) {
+	diff := NewNode()
+	err := c.compare(diff, c.TagName, reflect.ValueOf(a), reflect.ValueOf(b))
+	diff = diff.getChild(c.TagName)
+	return diff, err
 }
 
 // compare recursively compares given values.

@@ -5,8 +5,6 @@ import (
 	"reflect"
 )
 
-const skipPrivateFields = false
-
 func (c *Comparator) cmpStruct(parent *DiffNode, key interface{}, a, b reflect.Value) error {
 	node := parent.addNode(key)
 
@@ -19,7 +17,7 @@ func (c *Comparator) cmpStruct(parent *DiffNode, key interface{}, a, b reflect.V
 	}
 
 	for i := 0; i < a.NumField(); i++ {
-		if skipPrivateFields && !a.CanInterface() {
+		if c.SkipPrivateFields && !a.CanInterface() {
 			continue
 		}
 
