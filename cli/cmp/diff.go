@@ -29,7 +29,19 @@ func NewNode() *DiffNode {
 
 // addNode returns a new node that is linked to the current node.
 func (n *DiffNode) addNode(key interface{}) *DiffNode {
-	node := NewNode()
+	var node *DiffNode
+
+	for _, c := range n.children {
+		if c.key == key {
+			node = c
+			break
+		}
+	}
+
+	if node == nil {
+		node = NewNode()
+	}
+
 	node.key = toString(key)
 	node.parent = n
 	node.action = NIL
