@@ -1,6 +1,5 @@
-package structure
+package modelconfig
 
-type HostName string
 
 type Host struct {
 	Connection           *Connection

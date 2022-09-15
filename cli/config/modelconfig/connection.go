@@ -1,6 +1,5 @@
-package structure
+package modelconfig
 
-type IP string
 
 type ConnectionType string
 type UserString string
