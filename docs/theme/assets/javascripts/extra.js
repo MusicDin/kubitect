@@ -29,27 +29,19 @@ window.onload = function () {
     observer.observe(bodyList, { childList: true, subtree: true });
 }
 
-// waits until code block annotations are loaded and remove hashtags
-function removeHashtags() {
-    document.querySelectorAll("code").forEach((node) => {
-        let str = node.innerHTML
-        node.innerHTML = str.replace(/(# )(\([0-9]*\))/g, "$2")
-    })
-};
-
 // terminal animation
 function terminalAnimation() {
 
-    // miliseconds between each output line printed
+    // milliseconds between each output line printed
     const outputDelay = 50
 
-    // miliseconds before command is applied
+    // milliseconds before command is applied
     const applyCommandDelay = 250
 
-    // miliseconds before command is typed
+    // milliseconds before command is typed
     const startCommandDelay = 1000
 
-    // miliseconds between each command character typed
+    // milliseconds between each command character typed
     const commandCharDelay = 20
     
     const Output = Symbol("output")

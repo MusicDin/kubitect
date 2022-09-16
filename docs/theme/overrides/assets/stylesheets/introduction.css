@@ -101,6 +101,14 @@ h3 {
     border-left: 3px dotted #aaaaaa;
 }
 
+.roadmap div.road.progress {
+    margin-left: 10pt;
+    margin-right: 10pt;
+    height: 20pt;
+    width: 2pt;
+    border-left: 3px dotted #c49a26;
+}
+
 .roadmap .question {
     color: #999999
 }
