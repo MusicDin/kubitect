@@ -1,3 +1,4 @@
+---
 site_name: Kubitect
 site_url: https://kubitect.io
 
@@ -80,7 +81,7 @@ markdown_extensions:
   # Emoji
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg # Page tree
+      emoji_generator: !!python/name:materialx.emoji.to_svg  # Page tree
 
   # - pymdownx.highlight:
   #     linenums: true
@@ -88,7 +89,7 @@ markdown_extensions:
   #     linenums_style: pymdownx-inline
 
   - toc:
-      permalink: "&#128279;&#xFE0E;" # Link symbol
+      permalink: "&#128279;&#xFE0E;"  # Link symbol
       permalink_title: Anchor link
 
 nav:
