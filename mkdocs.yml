@@ -38,6 +38,7 @@ theme:
     - search.highlight
     - search.share
     - search.suggest
+    - toc.follow
 
   icon:
     repo: octicons/mark-github-16
