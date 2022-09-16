@@ -2,37 +2,10 @@
 
 <h1 align="center">Project metadata</h1>
 
-To ensure the configuration will reproduce exactly the same cluster when reapplied, it is recommended to set specific Kubitect version.
-Furthermore if the project is forked or cloned, you can also instruct Kubitect to use your repository instead of the original one.
-
+The project metadata contains properties that are closely related to the project itself.
+These properties are rather fine-grained settings, as the default values should cover most use cases.
 
 ## Configuration
-
-### Project version
-
-:material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
-&ensp;
-:octicons-file-symlink-file-24: Default: *CLI tool version*
-
-If project version is not specified in the configuration file, version of the CLI tool will be used by default.
-To set the specific project version, set `kubitect.version` property in the configuration file.
-
-```yaml
-kubitect:
-    version: v2.1.0
-```
-
-All Kubitect versions can be found on the [release page](https://github.com/MusicDin/kubitect/releases).
-
-!!! warning "Warning"
-
-    It is not recommended to use version lower then the CLI tool version.
-
-    To check the CLI tool version, run the following command.
-
-    ```sh
-    kubitect --version
-    ```
 
 ### Project URL
 
@@ -41,9 +14,31 @@ All Kubitect versions can be found on the [release page](https://github.com/Musi
 :octicons-file-symlink-file-24: Default: `https://github.com/MusicDin/kubitect`
 
 By default, Kubitect clones the source code of the project from the official [GitHub repository](https://github.com/MusicDin/kubitect).
-To use the custom repository instead, set the `kubitect.url` property in the configuration file to the desired url.
+To use a custom repository instead, set the `kubitect.url` property in the configuration file to the desired url.
 
 ```yaml
 kubitect:
     url: "https://github.com/user/repo"
 ```
+
+### Project version
+
+:material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
+&ensp;
+:octicons-file-symlink-file-24: Default: *CLI tool version*
+
+If project version is not specified in the configuration file, version of the CLI tool will be used by default (*recommended*).
+To set the specific project version, set `kubitect.version` property in the configuration file.
+
+```yaml
+kubitect:
+    version: v2.2.0 # (1)!
+```
+
+1. Version can be either a tag (`v2.2.0`) or a branch name (`master`).
+
+All Kubitect versions can be found on the [release page](https://github.com/MusicDin/kubitect/releases).
+
+!!! warning "Warning"
+
+    A mismatched CLI and project version can lead to unexpected behavior.
