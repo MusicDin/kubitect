@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', terminalAnimation)
 window.onload = function () {
     let bodyList = document.querySelector("body")
 
-    let observer = new MutationObserver((mutations) => {
+    let observer = new MutationObserver(() => {
 
         // check if paths differ
         if (prevPath !== window.location.pathname) {
@@ -23,11 +23,11 @@ window.onload = function () {
                 terminalAnimation()
             } 
         }
-    });
+    })
 
     // start observing body for mutations
     observer.observe(bodyList, { childList: true, subtree: true });
-};
+}
 
 // waits until code block annotations are loaded and remove hashtags
 function removeHashtags() {
@@ -190,7 +190,7 @@ function terminalAnimation() {
 
     setPlaceholder(terminalPlaceholder)
 
-    // vieport width lower than 768px --> mobile --> wait for scroll
+    // viewport width lower than 768px --> mobile --> wait for scroll
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
     if (vw < 768) {
         document.getElementById('main-box').addEventListener('scroll', scrollEvent)
