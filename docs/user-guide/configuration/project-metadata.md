@@ -1,6 +1,10 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 
-<h1 align="center">Project metadata</h1>
+<div markdown="1" class="text-center">
+# Project metadata
+</div>
+
+<div markdown="1" class="text-justify">
 
 The project metadata contains properties that are closely related to the project itself.
 These properties are rather fine-grained settings, as the default values should cover most use cases.
@@ -42,3 +46,5 @@ All Kubitect versions can be found on the [release page](https://github.com/Musi
 !!! warning "Warning"
 
     A mismatched CLI and project version can lead to unexpected behavior.
+
+</div>

@@ -1,8 +1,12 @@
-<h1 align="center">Full (detailed) example</h1>
+<div markdown="1" class="text-center">
+# Full (detailed) example
+</div>
 
+<div markdown="1" class="text-justify">
 This document contains an example of Kubitect configuration.
 Example covers all (*or most*) of the Kubitect properties.
 This example is meant for users that learn the fastest from an example configuration.
+</div>
 
 ```yaml
 #

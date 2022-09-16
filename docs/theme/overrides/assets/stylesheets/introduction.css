@@ -1,22 +1,6 @@
-.heading {
-    text-align: center;
-}
-
 h3 {
     margin: 0;
     padding: 0;
-}
-
-@media (max-width:768px) {
-
-    .card-row {
-        flex-direction: column;
-        margin-right: 10pt;
-    }
-
-    .card-container {
-        padding-right: 10pt;
-    }
 }
 
 .card {
@@ -126,4 +110,16 @@ h3 {
 
 .roadmap div svg {
     fill: green !important;
+}
+
+@media (max-width:768px) {
+
+    .card-row {
+        flex-direction: column;
+        margin-right: 10pt;
+    }
+
+    .card-container {
+        padding-right: 10pt;
+    }
 }

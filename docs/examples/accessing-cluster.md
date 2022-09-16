@@ -1,9 +1,13 @@
-<h1 align="center">Accessing the cluster</h1>
+<div markdown="1" class="text-center">
+# Accessing the cluster
+</div>
+
+<div markdown="1" class="text-justify">
 
 Kubernetes clusters running on cloud providers typically support provision of a load balancer from the cloud infrastructure on demand.
 By simply setting a Service type to `LoadBalancer` provisions an external load balancer that has its own unique IP address and redirects all connections to the Service, as shown in the figure below.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/access-cloud-provider.png" 
@@ -20,7 +24,7 @@ Therefore, some alternative solutions are explained in this document.
 Setting Service type to `NodePort` makes Kubernetes reserve a port on all its nodes.
 As a result, the Service becomes available on `<NodeIP>:<NodePort>`, as shown in the figure below.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/access-nodeport.png" 
@@ -35,7 +39,7 @@ However, if all traffic is directed to a single node, its failure will make the 
 
 With Kubitect, it is possible to configure the port forwarding of the load balancer to distribute incoming requests to multiple nodes in the cluster, as shown in the figure below.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/access-self-provisioned-edge.png" 
@@ -153,3 +157,5 @@ curl -k https://10.10.13.225
 
 This example has demonstrated the functionality of MetalLB in `layer2` mode.
 For more MetalLB configuration options, see the [official MetalLB documentation](https://metallb.io).
+
+</div>

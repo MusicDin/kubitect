@@ -1,4 +1,8 @@
-<h1 align="center">Multi-master cluster</h1>
+<div markdown="1" class="text-center">
+# Multi-master cluster
+</div>
+
+<div markdown="1" class="text-justify">
 
 This example shows how to use Kubitect to set up a Kubernetes cluster with **3 master and 3 worker nodes**.
 Configuring multiple master nodes provides control plane redundancy, meaning that the control plane can continue to operate normally if a certain number of master nodes fail.
@@ -6,7 +10,7 @@ Since Kubitect deploys clusters with a *stacked control plane* (see [Kubernetes.
 
 
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/topology-3m3w1lb-arch.png" 
@@ -123,3 +127,5 @@ Apply the cluster:
 ```sh
 kubitect apply --config multi-master.yaml
 ```
+
+</div>

@@ -1,8 +1,12 @@
-<h1 align="center">Single node cluster</h1>
+<div markdown="1" class="text-center">
+# Single node cluster
+</div>
+
+<div markdown="1" class="text-justify">
 
 This example shows how to setup a single node Kubernetes cluster using Kubitect.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-75"
     src="/assets/images/topology-1m-arch.png" 
@@ -78,3 +82,5 @@ kubitect apply --config single-node.yaml
 ```
 
 Your master node now also becomes a worker node.
+
+</div>

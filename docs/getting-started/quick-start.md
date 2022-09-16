@@ -1,10 +1,14 @@
-<h1 align="center">Quick start</h1>
+<div markdown="1" class="text-center">
+# Quick start
+</div>
 
-<div align=center>
+<div markdown="1" class="text-justify">
+
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/topology-1m1w-arch.png" 
-    alt="Arhitecture of the cluster with one master and one worker node"
+    alt="Architecture of the cluster with one master and one worker node"
     width="75%">
 </div>
 
@@ -13,14 +17,16 @@
 Run the following command to apply the default cluster configuration, which creates a cluster with **one master and one worker node**.
 Generated cluster configuration files will be stored in `~/.kubitect/clusters/default/` directory.
 
+
 ```
 kubitect apply
 ```
 
 ### Step 2 - Export kubeconfig
-
-After successful installation of the Kubernetes cluster, Kubeconfig will be created within cluster's directory.
-To export the Kubeconfig into custom file run the following command.
+<div class="text-justify">
+  After successful installation of the Kubernetes cluster, Kubeconfig will be created within cluster's directory.
+  To export the Kubeconfig into custom file run the following command.
+</div>
 
 ```
 kubitect export kubeconfig > kubeconfig.yaml
@@ -28,8 +34,12 @@ kubitect export kubeconfig > kubeconfig.yaml
 
 ### Step 3 - Test the cluster
 
-Test if the cluster works by displaying all cluster nodes.
+<div class="text-justify">
+  Test if the cluster works by displaying all cluster nodes.
+</div>
 
 ```
 kubectl get nodes --kubeconfig kubeconfig.yaml
 ```
+
+</div>

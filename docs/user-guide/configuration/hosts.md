@@ -1,6 +1,10 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 
-<h1 align="center">Hosts configuration</h1>
+<div markdown="1" class="text-center">
+# Hosts configuration
+</div>
+
+<div markdown="1" class="text-justify">
 
 Defining Kubitect hosts is esential. 
 **Hosts represent the target servers** where the cluster will be deployed.
@@ -174,3 +178,5 @@ hosts:
         keyfile: "~/.ssh/id_rsa_server2"
   ...
 ```
+
+</div>

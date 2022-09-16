@@ -1,8 +1,12 @@
-<h1 align="center">Getting Started</h1>
+<div markdown="1" class="text-center">
+# Getting Started
+</div>
+
+<div markdown="1" class="text-justify">
 
 In this **step-by-step** guide, you will learn how to prepare a custom cluster configuration file from scratch and use it to create a functional Kubernetes cluster consisting of a **one master and one worker node**.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-75"
     src="/assets/images/topology-1m1w-base.png" 
@@ -17,7 +21,7 @@ For the successful installation of the Kubernetes cluster, some [requirements](.
 ## Step 2 - Create cluster configuration file
 
 In the quick start you have created a very basic Kubernetes cluster from predefined cluster configuration file.
-If configuration is not explicitly provided to the command-line tool using `--config` option, default cluster configuration file is used (*/examples/default-cluster.yaml*).
+If configuration is not explicitly provided to the command-line tool using `--config` option, default cluster configuration file is used (`/examples/default-cluster.yaml`).
 
 Now it's time to create your own cluster topology.
 
@@ -77,7 +81,7 @@ In this part, all virtual machines are defined along with their properties such 
 
 For easier interpretation of the components that the final cluster will be made of, see the below image.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/topology-1m1w-arch.png" 
@@ -328,3 +332,5 @@ kubectl get nodes --kubeconfig kubeconfig.yaml
 ```
 
 :clap: Congratulations, you have completed the *getting started* tutorial.
+
+</div>

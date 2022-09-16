@@ -2,7 +2,11 @@
 [tag 2.1.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.1.0
 [tag 2.2.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.2.0
 
-<h1 align="center">Cluster node template</h1>
+<div markdown="1" class="text-center">
+# Cluster node template
+</div>
+
+<div markdown="1" class="text-justify">
 
 The note template in the cluster section of the configuration **defines the properties of all nodes** in the cluster.
 This includes the properties of the operating system (OS), DNS, and virtual machine user.
@@ -166,3 +170,5 @@ cluster:
     ssh:
       addToKnownHosts: true
 ```
+
+</div>

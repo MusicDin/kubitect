@@ -1,10 +1,14 @@
-<h1 align="center">Network bridge</h1>
+<div markdown="1" class="text-center">
+# Network bridge
+</div>
+
+<div markdown="1" class="text-justify">
 
 Bridged networks allow virtual machines to connect directly to the LAN.
 To use Kubitect with bridged network mode, a bridge interface must be preconfigured on the host machine.
 This example shows how to configure a simple bridge interface using [Netplan](https://netplan.io/).
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/network-bridge.png" 
@@ -100,3 +104,5 @@ cluster:
     bridge: br0
 ...
 ```
+
+</div>

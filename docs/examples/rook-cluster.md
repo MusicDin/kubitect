@@ -1,14 +1,18 @@
-<h1 align="center">Rook cluster</h1>
+<div markdown="1" class="text-center">
+# Rook cluster
+</div>
+
+<div markdown="1" class="text-justify">
 
 !!! warning "Important"
 
     Since the Rook addon is still under development, it may not work as expected.
     Therefore, any feedback would be greatly appreciated.
 
-This example shows how to use Kubitect to set up distributed storage with Rook.
+This example shows how to use Kubitect to set up **distributed storage with Rook**.
 For distributed storage, we add an additional data disk to each virtual machine as shown on the figure below.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/rook-cluster-arch.png" 
@@ -290,3 +294,5 @@ addons:
 ```sh
 kubitect apply --config rook-sample.yaml
 ```
+
+</div>

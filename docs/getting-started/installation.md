@@ -1,8 +1,13 @@
-<h1 align="center">Installation</h1>
+<div markdown="1" class="text-center">
+# Installation
+</div>
+
+<div markdown="1" class="text-justify">
 
 Before starting with installation, make sure you meet all the [requirements](./requirements.md).
 
 ## Install Kubitect CLI tool
+
 
 After all requirements are met, download the Kubitect command line tool.
 ```sh
@@ -54,5 +59,7 @@ kubitect completion bash > /etc/bash_completion.d/kubitect
 
     For shell specific instructions run:
     <code>
-    kubitect completion <i>shell</i> -h
+    kubitect completion <em>shell</em> -h
     </code>
+
+</div>

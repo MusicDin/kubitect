@@ -3,7 +3,11 @@
 [tag 2.2.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.2.0
 [tag 2.3.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.3.0
 
-<h1 align="center">Cluster nodes</h1>
+<div markdown="1" class="text-center">
+# Cluster nodes
+</div>
+
+<div markdown="1" class="text-justify">
 
 ## Nodes configuration structure
 
@@ -554,3 +558,5 @@ cluster:
 ```
 
 1. When the target is set to `all`, load balancers distribute traffic across all nodes (master and worker nodes).
+
+</div>
