@@ -162,7 +162,7 @@ In this example, we label all worker nodes with the label `rook`.
 To ensure that scaling the cluster does not subsequently affect Rook, we set label's value to false by default.
 Only the nodes where Rook should be deployed are labeled `#!yaml rook: true`, as shown in the figure below.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/rook-cluster-labels.png" 
@@ -202,7 +202,7 @@ To restrict on which nodes Rook resources can be deployed, we need to configure 
 
 We want to deploy Rook on the nodes labeled with the label `#!yaml rook: true`, as shown in the figure below.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/rook-cluster-node-selector.png" 

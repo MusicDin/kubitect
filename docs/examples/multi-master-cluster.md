@@ -8,8 +8,6 @@ This example shows how to use Kubitect to set up a Kubernetes cluster with **3 m
 Configuring multiple master nodes provides control plane redundancy, meaning that the control plane can continue to operate normally if a certain number of master nodes fail.
 Since Kubitect deploys clusters with a *stacked control plane* (see [Kubernetes.io - Stacked etcd topology](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/ha-topology/#stacked-etcd-topology) for more information), this means that there is no downtime as long as (n/2)+1 master nodes are available.
 
-
-
 <div class="text-center">
   <img
     class="mobile-w-100"
@@ -28,7 +26,7 @@ Each worker node stores only a single control plane IP address.
 Therefore, when creating clusters with multiple master nodes, we need to make sure that all of them are reachable at the same IP address, otherwise all workers would send requests to only one of the master nodes.
 This problem can be solved by placing a load balancer in front of the control plane, and instructing it to distribute traffic to all master nodes in the cluster, as shown in the figure below.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/topology-3m3w1lb-base.png" 

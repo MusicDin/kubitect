@@ -17,16 +17,14 @@
 Run the following command to apply the default cluster configuration, which creates a cluster with **one master and one worker node**.
 Generated cluster configuration files will be stored in `~/.kubitect/clusters/default/` directory.
 
-
 ```
 kubitect apply
 ```
 
 ### Step 2 - Export kubeconfig
-<div class="text-justify">
-  After successful installation of the Kubernetes cluster, Kubeconfig will be created within cluster's directory.
-  To export the Kubeconfig into custom file run the following command.
-</div>
+
+After successful installation of the Kubernetes cluster, Kubeconfig will be created within cluster's directory.
+To export the Kubeconfig into custom file run the following command.
 
 ```
 kubitect export kubeconfig > kubeconfig.yaml
@@ -34,9 +32,7 @@ kubitect export kubeconfig > kubeconfig.yaml
 
 ### Step 3 - Test the cluster
 
-<div class="text-justify">
-  Test if the cluster works by displaying all cluster nodes.
-</div>
+Test if the cluster works by displaying all cluster nodes.
 
 ```
 kubectl get nodes --kubeconfig kubeconfig.yaml
