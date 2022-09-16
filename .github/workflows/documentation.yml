@@ -68,7 +68,7 @@ jobs:
             jinja2>=3.1 \
             markdown>=3.3 \
             mkdocs>=1.3 \
-            mkdocs-material>=8.3.7 \
+            mkdocs-material>=8.5.1 \
             mkdocs-material-extensions>=1.0.3 \
             mkdocs-minify-plugin>=0.5 \
             mkdocs-redirects>=1.0 \

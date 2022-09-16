@@ -1,6 +1,6 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 
-<h1 align="center">Before you being</h1>
+<h1 align="center">Before you begin</h1>
 
 The user guide is divided into three subsections: *Configuration*, *Cluster Management*, and *Reference*.
 The Configuration subsection contains explanations of the configurable Kubitect properties.

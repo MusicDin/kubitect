@@ -43,7 +43,7 @@ To use Debian instead, set `os.distro` property to Debian.
 cluster:
   nodeTemplate:
     os:
-      distro: debian # (1)
+      distro: debian # (1)!
 ```
 
 1. By default, `ubuntu` is used.
@@ -100,7 +100,7 @@ By default, a DNS list contains only the network gateway.
 ```yaml
 cluster:
   nodeTemplate:
-    dns: # (1)
+    dns: # (1)!
       - 1.1.1.1
       - 1.0.0.1
 ```

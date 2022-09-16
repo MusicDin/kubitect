@@ -15,11 +15,13 @@ cluster:
   nodes:
     ...
     loadBalancer:
-      vip: 10.10.64.200 # Floating IP that should not be taken by any other device
+      vip: 10.10.64.200 # (1)!
       instances:
         - id: 1
         - id: 40
 ```
+1. Floating IP that should not be taken by any other device.
+
 > :scroll: **Note:** Load balancers `id` must be a number between 0 and 200, because their fail-over priority is calculated from the `id`.
 
 ## Cluster without internal load balancers

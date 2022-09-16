@@ -45,7 +45,7 @@ cluster:
         - id: 1
           ip: 192.168.113.100
     master:
-      instances: # (1)
+      instances: # (1)!
         - id: 1
           ip: 192.168.113.10
         - id: 2
