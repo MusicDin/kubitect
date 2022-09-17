@@ -34,7 +34,7 @@ Verify the installation by checking the Kubitect version.
 ```sh
 kubitect --version
 
-# kubitect version v2.2.0
+# kubitect version v2.3.0
 ```
 
 !!! tip "Tip"
