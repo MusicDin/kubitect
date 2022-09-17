@@ -139,8 +139,8 @@ cluster:
         ram: 16
         cpu: 4
         labels: # (30)!
-         custom-label: "This is a custom default node label"
-         node-role.kubernetes.io/node: # (31)!
+          custom-label: "This is a custom default node label"
+          node-role.kubernetes.io/node: # (31)!
       instances:
         - id: 1
           ip: 10.10.64.101
