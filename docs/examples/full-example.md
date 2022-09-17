@@ -139,8 +139,8 @@ cluster:
         ram: 16
         cpu: 4
         labels: # (30)!
-         - custom-label: "This is a custom default node label"
-         - node-role.kubernetes.io/node: # (31)!
+         custom-label: "This is a custom default node label"
+         node-role.kubernetes.io/node: # (31)!
       instances:
         - id: 1
           ip: 10.10.64.101
@@ -160,8 +160,8 @@ cluster:
           ip: 10.10.64.103
           ram: 64
           labels:
-            - custom-label: "Overwrite default node label" # (35)!
-            - instance-label: "Node label, only for this instance"
+            custom-label: "Overwrite default node label" # (35)!
+            instance-label: "Node label, only for this instance"
         - id: 4
           host: remote-server-2
         - id: 5
