@@ -1,4 +1,5 @@
+---
 default:
-  # Default cluster config is used when cluster config does not exist 
+  # Default cluster config is used when cluster config does not exist
   # and is not provided (by user).
   cluster_config_path: "{{ cluster_dir }}/resources/default/default-cluster.yaml"

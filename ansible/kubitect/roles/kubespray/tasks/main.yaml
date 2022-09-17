@@ -4,9 +4,9 @@
     repo: "{{ config.kubernetes.kubespray.url | default( default.kubespray.url ) }}"
     version: "{{ config.kubernetes.kubespray.version }}"
     dest: "{{ cluster_dir }}/ansible/kubespray"
-    single_branch: yes
+    single_branch: true
+    force: true
     depth: 1
-    force: yes
 
 - name: Ensure group_vars directories exist
   file:

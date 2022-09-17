@@ -1,8 +1,12 @@
-<h1 align="center">Getting Started</h1>
+<div markdown="1" class="text-center">
+# Getting Started
+</div>
+
+<div markdown="1" class="text-justify">
 
 In this **step-by-step** guide, you will learn how to prepare a custom cluster configuration file from scratch and use it to create a functional Kubernetes cluster consisting of a **one master and one worker node**.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-75"
     src="/assets/images/topology-1m1w-base.png" 
@@ -17,7 +21,7 @@ For the successful installation of the Kubernetes cluster, some [requirements](.
 ## Step 2 - Create cluster configuration file
 
 In the quick start you have created a very basic Kubernetes cluster from predefined cluster configuration file.
-If configuration is not explicitly provided to the command-line tool using `--config` option, default cluster configuration file is used (*/examples/default-cluster.yaml*).
+If configuration is not explicitly provided to the command-line tool using `--config` option, default cluster configuration file is used (`/examples/default-cluster.yaml`).
 
 Now it's time to create your own cluster topology.
 
@@ -40,7 +44,7 @@ A host can be either a local or a remote machine.
 
         ```yaml title="kubitect.yaml"
         hosts:
-          - name: localhost # (1)
+          - name: localhost # (1)!
             connection:
               type: local
         ```
@@ -59,9 +63,9 @@ A host can be either a local or a remote machine.
             connection:
               type: remote
               user: myuser
-              ip: 10.10.40.143 # (1)
+              ip: 10.10.40.143 # (1)!
               ssh:
-                keyfile: "~/.ssh/id_rsa_server1" # (2)
+                keyfile: "~/.ssh/id_rsa_server1" # (2)!
         ```
 
         1. IP address of the remote host.
@@ -77,7 +81,7 @@ In this part, all virtual machines are defined along with their properties such 
 
 For easier interpretation of the components that the final cluster will be made of, see the below image.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/topology-1m1w-arch.png" 
@@ -175,13 +179,13 @@ cluster:
   ...
   nodes:
     master:
-      default: # (1)
-        ram: 4 # (2)
-        cpu: 2 # (3)
-        mainDiskSize: 32 # (4)
-      instances: # (5)
-        - id: 1 # (6)
-          ip: 192.168.113.10 # (7)
+      default: # (1)!
+        ram: 4 # (2)!
+        cpu: 2 # (3)!
+        mainDiskSize: 32 # (4)!
+      instances: # (5)!
+        - id: 1 # (6)!
+          ip: 192.168.113.10 # (7)!
     worker:
       default: 
         ram: 8
@@ -190,7 +194,7 @@ cluster:
       instances:
         - id: 1
           ip: 192.168.113.21
-          ram: 4 # (8)
+          ram: 4 # (8)!
 ```
 
 1.  Default properties are applied to all nodes of the same type (in this case `master` nodes).
@@ -328,3 +332,5 @@ kubectl get nodes --kubeconfig kubeconfig.yaml
 ```
 
 :clap: Congratulations, you have completed the *getting started* tutorial.
+
+</div>

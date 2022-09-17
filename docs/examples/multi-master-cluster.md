@@ -1,12 +1,14 @@
-<h1 align="center">Multi-master cluster</h1>
+<div markdown="1" class="text-center">
+# Multi-master cluster
+</div>
+
+<div markdown="1" class="text-justify">
 
 This example shows how to use Kubitect to set up a Kubernetes cluster with **3 master and 3 worker nodes**.
 Configuring multiple master nodes provides control plane redundancy, meaning that the control plane can continue to operate normally if a certain number of master nodes fail.
 Since Kubitect deploys clusters with a *stacked control plane* (see [Kubernetes.io - Stacked etcd topology](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/ha-topology/#stacked-etcd-topology) for more information), this means that there is no downtime as long as (n/2)+1 master nodes are available.
 
-
-
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/topology-3m3w1lb-arch.png" 
@@ -24,7 +26,7 @@ Each worker node stores only a single control plane IP address.
 Therefore, when creating clusters with multiple master nodes, we need to make sure that all of them are reachable at the same IP address, otherwise all workers would send requests to only one of the master nodes.
 This problem can be solved by placing a load balancer in front of the control plane, and instructing it to distribute traffic to all master nodes in the cluster, as shown in the figure below.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/topology-3m3w1lb-base.png" 
@@ -45,7 +47,7 @@ cluster:
         - id: 1
           ip: 192.168.113.100
     master:
-      instances: # (1)
+      instances: # (1)!
         - id: 1
           ip: 192.168.113.10
         - id: 2
@@ -123,3 +125,5 @@ Apply the cluster:
 ```sh
 kubitect apply --config multi-master.yaml
 ```
+
+</div>

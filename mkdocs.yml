@@ -1,3 +1,4 @@
+---
 site_name: Kubitect
 site_url: https://kubitect.io
 
@@ -37,6 +38,7 @@ theme:
     - search.highlight
     - search.share
     - search.suggest
+    - toc.follow
 
   icon:
     repo: octicons/mark-github-16
@@ -80,7 +82,7 @@ markdown_extensions:
   # Emoji
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg # Page tree
+      emoji_generator: !!python/name:materialx.emoji.to_svg  # Page tree
 
   # - pymdownx.highlight:
   #     linenums: true
@@ -88,7 +90,7 @@ markdown_extensions:
   #     linenums_style: pymdownx-inline
 
   - toc:
-      permalink: "&#128279;&#xFE0E;" # Link symbol
+      permalink: "&#128279;&#xFE0E;"  # Link symbol
       permalink_title: Anchor link
 
 nav:
@@ -112,6 +114,7 @@ nav:
           - Cluster nodes: user-guide/configuration/cluster-nodes.md
           - Kubernetes: user-guide/configuration/kubernetes.md
           - Addons: user-guide/configuration/addons.md
+          - Project metadata: user-guide/configuration/project-metadata.md
       - Cluster Management:
           - Creating the cluster: user-guide/management/creating.md
           - Upgrading the cluster: user-guide/management/upgrading.md

@@ -1,6 +1,10 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 
-<h1 align="center">Cluster metadata</h1>
+<div markdown="1" class="text-center">
+# Cluster metadata
+</div>
+
+<div markdown="1" class="text-justify">
 
 ## Configuration
 
@@ -18,6 +22,7 @@ cluster:
   name: my-cluster
 ```
 
-For example, the name of each virtual machine name is generated as `<cluster.name>-<node.type>-<node.instance.id>`.
-For the master node with ID 1, this would result in `my-cluster-master-1`.
+For example, the name of each virtual machine is generated as `<cluster.name>-<node.type>-<node.instance.id>`.
+This way, the master node with ID `1` would result in `my-cluster-master-1`.
 
+</div>

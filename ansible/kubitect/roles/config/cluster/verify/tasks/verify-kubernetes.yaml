@@ -23,7 +23,7 @@
   when:
     - config.kubernetes.networkPlugin is defined
     - config.kubernetes.networkPlugin not in valid_network_plugins
-        
+
 - name: Fail if Kubernetes DNS mode is invalid
   fail:
     msg: |
@@ -35,7 +35,7 @@
     - config.kubernetes.dnsMode not in valid_dns_modes
 
 - name: Verify Kubespray configuration
-  block: 
+  block:
     - name: Fail if Kubespray version is not defined
       fail:
         msg: |

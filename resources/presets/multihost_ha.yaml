@@ -1,15 +1,12 @@
 #
 # Configuration defines a cluster that spreads across 3 hosts.
 # Cluster contains 3 master nodes, 3 worker nodes, and 3 load balancers.
-# 
+#
 # Configuration requires:
 #   - a preconfigured bridge interface (br0) on each host,
 #   - SSH key for each host.
 #
-
-#kubitect:
-#  version: "v2.1.0"
-
+---
 hosts:
   - name: host1
     connection:
@@ -26,7 +23,7 @@ hosts:
       user: myuser
       ip: 10.10.40.144
       ssh:
-        verify: false 
+        verify: false
         port: 1234
         keyfile: "~/.ssh/id_rsa_host2"
 

@@ -1,6 +1,10 @@
-<h1 align="center">Requirements</h1>
+<div markdown="1" class="text-center">
+# Requirements
+</div>
 
 ## Local machine
+
+<div markdown="1" class="text-justify">
 
 On the machine where the command-line tool (kubitect) is installed, the following requirements must be met:
 
@@ -37,3 +41,5 @@ If the host is a remote server:
     sudo adduser $USER kvm
     sudo adduser $USER libvirt
     ```
+
+</div>

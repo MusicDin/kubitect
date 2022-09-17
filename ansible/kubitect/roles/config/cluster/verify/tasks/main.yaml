@@ -2,8 +2,8 @@
 - name: Verify hosts configuration
   include_tasks: verify-hosts.yaml
 
-- name: Verify cluster configuration 
+- name: Verify cluster configuration
   include_tasks: verify-cluster.yaml
 
-- name: Verify Kubernetes configuration 
+- name: Verify Kubernetes configuration
   include_tasks: verify-kubernetes.yaml

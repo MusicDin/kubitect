@@ -1,4 +1,8 @@
-<h1 align="center">Local development</h1>
+<div markdown="1" class="text-center">
+# Local development
+</div>
+
+<div markdown="1" class="text-justify">
 
 This document shows how to build a CLI tool manually and how to use the project without creating any files outside the project's directory.
 
@@ -21,8 +25,10 @@ cd kubitect
 
 ## Step 2: Install Kubitect CLI tool
 
+
 Kubitect CLI tool is implemented in Go using [cobra](https://github.com/spf13/cobra) library.
 The tool can either be installed from already built versions available on GitHub or you can build it manually.
+
 
 To manually build the CLI tool, first change to the `cli` directory.
 ```sh
@@ -34,7 +40,7 @@ Now, using build the tool using go.
 go build .
 ```
 
-This will create a `cli` binary file, which can be moved into `/usr/local/bin/` directory to use it globaly.
+This will create a `cli` binary file, which can be moved into `/usr/local/bin/` directory to use it globally.
 ```sh
 sudo mv cli /usr/bin/local/kubitect
 ```
@@ -52,3 +58,5 @@ This option can be used with most actions, such as `apply` or `destroy`.
 ```sh
 kubitect apply --local
 ```
+
+</div>

@@ -1,3 +1,4 @@
+---
 - name: Ensure Kubitect hosts meet the requirements
   hosts: kubitect_hosts
   gather_facts: false

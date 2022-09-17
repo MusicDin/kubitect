@@ -53,7 +53,7 @@
       when:
         - not config.cluster.network.cidr | ansible.utils.ipaddr
 
-    - name: Fail if network mode is set to bridge and network bridge is not defined 
+    - name: Fail if network mode is set to bridge and network bridge is not defined
       fail:
         msg: |
           The value of 'cluster.network.bridge' is undefined.
@@ -71,8 +71,8 @@
             {{ config.cluster.network.cidr | ansible.utils.ipaddr( 'range_usable' ) }}
       when:
         - config.cluster.network.gateway is defined
-        - not config.cluster.network.cidr | ansible.utils.network_in_usable( config.cluster.network.gateway ) 
-      
+        - not config.cluster.network.cidr | ansible.utils.network_in_usable( config.cluster.network.gateway )
+
 # -- Node template -- #
 
 - name: Verify user
@@ -104,7 +104,7 @@
       when:
         - config.cluster.nodeTemplate.os.networkInterface is defined
         - (config.cluster.nodeTemplate.os.networkInterface is none) or (config.cluster.nodeTemplate.os.networkInterface | length == 0)
-    
+
     - name: Fail if OS source is invalid
       fail:
         msg: |
@@ -121,7 +121,7 @@
             msg: |
               The value of 'cluster.nodeTemplate.os.source' is undefined.
               The OS source must be defined if OS distro is set to 'custom'.
-          when:            
+          when:
             - config.cluster.nodeTemplate.os.source is not defined
 
         - name: Fail if OS network interface is undefined
@@ -129,14 +129,14 @@
             msg: |
               The value of 'cluster.nodeTemplate.os.networkInterface' is undefined.
               The OS networkInterface must be defined if OS distro is set to 'custom'.
-          when:            
+          when:
             - config.cluster.nodeTemplate.os.networkInterface is not defined
       when:
         - config.cluster.nodeTemplate.os.distro is defined
         - config.cluster.nodeTemplate.os.distro == 'custom'
 
 - name: Verify node template SSH keys exist
-  block:        
+  block:
     - name: Check if SSH keys exist
       stat:
         path: "{{ item }}"
@@ -150,7 +150,7 @@
         msg: |
           The value of 'cluster.nodeTemplate.ssh.privateKeyPath' is invalid.
           SSH key '{{ item.item }}' does not exist!
-          Ensure that provided private key exists and that public key with '.pub' 
+          Ensure that provided private key exists and that public key with '.pub'
           suffix is in the same directory.
       when:
         - item.stat.exists is false
@@ -230,7 +230,7 @@
       fail:
         msg: |
           The value 'cluster.nodes.loadBalancer.vip' in undefined!
-          When more then 1 load balancer is configured, a virtual/floating IP 
+          When more then 1 load balancer is configured, a virtual/floating IP
           for the load balancers needs to be configured.
       when:
         - config.cluster.nodes.loadBalancer.vip is not defined
@@ -245,7 +245,7 @@
             {{ config.cluster.network.cidr | ansible.utils.ipaddr( 'range_usable' ) }}
       when:
         - config.cluster.nodes.loadBalancer.vip is defined
-        - not config.cluster.network.cidr | ansible.utils.network_in_usable( config.cluster.nodes.loadBalancer.vip ) 
+        - not config.cluster.network.cidr | ansible.utils.network_in_usable( config.cluster.nodes.loadBalancer.vip )
   when:
     - config.cluster.nodes.loadBalancer.instances | default(none)
 
@@ -264,8 +264,8 @@
 
 - name: Verify load balancer port forwarding
   vars:
-    forwardPorts: "{{ config.cluster.nodes.loadBalancer.forwardPorts if config.cluster.nodes.loadBalancer.forwardPorts | default(none) else [] }}" 
-  block: 
+    forwardPorts: "{{ config.cluster.nodes.loadBalancer.forwardPorts if config.cluster.nodes.loadBalancer.forwardPorts | default(none) else [] }}"
+  block:
     - name: Fail if port name is invalid
       fail:
         msg: |

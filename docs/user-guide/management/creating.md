@@ -1,4 +1,8 @@
-<h1 align="center">Creating the cluster</h1>
+<div markdown="1" class="text-center">
+# Creating the cluster
+</div>
+
+<div markdown="1" class="text-justify">
 
 With Kubitect, clusters are created by applying the cluster configuration to the Kubitect CLI tool.
 If no cluster configuration is not specified, the default configuration is applied, as described in the [Quick start](../../../getting-started/quick-start) guide.
@@ -26,3 +30,5 @@ The name of the cluster can be specified with the flag `--cluster`.
 ```sh
 kubitect apply --cluster <ClusterName>
 ```
+
+</div>

@@ -8,18 +8,18 @@
 
     <link rel="stylesheet" href="/assets/stylesheets/introduction.css">
 
-    <h1 align="center">Introduction</h1>
+    <div class="text-center">
+        <h1>Introduction</h1>
+    </div>
 
     <h2>What is Kubitect?</h2>
 
-    <div>
+    <div class="text-justify">
         <p>
-            Kubitect is an open source project that aims to simplify the <b>deployment</b> and subsequent <b>management of
-            Kubernetes clusters.</b>
-        </p>
-        <p>
-            It provides a CLI tool written in golang that lets you <b>set up</b>, <b>update</b>, <b>scale</b>, and
-            <b>destroy</b> Kubernetes clusters.
+            Kubitect is an open source project that aims to simplify the <strong>deployment</strong> and subsequent <strong>management of
+            Kubernetes clusters.</strong>
+            It provides a CLI tool written in golang that lets you <strong>set up</strong>, <strong>update</strong>, <strong>scale</strong>, and
+            <strong>destroy</strong> Kubernetes clusters.
         </p>
         <p>
             Under the hood, it uses <a href="https://www.terraform.io/">Terraform</a> along with 
@@ -40,7 +40,7 @@
             <div class="card">
 
                 <div class="card-header">As many clusters on as many hosts</div class="card-header">
-                <p class="card-content-text">
+                <p class="card-content-text text-center">
                     With Kubitect, you can set up a variety of cluster topologies, from single-node clusters to complex
                     clusters running on multiple hosts.
                 </p>
@@ -53,7 +53,7 @@
             <div class="card">
 
                 <div class="card-header">Open source forever</div class="card-header">
-                <p class="card-content-text">
+                <p class="card-content-text text-center">
                     Kubitect is based exclusively on open source technologies and will therefore remain open source forever!
                 </p>
 
@@ -68,13 +68,13 @@
             <div class="card">
 
                 <div class="card-header">Reliable, scalable and reproducible</div class="card-header">
-                <p class="card-content-text">
+                <p class="card-content-text text-center">
                     By using a single configuration file, Kubitect clusters can be easily replicated in different
                     environments,
                     while Kubespray ensures reliability and scalability.
                 </p>
 
-                <div class="card-footer-nav">
+                <div class="card-footer-nav text-center">
                     <img src="/assets/images/filelaptop.svg" alt="">
                 </div>
             </div>
@@ -82,7 +82,7 @@
             <div class="card">
 
                 <div class="card-header">From home-labs to companies</div class="card-header">
-                <p class="card-content-text">
+                <p class="card-content-text text-center">
                     Bridging the gap between local and enterprise environments, Kubitect enables you to set up a cluster for
                     your home lab or a business without the need for in-depth knowledge.
                 </p>
@@ -98,7 +98,7 @@
 
     <h2>Project roadmap</h2>
 
-    <div>
+    <div class="text-justify">
         The aim of this project is to combine a robust array of functionalities into a single easy-to-use tool.
         Below is the roadmap of the Kubitect project. If you have an idea that is not listed among these features,
         feel free to <a href="https://github.com/MusicDin/kubitect/issues/new">open an issue</a>.
@@ -132,8 +132,8 @@
         <div class="road"></div>
         <div><img src="/assets/images/checkmark.svg" alt=""><span>Support for Kubespray addons</span></div>
 
-        <div class="road todo"></div>
-        <div><img src="/assets/images/checkmark_gray.svg" alt=""><span>Out of the box storage solution</span></div>
+        <div class="road progress"></div>
+        <div><img src="/assets/images/circle_yellow.svg" alt=""><span>Distributed storage solution (see <a href="../../user-guide/configuration/addons/#rook-addon">Rook addon</a>)</span></div>
 
         <div class="road todo"></div>
         <div class="question">

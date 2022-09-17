@@ -1,4 +1,8 @@
-<h1 align="center">Destroying the cluster</h1>
+<div markdown="1" class="text-center">
+# Destroying the cluster
+</div>
+
+<div markdown="1" class="text-justify">
 
 The destruction of the cluster consists of 2 parts.
 The first part destroys all active cluster components, while the second part deletes all configuration files for a given cluster.
@@ -22,3 +26,5 @@ It can be executed only if the cluster is already destroyed.
 ```sh
 kubitect purge --cluster my-cluster
 ```
+
+</div>

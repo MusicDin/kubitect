@@ -1,4 +1,8 @@
-<h1 align="center"> Troubleshooting</h1>
+<div markdown="1" class="text-center">
+# Troubleshooting
+</div>
+
+<div markdown="1" class="text-justify">
 
 !!! question "Is your issue not listed here?"
 
@@ -354,3 +358,4 @@
 
         Check the HAProxy configuration file (`config/haproxy/haproxy.cfg`) that it does not contain 2 frontends bound to the same port.
 
+</div>

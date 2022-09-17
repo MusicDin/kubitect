@@ -5,9 +5,9 @@ all:
     {{ host.name }}:
     {% if host.connection.type == "remote" %}
       ansible_connection: ssh
-      ansible_user: {{ host.connection.user }} 
-      ansible_host: {{ host.connection.ip }} 
-      ansible_port: {{ host.connection.ssh.port if host.connection.ssh.port is defined else 22 }} 
+      ansible_user: {{ host.connection.user }}
+      ansible_host: {{ host.connection.ip }}
+      ansible_port: {{ host.connection.ssh.port if host.connection.ssh.port is defined else 22 }}
       ansible_private_key_file: {{ host.connection.ssh.keyfile if host.connection.ssh.keyfile is defined else default.keyfile_path }}
     {% else %}
       ansible_connection: local

@@ -21,7 +21,7 @@ all:
   {# Master nodes #}
   {% for master in infra.cluster.nodes.master.instances %}
   {% set cfg_master = cfg_masters | selectattr("id", "in", [master.id|string, master.id|int(none)]) | first %}
-    {{ master.name }}: 
+    {{ master.name }}:
       ansible_host: {{ master.ip }}
       {% set labels = def_master_labels | combine(cfg_master.labels | default({})) %}
       {% if labels.items() | length > 0 %}
@@ -62,7 +62,7 @@ all:
   {% endif %}
   children:
     haproxy:
-      hosts:      
+      hosts:
       {% if infra.cluster.nodes.loadBalancer.instances is defined %}
         {% for lb in infra.cluster.nodes.loadBalancer.instances %}
         {{ lb.name }}:

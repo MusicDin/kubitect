@@ -62,7 +62,7 @@ module "base" {
   defaults_config = local.defaults_config
 }
 {#
-  Check if default host is defined 
+  Check if default host is defined
 #}
 {% set is_default_host_defined = [] %}
 {% for host in host_list %}
@@ -148,8 +148,8 @@ module "host_{{ host.name }}" {
 #================================
 # Infrastructure output
 #================================
-{# 
-  Creates a list of host modules. 
+{#
+  Creates a list of host modules.
 #}
 {% set host_name_list = [] %}
 {% for host in host_list %}
@@ -191,7 +191,7 @@ module "output" {
   ]
 }
 
-# Creates a configuration file that contains evaluated 
+# Creates a configuration file that contains evaluated
 # information about the created infrastructure.
 resource "local_file" "output" {
   content         = replace(yamlencode(module.output), "/((?:^|\n)[\\s-]*)\"([\\w-]+)\":/", "$1$2:")
