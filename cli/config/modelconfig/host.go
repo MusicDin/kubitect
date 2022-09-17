@@ -3,18 +3,18 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type Host struct {
-	Connection           *Connection        `yaml:"connection"`
-	DataResourcePools    []DataResourcePool `yaml:"dataResourcePools"`
-	Default              bool               `yaml:"default"`
-	Name                 *HostName          `yaml:"name"`
-	MainResourcePoolPath *ResourcePath      `yaml:"mainResourcePoolPath"`
+	Name                 *HostName           `yaml:"name,omitempty"`
+	Default              *bool               `yaml:"default,omitempty"`
+	Connection           *Connection         `yaml:"connection,omitempty"`
+	MainResourcePoolPath *ResourcePath       `yaml:"mainResourcePoolPath,omitempty"`
+	DataResourcePools    *[]DataResourcePool `yaml:"dataResourcePools,omitempty"`
 }
 
 func (h Host) Validate() error {
 	return validation.ValidateStruct(&h,
 		validation.Field(h.Name, validation.Required),
 		validation.Field(h.Connection),
-		validation.Field(&h.DataResourcePools),
+		validation.Field(h.DataResourcePools),
 		validation.Field(h.MainResourcePoolPath),
 	)
 }

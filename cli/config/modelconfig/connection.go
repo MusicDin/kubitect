@@ -3,10 +3,10 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type Connection struct {
-	IP   *IP             `yaml:"ip"`
-	SSH  *SSH            `yaml:"ssh"`
-	Type *ConnectionType `yaml:"type"`
-	User *UserString     `yaml:"user"`
+	Type *ConnectionType `yaml:"type,omitempty"`
+	User *UserString     `yaml:"user,omitempty"`
+	IP   *IP             `yaml:"ip,omitempty"`
+	SSH  *SSH            `yaml:"ssh,omitempty"`
 }
 
 func (c Connection) Validate() error {

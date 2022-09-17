@@ -3,25 +3,25 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type NodeTemplate struct {
-	UpdateOnBoot *bool     `yaml:"updateOnBoot"`
-	User         *UserName `yaml:"user"`
+	UpdateOnBoot *bool     `yaml:"updateOnBoot,omitempty"`
+	User         *UserName `yaml:"user,omitempty"`
 
-	DNS []IP `yaml:"dns"`
+	DNS *[]IP `yaml:"dns,omitempty"`
 	OS  struct {
-		Distro           *OperatingSystem       `yaml:"distro"`
-		NetworkInterface *NetworkInterface      `yaml:"networkInterface"`
-		Source           *OperatingSystemSource `yaml:"source"`
+		Distro           *OperatingSystem       `yaml:"distro,omitempty"`
+		NetworkInterface *NetworkInterface      `yaml:"networkInterface,omitempty"`
+		Source           *OperatingSystemSource `yaml:"source,omitempty"`
 	} `yaml:"os"`
 
 	SSH struct {
-		AddToKnownHosts bool    `yaml:"addToKnownHosts"`
-		PrivateKeyPath  *string `yaml:"privateKeyPath"`
-	} `yaml:"ssh"`
+		AddToKnownHosts *bool    `yaml:"addToKnownHosts,omitempty"`
+		PrivateKeyPath  *string `yaml:"privateKeyPath,omitempty"`
+	} `yaml:"ssh,omitempty"`
 }
 
 func (n NodeTemplate) Validate() error {
 	return validation.ValidateStruct(&n,
-		validation.Field(&n.DNS), // TODO: isValidIp for each?
+		validation.Field(n.DNS), // TODO: isValidIp for each?
 		validation.Field(n.User),
 		validation.Field(n.UpdateOnBoot),
 		validation.Field(n.OS.Distro),

@@ -5,9 +5,9 @@ import (
 )
 
 type LoadBalancerDefault struct {
-	CPU          *CpuSize `yaml:"cpu"`
-	MainDiskSize *MB      `yaml:"mainDiskSize"`
-	RAM          *MB      `yaml:"ram"`
+	CPU          *CpuSize `yaml:"cpu,omitempty"`
+	MainDiskSize *MB      `yaml:"mainDiskSize,omitempty"`
+	RAM          *MB      `yaml:"ram,omitempty"`
 }
 
 func (l LoadBalancerDefault) Validate() error {
@@ -19,12 +19,12 @@ func (l LoadBalancerDefault) Validate() error {
 }
 
 type LoadBalancer struct {
-	VIP             *IP                  `yaml:"vip"`
-	VirtualRouterId *LoadBalancerId      `yaml:"virtualRouterId"`
-	Default         *LoadBalancerDefault `yaml:"default"`
+	VIP             *IP                  `yaml:"vip,omitempty"`
+	VirtualRouterId *LoadBalancerId      `yaml:"virtualRouterId,omitempty"`
+	Default         *LoadBalancerDefault `yaml:"default,omitempty"`
 
-	ForwardPorts []ForwardPort          `yaml:"forwardPorts"`
-	Instances    []LoadBalancerInstance `yaml:"instances"`
+	ForwardPorts *[]ForwardPort          `yaml:"forwardPorts,omitempty"`
+	Instances    *[]LoadBalancerInstance `yaml:"instances,omitempty"`
 }
 
 type LoadBalancerId uint8
@@ -37,6 +37,7 @@ func (b LoadBalancer) Validate() error {
 	return validation.ValidateStruct(&b,
 		validation.Field(b.Default),
 		validation.Field(b.Instances),
-		validation.Field(b.VIP, validation.Required.When(len(b.Instances) > 0)),
+		validation.Field(b.ForwardPorts),
+		validation.Field(b.VIP, validation.Required.When(len(*b.Instances) > 0)),
 	)
 }

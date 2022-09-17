@@ -3,10 +3,10 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type Network struct {
-	Bridge  *Bridge      `yaml:"bridge"`
-	CIDR    *CIDR        `yaml:"cidr"`
-	Gateway *Gateway     `yaml:"gateway"`
-	Mode    *NetworkMode `yaml:"mode"`
+	Bridge  *Bridge      `yaml:"bridge,omitempty"`
+	CIDR    *CIDR        `yaml:"cidr,omitempty"`
+	Gateway *Gateway     `yaml:"gateway,omitempty"`
+	Mode    *NetworkMode `yaml:"mode,omitempty"`
 }
 
 func (n Network) Validate() error {
