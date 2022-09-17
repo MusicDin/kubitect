@@ -6,8 +6,3 @@ type WorkerDefault struct {
 	RAM          *MB
 	Taints       []Taint
 }
-
-type Master struct {
-	Default   *WorkerDefault
-	Instances []Instance
-}

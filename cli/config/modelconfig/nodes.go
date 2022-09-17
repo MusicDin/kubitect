@@ -2,6 +2,6 @@ package modelconfig
 
 type Nodes struct {
 	LoadBalancer *LoadBalancer
-	Master       *Master
+	Master       *Worker
 	Worker       *Worker
 }

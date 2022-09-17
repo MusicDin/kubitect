@@ -1,8 +1,5 @@
 package modelconfig
 
-type InstanceId uint
-type Priority uint
-
 type LoadBalancerInstance struct {
 	CPU          *CpuSize
 	Host         *HostName

@@ -5,12 +5,14 @@ go 1.18
 require (
 	github.com/apenella/go-ansible v1.1.5
 	github.com/go-git/go-git/v5 v5.4.2
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/hashicorp/hc-install v0.3.2
 	github.com/hashicorp/terraform-exec v0.16.0
 	github.com/spf13/cobra v1.4.0
 )
 
 require (
+	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/terraform-json v0.13.0 // indirect
 	github.com/zclconf/go-cty v1.10.0 // indirect

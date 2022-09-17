@@ -1,6 +1,5 @@
 package modelconfig
 
-
 type Host struct {
 	Connection           *Connection
 	DataResourcePools    []DataResourcePool

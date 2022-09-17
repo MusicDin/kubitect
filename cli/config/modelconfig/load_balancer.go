@@ -1,7 +1,5 @@
 package modelconfig
 
-type LoadBalancerId uint
-
 type LoadBalancer struct {
 	Default *struct {
 		CPU          *CpuSize

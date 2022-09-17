@@ -1,6 +1,6 @@
 package modelconfig
 
 type Worker struct {
-	Default *WorkerDefault
+	Default   *WorkerDefault
 	Instances []Instance
 }
