@@ -3,8 +3,8 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type DataResourcePool struct {
-	Name *DataResourcePoolName
-	Path *ResourcePath
+	Name *DataResourcePoolName `yaml:"name"`
+	Path *ResourcePath         `yaml:"path"`
 }
 
 func (drp DataResourcePool) Validate() error {

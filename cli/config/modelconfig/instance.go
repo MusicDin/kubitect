@@ -3,16 +3,16 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type Instance struct {
-	CPU          *CpuSize
-	Host         *HostName
-	Id           *InstanceId
-	IP           *IP
-	MAC          *MAC
-	Labels       map[LabelKey]Label
-	MainDiskSize *MB
-	RAM          *MB
-	Taints       []Taint
-	DataDisks    []DataDisk
+	CPU          *CpuSize           `yaml:"cpu"`
+	Host         *HostName          `yaml:"host"`
+	Id           *InstanceId        `yaml:"id"`
+	IP           *IP                `yaml:"ip"`
+	MAC          *MAC               `yaml:"mac"`
+	Labels       map[LabelKey]Label `yaml:"labels"`
+	MainDiskSize *MB                `yaml:"mainDiskSize"`
+	RAM          *MB                `yaml:"ram"`
+	Taints       []Taint            `yaml:"taints"`
+	DataDisks    []DataDisk         `yaml:"dataDisks"`
 }
 
 func (i Instance) Validate() error {

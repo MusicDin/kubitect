@@ -5,10 +5,10 @@ import (
 )
 
 type ForwardPort struct {
-	Name       *ForwardPortName
-	Port       *Port
-	TargetPort *Port
-	Target     *PortForwardTarget
+	Name       *ForwardPortName   `yaml:"name"`
+	Port       *Port              `yaml:"port"`
+	TargetPort *Port              `yaml:"targetPort"`
+	Target     *PortForwardTarget `yaml:"target"`
 }
 
 func (f ForwardPort) Validate() error {

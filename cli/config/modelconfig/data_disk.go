@@ -3,9 +3,9 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type DataDisk struct {
-	Name *DiskName
-	Pool *PoolName
-	Size *DiskSize
+	Name *DiskName `yaml:"name"`
+	Pool *PoolName `yaml:"pool"`
+	Size *DiskSize `yaml:"size"`
 }
 
 func (d DataDisk) Validate() error {

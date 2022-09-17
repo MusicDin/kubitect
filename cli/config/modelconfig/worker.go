@@ -3,8 +3,8 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type Worker struct {
-	Default   *WorkerDefault
-	Instances []Instance
+	Default   *WorkerDefault `yaml:"default"`
+	Instances []Instance     `yaml:"instances"`
 }
 
 func (w Worker) Validate() error {

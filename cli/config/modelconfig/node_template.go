@@ -3,20 +3,20 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type NodeTemplate struct {
-	UpdateOnBoot *bool
-	User         *UserName
+	UpdateOnBoot *bool     `yaml:"updateOnBoot"`
+	User         *UserName `yaml:"user"`
 
-	DNS []IP
+	DNS []IP `yaml:"dns"`
 	OS  struct {
-		Distro           *OperatingSystem
-		NetworkInterface *NetworkInterface
-		Source           *OperatingSystemSource
-	}
+		Distro           *OperatingSystem       `yaml:"distro"`
+		NetworkInterface *NetworkInterface      `yaml:"networkInterface"`
+		Source           *OperatingSystemSource `yaml:"source"`
+	} `yaml:"os"`
 
 	SSH struct {
-		AddToKnownHosts bool
-		PrivateKeyPath  *string
-	}
+		AddToKnownHosts bool    `yaml:"addToKnownHosts"`
+		PrivateKeyPath  *string `yaml:"privateKeyPath"`
+	} `yaml:"ssh"`
 }
 
 func (n NodeTemplate) Validate() error {

@@ -5,10 +5,10 @@ import (
 )
 
 type Cluster struct {
-	Name         *ClusterName
-	Network      *Network
-	Nodes        *Nodes
-	NodeTemplate *NodeTemplate
+	Name         *ClusterName  `yaml:"name"`
+	Network      *Network      `yaml:"network"`
+	Nodes        *Nodes        `yaml:"nodes"`
+	NodeTemplate *NodeTemplate `yaml:"nodeTemplate"`
 }
 
 func (c Cluster) Validate() error {

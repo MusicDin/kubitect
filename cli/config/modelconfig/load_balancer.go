@@ -5,9 +5,9 @@ import (
 )
 
 type LoadBalancerDefault struct {
-	CPU          *CpuSize
-	MainDiskSize *MB
-	RAM          *MB
+	CPU          *CpuSize `yaml:"cpu"`
+	MainDiskSize *MB      `yaml:"mainDiskSize"`
+	RAM          *MB      `yaml:"ram"`
 }
 
 func (l LoadBalancerDefault) Validate() error {
@@ -19,11 +19,12 @@ func (l LoadBalancerDefault) Validate() error {
 }
 
 type LoadBalancer struct {
-	Default         *LoadBalancerDefault
-	ForwardPorts    []ForwardPort
-	Instances       []LoadBalancerInstance
-	VIP             *IP
-	VirtualRouterId *LoadBalancerId
+	VIP             *IP                  `yaml:"vip"`
+	VirtualRouterId *LoadBalancerId      `yaml:"virtualRouterId"`
+	Default         *LoadBalancerDefault `yaml:"default"`
+
+	ForwardPorts []ForwardPort          `yaml:"forwardPorts"`
+	Instances    []LoadBalancerInstance `yaml:"instances"`
 }
 
 type LoadBalancerId uint8

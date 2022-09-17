@@ -3,9 +3,9 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type SSH struct {
-	Keyfile *SSHKeyPath
-	Port    *Port
-	Verify  bool
+	Keyfile *SSHKeyPath `yaml:"keyfile"`
+	Port    *Port       `yaml:"port"`
+	Verify  bool        `yaml:"verify"`
 }
 
 func (s SSH) Validate() error {

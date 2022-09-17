@@ -3,11 +3,11 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type WorkerDefault struct {
-	CPU          *CpuSize
-	Labels       map[LabelKey]Label
-	MainDiskSize *MB
-	RAM          *MB
-	Taints       []Taint
+	CPU          *CpuSize           `yaml:"cpu"`
+	Labels       map[LabelKey]Label `yaml:"labels"`
+	MainDiskSize *MB                `yaml:"mainDiskSize"`
+	RAM          *MB                `yaml:"ram"`
+	Taints       []Taint            `yaml:"taints"`
 }
 
 func (d WorkerDefault) Validate() error {
