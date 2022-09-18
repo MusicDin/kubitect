@@ -10,8 +10,8 @@ type Nodes struct {
 
 func (n Nodes) Validate() error {
 	return validation.ValidateStruct(&n,
-		validation.Field(n.LoadBalancer),
-		validation.Field(n.Master),
-		validation.Field(n.Worker),
+		validation.Field(&n.LoadBalancer),
+		validation.Field(&n.Master),
+		validation.Field(&n.Worker),
 	)
 }

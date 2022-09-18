@@ -9,7 +9,7 @@ type Worker struct {
 
 func (w Worker) Validate() error {
 	return validation.ValidateStruct(&w,
-		validation.Field(w.Instances),
-		validation.Field(w.Default),
+		validation.Field(&w.Instances),
+		validation.Field(&w.Default),
 	)
 }

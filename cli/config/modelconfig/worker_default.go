@@ -12,11 +12,11 @@ type WorkerDefault struct {
 
 func (d WorkerDefault) Validate() error {
 	return validation.ValidateStruct(&d,
-		validation.Field(d.Labels),
-		validation.Field(d.Taints),
-		validation.Field(d.RAM),
-		validation.Field(d.MainDiskSize),
-		validation.Field(d.CPU),
+		validation.Field(&d.Labels),
+		validation.Field(&d.Taints),
+		validation.Field(&d.RAM),
+		validation.Field(&d.MainDiskSize),
+		validation.Field(&d.CPU),
 	)
 }
 

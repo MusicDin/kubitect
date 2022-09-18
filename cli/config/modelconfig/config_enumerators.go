@@ -7,26 +7,32 @@ import (
 type ConnectionType string
 
 func (ct ConnectionType) validate() error {
-	return validation.Validate(&ct, validation.In(ConnectionTypeList))
+	if err := validation.In(ConnectionTypeList...).Validate(ct); err != nil {
+		return err
+	}
+	return nil
 }
 
-var ConnectionTypeList = [...]ConnectionType{
+var ConnectionTypeList = []interface{}{
 	local_connection,
 	remote_connection,
 }
 
 const (
 	local_connection  ConnectionType = "local"
-	remote_connection                = "remote"
+	remote_connection ConnectionType = "remote"
 )
 
-type OperatingSystem string
+type Distro string
 
-func (os OperatingSystem) validate() error {
-	return validation.Validate(&os, validation.In(OperatingSystemList))
+func (os Distro) validate() error {
+	if err := validation.In(OperatingSystemList...).Validate(os); err != nil {
+		return err
+	}
+	return nil
 }
 
-var OperatingSystemList = [...]OperatingSystem{
+var OperatingSystemList = []interface{}{
 	ubuntu,
 	ubuntu22,
 	ubuntu20,
@@ -36,37 +42,46 @@ var OperatingSystemList = [...]OperatingSystem{
 }
 
 const (
-	ubuntu   OperatingSystem = "ubuntu"
-	ubuntu20                 = "ubuntu20"
-	ubuntu22                 = "ubuntu22"
-	debian                   = "debian"
-	debian11                 = "debian11"
-	custom                   = "custom"
+	ubuntu   Distro = "ubuntu"
+	ubuntu20 Distro = "ubuntu20"
+	ubuntu22 Distro = "ubuntu22"
+	debian   Distro = "debian"
+	debian11 Distro = "debian11"
+	custom   Distro = "custom"
 )
 
 type NetworkMode string
 
 func (nm NetworkMode) Validate() error {
-	return validation.Validate(&nm, validation.In(NetworkModeList))
+	if err := validation.In(NetworkModeList...).Validate(nm); err != nil {
+		return err
+	}
+	return nil
 }
 
-var NetworkModeList = [...]NetworkMode{
+var NetworkModeList = []interface{}{
 	nat_network_mode,
 	remote_network_mode,
+	bridge_network_mode,
 }
 
-const (
+var (
 	nat_network_mode    NetworkMode = "nat"
-	remote_network_mode             = "remote"
+	remote_network_mode NetworkMode = "remote"
+	bridge_network_mode NetworkMode = "bridge"
 )
 
 type PortForwardTarget string
 
 func (pft PortForwardTarget) Validate() error {
-	return validation.Validate(&pft, validation.In(PortForwardTargetList))
+
+	if err := validation.In(PortForwardTargetList...).Validate(pft); err != nil {
+		return err
+	}
+	return nil
 }
 
-var PortForwardTargetList = [...]PortForwardTarget{
+var PortForwardTargetList = []interface{}{
 	workers,
 	masters,
 	all,
@@ -74,6 +89,6 @@ var PortForwardTargetList = [...]PortForwardTarget{
 
 const (
 	workers PortForwardTarget = "workers"
-	masters                   = "masters"
-	all                       = "all"
+	masters PortForwardTarget = "masters"
+	all     PortForwardTarget = "all"
 )

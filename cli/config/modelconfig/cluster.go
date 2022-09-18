@@ -13,15 +13,15 @@ type Cluster struct {
 
 func (c Cluster) Validate() error {
 	return validation.ValidateStruct(&c,
-		validation.Field(c.Network),
-		validation.Field(c.Name),
-		validation.Field(c.Nodes),
-		validation.Field(c.NodeTemplate),
+		validation.Field(&c.Name),
+		validation.Field(&c.Network),
+		validation.Field(&c.Nodes),
+		validation.Field(&c.NodeTemplate),
 	)
 }
 
 type ClusterName string
 
 func (n ClusterName) Validate() error {
-	return validation.Validate(&n, StringNotEmptyAlphaNumeric...)
+	return validation.Validate(string(n), StringNotEmptyAlphaNumericMinus...)
 }

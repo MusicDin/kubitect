@@ -14,7 +14,7 @@ type Config struct {
 
 func (c Config) Validate() error {
 	return validation.ValidateStruct(&c,
-		validation.Field(c.Cluster),
-		validation.Field(c.Hosts, validation.Length(MinHostsLength, MaxHostsLength)),
+		validation.Field(&c.Cluster),
+		validation.Field(&c.Hosts, validation.Length(MinHostsLength, MaxHostsLength)),
 	)
 }

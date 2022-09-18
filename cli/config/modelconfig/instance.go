@@ -17,15 +17,15 @@ type Instance struct {
 
 func (i Instance) Validate() error {
 	return validation.ValidateStruct(&i,
-		validation.Field(i.CPU),
-		validation.Field(i.Host), // TODO: Is valid Host?
-		validation.Field(i.Id, validation.Required),
-		validation.Field(i.IP), // TODO: Is within CIDR?
-		validation.Field(i.Labels),
-		validation.Field(i.Taints),
-		validation.Field(i.MAC),
-		validation.Field(i.MainDiskSize),
-		validation.Field(i.RAM),
-		validation.Field(i.DataDisks),
+		validation.Field(&i.CPU),
+		validation.Field(&i.Host), // TODO: Is valid Host?
+		validation.Field(&i.Id, validation.Required),
+		validation.Field(&i.IP), // TODO: Is within CIDR?
+		validation.Field(&i.Labels),
+		validation.Field(&i.Taints),
+		validation.Field(&i.MAC),
+		validation.Field(&i.MainDiskSize),
+		validation.Field(&i.RAM),
+		validation.Field(&i.DataDisks),
 	)
 }

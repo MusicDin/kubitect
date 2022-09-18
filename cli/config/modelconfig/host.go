@@ -12,9 +12,10 @@ type Host struct {
 
 func (h Host) Validate() error {
 	return validation.ValidateStruct(&h,
-		validation.Field(h.Name, validation.Required),
-		validation.Field(h.Connection),
-		validation.Field(h.DataResourcePools),
-		validation.Field(h.MainResourcePoolPath),
+		validation.Field(&h.Default),
+		validation.Field(&h.Name, validation.Required),
+		validation.Field(&h.Connection),
+		validation.Field(&h.DataResourcePools),
+		validation.Field(&h.MainResourcePoolPath),
 	)
 }

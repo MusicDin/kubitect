@@ -19,17 +19,17 @@ func (d DataDisk) Validate() error {
 type DiskName string
 
 func (n DiskName) Validate() error {
-	return validation.Validate(&n, StringNotEmptyAlphaNumeric...)
+	return validation.Validate(string(n), StringNotEmptyAlphaNumericMinus...)
 }
 
 type PoolName string
 
 func (p PoolName) Validate() error {
-	return validation.Validate(&p) // TODO: IsValidPoolName
+	return validation.Validate(string(p)) // TODO: IsValidPoolName
 }
 
 type DiskSize uint
 
 func (d DiskSize) Validate() error {
-	return validation.Validate(&d, validation.Min(1))
+	return validation.Validate(int(d), validation.Min(1))
 }
