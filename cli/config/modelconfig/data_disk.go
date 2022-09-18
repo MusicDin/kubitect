@@ -4,7 +4,7 @@ import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type DataDisk struct {
 	Name *DiskName `yaml:"name,omitempty"`
-	Pool *PoolName `yaml:"pool,omitempty"`
+	Pool *PoolName `yaml:"pool,omitempty"  default:"main"`
 	Size *DiskSize `yaml:"size,omitempty"`
 }
 

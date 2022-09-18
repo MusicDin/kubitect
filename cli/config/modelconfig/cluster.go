@@ -5,7 +5,7 @@ import (
 )
 
 type Cluster struct {
-	Name         *ClusterName  `yaml:"name,omitempty"`
+	Name         *ClusterName  `yaml:"name,omitempty" default:"kubitect"`
 	Network      *Network      `yaml:"network,omitempty"`
 	NodeTemplate *NodeTemplate `yaml:"nodeTemplate,omitempty"`
 	Nodes        *Nodes        `yaml:"nodes,omitempty"`

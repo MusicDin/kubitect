@@ -5,9 +5,9 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 )
 
-type MB uint
+type GB uint
 
-func (m MB) Validate() error {
+func (m GB) Validate() error {
 	return validation.Validate(int(m), validation.Min(1))
 }
 

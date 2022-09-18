@@ -4,7 +4,7 @@ import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type Host struct {
 	Name                 *HostName           `yaml:"name,omitempty"`
-	Default              *bool               `yaml:"default,omitempty"`
+	Default              *bool               `yaml:"default,omitempty"  default:"false"`
 	Connection           *Connection         `yaml:"connection,omitempty"`
 	MainResourcePoolPath *ResourcePath       `yaml:"mainResourcePoolPath,omitempty"`
 	DataResourcePools    *[]DataResourcePool `yaml:"dataResourcePools,omitempty"`

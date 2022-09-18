@@ -4,7 +4,7 @@ import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type DataResourcePool struct {
 	Name *DataResourcePoolName `yaml:"name,omitempty"`
-	Path *ResourcePath         `yaml:"path,omitempty"`
+	Path *ResourcePath         `yaml:"path,omitempty"  default:"/var/lib/libvirt/images/"`
 }
 
 func (drp DataResourcePool) Validate() error {

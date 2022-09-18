@@ -8,7 +8,14 @@ type ForwardPort struct {
 	Name       *ForwardPortName   `yaml:"name,omitempty"`
 	Port       *Port              `yaml:"port,omitempty"`
 	TargetPort *Port              `yaml:"targetPort,omitempty"`
-	Target     *PortForwardTarget `yaml:"target,omitempty"`
+	Target     *PortForwardTarget `yaml:"target,omitempty" default:"workers"`
+}
+
+func (f *ForwardPort) SetDefaults() {
+	// Defaults to the incoming port value.
+	if f.TargetPort == nil {
+		f.TargetPort = f.Port
+	}
 }
 
 func (f ForwardPort) Validate() error {

@@ -1,6 +1,8 @@
 package modelconfig
 
-import validation "github.com/go-ozzo/ozzo-validation/v4"
+import (
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+)
 
 const (
 	MinHostsLength = 1

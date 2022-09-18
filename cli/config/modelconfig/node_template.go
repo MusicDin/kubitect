@@ -3,9 +3,17 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type OperatingSystem struct {
-	Distro           *Distro                `yaml:"distro,omitempty"`
+	Distro           *Distro                `yaml:"distro,omitempty"  default:"ubuntu"`
 	NetworkInterface *NetworkInterface      `yaml:"networkInterface,omitempty"`
 	Source           *OperatingSystemSource `yaml:"source,omitempty"`
+}
+
+func (s *OperatingSystem) SetDefaults() {
+	// TODO: Switch based on distro
+	if *s.Distro == ubuntu {
+		// TODO: If ubuntu.
+		return
+	}
 }
 
 func (s OperatingSystem) Validate() error {
@@ -18,7 +26,7 @@ func (s OperatingSystem) Validate() error {
 
 type NodeTemplateSSH struct {
 	AddToKnownHosts *bool   `yaml:"addToKnownHosts,omitempty"`
-	PrivateKeyPath  *string `yaml:"privateKeyPath,omitempty"`
+	PrivateKeyPath  *string `yaml:"privateKeyPath,omitempty"  default:"true"`
 }
 
 func (s NodeTemplateSSH) Validate() error {
@@ -28,8 +36,8 @@ func (s NodeTemplateSSH) Validate() error {
 }
 
 type NodeTemplate struct {
-	UpdateOnBoot *bool     `yaml:"updateOnBoot,omitempty"`
-	User         *UserName `yaml:"user,omitempty"`
+	UpdateOnBoot *bool     `yaml:"updateOnBoot,omitempty"  default:"true"`
+	User         *UserName `yaml:"user,omitempty"  default:"k8s"`
 
 	DNS *[]IP            `yaml:"dns,omitempty"`
 	OS  *OperatingSystem `yaml:"os"`

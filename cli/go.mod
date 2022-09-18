@@ -25,6 +25,7 @@ require (
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/apenella/go-common-utils/data v0.0.0-20210528133155-34ba915e28c8 // indirect
 	github.com/apenella/go-common-utils/error v0.0.0-20210528133155-34ba915e28c8 // indirect
+	github.com/creasty/defaults v1.6.0
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/fatih/color v1.13.0
 	github.com/go-git/gcfg v1.5.0 // indirect

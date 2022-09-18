@@ -3,9 +3,9 @@ package modelconfig
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type Connection struct {
+	IP   *IP             `yaml:"ip,omitempty"`
 	Type *ConnectionType `yaml:"type,omitempty"`
 	User *UserString     `yaml:"user,omitempty"`
-	IP   *IP             `yaml:"ip,omitempty"`
 	SSH  *HostSSH        `yaml:"ssh,omitempty"`
 }
 

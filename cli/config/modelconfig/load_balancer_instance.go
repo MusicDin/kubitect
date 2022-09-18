@@ -8,9 +8,9 @@ type LoadBalancerInstance struct {
 	Id           *InstanceId `yaml:"id,omitempty"`
 	IP           *IP         `yaml:"ip,omitempty"`
 	MAC          *MAC        `yaml:"mac,omitempty"`
-	MainDiskSize *MB         `yaml:"mainDiskSize,omitempty"`
-	Priority     *Priority   `yaml:"priority,omitempty"`
-	RAM          *MB         `yaml:"ram,omitempty"`
+	MainDiskSize *GB         `yaml:"mainDiskSize,omitempty"`
+	Priority     *Priority   `yaml:"priority,omitempty"  default:"10"`
+	RAM          *GB         `yaml:"ram,omitempty"`
 }
 
 func (i LoadBalancerInstance) Validate() error {
