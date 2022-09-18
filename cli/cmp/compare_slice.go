@@ -83,7 +83,7 @@ func (c *Comparator) cmpSliceById(n *DiffNode, key interface{}, a, b reflect.Val
 
 		id := hasTagOptionId(c.TagName, av)
 		if id != nil {
-			pairs.addA(id, &ai)
+			pairs.addA(toSliceKey(id), &ai)
 		}
 	}
 
@@ -93,7 +93,7 @@ func (c *Comparator) cmpSliceById(n *DiffNode, key interface{}, a, b reflect.Val
 
 		id := hasTagOptionId(c.TagName, bv)
 		if id != nil {
-			pairs.addB(id, &bi)
+			pairs.addB(toSliceKey(id), &bi)
 		}
 	}
 
