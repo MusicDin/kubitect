@@ -31,7 +31,7 @@ variable "hosts_mainResourcePoolPath" {
 variable "hosts_dataResourcePools" {
   type = list(object({
     name : string
-    path : optional(string)
+    path : optional(string, "/var/lib/libvirt/images/")
   }))
   description = "Additional data resource pools."
   default     = []
