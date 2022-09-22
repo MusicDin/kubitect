@@ -1,17 +1,18 @@
 package cmp
 
-type ActionType int
+type ActionType string
 
 const (
-	NIL  ActionType = iota // Unknown
-	NONE                   // No change
-	CREATE
-	DELETE
-	MODIFY
+	NIL    ActionType = "nil"  // Unknown
+	NONE   ActionType = "none" // No change
+	CREATE ActionType = "create"
+	DELETE ActionType = "delete"
+	MODIFY ActionType = "modify"
 )
 
 type DiffNode struct {
 	key      string
+	path     []string
 	parent   *DiffNode
 	children []*DiffNode
 	action   ActionType
@@ -19,32 +20,32 @@ type DiffNode struct {
 	after    interface{}
 }
 
-// NewNode returns new node.
+// NewNode returns new empty node.
 func NewNode() *DiffNode {
 	node := &DiffNode{
 		children: make([]*DiffNode, 0),
+		action:   NIL,
 	}
 	return node
 }
 
 // addNode returns a new node that is linked to the current node.
 func (n *DiffNode) addNode(key interface{}) *DiffNode {
-	var node *DiffNode
-
 	for _, c := range n.children {
 		if c.key == key {
-			node = c
-			break
+			return c
 		}
 	}
 
-	if node == nil {
-		node = NewNode()
-	}
+	var node *DiffNode
 
+	node = NewNode()
 	node.key = toString(key)
 	node.parent = n
-	node.action = NIL
+
+	if !node.isRoot() {
+		node.path = append(n.path, node.key)
+	}
 
 	n.children = append(n.children, node)
 
@@ -53,14 +54,10 @@ func (n *DiffNode) addNode(key interface{}) *DiffNode {
 
 // addLeaf returns a new leaf that is linked to the current node.
 func (n *DiffNode) addLeaf(a ActionType, key, before, after interface{}) {
-	node := NewNode()
-	node.key = toString(key)
-	node.parent = n
+	node := n.addNode(key)
 	node.action = a
 	node.before = before
 	node.after = after
-
-	n.children = append(n.children, node)
 
 	n.setActionToRoot(a)
 }
@@ -115,15 +112,17 @@ func (n *DiffNode) getChild(key interface{}) *DiffNode {
 	return nil
 }
 
+// isRoot returns true if node's key matches the root key.
+func (n *DiffNode) isRoot() bool {
+	return n.key == ROOT_KEY
+}
+
 // isLeaf returns true if node has no children.
 func (n *DiffNode) isLeaf() bool {
 	return len(n.children) == 0
 }
 
-// getPath returns all keys to the root node, separated by a dot.
-func (n *DiffNode) getPath() string {
-	if n.parent == nil {
-		return n.key
-	}
-	return n.parent.getPath() + "." + n.key
+// hasChanged returns true if node's action is not NIL or NONE.
+func (n *DiffNode) hasChanged() bool {
+	return !(n.action == NONE || n.action == NIL)
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"unsafe"
 )
 
@@ -17,6 +18,18 @@ func toString(v interface{}) string {
 	default:
 		return fmt.Sprint(v)
 	}
+}
+
+// toSliceKey wraps index into square brackets.
+func toSliceKey(key interface{}) string {
+	return "[" + toString(key) + "]"
+}
+
+// isSliceKey checks whether given key represents a slice key,
+// which means that it starts with "[" and ends with "]".
+func isSliceKey(k interface{}) bool {
+	s := toString(k)
+	return strings.HasPrefix(s, "[") && strings.HasSuffix(s, "]")
 }
 
 const isExportFlag uintptr = (1 << 5) | (1 << 6)

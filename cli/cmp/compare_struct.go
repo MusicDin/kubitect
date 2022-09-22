@@ -23,6 +23,15 @@ func (c *Comparator) cmpStruct(parent *DiffNode, key interface{}, a, b reflect.V
 
 		var af, bf reflect.Value
 		field := a.Type().Field(i)
+		tName := tagName(c.TagName, field)
+
+		if tName == "-" {
+			continue
+		}
+
+		if tName == "" {
+			tName = field.Name
+		}
 
 		if a.Kind() != reflect.Invalid {
 			af = a.Field(i)
@@ -32,7 +41,7 @@ func (c *Comparator) cmpStruct(parent *DiffNode, key interface{}, a, b reflect.V
 			bf = b.FieldByName(field.Name)
 		}
 
-		err := c.compare(node, field.Name, af, bf)
+		err := c.compare(node, tName, af, bf)
 		if err != nil {
 			return err
 		}
@@ -60,6 +69,15 @@ func (c *Comparator) addPlainStruct(a ActionType, n *DiffNode, k interface{}, v 
 
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Type().Field(i)
+		tName := tagName(c.TagName, field)
+
+		if tName == "-" {
+			continue
+		}
+
+		if tName == "" {
+			tName = field.Name
+		}
 
 		vf := v.Field(i)
 		xf := x.FieldByName(field.Name)
@@ -67,9 +85,9 @@ func (c *Comparator) addPlainStruct(a ActionType, n *DiffNode, k interface{}, v 
 		var err error
 		switch a {
 		case CREATE:
-			err = c.compare(n, field.Name, xf, vf)
+			err = c.compare(n, tName, xf, vf)
 		case DELETE:
-			err = c.compare(n, field.Name, vf, xf)
+			err = c.compare(n, tName, vf, xf)
 		}
 
 		if err != nil {

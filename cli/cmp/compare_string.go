@@ -5,14 +5,20 @@ import (
 	"reflect"
 )
 
+var emptyString string
+
 func (c *Comparator) cmpString(parent *DiffNode, key interface{}, a, b reflect.Value) error {
 	if a.Kind() == reflect.Invalid {
-		parent.addLeaf(CREATE, key, nil, exportInterface(b))
+		if b.String() != emptyString {
+			parent.addLeaf(CREATE, key, nil, exportInterface(b))
+		}
 		return nil
 	}
 
 	if b.Kind() == reflect.Invalid {
-		parent.addLeaf(DELETE, key, exportInterface(a), nil)
+		if a.String() != emptyString {
+			parent.addLeaf(DELETE, key, exportInterface(a), nil)
+		}
 		return nil
 	}
 
@@ -25,7 +31,9 @@ func (c *Comparator) cmpString(parent *DiffNode, key interface{}, a, b reflect.V
 		return nil
 	}
 
-	parent.addLeaf(NONE, key, a.String(), b.String())
+	if a.String() != emptyString {
+		parent.addLeaf(NONE, key, a.String(), b.String())
+	}
 
 	return nil
 }

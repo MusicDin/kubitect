@@ -81,7 +81,7 @@ func (c *Comparator) cmpSliceById(n *DiffNode, key interface{}, a, b reflect.Val
 		ai := a.Index(i)
 		av := getDeepValue(ai)
 
-		id := hasTagOptionId(c.TagName, av)
+		id := tagOptionId(c.TagName, av)
 		if id != nil {
 			pairs.addA(toSliceKey(id), &ai)
 		}
@@ -91,7 +91,7 @@ func (c *Comparator) cmpSliceById(n *DiffNode, key interface{}, a, b reflect.Val
 		bi := b.Index(i)
 		bv := getDeepValue(bi)
 
-		id := hasTagOptionId(c.TagName, bv)
+		id := tagOptionId(c.TagName, bv)
 		if id != nil {
 			pairs.addB(toSliceKey(id), &bi)
 		}
@@ -130,9 +130,4 @@ func containsAtIndex(s, x reflect.Value, i int) bool {
 	}
 
 	return false
-}
-
-// toSliceKey wraps index into square brackets
-func toSliceKey(key interface{}) string {
-	return "[" + toString(key) + "]"
 }

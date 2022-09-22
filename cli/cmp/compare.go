@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	ROOT_KEY      = "root"
 	TAG_OPTION_ID = "id"
 )
 
@@ -35,9 +36,8 @@ func Compare(a, b interface{}) (*DiffNode, error) {
 // a comparison tree.
 func (c *Comparator) Compare(a, b interface{}) (*DiffNode, error) {
 	diff := NewNode()
-	err := c.compare(diff, c.TagName, reflect.ValueOf(a), reflect.ValueOf(b))
-	diff = diff.getChild(c.TagName)
-	return diff, err
+	err := c.compare(diff, ROOT_KEY, reflect.ValueOf(a), reflect.ValueOf(b))
+	return diff.getChild(ROOT_KEY), err
 }
 
 // compare recursively compares given values.
@@ -55,6 +55,8 @@ func (c *Comparator) compare(parent *DiffNode, key interface{}, a, b reflect.Val
 // comparative values.
 func (c *Comparator) getCompareFunc(a, b reflect.Value) CompareFunc {
 	switch {
+	case areOfKind(a, b, reflect.Invalid, reflect.Bool):
+		return c.cmpBool
 	case areOfKind(a, b, reflect.Invalid, reflect.Int):
 		return c.cmpInt
 	case areOfKind(a, b, reflect.Invalid, reflect.String):
@@ -82,7 +84,7 @@ func (c *Comparator) areComparativeById(a, b reflect.Value) bool {
 		av := getDeepValue(ai)
 
 		if av.Kind() == reflect.Struct {
-			if hasTagOptionId(c.TagName, av) != nil {
+			if tagOptionId(c.TagName, av) != nil {
 				return true
 			}
 		}
@@ -93,7 +95,7 @@ func (c *Comparator) areComparativeById(a, b reflect.Value) bool {
 		bv := getDeepValue(bi)
 
 		if bv.Kind() == reflect.Struct {
-			if hasTagOptionId(c.TagName, bv) != nil {
+			if tagOptionId(c.TagName, bv) != nil {
 				return true
 			}
 		}
@@ -127,6 +129,7 @@ func areOfType(a, b reflect.Value, types ...reflect.Type) bool {
 				isA = true
 			}
 		}
+
 		if b.Kind() != reflect.Invalid {
 			if b.Type() == t {
 				isB = true
@@ -137,7 +140,18 @@ func areOfType(a, b reflect.Value, types ...reflect.Type) bool {
 	return isA && isB
 }
 
-func hasTagOptionId(tagName string, v reflect.Value) interface{} {
+func tagName(tagName string, field reflect.StructField) string {
+	tag := field.Tag.Get(tagName)
+	options := strings.Split(tag, ",")
+
+	if len(options) < 1 {
+		return "-"
+	}
+
+	return options[0]
+}
+
+func tagOptionId(tagName string, v reflect.Value) interface{} {
 	if v.Kind() != reflect.Struct {
 		return nil
 	}
@@ -152,7 +166,8 @@ func hasTagOptionId(tagName string, v reflect.Value) interface{} {
 }
 
 func hasTagOption(tagName string, field reflect.StructField, option string) bool {
-	options := strings.Split(field.Tag.Get(tagName), ",")
+	tag := field.Tag.Get(tagName)
+	options := strings.Split(tag, ",")
 
 	if len(options) < 2 {
 		return false

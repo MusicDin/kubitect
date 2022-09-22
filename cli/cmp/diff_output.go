@@ -3,7 +3,6 @@ package cmp
 import (
 	"fmt"
 	"sort"
-	"strings"
 
 	"github.com/fatih/color"
 )
@@ -14,26 +13,29 @@ var (
 	green  = color.New(color.FgHiGreen).SprintFunc()
 )
 
-// ToYaml returns the result of comparison in JSON format.
-func (n *DiffNode) ToJson() string {
-	return n.toJson(0)
-}
-
 // ToYaml returns the result of comparison in YAML format.
-func (n *DiffNode) ToYaml() string {
-	return n.toYaml(-1, false)
+func (n *DiffNode) ToYaml(diffOnly bool) string {
+	return n.toYaml(0, false, diffOnly)
 }
 
-// toJson recursively creates a string of differences in YAML format.
-func (n *DiffNode) toYaml(depth int, tagList bool) string {
+// ToJson returns the result of comparison in JSON format.
+func (n *DiffNode) ToJson(diffOnly bool) string {
+	return n.toJson(0, diffOnly)
+}
+
+// toYaml recursively creates a string of differences in YAML format.
+func (n *DiffNode) toYaml(depth int, tagList, diffOnly bool) string {
 	var output string
+
+	if diffOnly && !n.hasChanged() {
+		return ""
+	}
 
 	key := n.stringKey() + ": "
 	indent := fmt.Sprintf("%*s", depth*2, "")
-	isListIndex := isListIndex(n.key)
+	isListIndex := isSliceKey(n.key)
 
-	// Skip "[index]" nodes
-	if isListIndex {
+	if isListIndex || n.isRoot() {
 		key = ""
 	}
 
@@ -49,28 +51,35 @@ func (n *DiffNode) toYaml(depth int, tagList bool) string {
 		return fmt.Sprintf("%s%s%s\n", indent, key, val)
 	}
 
-	if !isListIndex && depth >= 0 {
+	if len(key) > 0 {
 		output += fmt.Sprintf("%s%s\n", indent, key)
+	}
+
+	if !n.isRoot() {
+		depth++
 	}
 
 	for i, k := range n.sortChildrenKeys() {
 		v := n.getChild(k)
 		tagList = (isListIndex && i == 0)
-		output += v.toYaml(depth+1, tagList)
+		output += v.toYaml(depth, tagList, diffOnly)
 	}
 
 	return output
 }
 
 // toJson recursively creates a string of differences in JSON format.
-func (n *DiffNode) toJson(depth int) string {
+func (n *DiffNode) toJson(depth int, diffOnly bool) string {
 	var output string
+
+	if diffOnly && !n.hasChanged() {
+		return ""
+	}
 
 	key := n.key + ": "
 	indent := fmt.Sprintf("%*s", depth*2, "")
 
-	// Skip "[index]" nodes
-	if isListIndex(n.key) || depth == 0 {
+	if isSliceKey(n.key) || n.isRoot() {
 		key = ""
 	}
 
@@ -80,7 +89,7 @@ func (n *DiffNode) toJson(depth int) string {
 	}
 
 	keys := n.sortChildrenKeys()
-	isList := isListIndex(keys[0])
+	isList := isSliceKey(keys[0])
 
 	annoA := "{"
 	annoB := "}"
@@ -94,7 +103,7 @@ func (n *DiffNode) toJson(depth int) string {
 
 	for _, k := range keys {
 		v := n.getChild(k)
-		output += v.toJson(depth + 1)
+		output += v.toJson(depth+1, diffOnly)
 	}
 
 	output += fmt.Sprintf("%s%s,\n", indent, annoB)
@@ -127,11 +136,11 @@ func (n *DiffNode) stringKey() string {
 }
 
 // stringValue returns node's value change as a string.
-func (l *DiffNode) stringValue() string {
-	bv := formatValue(l.before)
-	av := formatValue(l.after)
+func (n *DiffNode) stringValue() string {
+	bv := formatValue(n.before)
+	av := formatValue(n.after)
 
-	switch l.action {
+	switch n.action {
 	case CREATE:
 		return green(av)
 	case DELETE:
@@ -151,11 +160,4 @@ func formatValue(v interface{}) string {
 	default:
 		return fmt.Sprintf("%v", v)
 	}
-}
-
-// isListIndex checks whether given key represents a list index,
-// which means that it starts with "[" and ends with "]".
-func isListIndex(k interface{}) bool {
-	s := toString(k)
-	return strings.HasPrefix(s, "[") && strings.HasSuffix(s, "]")
 }
