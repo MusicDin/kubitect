@@ -7,7 +7,7 @@ const (
 	ConstProjectClustersDir = "clusters"
 	ConstProjectUrl         = "https://github.com/MusicDin/kubitect"
 	ConstProjectVersion     = "v2.3.0"
-	ConstTerraformVersion   = "1.2.4"
+	ConstTerraformVersion   = "1.3.0"
 	ConstTerraformStatePath = "config/terraform/terraform.tfstate"
 	ConstKubeconfigPath     = "config/admin.conf"
 	ConstVenvBinDir         = "bin/venvs"
