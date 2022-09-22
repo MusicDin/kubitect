@@ -140,7 +140,7 @@ variable "vm_data_disks" {
   type = list(object({
     name : string
     size : number
-    pool : optional(string)
+    pool : optional(string, "main")
   }))
   description = "Additional data disks attached to the virtual machine"
 }
