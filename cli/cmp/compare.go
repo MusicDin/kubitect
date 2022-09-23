@@ -174,6 +174,7 @@ func hasTagOption(tagName string, field reflect.StructField, option string) bool
 	}
 
 	for _, o := range options[1:] {
+
 		o = strings.TrimSpace(o)
 		o = strings.ToLower(o)
 

@@ -25,6 +25,19 @@ func toSliceKey(key interface{}) string {
 	return "[" + toString(key) + "]"
 }
 
+// fromSliceKey unwraps index out of square brackets.
+func fromSliceKey(k interface{}) string {
+	if !isSliceKey(k) {
+		return ""
+	}
+
+	key := toString(k)
+	key = strings.TrimPrefix(key, "[")
+	key = strings.TrimSuffix(key, "]")
+
+	return key
+}
+
 // isSliceKey checks whether given key represents a slice key,
 // which means that it starts with "[" and ends with "]".
 func isSliceKey(k interface{}) bool {

@@ -27,7 +27,7 @@ func (n *DiffNode) ToJson(diffOnly bool) string {
 func (n *DiffNode) toYaml(depth int, tagList, diffOnly bool) string {
 	var output string
 
-	if diffOnly && !n.hasChanged() {
+	if diffOnly && !n.hasChanged() && !n.isId {
 		return ""
 	}
 
@@ -72,7 +72,7 @@ func (n *DiffNode) toYaml(depth int, tagList, diffOnly bool) string {
 func (n *DiffNode) toJson(depth int, diffOnly bool) string {
 	var output string
 
-	if diffOnly && !n.hasChanged() {
+	if diffOnly && !n.hasChanged() && !n.isId {
 		return ""
 	}
 

@@ -18,6 +18,7 @@ type DiffNode struct {
 	action   ActionType
 	before   interface{}
 	after    interface{}
+	isId     bool
 }
 
 // NewNode returns new empty node.
@@ -58,6 +59,7 @@ func (n *DiffNode) addLeaf(a ActionType, key, before, after interface{}) {
 	node.action = a
 	node.before = before
 	node.after = after
+	node.isId = (fromSliceKey(n.key) == before)
 
 	n.setActionToRoot(a)
 }
