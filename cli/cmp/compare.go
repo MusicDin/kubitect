@@ -119,26 +119,6 @@ func areOfKind(a, b reflect.Value, kinds ...reflect.Kind) bool {
 	return isA && isB
 }
 
-func areOfType(a, b reflect.Value, types ...reflect.Type) bool {
-	var isA, isB bool
-
-	for _, t := range types {
-		if a.Kind() != reflect.Invalid {
-			if a.Type() == t {
-				isA = true
-			}
-		}
-
-		if b.Kind() != reflect.Invalid {
-			if b.Type() == t {
-				isB = true
-			}
-		}
-	}
-
-	return isA && isB
-}
-
 func tagName(tagName string, field reflect.StructField) string {
 	tag := field.Tag.Get(tagName)
 	options := strings.Split(tag, ",")

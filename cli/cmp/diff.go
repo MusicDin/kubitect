@@ -3,11 +3,11 @@ package cmp
 type ActionType string
 
 const (
-	NIL    ActionType = "nil"  // Unknown
-	NONE   ActionType = "none" // No change
-	CREATE ActionType = "create"
-	DELETE ActionType = "delete"
-	MODIFY ActionType = "modify"
+	UNKNOWN ActionType = ""
+	NONE    ActionType = "none"
+	CREATE  ActionType = "create"
+	DELETE  ActionType = "delete"
+	MODIFY  ActionType = "modify"
 )
 
 type DiffNode struct {
@@ -25,7 +25,7 @@ type DiffNode struct {
 func NewNode() *DiffNode {
 	node := &DiffNode{
 		children: make([]*DiffNode, 0),
-		action:   NIL,
+		action:   UNKNOWN,
 	}
 	return node
 }
@@ -84,7 +84,7 @@ func (n *DiffNode) setActionToRoot(a ActionType) {
 		if a == MODIFY {
 			n.action = a
 		}
-	case NIL:
+	case UNKNOWN:
 		n.action = a
 	}
 
@@ -126,5 +126,5 @@ func (n *DiffNode) isLeaf() bool {
 
 // hasChanged returns true if node's action is not NIL or NONE.
 func (n *DiffNode) hasChanged() bool {
-	return !(n.action == NONE || n.action == NIL)
+	return !(n.action == NONE || n.action == UNKNOWN)
 }

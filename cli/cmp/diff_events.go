@@ -42,7 +42,7 @@ func (n *DiffNode) triggers(e ChangeEvent) bool {
 	ea := e.GetAction()
 	ep := e.GetPath()
 
-	return np == ep && (ea == na || ea == "")
+	return np == ep && (ea == na || ea == UNKNOWN)
 }
 
 // GenericPath returns the path as a string with all slice keys

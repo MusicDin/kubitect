@@ -20,5 +20,5 @@ func NewTypeMismatchError(aKind, bKind reflect.Kind) *TypeMismatchError {
 }
 
 func (e *TypeMismatchError) Error() string {
-	return fmt.Sprintf("Compared values have mismatched kinds (%v <> %v).", e.aKind, e.bKind)
+	return fmt.Sprintf("Compared values have mismatched types (%v <> %v).", e.aKind, e.bKind)
 }
