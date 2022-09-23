@@ -21,7 +21,7 @@ func (c *Comparator) cmpBool(parent *DiffNode, key interface{}, a, b reflect.Val
 	}
 
 	if a.Bool() != b.Bool() {
-		parent.addLeaf(MODIFY, key, a.Int(), b.Int())
+		parent.addLeaf(MODIFY, key, a.Bool(), b.Bool())
 		return nil
 	}
 
