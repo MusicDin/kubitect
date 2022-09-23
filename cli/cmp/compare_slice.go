@@ -1,7 +1,6 @@
 package cmp
 
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -23,7 +22,7 @@ func (c *Comparator) cmpSlice(parent *DiffNode, key interface{}, a, b reflect.Va
 	}
 
 	if a.Kind() != b.Kind() {
-		return fmt.Errorf("Type mismatch: %v <> %v\n", a.Kind(), b.Kind())
+		return NewTypeMismatchError(a.Kind(), b.Kind())
 	}
 
 	if c.areComparativeById(a, b) {
@@ -102,13 +101,11 @@ func (c *Comparator) cmpSliceById(n *DiffNode, key interface{}, a, b reflect.Val
 
 // contains checks whether a slice s contains an element x
 func contains(s, x reflect.Value, matched *[]bool) bool {
-
 	if len(*matched) != s.Len() {
 		*matched = make([]bool, s.Len())
 	}
 
 	for i := 0; i < s.Len(); i++ {
-
 		if (*matched)[i] {
 			continue
 		}

@@ -1,7 +1,6 @@
 package cmp
 
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -17,7 +16,7 @@ func (c *Comparator) cmpInt(parent *DiffNode, key interface{}, a, b reflect.Valu
 	}
 
 	if a.Kind() != b.Kind() {
-		return fmt.Errorf("Type mismatch: %v <> %v\n", a.Kind(), b.Kind())
+		return NewTypeMismatchError(a.Kind(), b.Kind())
 	}
 
 	if a.Int() != b.Int() {

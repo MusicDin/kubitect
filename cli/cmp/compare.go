@@ -1,7 +1,6 @@
 package cmp
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 )
@@ -45,7 +44,7 @@ func (c *Comparator) compare(parent *DiffNode, key interface{}, a, b reflect.Val
 	cmpFunc := c.getCompareFunc(a, b)
 
 	if cmpFunc == nil {
-		return fmt.Errorf("Invalid compare type. Type mismatch: %s <> %s\n", a.Kind().String(), b.Kind().String())
+		return NewTypeMismatchError(a.Kind(), b.Kind())
 	}
 
 	return cmpFunc(parent, key, a, b)
@@ -174,7 +173,6 @@ func hasTagOption(tagName string, field reflect.StructField, option string) bool
 	}
 
 	for _, o := range options[1:] {
-
 		o = strings.TrimSpace(o)
 		o = strings.ToLower(o)
 
