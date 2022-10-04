@@ -3,6 +3,7 @@ package cmp
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/fatih/color"
 )
@@ -13,14 +14,24 @@ var (
 	green  = color.New(color.FgHiGreen).SprintFunc()
 )
 
-// ToYaml returns the result of comparison in YAML format.
-func (n *DiffNode) ToYaml(diffOnly bool) string {
-	return n.toYaml(0, false, diffOnly)
+// ToYaml returns comparison result in YAML like format.
+func (n *DiffNode) ToYaml() string {
+	return strings.TrimSuffix(n.toYaml(0, false, false), "\n")
 }
 
-// ToJson returns the result of comparison in JSON format.
-func (n *DiffNode) ToJson(diffOnly bool) string {
-	return n.toJson(0, diffOnly)
+// ToYamlDiff returns only differences of the comparison in YAML like format.
+func (n *DiffNode) ToYamlDiff() string {
+	return strings.TrimSuffix(n.toYaml(0, false, true), "\n")
+}
+
+// ToJson returns comparison result in JSON like format.
+func (n *DiffNode) ToJson() string {
+	return strings.TrimSuffix(n.toJson(0, false), ",\n")
+}
+
+// ToJsonDiff returns only differences of the comparison in JSON like format.
+func (n *DiffNode) ToJsonDiff() string {
+	return strings.TrimSuffix(n.toJson(0, true), ",\n")
 }
 
 // toYaml recursively creates a string of differences in YAML format.
