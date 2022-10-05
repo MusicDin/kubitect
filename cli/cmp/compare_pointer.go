@@ -1,7 +1,6 @@
 package cmp
 
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -33,5 +32,5 @@ func (c *Comparator) cmpPointer(parent *DiffNode, key interface{}, a, b reflect.
 		return nil
 	}
 
-	return fmt.Errorf("Type mismatch: %v <> %v", a.Kind(), b.Kind())
+	return NewTypeMismatchError(a.Kind(), b.Kind())
 }

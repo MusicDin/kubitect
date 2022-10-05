@@ -1,7 +1,6 @@
 package cmp
 
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -23,7 +22,7 @@ func (c *Comparator) cmpSlice(parent *DiffNode, key interface{}, a, b reflect.Va
 	}
 
 	if a.Kind() != b.Kind() {
-		return fmt.Errorf("Type mismatch: %v <> %v\n", a.Kind(), b.Kind())
+		return NewTypeMismatchError(a.Kind(), b.Kind())
 	}
 
 	if c.areComparativeById(a, b) {
@@ -81,9 +80,9 @@ func (c *Comparator) cmpSliceById(n *DiffNode, key interface{}, a, b reflect.Val
 		ai := a.Index(i)
 		av := getDeepValue(ai)
 
-		id := hasTagOptionId(c.TagName, av)
+		id := tagOptionId(c.TagName, av)
 		if id != nil {
-			pairs.addA(id, &ai)
+			pairs.addA(toSliceKey(id), &ai)
 		}
 	}
 
@@ -91,9 +90,9 @@ func (c *Comparator) cmpSliceById(n *DiffNode, key interface{}, a, b reflect.Val
 		bi := b.Index(i)
 		bv := getDeepValue(bi)
 
-		id := hasTagOptionId(c.TagName, bv)
+		id := tagOptionId(c.TagName, bv)
 		if id != nil {
-			pairs.addB(id, &bi)
+			pairs.addB(toSliceKey(id), &bi)
 		}
 	}
 
@@ -102,13 +101,11 @@ func (c *Comparator) cmpSliceById(n *DiffNode, key interface{}, a, b reflect.Val
 
 // contains checks whether a slice s contains an element x
 func contains(s, x reflect.Value, matched *[]bool) bool {
-
 	if len(*matched) != s.Len() {
 		*matched = make([]bool, s.Len())
 	}
 
 	for i := 0; i < s.Len(); i++ {
-
 		if (*matched)[i] {
 			continue
 		}
@@ -130,9 +127,4 @@ func containsAtIndex(s, x reflect.Value, i int) bool {
 	}
 
 	return false
-}
-
-// toSliceKey wraps index into square brackets
-func toSliceKey(key interface{}) string {
-	return "[" + toString(key) + "]"
 }

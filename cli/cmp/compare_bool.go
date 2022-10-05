@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-func (c *Comparator) cmpInt(parent *DiffNode, key interface{}, a, b reflect.Value) error {
+func (c *Comparator) cmpBool(parent *DiffNode, key interface{}, a, b reflect.Value) error {
 	if a.Kind() == reflect.Invalid {
 		parent.addLeaf(CREATE, key, nil, exportInterface(b))
 		return nil
@@ -19,12 +19,12 @@ func (c *Comparator) cmpInt(parent *DiffNode, key interface{}, a, b reflect.Valu
 		return NewTypeMismatchError(a.Kind(), b.Kind())
 	}
 
-	if a.Int() != b.Int() {
-		parent.addLeaf(MODIFY, key, a.Int(), b.Int())
+	if a.Bool() != b.Bool() {
+		parent.addLeaf(MODIFY, key, a.Bool(), b.Bool())
 		return nil
 	}
 
-	parent.addLeaf(NONE, key, a.Int(), b.Int())
+	parent.addLeaf(NONE, key, a.Bool(), b.Bool())
 
 	return nil
 }

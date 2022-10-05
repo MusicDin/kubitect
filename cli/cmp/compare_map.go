@@ -26,7 +26,7 @@ func (c *Comparator) cmpMap(parent *DiffNode, key interface{}, a, b reflect.Valu
 	}
 
 	for _, k := range b.MapKeys() {
-		bi := a.MapIndex(k)
+		bi := b.MapIndex(k)
 		if bi.Kind() != reflect.Invalid {
 			pairs.addB(exportInterface(k), &bi)
 		}
