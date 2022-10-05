@@ -1,10 +1,16 @@
 package validation
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestCustomError(t *testing.T) {
+	assert.NotEmpty(t, Var("42", Max(0).Error("")))
+	assert.Error(t, errors.New("test"), Var("42", Max(0).Error("test")))
+}
 
 func TestTags(t *testing.T) {
 	assert.NoError(t, Var("42", Tags("")))

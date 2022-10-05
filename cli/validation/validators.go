@@ -13,7 +13,7 @@ var ErrorFieldIsNotPointer = fmt.Errorf("validators.Field: First argument must b
 // Validator represents a validation rule.
 type Validator struct {
 	Tags string
-	Err  *string
+	Err  string
 }
 
 // initialize creates new singleton validator if its value is nil.
@@ -39,9 +39,9 @@ func (v *Validator) validate(value interface{}) (ValidationErrors, bool) {
 	errs := validate.Var(value, v.Tags)
 	es := toValidationErrors(errs)
 
-	if v.Err != nil {
+	if len(v.Err) > 0 {
 		for i := range es {
-			es[i].Err = *v.Err
+			es[i].Err = v.Err
 		}
 	}
 
@@ -50,7 +50,7 @@ func (v *Validator) validate(value interface{}) (ValidationErrors, bool) {
 
 // Error overrides the default error of the validator and returns modified validator.
 func (v Validator) Error(err string) Validator {
-	v.Err = &err
+	v.Err = err
 	return v
 }
 
@@ -73,23 +73,28 @@ func OmitEmpty() Validator {
 func Required() Validator {
 	return Validator{
 		Tags: "required",
+		Err:  "Property '{.Namespace}' is required.",
 	}
 }
 
-// Min
+// Min validator verifies that the field value is greater then or equal to the given value.
+// In case of slices, arrays and maps, the length is verified.
 func Min(value int) Validator {
 	tag := fmt.Sprintf("min=%d", value)
 
 	return Validator{
 		Tags: tag,
+		Err:  "Minimum value for property '{.Namespace}' is {.Param} (actual: {.Value}).",
 	}
 }
 
-// Max
+// Max validator verifies that the field value is less then or equal to the given value.
+// In case of slices, arrays and maps, the length is verified.
 func Max(value int) Validator {
 	tag := fmt.Sprintf("max=%d", value)
 
 	return Validator{
 		Tags: tag,
+		Err:  "Maximum value for property '{.Namespace}' is {.Param} (actual: {.Value}).",
 	}
 }
