@@ -47,3 +47,24 @@ func TestMax(t *testing.T) {
 	assert.NoError(t, Var([]int{}, Max(1)))
 	assert.Error(t, Var([]int{42, 42}, Max(1)))
 }
+
+func TestLen(t *testing.T) {
+	assert.NoError(t, Var([]string{"1"}, Len(1)))
+	assert.Error(t, Var([]int{42, 42}, Len(1)))
+}
+
+func TestMinLen(t *testing.T) {
+	assert.NoError(t, Var(42, MinLen(42)))
+	assert.Error(t, Var(0, MinLen(42)))
+
+	assert.Error(t, Var([]int{}, MinLen(1)))
+	assert.NoError(t, Var([]int{42}, MinLen(1)))
+}
+
+func TestMaxLen(t *testing.T) {
+	assert.NoError(t, Var(42, MaxLen(42)))
+	assert.Error(t, Var(42, MaxLen(0)))
+
+	assert.NoError(t, Var([]int{}, MaxLen(1)))
+	assert.Error(t, Var([]int{42, 42}, MaxLen(1)))
+}

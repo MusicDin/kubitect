@@ -55,19 +55,22 @@ func Var(value interface{}, validators ...Validator) error {
 		}
 	}
 
-	rv := getDeepValue(reflect.ValueOf(value))
+	rv := reflect.ValueOf(value)
+	dv := getDeepValue(rv)
 
-	if value != nil && rv.Kind() != reflect.Invalid {
-		ri := rv.Interface()
+	if value != nil && dv.Kind() != reflect.Invalid {
+		ri := dv.Interface()
 
-		if val, ok := ri.(Validatable); ok {
-			errs.append(val.Validate())
-		} else {
-			switch rv.Kind() {
-			case reflect.Slice, reflect.Array:
-				errs.append(validateSlice(rv))
-			case reflect.Map:
-				errs.append(validateMap(rv))
+		switch dv.Kind() {
+		case reflect.Slice, reflect.Array:
+			errs.append(validateSlice(dv))
+		case reflect.Map:
+			errs.append(validateMap(dv))
+		default:
+			if dv.Kind() == reflect.Struct || rv.Kind() == reflect.Pointer {
+				if val, ok := ri.(Validatable); ok {
+					errs.append(val.Validate())
+				}
 			}
 		}
 	}
@@ -158,6 +161,10 @@ func Struct(sPtr interface{}, validators ...FieldValidator) error {
 func findStructField(s reflect.Value, f reflect.Value) *reflect.StructField {
 	for i := 0; i < s.NumField(); i++ {
 		ft := s.Type().Field(i)
+
+		if !s.Field(i).CanAddr() {
+			continue
+		}
 
 		if f.Pointer() == s.Field(i).Addr().Pointer() {
 			if ft.Type == f.Elem().Type() {

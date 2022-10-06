@@ -98,3 +98,25 @@ func Max(value int) Validator {
 		Err:  "Maximum value for property '{.Namespace}' is {.Param} (actual: {.Value}).",
 	}
 }
+
+// Len validator verifies that the field length equals to the given value.
+func Len(value int) Validator {
+	tag := fmt.Sprintf("len=%d", value)
+
+	return Validator{
+		Tags: tag,
+		Err:  "Length of '{.Namespace}' must be {.Param} (actual: {.Value}).",
+	}
+}
+
+// MinLen validator verifies that the field value is greater then or equal to the given value.
+// In case of slices, arrays and maps, the length is verified.
+func MinLen(value int) Validator {
+	return Min(value).Error("Minimum length of '{.StructField}' is {.Param} (actual: {.Value})")
+}
+
+// MaxLen validator verifies that the field value is less then or equal to the given value.
+// In case of slices, arrays and maps, the length is verified.
+func MaxLen(value int) Validator {
+	return Max(value).Error("Maximum length of '{.StructField}' is {.Param} (actual: {.Value})")
+}

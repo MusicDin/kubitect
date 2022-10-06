@@ -1,9 +1,12 @@
 package validation
 
-import "reflect"
+import (
+	"reflect"
+)
 
 // getDeepValue returns the actual (final) reflect value.
 func getDeepValue(v reflect.Value) reflect.Value {
+
 	switch v.Kind() {
 	case reflect.Interface:
 		return getDeepValue(v.Elem())
