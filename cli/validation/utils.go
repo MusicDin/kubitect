@@ -1,12 +1,25 @@
 package validation
 
 import (
+	"fmt"
 	"reflect"
+	"strconv"
 )
+
+// toString converts an interface to a string.
+func toString(v interface{}) string {
+	switch v := v.(type) {
+	case string:
+		return v
+	case int:
+		return strconv.Itoa(v)
+	default:
+		return fmt.Sprint(v)
+	}
+}
 
 // getDeepValue returns the actual (final) reflect value.
 func getDeepValue(v reflect.Value) reflect.Value {
-
 	switch v.Kind() {
 	case reflect.Interface:
 		return getDeepValue(v.Elem())

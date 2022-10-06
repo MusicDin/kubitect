@@ -2,6 +2,7 @@ package validation
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -10,10 +11,20 @@ var validate *validator.Validate
 
 var ErrorFieldIsNotPointer = fmt.Errorf("validators.Field: First argument must be a pointer to a struct field!")
 
+type Action string
+
+const (
+	UNKNOWN   = ""
+	OMITEMPTY = "OMITEMPTY"
+	SKIP      = "SKIP"
+)
+
 // Validator represents a validation rule.
 type Validator struct {
-	Tags string
-	Err  string
+	Tags   string
+	Err    string
+	ignore bool
+	action Action
 }
 
 // initialize creates new singleton validator if its value is nil.
@@ -28,12 +39,19 @@ func initialize() {
 
 // validate validates the provided value against the validator.
 // It returns encountered validation errors and boolean indicating
-// whether to skip further validation of a variable or not.
+// whether to skip further validation of a field or not.
 func (v *Validator) validate(value interface{}) (ValidationErrors, bool) {
 	initialize()
 
-	if v.Tags == "omitempty" {
+	if v.ignore {
+		return nil, false
+	}
+
+	switch v.action {
+	case OMITEMPTY:
 		return nil, isEmpty(value)
+	case SKIP:
+		return nil, true
 	}
 
 	errs := validate.Var(value, v.Tags)
@@ -54,6 +72,12 @@ func (v Validator) Error(err string) Validator {
 	return v
 }
 
+// When allows validator to be applied only when the given condition is met.
+func (v Validator) When(condition bool) Validator {
+	v.ignore = !condition
+	return v
+}
+
 // Tags returns a new validator with the given tags. It is a generic validator that
 // allows use of any validation rule from 'github.com/go-playground/validator' library.
 func Tags(tags string) Validator {
@@ -62,10 +86,19 @@ func Tags(tags string) Validator {
 	}
 }
 
-// OmitEmpty validator prevents further validation of a variable, if variable is empty.
+// OmitEmpty prevents further validation of the field, if the field is empty.
 func OmitEmpty() Validator {
 	return Validator{
-		Tags: "omitempty",
+		Tags:   "omitempty",
+		action: OMITEMPTY,
+	}
+}
+
+// Skip prevents further validation of the field.
+func Skip() Validator {
+	return Validator{
+		Tags:   "-",
+		action: SKIP,
 	}
 }
 
@@ -77,46 +110,88 @@ func Required() Validator {
 	}
 }
 
-// Min validator verifies that the field value is greater then or equal to the given value.
-// In case of slices, arrays and maps, the length is verified.
+// Min checks whether the field value is greater than or equal to the specified value.
+// In case of strings, slices, arrays and maps the length is checked.
 func Min(value int) Validator {
-	tag := fmt.Sprintf("min=%d", value)
-
 	return Validator{
-		Tags: tag,
+		Tags: fmt.Sprintf("min=%d", value),
 		Err:  "Minimum value for property '{.Namespace}' is {.Param} (actual: {.Value}).",
 	}
 }
 
-// Max validator verifies that the field value is less then or equal to the given value.
-// In case of slices, arrays and maps, the length is verified.
+// Max checks whether the field value is less than or equal to the specified value.
+// In case of strings, slices, arrays and maps the length is checked.
 func Max(value int) Validator {
-	tag := fmt.Sprintf("max=%d", value)
-
 	return Validator{
-		Tags: tag,
+		Tags: fmt.Sprintf("max=%d", value),
 		Err:  "Maximum value for property '{.Namespace}' is {.Param} (actual: {.Value}).",
 	}
 }
 
-// Len validator verifies that the field length equals to the given value.
+// Len checks if the field length matches the specified value.
 func Len(value int) Validator {
-	tag := fmt.Sprintf("len=%d", value)
-
 	return Validator{
-		Tags: tag,
+		Tags: fmt.Sprintf("len=%d", value),
 		Err:  "Length of '{.Namespace}' must be {.Param} (actual: {.Value}).",
 	}
 }
 
-// MinLen validator verifies that the field value is greater then or equal to the given value.
-// In case of slices, arrays and maps, the length is verified.
+// MinLen checks whether the field length is greater than or equal to the specified value.
 func MinLen(value int) Validator {
 	return Min(value).Error("Minimum length of '{.StructField}' is {.Param} (actual: {.Value})")
 }
 
-// MaxLen validator verifies that the field value is less then or equal to the given value.
-// In case of slices, arrays and maps, the length is verified.
+// MaxLen checks whether the field length is less than or equal to the specified value.
 func MaxLen(value int) Validator {
 	return Max(value).Error("Maximum length of '{.StructField}' is {.Param} (actual: {.Value})")
+}
+
+// IP checks whether the field value is a valid IP address.
+func IP() Validator {
+	return Validator{
+		Tags: "ip",
+		Err:  "Property '{.Field}' must be a valid IP address (actual: {.Value}).",
+	}
+}
+
+// IPv4 checks whether the field value is a valid v4 IP address.
+func IPv4() Validator {
+	return Validator{
+		Tags: "ipv4",
+		Err:  "Property '{.Field}' must be a valid IPv4 address (actual: {.Value}).",
+	}
+}
+
+// IPv6 checks whether the field value is a valid v6 IP address.
+func IPv6() Validator {
+	return Validator{
+		Tags: "ipv6",
+		Err:  "Property '{.Field}' must be a valid IPv6 address (actual: {.Value}).",
+	}
+}
+
+// MAC checks whether the field value is a valid MAC address.
+func MAC() Validator {
+	return Validator{
+		Tags: "mac",
+		Err:  "Property '{.Field}' must be a valid MAC address (actual: {.Value}).",
+	}
+}
+
+// OneOf checks whether the field value equals one of the specified values.
+// If no value is provided, the validation always fails.
+func OneOf(values ...interface{}) Validator {
+	var s []string
+
+	for _, v := range values {
+		s = append(s, toString(v))
+	}
+
+	oneOf := strings.Join(s, " ")
+	valid := strings.Join(s, "|")
+
+	return Validator{
+		Tags: fmt.Sprintf("oneof=%s", oneOf),
+		Err:  fmt.Sprintf("Property '{.Field}' must one of the following values: [%s] (actual: {.Value}).", valid),
+	}
 }

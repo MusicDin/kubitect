@@ -45,12 +45,12 @@ func Var(value interface{}, validators ...Validator) error {
 	for _, v := range validators {
 		err, skip := v.validate(value)
 
-		if err != nil {
-			errs.append(err)
-			break
+		if skip {
+			return nil
 		}
 
-		if skip {
+		if err != nil {
+			errs.append(err)
 			break
 		}
 	}

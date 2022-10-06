@@ -7,6 +7,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestToString(t *testing.T) {
+	assert.Equal(t, "42", toString("42"))
+	assert.Equal(t, "42", toString(42))
+	assert.Equal(t, "<nil>", toString(nil))
+}
+
+func TestDeepValue(t *testing.T) {
+	a := 42
+	ra := reflect.ValueOf(a)
+	assert.Equal(t, a, getDeepValue(ra).Interface())
+}
+
 func TestIsEmpty(t *testing.T) {
 	assert.False(t, isEmpty(42))
 	assert.False(t, isEmpty("42"))
@@ -22,10 +34,4 @@ func TestIsEmpty(t *testing.T) {
 	assert.True(t, isEmpty(&[]int{}))
 	assert.True(t, isEmpty(map[string]int{}))
 	assert.True(t, isEmpty(&map[string]string{}))
-}
-
-func TestDeepValue(t *testing.T) {
-	a := 42
-	ra := reflect.ValueOf(a)
-	assert.Equal(t, a, getDeepValue(ra).Interface())
 }
