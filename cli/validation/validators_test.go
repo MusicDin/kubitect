@@ -108,3 +108,84 @@ func TestOneOf(t *testing.T) {
 	assert.Error(t, Var(7, OneOf(1, 42, 24)))
 	assert.Error(t, Var(7, OneOf()))
 }
+
+func TestAlpha(t *testing.T) {
+	assert.Error(t, Var("42", Alpha()))
+	assert.Error(t, Var(42, Alpha()))
+	assert.Error(t, Var("42.0", Alpha()))
+	assert.Error(t, Var(42.0, Alpha()))
+	assert.Error(t, Var("42aAbB", Alpha()))
+	assert.NoError(t, Var("aAbB", Alpha()))
+	assert.Error(t, Var("-", Alpha()))
+	assert.Error(t, Var("_", Alpha()))
+	assert.Error(t, Var(nil, Alpha()))
+}
+
+func TestNumeric(t *testing.T) {
+	assert.NoError(t, Var("42", Numeric()))
+	assert.NoError(t, Var(42, Numeric()))
+	assert.NoError(t, Var("42.0", Numeric()))
+	assert.NoError(t, Var(42.0, Numeric()))
+	assert.Error(t, Var("42aAbB", Numeric()))
+	assert.Error(t, Var("-", Numeric()))
+	assert.Error(t, Var("_", Numeric()))
+	assert.Error(t, Var(nil, Alpha()))
+}
+
+func TestAlphaNumeric(t *testing.T) {
+	assert.NoError(t, Var("42", AlphaNumeric()))
+	assert.Error(t, Var(42, AlphaNumeric()))
+	assert.Error(t, Var("42.0", AlphaNumeric()))
+	assert.Error(t, Var(42.0, AlphaNumeric()))
+	assert.NoError(t, Var("42aAbB", AlphaNumeric()))
+	assert.NoError(t, Var("aAbB", AlphaNumeric()))
+	assert.Error(t, Var("-", AlphaNumeric()))
+	assert.Error(t, Var("_", AlphaNumeric()))
+	assert.Error(t, Var(nil, AlphaNumeric()))
+}
+
+func TestAlphaNumericHyp(t *testing.T) {
+	assert.NoError(t, Var("42", AlphaNumericHyp()))
+	assert.Error(t, Var(42, AlphaNumericHyp()))
+	assert.Error(t, Var("42.0", AlphaNumericHyp()))
+	assert.Error(t, Var(42.0, AlphaNumericHyp()))
+	assert.NoError(t, Var("42aAbB", AlphaNumericHyp()))
+	assert.NoError(t, Var("aAbB", AlphaNumericHyp()))
+	assert.NoError(t, Var("-", AlphaNumericHyp()))
+	assert.Error(t, Var("_", AlphaNumericHyp()))
+	assert.Error(t, Var(nil, AlphaNumericHyp()))
+}
+
+func TestAlphaNumericHypUS(t *testing.T) {
+	assert.NoError(t, Var("42", AlphaNumericHypUS()))
+	assert.Error(t, Var(42, AlphaNumericHypUS()))
+	assert.Error(t, Var("42.0", AlphaNumericHypUS()))
+	assert.Error(t, Var(42.0, AlphaNumericHypUS()))
+	assert.NoError(t, Var("42aAbB", AlphaNumericHypUS()))
+	assert.NoError(t, Var("aAbB", AlphaNumericHypUS()))
+	assert.NoError(t, Var("-", AlphaNumericHypUS()))
+	assert.NoError(t, Var("_", AlphaNumericHypUS()))
+	assert.Error(t, Var(nil, AlphaNumericHypUS()))
+}
+
+func TestLowercase(t *testing.T) {
+	assert.NoError(t, Var("42", Lowercase()))
+	assert.Error(t, Var("42aAbB", Lowercase()))
+	assert.Error(t, Var("aAbB", Lowercase()))
+	assert.Error(t, Var("AB", Lowercase()))
+	assert.NoError(t, Var("ab", Lowercase()))
+	assert.NoError(t, Var("-", Lowercase()))
+	assert.NoError(t, Var("_", Lowercase()))
+	assert.Error(t, Var(nil, Lowercase()))
+}
+
+func TestUppercase(t *testing.T) {
+	assert.NoError(t, Var("42", Uppercase()))
+	assert.Error(t, Var("42aAbB", Uppercase()))
+	assert.Error(t, Var("aAbB", Uppercase()))
+	assert.NoError(t, Var("AB", Uppercase()))
+	assert.Error(t, Var("ab", Uppercase()))
+	assert.NoError(t, Var("-", Uppercase()))
+	assert.NoError(t, Var("_", Uppercase()))
+	assert.Error(t, Var(nil, Uppercase()))
+}

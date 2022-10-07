@@ -13,6 +13,20 @@ func TestToString(t *testing.T) {
 	assert.Equal(t, "<nil>", toString(nil))
 }
 
+func TestRegex(t *testing.T) {
+	assert.False(t, regex("[0-9]+", "ab"))
+	assert.True(t, regex("[0-9]*", "ab"))
+	assert.True(t, regex("^[0-9]*$", "42"))
+	assert.True(t, regex("[0-9]+", "42"))
+	assert.True(t, regex("", ""))
+
+	fn := func() {
+		regex("\\", "ab")
+	}
+
+	assert.Panics(t, fn)
+}
+
 func TestDeepValue(t *testing.T) {
 	a := 42
 	ra := reflect.ValueOf(a)

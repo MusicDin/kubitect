@@ -3,6 +3,7 @@ package validation
 import (
 	"fmt"
 	"reflect"
+	"regexp"
 	"strconv"
 )
 
@@ -16,6 +17,18 @@ func toString(v interface{}) string {
 	default:
 		return fmt.Sprint(v)
 	}
+}
+
+// regex tests whether a pattern matches a string.
+// It panics if the provided pattern is incorrect.
+func regex(regex string, value string) bool {
+	matched, err := regexp.MatchString(regex, value)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return matched
 }
 
 // getDeepValue returns the actual (final) reflect value.

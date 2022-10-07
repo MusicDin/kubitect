@@ -35,6 +35,8 @@ func initialize() {
 
 	validate = validator.New()
 	validate.RegisterTagNameFunc(fieldName)
+	validate.RegisterValidation("custom_alphanumhyp", custom_AlphaNumericHyphen)
+	validate.RegisterValidation("custom_alphanumhypus", custom_AlphaNumericHyphenUnderscore)
 }
 
 // validate validates the provided value against the validator.
@@ -76,6 +78,18 @@ func (v Validator) Error(err string) Validator {
 func (v Validator) When(condition bool) Validator {
 	v.ignore = !condition
 	return v
+}
+
+// custom_AlphaNumericDash checks whether the field contains only alphanumeric characters
+// (a-Z0-9) and hyphen (-).
+func custom_AlphaNumericHyphen(fl validator.FieldLevel) bool {
+	return regex("^[a-zA-Z0-9-]*$", fl.Field().String())
+}
+
+// custom_AlphaNumericDashUnderscore checks whether the field contains only alphanumeric
+// characters (a-Z0-9), hyphen (-) and underscore (_).
+func custom_AlphaNumericHyphenUnderscore(fl validator.FieldLevel) bool {
+	return regex("^[a-zA-Z0-9-_]*$", fl.Field().String())
 }
 
 // Tags returns a new validator with the given tags. It is a generic validator that
@@ -192,6 +206,66 @@ func OneOf(values ...interface{}) Validator {
 
 	return Validator{
 		Tags: fmt.Sprintf("oneof=%s", oneOf),
-		Err:  fmt.Sprintf("Property '{.Field}' must one of the following values: [%s] (actual: {.Value}).", valid),
+		Err:  fmt.Sprintf("Property '{.Field}' must be one of the following values: [%s] (actual: {.Value}).", valid),
+	}
+}
+
+// Alpha checks whether the field contains only ASCII alpha characters.
+func Alpha() Validator {
+	return Validator{
+		Tags: "alpha",
+		Err:  "Property '{.Field}' can contain only alpha characters (a-Z). (actual: {.Value})",
+	}
+}
+
+// Numeric checks whether the field contains only numeric characters.
+// Validation fails for integers and floats.
+func Numeric() Validator {
+	return Validator{
+		Tags: "numeric",
+		Err:  "Property '{.Field}' can contain only numeric characters (0-9). (actual: {.Value})",
+	}
+}
+
+// AlphaNumeric checks whether the field contains only alphanumeric characters.
+// Validation fails for integers and floats.
+func AlphaNumeric() Validator {
+	return Validator{
+		Tags: "alphanum",
+		Err:  "Property '{.Field}' can contain only alphanumeric characters. (actual: {.Value})",
+	}
+}
+
+// AlphaNumericDash checks whether the field contains only alphanumeric characters
+// (a-Z0-9) and hyphen (-). Validation fails non string values.
+func AlphaNumericHyp() Validator {
+	return Validator{
+		Tags: "custom_alphanumhyp",
+		Err:  "Property '{.Field}' can contain only alphanumeric characters and hyphen. (actual: {.Value})",
+	}
+}
+
+// AlphaNumericDash checks whether the field contains only alphanumeric characters
+// (a-Z0-9), hyphen (-) and underscore (_). Validation fails non string values.
+func AlphaNumericHypUS() Validator {
+	return Validator{
+		Tags: "custom_alphanumhypus",
+		Err:  "Property '{.Field}' can contain only alphanumeric characters, hyphen and underscore. (actual: {.Value})",
+	}
+}
+
+// Lowercase checks whether the field contains only lowercase characters.
+func Lowercase() Validator {
+	return Validator{
+		Tags: "lowercase",
+		Err:  "Property '{.Field}' can contain only lowercase characters. (actual: {.Value})",
+	}
+}
+
+// Uppercase checks whether the field contains only uppercase characters.
+func Uppercase() Validator {
+	return Validator{
+		Tags: "uppercase",
+		Err:  "Property '{.Field}' can contain only uppercase characters. (actual: {.Value})",
 	}
 }
