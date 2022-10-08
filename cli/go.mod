@@ -5,16 +5,15 @@ go 1.18
 require (
 	github.com/apenella/go-ansible v1.1.5
 	github.com/go-git/go-git/v5 v5.4.2
-	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/hashicorp/hc-install v0.3.2
 	github.com/hashicorp/terraform-exec v0.16.0
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.8.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
@@ -24,7 +23,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/zclconf/go-cty v1.10.0 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (
@@ -33,7 +31,6 @@ require (
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/apenella/go-common-utils/data v0.0.0-20210528133155-34ba915e28c8 // indirect
 	github.com/apenella/go-common-utils/error v0.0.0-20210528133155-34ba915e28c8 // indirect
-	github.com/creasty/defaults v1.6.0
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/fatih/color v1.13.0
 	github.com/go-git/gcfg v1.5.0 // indirect
@@ -55,6 +52,5 @@ require (
 	golang.org/x/sys v0.0.0-20220330033206-e17cdc41300f // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gopkg.in/yaml.v3 v3.0.1
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

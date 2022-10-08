@@ -1,27 +1,19 @@
 package modelconfig
 
-import (
-	validation "github.com/go-ozzo/ozzo-validation/v4"
-)
+import v "cli/validation"
 
 type Cluster struct {
-	Name         *ClusterName  `yaml:"name,omitempty" default:"kubitect"`
-	Network      *Network      `yaml:"network,omitempty"`
-	NodeTemplate *NodeTemplate `yaml:"nodeTemplate,omitempty"`
-	Nodes        *Nodes        `yaml:"nodes,omitempty"`
+	Name         *string       `yaml:"name"`
+	Network      *Network      `yaml:"network"`
+	NodeTemplate *NodeTemplate `yaml:"nodeTemplate"`
+	Nodes        *Nodes        `yaml:"nodes"`
 }
 
 func (c Cluster) Validate() error {
-	return validation.ValidateStruct(&c,
-		validation.Field(&c.Name),
-		validation.Field(&c.Network),
-		validation.Field(&c.Nodes),
-		validation.Field(&c.NodeTemplate),
+	return v.Struct(&c,
+		v.Field(&c.Name, v.Required(), v.AlphaNumericHyp()),
+		v.Field(&c.Network),
+		v.Field(&c.Nodes),
+		v.Field(&c.NodeTemplate),
 	)
-}
-
-type ClusterName string
-
-func (n ClusterName) Validate() error {
-	return validation.Validate(string(n), StringNotEmptyAlphaNumericMinus...)
 }

@@ -1,21 +1,25 @@
 package modelconfig
 
-import validation "github.com/go-ozzo/ozzo-validation/v4"
+import (
+	v "cli/validation"
+)
+
+// import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type Host struct {
-	Name                 *HostName           `yaml:"name,omitempty"`
-	Default              *bool               `yaml:"default,omitempty"  default:"false"`
-	Connection           *Connection         `yaml:"connection,omitempty"`
-	MainResourcePoolPath *ResourcePath       `yaml:"mainResourcePoolPath,omitempty"`
-	DataResourcePools    *[]DataResourcePool `yaml:"dataResourcePools,omitempty"`
+	Name                 *string             `yaml:"name" opt:",id"`
+	Default              *bool               `yaml:"default"`
+	Connection           *Connection         `yaml:"connection"`
+	MainResourcePoolPath *string             `yaml:"mainResourcePoolPath"`
+	DataResourcePools    *[]DataResourcePool `yaml:"dataResourcePools"`
 }
 
 func (h Host) Validate() error {
-	return validation.ValidateStruct(&h,
-		validation.Field(&h.Default),
-		validation.Field(&h.Name, validation.Required),
-		validation.Field(&h.Connection),
-		validation.Field(&h.DataResourcePools),
-		validation.Field(&h.MainResourcePoolPath),
+	return v.Struct(&h,
+		v.Field(&h.Name, v.Required(), v.AlphaNumericHypUS()), // TODO: unique among all hosts + StringNotEmptyAlphaNumericMinus
+		// v.Field(&h.Default), // TODO: only one can be true
+		v.Field(&h.Connection),
+		v.Field(&h.MainResourcePoolPath, v.OmitEmpty()), // TODO: validate dir path which does not have to exist
+		v.Field(&h.DataResourcePools),
 	)
 }
