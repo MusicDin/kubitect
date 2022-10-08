@@ -68,9 +68,17 @@ func (v *Validator) validate(value interface{}) (ValidationErrors, bool) {
 	return es, false
 }
 
-// Error overrides the default error of the validator and returns modified validator.
+// Error overwrites the validator's default error message with the user-defined error
+// and returns the modified validator.
 func (v Validator) Error(err string) Validator {
 	v.Err = err
+	return v
+}
+
+// Errorf overwrites the validator's default error message with the formatted user-defined
+// error and returns the modified validator.
+func (v Validator) Errorf(err string, opt ...interface{}) Validator {
+	v.Err = fmt.Sprintf(err, opt...)
 	return v
 }
 
@@ -120,7 +128,7 @@ func Skip() Validator {
 func Required() Validator {
 	return Validator{
 		Tags: "required",
-		Err:  "Property '{.Namespace}' is required.",
+		Err:  "Property '{.Field}' is required.",
 	}
 }
 
@@ -129,7 +137,7 @@ func Required() Validator {
 func Min(value int) Validator {
 	return Validator{
 		Tags: fmt.Sprintf("min=%d", value),
-		Err:  "Minimum value for property '{.Namespace}' is {.Param} (actual: {.Value}).",
+		Err:  "Minimum value for property '{.Field}' is {.Param} (actual: {.Value}).",
 	}
 }
 
@@ -138,7 +146,7 @@ func Min(value int) Validator {
 func Max(value int) Validator {
 	return Validator{
 		Tags: fmt.Sprintf("max=%d", value),
-		Err:  "Maximum value for property '{.Namespace}' is {.Param} (actual: {.Value}).",
+		Err:  "Maximum value for property '{.Field}' is {.Param} (actual: {.Value}).",
 	}
 }
 
@@ -146,18 +154,18 @@ func Max(value int) Validator {
 func Len(value int) Validator {
 	return Validator{
 		Tags: fmt.Sprintf("len=%d", value),
-		Err:  "Length of '{.Namespace}' must be {.Param} (actual: {.Value}).",
+		Err:  "Length of '{.Field}' must be {.Param} (actual: {.Value}).",
 	}
 }
 
 // MinLen checks whether the field length is greater than or equal to the specified value.
 func MinLen(value int) Validator {
-	return Min(value).Error("Minimum length of '{.StructField}' is {.Param} (actual: {.Value})")
+	return Min(value).Error("Minimum length of '{.Field}' is {.Param} (actual: {.Value})")
 }
 
 // MaxLen checks whether the field length is less than or equal to the specified value.
 func MaxLen(value int) Validator {
-	return Max(value).Error("Maximum length of '{.StructField}' is {.Param} (actual: {.Value})")
+	return Max(value).Error("Maximum length of '{.Field}' is {.Param} (actual: {.Value})")
 }
 
 // IP checks whether the field value is a valid IP address.
@@ -181,6 +189,30 @@ func IPv6() Validator {
 	return Validator{
 		Tags: "ipv6",
 		Err:  "Property '{.Field}' must be a valid IPv6 address (actual: {.Value}).",
+	}
+}
+
+// CIDR checks whether the field value is a valid CIDR address.
+func CIDR() Validator {
+	return Validator{
+		Tags: "cidr",
+		Err:  "Property '{.Field}' must be a valid CIDR address (actual: {.Value}).",
+	}
+}
+
+// CIDRv4 checks whether the field value is a valid v4 CIDR address.
+func CIDRv4() Validator {
+	return Validator{
+		Tags: "cidrv4",
+		Err:  "Property '{.Field}' must be a valid CIDRv4 address (actual: {.Value}).",
+	}
+}
+
+// CIDRv6 checks whether the field value is a valid v6 CIDR address.
+func CIDRv6() Validator {
+	return Validator{
+		Tags: "cidrv6",
+		Err:  "Property '{.Field}' must be a valid CIDRv6 address (actual: {.Value}).",
 	}
 }
 
@@ -267,5 +299,13 @@ func Uppercase() Validator {
 	return Validator{
 		Tags: "uppercase",
 		Err:  "Property '{.Field}' can contain only uppercase characters. (actual: {.Value})",
+	}
+}
+
+// File checks whether the field is a valid file path and whether file exists.
+func FileExists() Validator {
+	return Validator{
+		Tags: "file",
+		Err:  "Property '{.Field}' must be a valid file path that points to an existing file. (actual: {.Value})",
 	}
 }

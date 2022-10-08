@@ -12,6 +12,11 @@ func TestCustomError(t *testing.T) {
 	assert.Error(t, errors.New("test"), Var("42", Max(0).Error("test")))
 }
 
+func TestCustomErrorf(t *testing.T) {
+	assert.NotEmpty(t, Var("42", Max(0).Errorf("")))
+	assert.Error(t, errors.New("test"), Var("42", Max(0).Errorf("%s", "test")))
+}
+
 func TestWhen(t *testing.T) {
 	assert.NoError(t, Var("42", Max(0).When(false == true)))
 	assert.Error(t, Var("42", Max(0).When(false == false)))
@@ -95,6 +100,24 @@ func TestIPv6(t *testing.T) {
 	assert.Error(t, Var("42", IPv6()))
 	assert.Error(t, Var("192.168.113.1", IPv6()))
 	assert.NoError(t, Var("2001:db8:3333:4444:5555:6666:7777:8888", IPv6()))
+}
+
+func TestCIDR(t *testing.T) {
+	assert.Error(t, Var("42", CIDR()))
+	assert.NoError(t, Var("192.168.113.1/24", CIDR()))
+	assert.NoError(t, Var("2001:db8:3333:4444:5555:6666:7777:8888/64", CIDR()))
+}
+
+func TestCIDRv4(t *testing.T) {
+	assert.Error(t, Var("42", CIDRv4()))
+	assert.NoError(t, Var("192.168.113.1/24", CIDRv4()))
+	assert.Error(t, Var("2001:db8:3333:4444:5555:6666:7777:8888/64", CIDRv4()))
+}
+
+func TestCIDRv6(t *testing.T) {
+	assert.Error(t, Var("42", CIDRv6()))
+	assert.Error(t, Var("192.168.113.1/24", CIDRv6()))
+	assert.NoError(t, Var("2001:db8:3333:4444:5555:6666:7777:8888/64", CIDRv6()))
 }
 
 func TestMAC(t *testing.T) {
@@ -188,4 +211,9 @@ func TestUppercase(t *testing.T) {
 	assert.NoError(t, Var("-", Uppercase()))
 	assert.NoError(t, Var("_", Uppercase()))
 	assert.Error(t, Var(nil, Uppercase()))
+}
+
+func TestFileExists(t *testing.T) {
+	assert.NoError(t, Var("./validators_test.go", FileExists()))
+	assert.Error(t, Var("./non-existing-file-test", FileExists()))
 }

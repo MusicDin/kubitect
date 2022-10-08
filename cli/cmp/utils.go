@@ -3,18 +3,23 @@ package cmp
 import (
 	"fmt"
 	"reflect"
-	"strconv"
 	"strings"
 	"unsafe"
 )
 
+const (
+	flagStickyRO uintptr = 1 << 5
+	flagEmbedRO  uintptr = 1 << 6
+	flagRO       uintptr = flagStickyRO | flagEmbedRO
+)
+
 // toString converts an interface to a string.
 func toString(v interface{}) string {
-	switch v := v.(type) {
-	case string:
-		return v
-	case int:
-		return strconv.Itoa(v)
+	rv := reflect.ValueOf(v)
+
+	switch rv.Kind() {
+	case reflect.Pointer:
+		return toString(reflect.Indirect(rv))
 	default:
 		return fmt.Sprint(v)
 	}
@@ -45,13 +50,11 @@ func isSliceKey(k interface{}) bool {
 	return strings.HasPrefix(s, "[") && strings.HasSuffix(s, "]")
 }
 
-const isExportFlag uintptr = (1 << 5) | (1 << 6)
-
-// exportInterface returns an interface of a reflect value.
+// exportInterface returns an interface of the reflect value.
 func exportInterface(v reflect.Value) interface{} {
 	if !v.CanInterface() {
 		flagTmp := (*uintptr)(unsafe.Pointer(uintptr(unsafe.Pointer(&v)) + 2*unsafe.Sizeof(uintptr(0))))
-		*flagTmp = (*flagTmp) & (^isExportFlag)
+		*flagTmp &^= flagRO
 	}
 	return v.Interface()
 }
