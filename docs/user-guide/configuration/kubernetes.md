@@ -25,7 +25,7 @@ All Kubespray versions can be found on on their GitHub [release page](https://gi
 ```yaml
 kubernetes:
   kubespray:
-    version: v2.19.0
+    version: v2.20.0
 ```
 
 ### Kubespray URL
@@ -137,7 +137,7 @@ The minimalistic Kubernetes configuration encompasses setting Kubernetes and Kub
 kuberentes:
   version: v1.23.7
   kubespray:
-    version: v2.19.0
+    version: v2.20.0
 ```
 
 </div>

@@ -71,7 +71,7 @@ cluster:
       networkPlugin: calico
       dnsMode: coredns
       kubespray:
-        version: v2.19.0
+        version: v2.20.0
     ```
 
 ## Step 2: Applying the configuration
