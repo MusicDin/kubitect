@@ -134,7 +134,7 @@ This behavior can be restricted with node selectors.
     kubernetes:
       version: v1.23.7
       kubespray:
-        version: v2.19.0
+        version: v2.20.0
 
     addons:
       rook:
@@ -280,7 +280,7 @@ addons:
     kubernetes:
       version: v1.23.7
       kubespray:
-        version: v2.19.0
+        version: v2.20.0
 
     addons:
       rook:

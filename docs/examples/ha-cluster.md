@@ -307,7 +307,7 @@ cluster:
     kubernetes:
       version: v1.23.7
       kubespray:
-        version: v2.19.0
+        version: v2.20.0
     ```
 
 ## Step 5: Applying the configuration

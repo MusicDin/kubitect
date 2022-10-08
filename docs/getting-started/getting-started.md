@@ -229,7 +229,7 @@ kubernetes:
   networkPlugin: calico
   dnsMode: coredns
   kubespray:
-    version: v2.19.0
+    version: v2.20.0
 ```
 
 ## Step 5 - Create the cluster
@@ -282,7 +282,7 @@ kubernetes:
   networkPlugin: calico
   dnsMode: coredns
   kubespray:
-    version: v2.19.0
+    version: v2.20.0
 ```
 
 Now create the cluster by applying your custom configuration using the Kubitect command line tool. 

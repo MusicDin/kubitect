@@ -176,7 +176,7 @@ kubernetes:
   dnsMode: coredns
   kubespray:
     url: "https://github.com/kubernetes-sigs/kubespray.git"
-    version: v2.19.0
+    version: v2.20.0
   other:
     copyKubeconfig: false
 
