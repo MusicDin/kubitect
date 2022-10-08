@@ -217,3 +217,31 @@ func TestFileExists(t *testing.T) {
 	assert.NoError(t, Var("./validators_test.go", FileExists()))
 	assert.Error(t, Var("./non-existing-file-test", FileExists()))
 }
+
+func TestURL(t *testing.T) {
+	assert.NoError(t, Var("https://kubitect.io", URL()))
+	assert.Error(t, Var("kubitect.io", URL()))
+	assert.Error(t, Var(nil, URL()))
+}
+
+func TestSemVer(t *testing.T) {
+	assert.Error(t, Var("v1.2.3", SemVer()))
+	assert.NoError(t, Var("1.2.3", SemVer()))
+	assert.Error(t, Var("1.2", SemVer()))
+	assert.Error(t, Var("1", SemVer()))
+	assert.Error(t, Var("", SemVer()))
+	assert.Error(t, Var("1.2.*", SemVer()))
+	assert.Error(t, Var("a.b.c", SemVer()))
+	assert.Error(t, Var(nil, SemVer()))
+}
+
+func TestVSemVer(t *testing.T) {
+	assert.NoError(t, Var("v1.2.3", VSemVer()))
+	assert.Error(t, Var("1.2.3", VSemVer()))
+	assert.Error(t, Var("1.2", VSemVer()))
+	assert.Error(t, Var("1", VSemVer()))
+	assert.Error(t, Var("", VSemVer()))
+	assert.Error(t, Var("1.2.*", VSemVer()))
+	assert.Error(t, Var("a.b.c", VSemVer()))
+	assert.Error(t, Var(nil, VSemVer()))
+}

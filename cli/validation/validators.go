@@ -37,6 +37,7 @@ func initialize() {
 	validate.RegisterTagNameFunc(fieldName)
 	validate.RegisterValidation("custom_alphanumhyp", custom_AlphaNumericHyphen)
 	validate.RegisterValidation("custom_alphanumhypus", custom_AlphaNumericHyphenUnderscore)
+	validate.RegisterValidation("custom_vsemver", custom_VSemVer)
 }
 
 // validate validates the provided value against the validator.
@@ -100,6 +101,12 @@ func custom_AlphaNumericHyphenUnderscore(fl validator.FieldLevel) bool {
 	return regex("^[a-zA-Z0-9-_]*$", fl.Field().String())
 }
 
+// custom_VSemVer checks whether the field is a valid semantic version
+// prefixed with 'v'.
+func custom_VSemVer(fl validator.FieldLevel) bool {
+	return regex("^(v){1}(\\*|\\d+(\\.\\d+){2})$", fl.Field().String())
+}
+
 // Tags returns a new validator with the given tags. It is a generic validator that
 // allows use of any validation rule from 'github.com/go-playground/validator' library.
 func Tags(tags string) Validator {
@@ -128,7 +135,7 @@ func Skip() Validator {
 func Required() Validator {
 	return Validator{
 		Tags: "required",
-		Err:  "Property '{.Field}' is required.",
+		Err:  "Field '{.Field}' is required.",
 	}
 }
 
@@ -137,7 +144,7 @@ func Required() Validator {
 func Min(value int) Validator {
 	return Validator{
 		Tags: fmt.Sprintf("min=%d", value),
-		Err:  "Minimum value for property '{.Field}' is {.Param} (actual: {.Value}).",
+		Err:  "Minimum value for field '{.Field}' is {.Param} (actual: {.Value}).",
 	}
 }
 
@@ -146,7 +153,7 @@ func Min(value int) Validator {
 func Max(value int) Validator {
 	return Validator{
 		Tags: fmt.Sprintf("max=%d", value),
-		Err:  "Maximum value for property '{.Field}' is {.Param} (actual: {.Value}).",
+		Err:  "Maximum value for field '{.Field}' is {.Param} (actual: {.Value}).",
 	}
 }
 
@@ -172,7 +179,7 @@ func MaxLen(value int) Validator {
 func IP() Validator {
 	return Validator{
 		Tags: "ip",
-		Err:  "Property '{.Field}' must be a valid IP address (actual: {.Value}).",
+		Err:  "Field '{.Field}' must be a valid IP address (actual: {.Value}).",
 	}
 }
 
@@ -180,7 +187,7 @@ func IP() Validator {
 func IPv4() Validator {
 	return Validator{
 		Tags: "ipv4",
-		Err:  "Property '{.Field}' must be a valid IPv4 address (actual: {.Value}).",
+		Err:  "Field '{.Field}' must be a valid IPv4 address (actual: {.Value}).",
 	}
 }
 
@@ -188,7 +195,7 @@ func IPv4() Validator {
 func IPv6() Validator {
 	return Validator{
 		Tags: "ipv6",
-		Err:  "Property '{.Field}' must be a valid IPv6 address (actual: {.Value}).",
+		Err:  "Field '{.Field}' must be a valid IPv6 address (actual: {.Value}).",
 	}
 }
 
@@ -196,7 +203,7 @@ func IPv6() Validator {
 func CIDR() Validator {
 	return Validator{
 		Tags: "cidr",
-		Err:  "Property '{.Field}' must be a valid CIDR address (actual: {.Value}).",
+		Err:  "Field '{.Field}' must be a valid CIDR address (actual: {.Value}).",
 	}
 }
 
@@ -204,7 +211,7 @@ func CIDR() Validator {
 func CIDRv4() Validator {
 	return Validator{
 		Tags: "cidrv4",
-		Err:  "Property '{.Field}' must be a valid CIDRv4 address (actual: {.Value}).",
+		Err:  "Field '{.Field}' must be a valid CIDRv4 address (actual: {.Value}).",
 	}
 }
 
@@ -212,7 +219,7 @@ func CIDRv4() Validator {
 func CIDRv6() Validator {
 	return Validator{
 		Tags: "cidrv6",
-		Err:  "Property '{.Field}' must be a valid CIDRv6 address (actual: {.Value}).",
+		Err:  "Field '{.Field}' must be a valid CIDRv6 address (actual: {.Value}).",
 	}
 }
 
@@ -220,7 +227,7 @@ func CIDRv6() Validator {
 func MAC() Validator {
 	return Validator{
 		Tags: "mac",
-		Err:  "Property '{.Field}' must be a valid MAC address (actual: {.Value}).",
+		Err:  "Field '{.Field}' must be a valid MAC address (actual: {.Value}).",
 	}
 }
 
@@ -238,7 +245,7 @@ func OneOf(values ...interface{}) Validator {
 
 	return Validator{
 		Tags: fmt.Sprintf("oneof=%s", oneOf),
-		Err:  fmt.Sprintf("Property '{.Field}' must be one of the following values: [%s] (actual: {.Value}).", valid),
+		Err:  fmt.Sprintf("Field '{.Field}' must be one of the following values: [%s] (actual: {.Value}).", valid),
 	}
 }
 
@@ -246,7 +253,7 @@ func OneOf(values ...interface{}) Validator {
 func Alpha() Validator {
 	return Validator{
 		Tags: "alpha",
-		Err:  "Property '{.Field}' can contain only alpha characters (a-Z). (actual: {.Value})",
+		Err:  "Field '{.Field}' can contain only alpha characters (a-Z). (actual: {.Value})",
 	}
 }
 
@@ -255,7 +262,7 @@ func Alpha() Validator {
 func Numeric() Validator {
 	return Validator{
 		Tags: "numeric",
-		Err:  "Property '{.Field}' can contain only numeric characters (0-9). (actual: {.Value})",
+		Err:  "Field '{.Field}' can contain only numeric characters (0-9). (actual: {.Value})",
 	}
 }
 
@@ -264,7 +271,7 @@ func Numeric() Validator {
 func AlphaNumeric() Validator {
 	return Validator{
 		Tags: "alphanum",
-		Err:  "Property '{.Field}' can contain only alphanumeric characters. (actual: {.Value})",
+		Err:  "Field '{.Field}' can contain only alphanumeric characters. (actual: {.Value})",
 	}
 }
 
@@ -273,7 +280,7 @@ func AlphaNumeric() Validator {
 func AlphaNumericHyp() Validator {
 	return Validator{
 		Tags: "custom_alphanumhyp",
-		Err:  "Property '{.Field}' can contain only alphanumeric characters and hyphen. (actual: {.Value})",
+		Err:  "Field '{.Field}' can contain only alphanumeric characters and hyphen. (actual: {.Value})",
 	}
 }
 
@@ -282,7 +289,7 @@ func AlphaNumericHyp() Validator {
 func AlphaNumericHypUS() Validator {
 	return Validator{
 		Tags: "custom_alphanumhypus",
-		Err:  "Property '{.Field}' can contain only alphanumeric characters, hyphen and underscore. (actual: {.Value})",
+		Err:  "Field '{.Field}' can contain only alphanumeric characters, hyphen and underscore. (actual: {.Value})",
 	}
 }
 
@@ -290,7 +297,7 @@ func AlphaNumericHypUS() Validator {
 func Lowercase() Validator {
 	return Validator{
 		Tags: "lowercase",
-		Err:  "Property '{.Field}' can contain only lowercase characters. (actual: {.Value})",
+		Err:  "Field '{.Field}' can contain only lowercase characters. (actual: {.Value})",
 	}
 }
 
@@ -298,7 +305,7 @@ func Lowercase() Validator {
 func Uppercase() Validator {
 	return Validator{
 		Tags: "uppercase",
-		Err:  "Property '{.Field}' can contain only uppercase characters. (actual: {.Value})",
+		Err:  "Field '{.Field}' can contain only uppercase characters. (actual: {.Value})",
 	}
 }
 
@@ -306,6 +313,30 @@ func Uppercase() Validator {
 func FileExists() Validator {
 	return Validator{
 		Tags: "file",
-		Err:  "Property '{.Field}' must be a valid file path that points to an existing file. (actual: {.Value})",
+		Err:  "Field '{.Field}' must be a valid file path that points to an existing file. (actual: {.Value})",
+	}
+}
+
+// URL checks whether the field is a valid URL.
+func URL() Validator {
+	return Validator{
+		Tags: "url",
+		Err:  "Field '{.Field}' must be a valid URL. (actual: {.Value})",
+	}
+}
+
+// SemVer checks whether the field is a valid semantic version.
+func SemVer() Validator {
+	return Validator{
+		Tags: "semver",
+		Err:  "Field '{.Field}' must be a valid semantic version (e.g. 1.2.3). (actual: {.Value})",
+	}
+}
+
+// VSemVer checks whether the field is a valid semantic version and is prefixed with 'v'.
+func VSemVer() Validator {
+	return Validator{
+		Tags: "custom_vsemver",
+		Err:  "Field '{.Field}' must be a valid semantic version prefixed with 'v' (e.g. v1.2.3). (actual: {.Value})",
 	}
 }
