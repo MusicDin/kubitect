@@ -121,6 +121,23 @@ func custom_IPInRange(fl validator.FieldLevel) bool {
 	return subnet.Contains(ip)
 }
 
+var customValidators = make(map[string]Validator)
+
+// RegisterCustomValidator registers custom validator with custom key.
+func RegisterCustomValidator(key string, v Validator) {
+	customValidators[key] = v
+}
+
+// RegisterCustomValidator registers custom validator with custom key.
+func ClearCustomValidators() {
+	customValidators = make(map[string]Validator)
+}
+
+// Custom returns custom validator registered with the given key.
+func Custom(key string) Validator {
+	return customValidators[key]
+}
+
 // Tags returns a new validator with the given tags. It is a generic validator that
 // allows use of any validation rule from 'github.com/go-playground/validator' library.
 func Tags(tags string) Validator {
