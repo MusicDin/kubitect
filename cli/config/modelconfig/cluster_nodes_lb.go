@@ -17,7 +17,7 @@ func (def LBDefault) Validate() error {
 }
 
 type LB struct {
-	VIP             *IP                `yaml:"vip"`
+	VIP             *IPv4              `yaml:"vip"`
 	VirtualRouterId *LBVirtualRouterID `yaml:"virtualRouterId"`
 	Default         *LBDefault         `yaml:"default"`
 	Instances       *[]LBInstance      `yaml:"instances"`
@@ -26,7 +26,11 @@ type LB struct {
 
 func (lb LB) Validate() error {
 	return v.Struct(&lb,
-		v.Field(&lb.VIP, v.Required().When(len(*lb.Instances) > 0).Error("Virtual IP (VIP) is required when multiple load balancer instances are configured.")),
+		v.Field(&lb.VIP,
+			v.Required().When(len(*lb.Instances) > 1).Error("Virtual IP (VIP) is required when multiple load balancer instances are configured."),
+			v.OmitEmpty(),
+			v.Custom(IP_IN_CIDR),
+		),
 		v.Field(&lb.VirtualRouterId),
 		v.Field(&lb.Default),
 		v.Field(&lb.Instances),
@@ -71,7 +75,7 @@ func (pft LBPortForwardTarget) Validate() error {
 type LBInstance struct {
 	Id           *string     `yaml:"id" opt:",id"`
 	Host         *string     `yaml:"host"`
-	IP           *IP         `yaml:"ip"`
+	IP           *IPv4       `yaml:"ip"`
 	MAC          *MAC        `yaml:"mac"`
 	CPU          *VCpu       `yaml:"cpu"`
 	RAM          *GB         `yaml:"ram"`
@@ -82,8 +86,8 @@ type LBInstance struct {
 func (i LBInstance) Validate() error {
 	return v.Struct(&i,
 		v.Field(&i.Id, v.Required()),
-		// v.Field(&i.Host, v.OmitEmpty()), // TODO: Is valid Hostname?
-		v.Field(&i.IP, v.OmitEmpty()), // TODO: Is withing CIDR?
+		v.Field(&i.Host, v.OmitEmpty(), v.Custom(VALID_HOST)),
+		v.Field(&i.IP, v.OmitEmpty(), v.Custom(IP_IN_CIDR)),
 		v.Field(&i.MAC, v.OmitEmpty()),
 		v.Field(&i.CPU, v.OmitEmpty()),
 		v.Field(&i.RAM, v.OmitEmpty()),

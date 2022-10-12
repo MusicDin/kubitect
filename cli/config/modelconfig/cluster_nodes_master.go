@@ -21,14 +21,14 @@ func (d MasterDefault) Validate() error {
 }
 
 type Master struct {
-	Default   *WorkerDefault    `yaml:"default"`
-	Instances *[]WorkerInstance `yaml:"instances"`
+	Default   *MasterDefault    `yaml:"default"`
+	Instances *[]MasterInstance `yaml:"instances"`
 }
 
 func (m Master) Validate() error {
 	return v.Struct(&m,
-		v.Field(&m.Instances),
 		v.Field(&m.Default),
+		v.Field(&m.Instances),
 	)
 }
 
@@ -48,14 +48,14 @@ type MasterInstance struct {
 func (i MasterInstance) Validate() error {
 	return v.Struct(&i,
 		v.Field(&i.Id, v.Required()),
-		// v.Field(&i.Host), // TODO: Is valid Host?
-		v.Field(&i.IP, v.OmitEmpty()), // TODO: Is within CIDR?
+		v.Field(&i.Host, v.OmitEmpty(), v.Custom(VALID_HOST)),
+		v.Field(&i.IP, v.OmitEmpty(), v.Custom(IP_IN_CIDR)),
 		v.Field(&i.MAC, v.OmitEmpty()),
 		v.Field(&i.CPU, v.OmitEmpty()),
 		v.Field(&i.RAM, v.OmitEmpty()),
 		v.Field(&i.MainDiskSize, v.OmitEmpty()),
 		v.Field(&i.DataDisks),
-		v.Field(&i.Labels), // TODO: Is Omit empty required?
+		v.Field(&i.Labels, v.OmitEmpty()), // TODO: Is Omit empty required?
 		v.Field(&i.Taints),
 	)
 }
