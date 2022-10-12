@@ -2,6 +2,7 @@ package validation
 
 import (
 	"fmt"
+	"net"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -38,6 +39,7 @@ func initialize() {
 	validate.RegisterValidation("custom_alphanumhyp", custom_AlphaNumericHyphen)
 	validate.RegisterValidation("custom_alphanumhypus", custom_AlphaNumericHyphenUnderscore)
 	validate.RegisterValidation("custom_vsemver", custom_VSemVer)
+	validate.RegisterValidation("custom_ipinrange", custom_IPInRange)
 }
 
 // validate validates the provided value against the validator.
@@ -105,6 +107,18 @@ func custom_AlphaNumericHyphenUnderscore(fl validator.FieldLevel) bool {
 // prefixed with 'v'.
 func custom_VSemVer(fl validator.FieldLevel) bool {
 	return regex("^(v){1}(\\*|\\d+(\\.\\d+){2})$", fl.Field().String())
+}
+
+// custom_IPInRange checks whether the field is a valid IP within provided CIDR
+func custom_IPInRange(fl validator.FieldLevel) bool {
+	_, subnet, err := net.ParseCIDR(fl.Param())
+
+	if err != nil {
+		return false
+	}
+
+	ip := net.ParseIP(fl.Field().String())
+	return subnet.Contains(ip)
 }
 
 // Tags returns a new validator with the given tags. It is a generic validator that
@@ -220,6 +234,14 @@ func CIDRv6() Validator {
 	return Validator{
 		Tags: "cidrv6",
 		Err:  "Field '{.Field}' must be a valid CIDRv6 address (actual: {.Value}).",
+	}
+}
+
+// IPInRange checks whether the field value is contained within the specified CIDR.
+func IPInRange(cidr string) Validator {
+	return Validator{
+		Tags: fmt.Sprintf("custom_ipinrange=%s", cidr),
+		Err:  fmt.Sprintf("Field '{.Field}' must be a valid IP address within '{.Param}' subnet. (actual: {.Value})"),
 	}
 }
 

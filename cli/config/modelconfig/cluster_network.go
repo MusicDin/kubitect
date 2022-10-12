@@ -24,7 +24,7 @@ type Network struct {
 func (n Network) Validate() error {
 	return v.Struct(&n,
 		v.Field(&n.CIDR, v.Required()),
-		v.Field(&n.Bridge, v.OmitEmpty().When(*n.Mode != BRIDGE)),
+		v.Field(&n.Bridge, v.OmitEmpty().When(n.Mode != nil && *n.Mode != BRIDGE)),
 		v.Field(&n.Gateway),
 		v.Field(&n.Mode, v.OmitEmpty()),
 	)

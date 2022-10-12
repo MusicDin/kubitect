@@ -120,6 +120,14 @@ func TestCIDRv6(t *testing.T) {
 	assert.NoError(t, Var("2001:db8:3333:4444:5555:6666:7777:8888/64", CIDRv6()))
 }
 
+func TestIPInRange(t *testing.T) {
+	assert.Error(t, Var("192.168.113.1", IPInRange("")))
+	assert.Error(t, Var("", IPInRange("192.168.113.1")))
+	assert.Error(t, Var("192.168.112.0", IPInRange("192.168.113.1/24")))
+	assert.NoError(t, Var("192.168.113.0", IPInRange("192.168.113.1/24")))
+	assert.NoError(t, Var("192.168.113.113", IPInRange("192.168.113.1/24")))
+}
+
 func TestMAC(t *testing.T) {
 	assert.Error(t, Var("42", MAC()))
 	assert.NoError(t, Var("AA:BB:CC:DD:EE:FF", MAC()))
