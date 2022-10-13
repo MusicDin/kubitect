@@ -28,7 +28,10 @@ type Master struct {
 func (m Master) Validate() error {
 	return v.Struct(&m,
 		v.Field(&m.Default),
-		v.Field(&m.Instances),
+		v.Field(&m.Instances,
+			v.MinLen(1).Error("At least one master instance must be configured."),
+			v.Fail().When(m.Instances != nil && len(*m.Instances)%2 == 0).Error("Number of master instances must be odd (1, 3, 5 etc.)."),
+		),
 	)
 }
 
@@ -48,7 +51,7 @@ type MasterInstance struct {
 func (i MasterInstance) Validate() error {
 	defer v.RemoveCustomValidator(VALID_POOL)
 
-	v.RegisterCustomValidator(VALID_POOL, getPoolNameValidator(i.Host))
+	v.RegisterCustomValidator(VALID_POOL, poolNameValidator(i.Host))
 
 	return v.Struct(&i,
 		v.Field(&i.Id, v.Required()),

@@ -33,7 +33,7 @@ func (lb LB) Validate() error {
 		),
 		v.Field(&lb.VirtualRouterId),
 		v.Field(&lb.Default),
-		v.Field(&lb.Instances),
+		v.Field(&lb.Instances, v.Custom(LB_REQUIRED)),
 		v.Field(&lb.ForwardPorts),
 	)
 }

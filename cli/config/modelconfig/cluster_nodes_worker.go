@@ -48,7 +48,7 @@ type WorkerInstance struct {
 func (i WorkerInstance) Validate() error {
 	defer v.RemoveCustomValidator(VALID_POOL)
 
-	v.RegisterCustomValidator(VALID_POOL, getPoolNameValidator(i.Host))
+	v.RegisterCustomValidator(VALID_POOL, poolNameValidator(i.Host))
 
 	return v.Struct(&i,
 		v.Field(&i.Id, v.Required()),
