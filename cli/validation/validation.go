@@ -117,6 +117,18 @@ func validateMap(rv reflect.Value) ValidationErrors {
 	return errs
 }
 
+var topParent interface{}
+
+// TopParent returns first struct in validation stream.
+func TopParent() interface{} {
+	return topParent
+}
+
+// resetTopParent sets top parent value to nil.
+func resetTopParent() {
+	topParent = nil
+}
+
 // Struct validates every given field against corresponding validators.
 //
 // It panics if a provided value is not a pointer to a struct or if a field
@@ -132,6 +144,11 @@ func Struct(sPtr interface{}, validators ...FieldValidator) error {
 
 	if rv.Kind() != reflect.Pointer || rs.Kind() != reflect.Struct {
 		panic(ErrorInvalidStructPointer)
+	}
+
+	if topParent == nil {
+		defer resetTopParent()
+		topParent = sPtr
 	}
 
 	errs := make(ValidationErrors, 0)

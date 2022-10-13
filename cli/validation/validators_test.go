@@ -54,6 +54,11 @@ func TestSkip(t *testing.T) {
 	assert.Error(t, Var(nil, Required(), Skip()))
 }
 
+func TestFail(t *testing.T) {
+	assert.Error(t, Var(nil, Fail()))
+	assert.Error(t, Var(42, Fail()))
+}
+
 func TestRequired(t *testing.T) {
 	assert.Error(t, Var(nil, Required()))
 	assert.Error(t, Var("", Required()))

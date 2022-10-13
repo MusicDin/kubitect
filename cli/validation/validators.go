@@ -36,6 +36,7 @@ func initialize() {
 
 	validate = validator.New()
 	validate.RegisterTagNameFunc(fieldName)
+	validate.RegisterValidation("custom_fail", custom_Fail)
 	validate.RegisterValidation("custom_alphanumhyp", custom_AlphaNumericHyphen)
 	validate.RegisterValidation("custom_alphanumhypus", custom_AlphaNumericHyphenUnderscore)
 	validate.RegisterValidation("custom_vsemver", custom_VSemVer)
@@ -91,6 +92,11 @@ func (v Validator) When(condition bool) Validator {
 	return v
 }
 
+// custom_Fail always fails the validation.
+func custom_Fail(fl validator.FieldLevel) bool {
+	return false
+}
+
 // custom_AlphaNumericDash checks whether the field contains only alphanumeric characters
 // (a-Z0-9) and hyphen (-).
 func custom_AlphaNumericHyphen(fl validator.FieldLevel) bool {
@@ -128,6 +134,11 @@ func RegisterCustomValidator(key string, v Validator) {
 	customValidators[key] = v
 }
 
+// RemoveCustomValidator removes custom validator from a list.
+func RemoveCustomValidator(key string) {
+	delete(customValidators, key)
+}
+
 // RegisterCustomValidator registers custom validator with custom key.
 func ClearCustomValidators() {
 	customValidators = make(map[string]Validator)
@@ -159,6 +170,14 @@ func Skip() Validator {
 	return Validator{
 		Tags:   "-",
 		action: SKIP,
+	}
+}
+
+// Fail triggers validation error.
+func Fail() Validator {
+	return Validator{
+		Tags: "custom_fail",
+		Err:  "Field '{.Field}' (force) failed validation.",
 	}
 }
 
