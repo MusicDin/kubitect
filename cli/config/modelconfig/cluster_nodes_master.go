@@ -31,6 +31,7 @@ func (m Master) Validate() error {
 		v.Field(&m.Instances,
 			v.MinLen(1).Error("At least one master instance must be configured."),
 			v.Fail().When(m.Instances != nil && len(*m.Instances)%2 == 0).Error("Number of master instances must be odd (1, 3, 5 etc.)."),
+			v.Custom(LB_REQUIRED),
 		),
 	)
 }
@@ -61,7 +62,7 @@ func (i MasterInstance) Validate() error {
 		v.Field(&i.CPU, v.OmitEmpty()),
 		v.Field(&i.RAM, v.OmitEmpty()),
 		v.Field(&i.MainDiskSize, v.OmitEmpty()),
-		v.Field(&i.DataDisks),
+		v.Field(&i.DataDisks),             // TODO: Unique names
 		v.Field(&i.Labels, v.OmitEmpty()), // TODO: Is Omit empty required?
 		v.Field(&i.Taints),
 	)

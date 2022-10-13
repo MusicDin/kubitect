@@ -27,13 +27,13 @@ type LB struct {
 func (lb LB) Validate() error {
 	return v.Struct(&lb,
 		v.Field(&lb.VIP,
-			v.Required().When(len(*lb.Instances) > 1).Error("Virtual IP (VIP) is required when multiple load balancer instances are configured."),
+			v.Required().When(lb.Instances != nil && len(*lb.Instances) > 1).Error("Virtual IP (VIP) is required when multiple load balancer instances are configured."),
 			v.OmitEmpty(),
 			v.Custom(IP_IN_CIDR),
 		),
 		v.Field(&lb.VirtualRouterId),
 		v.Field(&lb.Default),
-		v.Field(&lb.Instances, v.Custom(LB_REQUIRED)),
+		v.Field(&lb.Instances),
 		v.Field(&lb.ForwardPorts),
 	)
 }

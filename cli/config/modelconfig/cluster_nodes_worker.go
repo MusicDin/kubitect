@@ -58,7 +58,7 @@ func (i WorkerInstance) Validate() error {
 		v.Field(&i.CPU, v.OmitEmpty()),
 		v.Field(&i.RAM, v.OmitEmpty()),
 		v.Field(&i.MainDiskSize, v.OmitEmpty()),
-		v.Field(&i.DataDisks),
+		v.Field(&i.DataDisks),             // TODO: Unique names
 		v.Field(&i.Labels, v.OmitEmpty()), // TODO: Is Omit empty required?
 		v.Field(&i.Taints),
 	)
