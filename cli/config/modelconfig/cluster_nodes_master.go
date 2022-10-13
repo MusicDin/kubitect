@@ -46,6 +46,10 @@ type MasterInstance struct {
 }
 
 func (i MasterInstance) Validate() error {
+	defer v.RemoveCustomValidator(VALID_POOL)
+
+	v.RegisterCustomValidator(VALID_POOL, getPoolNameValidator(i.Host))
+
 	return v.Struct(&i,
 		v.Field(&i.Id, v.Required()),
 		v.Field(&i.Host, v.OmitEmpty(), v.Custom(VALID_HOST)),
