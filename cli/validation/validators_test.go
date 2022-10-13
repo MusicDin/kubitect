@@ -70,6 +70,44 @@ func TestRequired(t *testing.T) {
 	assert.NoError(t, Var("test", Required()))
 }
 
+func TestUnique(t *testing.T) {
+	assert.Error(t, Var(nil, Unique()))
+	assert.Error(t, Var([]string{"a", "a"}, Unique()))
+	assert.NoError(t, Var([]string{"a", "b"}, Unique()))
+	assert.NoError(t, Var([]string{}, Unique()))
+}
+
+func TestUniqueField(t *testing.T) {
+	type S struct {
+		X string
+		V int
+	}
+
+	type ps struct {
+		v int
+	}
+
+	fn1 := func() {
+		Var([]ps{{42}, {42}}, UniqueField("v"))
+	}
+
+	fn2 := func() {
+		Var([]ps{{}}, UniqueField(""))
+	}
+
+	assert.PanicsWithError(t, ErrorExportInterface.Error(), fn1)
+	assert.PanicsWithError(t, ErrorFieldNotFound.Error(), fn2)
+
+	assert.Error(t, Var(nil, UniqueField("V")))
+	assert.Error(t, Var([]S{{}, {}}, UniqueField("V")))
+	assert.Error(t, Var([]S{{V: 42}, {V: 42}}, UniqueField("V")))
+	assert.NoError(t, Var([]S{{V: 41}, {V: 42}}, UniqueField("V")))
+	assert.NoError(t, Var([]S{}, UniqueField("")))
+	assert.NoError(t, Var([]S{}, UniqueField("V")))
+	assert.NoError(t, Var([]S{{}}, UniqueField("V")))
+	assert.NoError(t, Var([]S{{V: 42}}, UniqueField("V")))
+}
+
 func TestMin(t *testing.T) {
 	assert.NoError(t, Var(42, Min(42)))
 	assert.Error(t, Var(0, Min(42)))

@@ -2,15 +2,12 @@ package validation
 
 import (
 	"fmt"
-	"net"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
 
 var validate *validator.Validate
-
-var ErrorFieldIsNotPointer = fmt.Errorf("validators.Field: First argument must be a pointer to a struct field!")
 
 type Action string
 
@@ -32,6 +29,23 @@ type Validator struct {
 // It is useful for custom validators.
 var None Validator = Validator{}
 
+var customValidators = make(map[string]Validator)
+
+// RegisterCustomValidator registers custom validator with custom key.
+func RegisterCustomValidator(key string, v Validator) {
+	customValidators[key] = v
+}
+
+// RemoveCustomValidator removes custom validator from a list.
+func RemoveCustomValidator(key string) {
+	delete(customValidators, key)
+}
+
+// RegisterCustomValidator registers custom validator with custom key.
+func ClearCustomValidators() {
+	customValidators = make(map[string]Validator)
+}
+
 // initialize creates new singleton validator if its value is nil.
 func initialize() {
 	if validate != nil {
@@ -40,11 +54,12 @@ func initialize() {
 
 	validate = validator.New()
 	validate.RegisterTagNameFunc(fieldName)
-	validate.RegisterValidation("custom_fail", custom_Fail)
-	validate.RegisterValidation("custom_alphanumhyp", custom_AlphaNumericHyphen)
-	validate.RegisterValidation("custom_alphanumhypus", custom_AlphaNumericHyphenUnderscore)
-	validate.RegisterValidation("custom_vsemver", custom_VSemVer)
-	validate.RegisterValidation("custom_ipinrange", custom_IPInRange)
+	validate.RegisterValidation("extra_fail", extra_Fail)
+	validate.RegisterValidation("extra_alphanumhyp", extra_AlphaNumericHyphen)
+	validate.RegisterValidation("extra_alphanumhypus", extra_AlphaNumericHyphenUnderscore)
+	validate.RegisterValidation("extra_vsemver", extra_VSemVer)
+	validate.RegisterValidation("extra_ipinrange", extra_IPInRange)
+	validate.RegisterValidation("extra_uniquefield", extra_UniqueField)
 }
 
 // validate validates the provided value against the validator.
@@ -96,58 +111,6 @@ func (v Validator) When(condition bool) Validator {
 	return v
 }
 
-// custom_Fail always fails the validation.
-func custom_Fail(fl validator.FieldLevel) bool {
-	return false
-}
-
-// custom_AlphaNumericDash checks whether the field contains only alphanumeric characters
-// (a-Z0-9) and hyphen (-).
-func custom_AlphaNumericHyphen(fl validator.FieldLevel) bool {
-	return regex("^[a-zA-Z0-9-]*$", fl.Field().String())
-}
-
-// custom_AlphaNumericDashUnderscore checks whether the field contains only alphanumeric
-// characters (a-Z0-9), hyphen (-) and underscore (_).
-func custom_AlphaNumericHyphenUnderscore(fl validator.FieldLevel) bool {
-	return regex("^[a-zA-Z0-9-_]*$", fl.Field().String())
-}
-
-// custom_VSemVer checks whether the field is a valid semantic version
-// prefixed with 'v'.
-func custom_VSemVer(fl validator.FieldLevel) bool {
-	return regex("^(v){1}(\\*|\\d+(\\.\\d+){2})$", fl.Field().String())
-}
-
-// custom_IPInRange checks whether the field is a valid IP within provided CIDR
-func custom_IPInRange(fl validator.FieldLevel) bool {
-	_, subnet, err := net.ParseCIDR(fl.Param())
-
-	if err != nil {
-		return false
-	}
-
-	ip := net.ParseIP(fl.Field().String())
-	return subnet.Contains(ip)
-}
-
-var customValidators = make(map[string]Validator)
-
-// RegisterCustomValidator registers custom validator with custom key.
-func RegisterCustomValidator(key string, v Validator) {
-	customValidators[key] = v
-}
-
-// RemoveCustomValidator removes custom validator from a list.
-func RemoveCustomValidator(key string) {
-	delete(customValidators, key)
-}
-
-// RegisterCustomValidator registers custom validator with custom key.
-func ClearCustomValidators() {
-	customValidators = make(map[string]Validator)
-}
-
 // Custom returns custom validator registered with the given key.
 func Custom(key string) Validator {
 	return customValidators[key]
@@ -180,7 +143,7 @@ func Skip() Validator {
 // Fail triggers validation error.
 func Fail() Validator {
 	return Validator{
-		Tags: "custom_fail",
+		Tags: "extra_fail",
 		Err:  "Field '{.Field}' (force) failed validation.",
 	}
 }
@@ -190,6 +153,23 @@ func Required() Validator {
 	return Validator{
 		Tags: "required",
 		Err:  "Field '{.Field}' is required.",
+	}
+}
+
+// Unique validator checks whether all elements within array, slice or map are unique.
+func Unique() Validator {
+	return Validator{
+		Tags: "unique",
+		Err:  "All elements within '{.Field}' must be unique.",
+	}
+}
+
+// Unique validator checks whether the given field is unique for all elements within
+// a slice of struct.
+func UniqueField(field string) Validator {
+	return Validator{
+		Tags: fmt.Sprintf("extra_uniquefield=%s", field),
+		Err:  "Field '{.Param}' must be unique for each element in '{.Field}'.",
 	}
 }
 
@@ -280,7 +260,7 @@ func CIDRv6() Validator {
 // IPInRange checks whether the field value is contained within the specified CIDR.
 func IPInRange(cidr string) Validator {
 	return Validator{
-		Tags: fmt.Sprintf("custom_ipinrange=%s", cidr),
+		Tags: fmt.Sprintf("extra_ipinrange=%s", cidr),
 		Err:  fmt.Sprintf("Field '{.Field}' must be a valid IP address within '{.Param}' subnet. (actual: {.Value})"),
 	}
 }
@@ -341,7 +321,7 @@ func AlphaNumeric() Validator {
 // (a-Z0-9) and hyphen (-). Validation fails non string values.
 func AlphaNumericHyp() Validator {
 	return Validator{
-		Tags: "custom_alphanumhyp",
+		Tags: "extra_alphanumhyp",
 		Err:  "Field '{.Field}' can contain only alphanumeric characters and hyphen. (actual: {.Value})",
 	}
 }
@@ -350,7 +330,7 @@ func AlphaNumericHyp() Validator {
 // (a-Z0-9), hyphen (-) and underscore (_). Validation fails non string values.
 func AlphaNumericHypUS() Validator {
 	return Validator{
-		Tags: "custom_alphanumhypus",
+		Tags: "extra_alphanumhypus",
 		Err:  "Field '{.Field}' can contain only alphanumeric characters, hyphen and underscore. (actual: {.Value})",
 	}
 }
@@ -398,7 +378,7 @@ func SemVer() Validator {
 // VSemVer checks whether the field is a valid semantic version and is prefixed with 'v'.
 func VSemVer() Validator {
 	return Validator{
-		Tags: "custom_vsemver",
+		Tags: "extra_vsemver",
 		Err:  "Field '{.Field}' must be a valid semantic version prefixed with 'v' (e.g. v1.2.3). (actual: {.Value})",
 	}
 }
