@@ -22,6 +22,11 @@ func TestWhen(t *testing.T) {
 	assert.Error(t, Var("42", Max(0).When(false == false)))
 }
 
+func TestNoneValidator(t *testing.T) {
+	assert.NoError(t, Var(nil, None))
+	assert.NoError(t, Var(5, None))
+}
+
 func TestCustomValidator(t *testing.T) {
 	key := "test"
 

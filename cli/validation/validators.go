@@ -28,6 +28,10 @@ type Validator struct {
 	action Action
 }
 
+// None is an empty validator that does nothing (is skipped).
+// It is useful for custom validators.
+var None Validator = Validator{}
+
 // initialize creates new singleton validator if its value is nil.
 func initialize() {
 	if validate != nil {
