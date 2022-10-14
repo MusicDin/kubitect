@@ -12,8 +12,58 @@ type Cluster struct {
 func (c Cluster) Validate() error {
 	return v.Struct(&c,
 		v.Field(&c.Name, v.Required(), v.AlphaNumericHyp()),
-		v.Field(&c.Network),
-		v.Field(&c.Nodes),
+		v.Field(&c.Network, v.Required()),
+		v.Field(&c.Nodes, v.Required(), c.uniqueIpValidator(), c.uniqueMacValidator()),
 		v.Field(&c.NodeTemplate),
 	)
+}
+
+// uniqueIpValidator returns a validator that triggers an error if multiple nodes
+// are assigned the same IP address.
+func (c Cluster) uniqueIpValidator() v.Validator {
+	if c.Nodes == nil {
+		return v.None
+	}
+
+	var duplicates []string
+	ips := c.Nodes.IPs()
+
+	for i := 0; i < len(ips); i++ {
+		for j := i + 1; j < len(ips); j++ {
+			if ips[i] == ips[j] {
+				duplicates = append(duplicates, ips[i])
+			}
+		}
+	}
+
+	if len(duplicates) == 0 {
+		return v.None
+	}
+
+	return v.Fail().Errorf("IP of each node instance (including VIP) must be unique. (duplicates: %v)", duplicates)
+}
+
+// uniqueMacValidator returns a validator that triggers an error if multiple nodes
+// are assigned the same MAC address.
+func (c Cluster) uniqueMacValidator() v.Validator {
+	if c.Nodes == nil {
+		return v.None
+	}
+
+	var duplicates []string
+	macs := c.Nodes.MACs()
+
+	for i := 0; i < len(macs); i++ {
+		for j := i + 1; j < len(macs); j++ {
+			if macs[i] == macs[j] {
+				duplicates = append(duplicates, macs[i])
+			}
+		}
+	}
+
+	if len(duplicates) == 0 {
+		return v.None
+	}
+
+	return v.Fail().Errorf("MAC of each node instance must be unique. (duplicates: %v)", duplicates)
 }

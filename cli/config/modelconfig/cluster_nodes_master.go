@@ -36,6 +36,38 @@ func (m Master) Validate() error {
 	)
 }
 
+func (m Master) IPs() []string {
+	if m.Instances == nil {
+		return nil
+	}
+
+	var ips []string
+
+	for _, i := range *m.Instances {
+		if i.IP != nil {
+			ips = append(ips, string(*i.IP))
+		}
+	}
+
+	return ips
+}
+
+func (m Master) MACs() []string {
+	if m.Instances == nil {
+		return nil
+	}
+
+	var macs []string
+
+	for _, i := range *m.Instances {
+		if i.MAC != nil {
+			macs = append(macs, string(*i.MAC))
+		}
+	}
+
+	return macs
+}
+
 type MasterInstance struct {
 	Id           *string     `yaml:"id" opt:",id"`
 	Host         *string     `yaml:"host"`
@@ -62,7 +94,7 @@ func (i MasterInstance) Validate() error {
 		v.Field(&i.CPU, v.OmitEmpty()),
 		v.Field(&i.RAM, v.OmitEmpty()),
 		v.Field(&i.MainDiskSize, v.OmitEmpty()),
-		v.Field(&i.DataDisks),             // TODO: Unique names
+		v.Field(&i.DataDisks, v.OmitEmpty(), v.UniqueField("Name")),
 		v.Field(&i.Labels, v.OmitEmpty()), // TODO: Is Omit empty required?
 		v.Field(&i.Taints),
 	)

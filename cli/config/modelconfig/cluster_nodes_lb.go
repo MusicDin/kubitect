@@ -38,6 +38,42 @@ func (lb LB) Validate() error {
 	)
 }
 
+func (lb LB) IPs() []string {
+	if lb.Instances == nil {
+		return nil
+	}
+
+	var ips []string
+
+	if lb.VIP != nil {
+		ips = append(ips, string(*lb.VIP))
+	}
+
+	for _, i := range *lb.Instances {
+		if i.IP != nil {
+			ips = append(ips, string(*i.IP))
+		}
+	}
+
+	return ips
+}
+
+func (lb LB) MACs() []string {
+	if lb.Instances == nil {
+		return nil
+	}
+
+	var macs []string
+
+	for _, i := range *lb.Instances {
+		if i.MAC != nil {
+			macs = append(macs, string(*i.MAC))
+		}
+	}
+
+	return macs
+}
+
 type LBVirtualRouterID int
 
 func (id LBVirtualRouterID) Validate() error {

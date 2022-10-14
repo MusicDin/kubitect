@@ -30,11 +30,34 @@ func (c Config) Validate() error {
 		v.Field(&c.Hosts,
 			v.MinLen(1).Error("At least {.Param} {.Field} must be configured."),
 			v.UniqueField("Name"),
+			c.singleDefaultHostValidator(),
 		),
 		v.Field(&c.Cluster, v.Required().Error("Configuration must contain '{.Field}' section.")),
 		v.Field(&c.Kubernetes, v.Required().Error("Configuration must contain '{.Field}' section.")),
 		v.Field(&c.Addons, v.OmitEmpty()),
 	)
+}
+
+// singleDefaultHostValidator returns a validator that triggers an error
+// if multiple hosts are configured as default.
+func (c Config) singleDefaultHostValidator() v.Validator {
+	if c.Hosts == nil {
+		return v.None
+	}
+
+	var defs int
+
+	for _, h := range *c.Hosts {
+		if h.Default != nil && *h.Default {
+			defs++
+		}
+	}
+
+	if defs > 1 {
+		return v.Fail().Errorf("Only one host can be configured as default.")
+	}
+
+	return v.None
 }
 
 // ipInCidrValidator registers a custom validator that checks whether
