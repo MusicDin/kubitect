@@ -39,8 +39,6 @@ type FieldValidator struct {
 // Var validates a variable against the provided validators. Validation will
 // dive deeper, if variable is validatable struct, map or slice.
 func Var(value interface{}, validators ...Validator) error {
-	initialize()
-
 	errs := make(ValidationErrors, 0)
 
 	for _, v := range validators {
@@ -160,7 +158,6 @@ func Struct(sPtr interface{}, validators ...FieldValidator) error {
 
 		if sf == nil {
 			panic(ErrorStructFieldNotFound)
-			//continue
 		}
 
 		err := Var(rf.Interface(), v.validators...)

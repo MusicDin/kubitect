@@ -12,9 +12,10 @@ var validate *validator.Validate
 type Action string
 
 const (
-	UNKNOWN   = ""
-	OMITEMPTY = "OMITEMPTY"
-	SKIP      = "SKIP"
+	UNKNOWN   Action = ""
+	OMITEMPTY Action = "OMITEMPTY"
+	SKIP      Action = "SKIP"
+	FAIL      Action = "FAIL"
 )
 
 // Validator represents a validation rule.
@@ -54,7 +55,6 @@ func initialize() {
 
 	validate = validator.New()
 	validate.RegisterTagNameFunc(fieldName)
-	validate.RegisterValidation("extra_fail", extra_Fail)
 	validate.RegisterValidation("extra_alphanumhyp", extra_AlphaNumericHyphen)
 	validate.RegisterValidation("extra_alphanumhypus", extra_AlphaNumericHyphenUnderscore)
 	validate.RegisterValidation("extra_vsemver", extra_VSemVer)
@@ -77,6 +77,12 @@ func (v *Validator) validate(value interface{}) (ValidationErrors, bool) {
 		return nil, isEmpty(value)
 	case SKIP:
 		return nil, true
+	case FAIL:
+		return ValidationErrors{{
+			Tag:       v.Tags,
+			ActualTag: v.Tags,
+			Err:       v.Err,
+		}}, false
 	}
 
 	errs := validate.Var(value, v.Tags)
@@ -143,8 +149,9 @@ func Skip() Validator {
 // Fail triggers validation error.
 func Fail() Validator {
 	return Validator{
-		Tags: "extra_fail",
-		Err:  "Field '{.Field}' (force) failed validation.",
+		Tags:   "fail",
+		Err:    "Field '{.Field}' (forcefully) failed validation.",
+		action: FAIL,
 	}
 }
 

@@ -11,11 +11,6 @@ import (
 var ErrorExportInterface = fmt.Errorf("validators.extra_UniqueField: Cannot export private field!")
 var ErrorFieldNotFound = fmt.Errorf("validators.extra_UniqueField: Field not found!")
 
-// extra_Fail always fails the validation.
-func extra_Fail(fl validator.FieldLevel) bool {
-	return false
-}
-
 // extra_AlphaNumericDash checks whether the field contains only alphanumeric characters
 // (a-Z0-9) and hyphen (-).
 func extra_AlphaNumericHyphen(fl validator.FieldLevel) bool {
