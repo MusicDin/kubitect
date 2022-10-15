@@ -22,6 +22,6 @@ type Rook struct {
 func (r Rook) Validate() error {
 	return v.Struct(&r,
 		v.Field(&r.NodeSelector),
-		v.Field(&r.Version, v.OmitEmpty()),
+		v.Field(&r.Version),
 	)
 }

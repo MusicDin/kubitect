@@ -63,7 +63,7 @@ func (c Config) singleDefaultHostValidator() v.Validator {
 // ipInCidrValidator registers a custom validator that checks whether
 // an IP address is within the configured network CIDR.
 func (c Config) ipInCidrValidator() v.Validator {
-	if c.Cluster != nil && c.Cluster.Network != nil && c.Cluster.Network.CIDR != nil {
+	if c.Cluster == nil || c.Cluster.Network == nil || c.Cluster.Network.CIDR == nil {
 		return v.None
 	}
 
@@ -77,22 +77,24 @@ func (c Config) hostNameValidator() v.Validator {
 		return v.None
 	}
 
-	var hostNames []string
+	var oneOf []interface{}
+	var names []string
 
 	for _, h := range *c.Hosts {
 		if h.Name != nil {
-			hostNames = append(hostNames, *h.Name)
+			oneOf = append(oneOf, *h.Name)
+			names = append(names, *h.Name)
 		}
 	}
 
-	return v.OneOf(hostNames).Errorf("Field '{.Field}' must point to one of the configured host: [%s]", strings.Join(hostNames, "|"))
+	return v.OneOf(oneOf...).Errorf("Field '{.Field}' must point to one of the configured host: [%v] (actual: {.Value})", strings.Join(names, "|"))
 }
 
 // poolNameValidator returns a custom cross-validator that checks whether
 // a given pool name is valid for a matching host.
 func poolNameValidator(hostName *string) v.Validator {
-
 	c, ok := v.TopParent().(*Config)
+
 	if !ok || c == nil {
 		return v.None
 	}
@@ -127,16 +129,18 @@ func poolNameValidator(hostName *string) v.Validator {
 	pools := host.DataResourcePools
 
 	if pools == nil || len(*pools) == 0 {
-		return v.Fail().Errorf("Field '{.Field}' points to a data resource pool, but matching host '%s' has none configured.", host)
+		return v.Fail().Errorf("Field '{.Field}' points to a data resource pool, but matching host '%v' has none configured.", *host.Name)
 	}
 
-	var poolNames []string
+	var oneOf []interface{}
+	var names []string
 
 	for _, p := range *host.DataResourcePools {
 		if p.Name != nil {
-			poolNames = append(poolNames, *p.Name)
+			oneOf = append(oneOf, *p.Name)
+			names = append(names, *p.Name)
 		}
 	}
 
-	return v.OneOf(poolNames).Errorf("Field '{.Field}' must point to one of the pools configured on a matching host '%s': [%s]", *host.Name, strings.Join(poolNames, "|"))
+	return v.OneOf(oneOf...).Errorf("Field '{.Field}' must point to one of the pools configured on a matching host '%s': [%s] (actual: {.Value})", *host.Name, strings.Join(names, "|"))
 }

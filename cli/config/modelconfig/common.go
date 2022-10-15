@@ -4,6 +4,17 @@ import (
 	v "cli/validation"
 )
 
+// Uint8 is intentionally set to int to avoid panic if value is set
+// outside the uint8 size.
+//
+// For example, if LB priority is set to -1, raising a custom error
+// is not possible since go will panic when converting -1 to uint8.
+type Uint8 int
+
+func (u Uint8) Validate() error {
+	return v.Var(u, v.Min(0), v.Max(255))
+}
+
 type GB int
 
 func (size GB) Validate() error {
@@ -32,6 +43,12 @@ type IPv4 string
 
 func (ip IPv4) Validate() error {
 	return v.Var(ip, v.IPv4())
+}
+
+type CIDRv4 string
+
+func (cidr CIDRv4) Validate() error {
+	return v.Var(cidr, v.CIDRv4())
 }
 
 type MAC string
@@ -80,7 +97,7 @@ func (d DataDisk) Validate() error {
 	return v.Struct(&d,
 		v.Field(&d.Name, v.Required(), v.AlphaNumericHyp()),
 		v.Field(&d.Pool, v.OmitEmpty(), v.Custom(VALID_POOL)),
-		v.Field(&d.Size),
+		v.Field(&d.Size, v.Required()),
 	)
 }
 
@@ -88,4 +105,10 @@ type Version string
 
 func (ver Version) Validate() error {
 	return v.Var(ver, v.VSemVer())
+}
+
+type MasterVersion string
+
+func (ver MasterVersion) Validate() error {
+	return v.Var(ver, v.Skip().When(ver == "master"), v.VSemVer())
 }

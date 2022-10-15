@@ -12,10 +12,10 @@ type WorkerDefault struct {
 
 func (d WorkerDefault) Validate() error {
 	return v.Struct(&d,
-		v.Field(&d.CPU, v.OmitEmpty()),
-		v.Field(&d.RAM, v.OmitEmpty()),
-		v.Field(&d.MainDiskSize, v.OmitEmpty()),
-		v.Field(&d.Labels, v.OmitEmpty()), // TODO: Is omit empty required?
+		v.Field(&d.CPU),
+		v.Field(&d.RAM),
+		v.Field(&d.MainDiskSize),
+		v.Field(&d.Labels),
 		v.Field(&d.Taints),
 	)
 }
@@ -28,7 +28,7 @@ type Worker struct {
 func (w Worker) Validate() error {
 	return v.Struct(&w,
 		v.Field(&w.Default),
-		v.Field(&w.Instances),
+		v.Field(&w.Instances, v.OmitEmpty(), v.UniqueField("Id")),
 	)
 }
 
@@ -86,12 +86,12 @@ func (i WorkerInstance) Validate() error {
 		v.Field(&i.Id, v.Required()),
 		v.Field(&i.Host, v.OmitEmpty(), v.Custom(VALID_HOST)),
 		v.Field(&i.IP, v.OmitEmpty(), v.Custom(IP_IN_CIDR)),
-		v.Field(&i.MAC, v.OmitEmpty()),
-		v.Field(&i.CPU, v.OmitEmpty()),
-		v.Field(&i.RAM, v.OmitEmpty()),
-		v.Field(&i.MainDiskSize, v.OmitEmpty()),
+		v.Field(&i.MAC),
+		v.Field(&i.CPU),
+		v.Field(&i.RAM),
+		v.Field(&i.MainDiskSize),
 		v.Field(&i.DataDisks, v.OmitEmpty(), v.UniqueField("Name")),
-		v.Field(&i.Labels, v.OmitEmpty()), // TODO: Is Omit empty required?
+		v.Field(&i.Labels),
 		v.Field(&i.Taints),
 	)
 }

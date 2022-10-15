@@ -10,7 +10,7 @@ type ConnectionSSH struct {
 
 func (s ConnectionSSH) Validate() error {
 	return v.Struct(&s,
-		v.Field(&s.Keyfile, v.OmitEmpty()),
-		v.Field(&s.Port, v.OmitEmpty()),
+		v.Field(&s.Keyfile, v.Required().Error("Path to password-less private key of the remote host is required.")),
+		v.Field(&s.Port),
 	)
 }

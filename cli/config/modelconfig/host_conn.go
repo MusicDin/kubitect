@@ -1,6 +1,9 @@
 package modelconfig
 
-import v "cli/validation"
+import (
+	v "cli/validation"
+	"fmt"
+)
 
 type ConnectionType string
 
@@ -10,6 +13,10 @@ const (
 	REMOTE    ConnectionType = "remote"
 )
 
+func (t ConnectionType) Validate() error {
+	return v.Var(t, v.OneOf(LOCALHOST, LOCAL, REMOTE))
+}
+
 type Connection struct {
 	IP   *IPv4           `yaml:"ip"`
 	Type *ConnectionType `yaml:"type"`
@@ -18,10 +25,16 @@ type Connection struct {
 }
 
 func (c Connection) Validate() error {
+	isRemote := (c.Type != nil && *c.Type == REMOTE)
+	isRemoteErr := fmt.Sprintf("Field '{.Field}' is required when connection type is set to '%s'.", REMOTE)
+
 	return v.Struct(&c,
-		v.Field(&c.Type, v.Required(), v.OneOf(LOCALHOST, LOCAL, REMOTE)),
-		v.Field(&c.IP, v.Skip().When(*c.Type != REMOTE)),
-		v.Field(&c.User, v.Skip().When(*c.Type != REMOTE)),
-		v.Field(&c.SSH, v.Skip().When(*c.Type != REMOTE)),
+		v.Field(&c.Type, v.Required()),
+		v.Field(&c.IP, v.Required().When(isRemote).Error(isRemoteErr)),
+		v.Field(&c.User, v.Required().When(isRemote).Error(isRemoteErr)),
+		v.Field(&c.SSH,
+			v.Skip().When(!isRemote),
+			v.Required().When(isRemote).Error(isRemoteErr),
+		),
 	)
 }

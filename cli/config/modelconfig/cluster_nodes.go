@@ -22,9 +22,9 @@ func (n Nodes) Validate() error {
 	v.RegisterCustomValidator(LB_REQUIRED, n.isLBRequiredValidator())
 
 	return v.Struct(&n,
-		v.Field(&n.LoadBalancer, v.OmitEmpty(), v.UniqueField("Name")),
-		v.Field(&n.Master, v.UniqueField("Name")),
-		v.Field(&n.Worker, v.OmitEmpty(), v.UniqueField("Name")),
+		v.Field(&n.LoadBalancer),
+		v.Field(&n.Master, v.Required()),
+		v.Field(&n.Worker),
 	)
 }
 

@@ -10,30 +10,29 @@ type LBDefault struct {
 
 func (def LBDefault) Validate() error {
 	return v.Struct(&def,
-		v.Field(&def.CPU, v.OmitEmpty()),
-		v.Field(&def.RAM, v.OmitEmpty()),
-		v.Field(&def.MainDiskSize, v.OmitEmpty()),
+		v.Field(&def.CPU),
+		v.Field(&def.RAM),
+		v.Field(&def.MainDiskSize),
 	)
 }
 
 type LB struct {
-	VIP             *IPv4              `yaml:"vip"`
-	VirtualRouterId *LBVirtualRouterID `yaml:"virtualRouterId"`
-	Default         *LBDefault         `yaml:"default"`
-	Instances       *[]LBInstance      `yaml:"instances"`
-	ForwardPorts    *[]LBPortForward   `yaml:"forwardPorts"`
+	VIP             *IPv4            `yaml:"vip"`
+	VirtualRouterId *Uint8           `yaml:"virtualRouterId"`
+	Default         *LBDefault       `yaml:"default"`
+	Instances       *[]LBInstance    `yaml:"instances"`
+	ForwardPorts    *[]LBPortForward `yaml:"forwardPorts"`
 }
 
 func (lb LB) Validate() error {
 	return v.Struct(&lb,
 		v.Field(&lb.VIP,
 			v.Required().When(lb.Instances != nil && len(*lb.Instances) > 1).Error("Virtual IP (VIP) is required when multiple load balancer instances are configured."),
-			v.OmitEmpty(),
-			v.Custom(IP_IN_CIDR),
+			v.OmitEmpty(), v.Custom(IP_IN_CIDR),
 		),
 		v.Field(&lb.VirtualRouterId),
 		v.Field(&lb.Default),
-		v.Field(&lb.Instances),
+		v.Field(&lb.Instances, v.OmitEmpty(), v.UniqueField("Id")),
 		v.Field(&lb.ForwardPorts),
 	)
 }
@@ -74,12 +73,6 @@ func (lb LB) MACs() []string {
 	return macs
 }
 
-type LBVirtualRouterID int
-
-func (id LBVirtualRouterID) Validate() error {
-	return v.Var(int(id), v.Min(0), v.Max(255))
-}
-
 type LBPortForward struct {
 	Name       *string              `yaml:"name"`
 	Port       *Port                `yaml:"port"`
@@ -91,7 +84,7 @@ func (pf LBPortForward) Validate() error {
 	return v.Struct(&pf,
 		v.Field(&pf.Name, v.Required(), v.AlphaNumericHypUS()),
 		v.Field(&pf.Port, v.Required()),
-		v.Field(&pf.TargetPort, v.OmitEmpty()),
+		v.Field(&pf.TargetPort),
 		v.Field(&pf.Target),
 	)
 }
@@ -109,14 +102,14 @@ func (pft LBPortForwardTarget) Validate() error {
 }
 
 type LBInstance struct {
-	Id           *string     `yaml:"id" opt:",id"`
-	Host         *string     `yaml:"host"`
-	IP           *IPv4       `yaml:"ip"`
-	MAC          *MAC        `yaml:"mac"`
-	CPU          *VCpu       `yaml:"cpu"`
-	RAM          *GB         `yaml:"ram"`
-	MainDiskSize *GB         `yaml:"mainDiskSize"`
-	Priority     *LBPriority `yaml:"priority"`
+	Id           *string `yaml:"id" opt:",id"`
+	Host         *string `yaml:"host"`
+	IP           *IPv4   `yaml:"ip"`
+	MAC          *MAC    `yaml:"mac"`
+	CPU          *VCpu   `yaml:"cpu"`
+	RAM          *GB     `yaml:"ram"`
+	MainDiskSize *GB     `yaml:"mainDiskSize"`
+	Priority     *Uint8  `yaml:"priority"`
 }
 
 func (i LBInstance) Validate() error {
@@ -124,16 +117,10 @@ func (i LBInstance) Validate() error {
 		v.Field(&i.Id, v.Required()),
 		v.Field(&i.Host, v.OmitEmpty(), v.Custom(VALID_HOST)),
 		v.Field(&i.IP, v.OmitEmpty(), v.Custom(IP_IN_CIDR)),
-		v.Field(&i.MAC, v.OmitEmpty()),
-		v.Field(&i.CPU, v.OmitEmpty()),
-		v.Field(&i.RAM, v.OmitEmpty()),
-		v.Field(&i.MainDiskSize, v.OmitEmpty()),
-		v.Field(&i.Priority, v.OmitEmpty()),
+		v.Field(&i.MAC),
+		v.Field(&i.CPU),
+		v.Field(&i.RAM),
+		v.Field(&i.MainDiskSize),
+		v.Field(&i.Priority),
 	)
-}
-
-type LBPriority int
-
-func (p LBPriority) Validate() error {
-	return v.Var(p, v.Min(0), v.Max(255))
 }

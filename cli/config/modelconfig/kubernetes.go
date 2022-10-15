@@ -12,10 +12,10 @@ type Kubernetes struct {
 
 func (k Kubernetes) Validate() error {
 	return v.Struct(&k,
-		v.Field(&k.DnsMode, v.OmitEmpty()),
-		v.Field(&k.NetworkPlugin, v.OmitEmpty()),
 		v.Field(&k.Version, v.Required()),
-		v.Field(&k.Kubespray),
+		v.Field(&k.DnsMode),
+		v.Field(&k.NetworkPlugin),
+		v.Field(&k.Kubespray, v.Required()),
 		v.Field(&k.Other),
 	)
 }
@@ -52,13 +52,13 @@ type Other struct {
 }
 
 type Kubespray struct {
-	URL     *URL     `yaml:"url"`
-	Version *Version `yaml:"version"`
+	URL     *URL           `yaml:"url"`
+	Version *MasterVersion `yaml:"version"`
 }
 
 func (k Kubespray) Validate() error {
 	return v.Struct(&k,
-		v.Field(&k.URL, v.OmitEmpty()),
+		v.Field(&k.URL),
 		v.Field(&k.Version, v.Required()),
 	)
 }

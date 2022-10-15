@@ -5,15 +5,16 @@ import v "cli/validation"
 type NodeTemplate struct {
 	User         *User            `yaml:"user"`
 	OS           *OS              `yaml:"os"`
-	SSH          *NodeTemplateSSH `yaml:"ssh,omitempty"`
+	SSH          *NodeTemplateSSH `yaml:"ssh"`
 	DNS          *[]IP            `yaml:"dns"`
 	UpdateOnBoot *bool            `yaml:"updateOnBoot"`
 }
 
 func (n NodeTemplate) Validate() error {
 	return v.Struct(&n,
-		v.Field(&n.User, v.OmitEmpty()),
-		v.Field(&n.DNS, v.OmitEmpty()),
+		v.Field(&n.User),
+		v.Field(&n.OS),
+		v.Field(&n.DNS),
 		v.Field(&n.SSH),
 	)
 }
@@ -27,8 +28,8 @@ type OS struct {
 func (s OS) Validate() error {
 	return v.Struct(&s,
 		v.Field(&s.Distro),
-		v.Field(&s.NetworkInterface), // TODO: depends on Distro
-		v.Field(&s.Source),           // TODO: depends on Distro
+		v.Field(&s.NetworkInterface),
+		v.Field(&s.Source),
 	)
 }
 
@@ -43,19 +44,19 @@ const (
 )
 
 func (distro OSDistro) Validate() error {
-	return v.Var(distro, v.OmitEmpty(), v.OneOf(UBUNTU, UBUNTU20, UBUNTU22, DEBIAN, DEBIAN11))
+	return v.Var(distro, v.OneOf(UBUNTU, UBUNTU20, UBUNTU22, DEBIAN, DEBIAN11))
 }
 
 type OSNetworkInterface string
 
 func (nic OSNetworkInterface) Validate() error {
-	return v.Var(nic, v.OmitEmpty(), v.AlphaNumeric())
+	return v.Var(nic, v.AlphaNumeric(), v.MaxLen(16))
 }
 
 type OSSource string
 
 func (s OSSource) Validate() error {
-	return v.Var(s, v.OmitEmpty()) // TODO: URL or FileExists
+	return v.Var(s) // TODO: URL or FileExists
 }
 
 type NodeTemplateSSH struct {
@@ -65,6 +66,6 @@ type NodeTemplateSSH struct {
 
 func (s NodeTemplateSSH) Validate() error {
 	return v.Struct(&s,
-		v.Field(&s.PrivateKeyPath, v.OmitEmpty()),
+		v.Field(&s.PrivateKeyPath),
 	)
 }

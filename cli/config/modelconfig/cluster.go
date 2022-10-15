@@ -40,7 +40,7 @@ func (c Cluster) uniqueIpValidator() v.Validator {
 		return v.None
 	}
 
-	return v.Fail().Errorf("IP of each node instance (including VIP) must be unique. (duplicates: %v)", duplicates)
+	return v.Fail().Errorf("IP address of each node instance (including VIP) must be unique. (duplicates: %v)", duplicates)
 }
 
 // uniqueMacValidator returns a validator that triggers an error if multiple nodes
@@ -65,5 +65,5 @@ func (c Cluster) uniqueMacValidator() v.Validator {
 		return v.None
 	}
 
-	return v.Fail().Errorf("MAC of each node instance must be unique. (duplicates: %v)", duplicates)
+	return v.Fail().Errorf("MAC address of each node instance must be unique. (duplicates: %v)", duplicates)
 }
