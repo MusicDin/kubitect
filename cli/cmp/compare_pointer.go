@@ -7,7 +7,6 @@ import (
 func (c *Comparator) cmpPointer(parent *DiffNode, key interface{}, a, b reflect.Value) error {
 	if a.Kind() == b.Kind() {
 		if a.IsNil() && b.IsNil() {
-			parent.addLeaf(NONE, key, nil, nil)
 			return nil
 		}
 

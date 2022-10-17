@@ -175,7 +175,7 @@ func TestConfig_InvalidHostRef(t *testing.T) {
 	cfg := config
 	cfg.Cluster = &cls
 
-	assert.ErrorContains(t, cfg.Validate(), "Field 'host' must point to one of the configured host: [test] (actual: wrong)")
+	assert.ErrorContains(t, cfg.Validate(), "Field 'host' must point to one of the configured hosts: [test] (actual: wrong)")
 }
 
 func TestConfig_InvalidPoolHostRef(t *testing.T) {

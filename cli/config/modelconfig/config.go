@@ -18,6 +18,7 @@ type Config struct {
 	Cluster    *Cluster    `yaml:"cluster"`
 	Kubernetes *Kubernetes `yaml:"kubernetes"`
 	Addons     *Addons     `yaml:"addons"`
+	Kubitect   *Kubitect   `yaml:"kubitect"`
 }
 
 func (c Config) Validate() error {
@@ -34,7 +35,8 @@ func (c Config) Validate() error {
 		),
 		v.Field(&c.Cluster, v.Required().Error("Configuration must contain '{.Field}' section.")),
 		v.Field(&c.Kubernetes, v.Required().Error("Configuration must contain '{.Field}' section.")),
-		v.Field(&c.Addons, v.OmitEmpty()),
+		v.Field(&c.Addons),
+		v.Field(&c.Kubitect),
 	)
 }
 
@@ -87,7 +89,7 @@ func (c Config) hostNameValidator() v.Validator {
 		}
 	}
 
-	return v.OneOf(oneOf...).Errorf("Field '{.Field}' must point to one of the configured host: [%v] (actual: {.Value})", strings.Join(names, "|"))
+	return v.OneOf(oneOf...).Errorf("Field '{.Field}' must point to one of the configured hosts: [%v] (actual: {.Value})", strings.Join(names, "|"))
 }
 
 // poolNameValidator returns a custom cross-validator that checks whether
