@@ -61,11 +61,6 @@ func extra_UniqueField(fl validator.FieldLevel) bool {
 		}
 
 		f := structFieldValue(ri, fName)
-
-		if f == nil {
-			panic(ErrorFieldNotFound)
-		}
-
 		fields = append(fields, f)
 	}
 
@@ -90,12 +85,18 @@ func structFieldValue(rs reflect.Value, fName string) interface{} {
 			continue
 		}
 
-		if !rf.CanInterface() {
+		v := getDeepValue(rf)
+
+		if v.Kind() == reflect.Invalid {
+			return nil
+		}
+
+		if !v.CanInterface() {
 			panic(ErrorExportInterface)
 		}
 
-		return rf.Interface()
+		return v.Interface()
 	}
 
-	return nil
+	panic(ErrorFieldNotFound)
 }
