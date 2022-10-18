@@ -45,7 +45,9 @@ func (n *DiffNode) addNode(key interface{}) *DiffNode {
 	node.parent = n
 
 	if !node.isRoot() {
-		node.path = append(n.path, node.key)
+		path := make([]string, len(n.path))
+		copy(path, n.path)
+		node.path = append(path, node.key)
 	}
 
 	n.children = append(n.children, node)
@@ -69,20 +71,16 @@ func (n *DiffNode) addLeaf(a ActionType, key, before, after interface{}) {
 func (n *DiffNode) setActionToRoot(a ActionType) {
 	switch n.action {
 	case CREATE:
-		if a == DELETE {
+		if a != CREATE {
 			n.action = MODIFY
-		} else {
-			n.action = a
 		}
 	case DELETE:
-		if a == CREATE {
+		if a != DELETE {
 			n.action = MODIFY
-		} else {
-			n.action = a
 		}
 	case NONE:
-		if a == MODIFY {
-			n.action = a
+		if a != NONE {
+			n.action = MODIFY
 		}
 	case UNKNOWN:
 		n.action = a

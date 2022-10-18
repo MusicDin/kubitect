@@ -19,12 +19,7 @@ func (n *DiffNode) Changes() Changes {
 	changes := make([]Change, 0)
 
 	if n.isLeaf() && n.hasChanged() {
-		changes = append(changes, Change{
-			Path:   n.path,
-			Before: n.before,
-			After:  n.after,
-			Action: n.action,
-		})
+		changes = append(changes, n.toChange())
 		return changes
 	}
 
@@ -37,6 +32,17 @@ func (n *DiffNode) Changes() Changes {
 	}
 
 	return changes
+}
+
+// toChange converts node into a change (by stripping
+// away parent and children references)
+func (n DiffNode) toChange() Change {
+	return Change{
+		Path:   n.path,
+		Before: n.before,
+		After:  n.after,
+		Action: n.action,
+	}
 }
 
 // String returns change as a string.

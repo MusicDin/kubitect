@@ -2,7 +2,6 @@ package cmp
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,23 +30,29 @@ func TestChanges(t *testing.T) {
 	d, _ = Compare(true, false)
 	assert.Equal(t, "(modify) : true -> false", fmt.Sprint(d.Changes()))
 
-	expect := Changes{
+	d, _ = Compare(s, nil)
+	assert.Len(t, d.Changes(), 2)
+
+	s1 := []SimpleStruct{
 		{
-			Path:   []string{"value", "[0]", "value"},
-			Before: 42,
-			After:  nil,
-			Action: DELETE,
-		},
-		{
-			Path:   []string{"value", "[1]", "value"},
-			Before: 24,
-			After:  nil,
-			Action: DELETE,
+			value: 42,
 		},
 	}
 
-	d, _ = Compare(s, nil)
-	assert.True(t, reflect.DeepEqual(expect, d.Changes()))
+	s2 := s1
+	s2 = append(s2, SimpleStruct{value: 24})
+
+	expect := Changes{
+		{
+			Path:   []string{"[1]", "value"},
+			Before: nil,
+			After:  24,
+			Action: CREATE,
+		},
+	}
+
+	d, _ = Compare(s1, s2)
+	assert.Equal(t, expect, d.Changes())
 }
 
 func TestOutputYaml(t *testing.T) {
@@ -88,8 +93,8 @@ type TestEvent struct {
 	Action ActionType
 }
 
-func (e TestEvent) GetPath() string {
-	return e.Path
+func (e TestEvent) GetPaths() []string {
+	return []string{e.Path}
 }
 
 func (e TestEvent) GetAction() ActionType {
