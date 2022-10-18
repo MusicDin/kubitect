@@ -96,7 +96,7 @@ type DataDisk struct {
 func (d DataDisk) Validate() error {
 	return v.Struct(&d,
 		v.Field(&d.Name, v.Required(), v.AlphaNumericHyp()),
-		v.Field(&d.Pool, v.OmitEmpty(), v.Custom(VALID_POOL)),
+		v.Field(&d.Pool, v.OmitEmpty(), v.Skip().When(d.Pool != nil && *d.Pool == "main"), v.Custom(VALID_POOL)),
 		v.Field(&d.Size, v.Required()),
 	)
 }

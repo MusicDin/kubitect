@@ -234,3 +234,30 @@ func TestConfig_InvalidPoolRef(t *testing.T) {
 
 	assert.ErrorContains(t, cfg.Validate(), "Field 'pool' must point to one of the pools configured on a matching host 'test': [test|test2] (actual: wrong)")
 }
+
+func TestConfig_MainPoolRef(t *testing.T) {
+	pool := "main"
+
+	cls := cluster
+	cls.Nodes = &Nodes{
+		Master: &Master{
+			Instances: &[]MasterInstance{
+				{
+					Id: &sample_name1,
+					DataDisks: &[]DataDisk{
+						{
+							Name: &sample_name1,
+							Pool: &pool,
+							Size: &sample_dd_size,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	cfg := config
+	cfg.Cluster = &cls
+
+	assert.NoError(t, cfg.Validate())
+}

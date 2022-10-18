@@ -86,7 +86,6 @@ func TestLabels(t *testing.T) {
 }
 
 func TestDataDisk(t *testing.T) {
-
 	str := "test"
 	size := GB(5)
 
