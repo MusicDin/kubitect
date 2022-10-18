@@ -10,6 +10,8 @@ const (
 	TAG_OPTION_ID = "id"
 )
 
+var fieldNameTags = []string{"json", "yaml"}
+
 type CompareFunc func(*DiffNode, interface{}, reflect.Value, reflect.Value) error
 
 type Comparator struct {
@@ -120,14 +122,17 @@ func areOfKind(a, b reflect.Value, kinds ...reflect.Kind) bool {
 }
 
 func tagName(tagName string, field reflect.StructField) string {
-	tag := field.Tag.Get(tagName)
-	options := strings.Split(tag, ",")
+	tags := append([]string{tagName}, fieldNameTags...)
 
-	if len(options) < 1 {
-		return "-"
+	for _, tag := range tags {
+		tName := strings.SplitN(field.Tag.Get(tag), ",", 2)[0]
+
+		if len(tName) > 0 {
+			return tName
+		}
 	}
 
-	return options[0]
+	return ""
 }
 
 func tagOptionId(tagName string, v reflect.Value) interface{} {
