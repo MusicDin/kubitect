@@ -5,31 +5,44 @@ import (
 )
 
 type ChangeEvent interface {
-	GetPaths() []string    // Affected paths
-	GetAction() ActionType // Affected action
+	Action() ActionType // Affected action
+	Paths() []string    // Affected paths
+	TriggerPath(string) // Set path of a change that triggered an event
 }
 
-// TriggerEvents returns a list of events triggered by changes.
+// triggerEvents returns a list of triggered events.
 func TriggerEvents[E ChangeEvent](n *DiffNode, events []E) []E {
-	triggered := make([]E, 0)
+	triggered := new([]E)
+	triggerEvents(n, events, triggered)
+	return *triggered
+}
 
-	if !n.isRoot() {
-		if !n.hasChanged() {
-			return triggered
-		}
-
-		for _, e := range events {
-			if triggers(n, e) {
-				triggered = append(triggered, e)
-			}
-		}
-	}
-
+// triggerEvents detects triggered events and appends them to the triggered slice.
+// Whenever an event is triggered, a TriggerPath method is called with an actual path
+// that has triggered an event.
+func triggerEvents[E ChangeEvent](n *DiffNode, events []E, triggered *[]E) {
 	for _, c := range n.children {
-		triggered = append(triggered, TriggerEvents(c, events)...)
+		triggerEvents(c, events, triggered)
 	}
 
-	return triggered
+	if n.isRoot() || !n.hasChanged() {
+		return
+	}
+
+	for i, e := range *triggered {
+		if triggers(n, e) {
+			(*triggered)[i].TriggerPath(n.genericPath())
+			return
+		}
+	}
+
+	for _, e := range events {
+		if triggers(n, e) {
+			e.TriggerPath(n.genericPath())
+			*triggered = append(*triggered, e)
+			return
+		}
+	}
 }
 
 // MatchingChanges returns changes that match (trigger) given events.
@@ -84,7 +97,6 @@ func categorizeChanges[E ChangeEvent](n *DiffNode, events []E, mismatch bool) (C
 // triggers returns true if the path and action of the node match the
 // path and action of the event.
 func triggers[E ChangeEvent](n *DiffNode, e E) bool {
-
 	a := n.action
 
 	if n.action == NONE {
@@ -92,9 +104,9 @@ func triggers[E ChangeEvent](n *DiffNode, e E) bool {
 	}
 
 	p := n.genericPath()
-	ea := e.GetAction()
+	ea := e.Action()
 
-	for _, ep := range e.GetPaths() {
+	for _, ep := range e.Paths() {
 		if ep == p && (ea == a || ea == UNKNOWN) {
 			return true
 		}
@@ -107,7 +119,7 @@ func triggers[E ChangeEvent](n *DiffNode, e E) bool {
 // from all events.
 func excludes[E ChangeEvent](n *DiffNode, events []E) bool {
 	for _, e := range events {
-		for _, p := range e.GetPaths() {
+		for _, p := range e.Paths() {
 			if strings.Contains(n.genericPath(), p) {
 				return false
 			}
@@ -123,9 +135,9 @@ func conflicts[E ChangeEvent](n *DiffNode, events []E) bool {
 	var matched bool
 
 	for _, e := range events {
-		for _, p := range e.GetPaths() {
+		for _, p := range e.Paths() {
 			if p == n.genericPath() {
-				a := e.GetAction()
+				a := e.Action()
 
 				if a == UNKNOWN || a == n.action {
 					return false
@@ -137,20 +149,4 @@ func conflicts[E ChangeEvent](n *DiffNode, events []E) bool {
 	}
 
 	return matched
-}
-
-// GenericPath returns the path as a string with all slice keys
-// replaced by an asterisk (*).
-func (n *DiffNode) genericPath() string {
-	path := make([]string, 0)
-
-	for _, s := range n.path {
-		if isSliceKey(s) {
-			path = append(path, "[*]")
-		} else {
-			path = append(path, s)
-		}
-	}
-
-	return strings.Join(path, ".")
 }

@@ -6,10 +6,11 @@ import (
 )
 
 type Change struct {
-	Path   []string
-	Before interface{}
-	After  interface{}
-	Action ActionType
+	Path        string
+	GenericPath string
+	Before      interface{}
+	After       interface{}
+	Action      ActionType
 }
 
 type Changes []Change
@@ -38,21 +39,17 @@ func (n *DiffNode) Changes() Changes {
 // away parent and children references)
 func (n DiffNode) toChange() Change {
 	return Change{
-		Path:   n.path,
-		Before: n.before,
-		After:  n.after,
-		Action: n.action,
+		Path:        n.exactPath(),
+		GenericPath: n.genericPath(),
+		Before:      n.before,
+		After:       n.after,
+		Action:      n.action,
 	}
 }
 
 // String returns change as a string.
 func (c Change) String() string {
-	return fmt.Sprintf("(%s) %s: %v -> %v",
-		c.Action,
-		strings.Join(c.Path, "."),
-		c.Before,
-		c.After,
-	)
+	return fmt.Sprintf("(%s) %s: %v -> %v", c.Action, c.Path, c.Before, c.After)
 }
 
 // String returns all changes as a string.

@@ -1,5 +1,7 @@
 package cmp
 
+import "strings"
+
 type ActionType string
 
 const (
@@ -110,6 +112,28 @@ func (n *DiffNode) getChild(key interface{}) *DiffNode {
 		}
 	}
 	return nil
+}
+
+// exactPath returns node's path as a string with each section being
+// separated with a dot.
+func (n *DiffNode) exactPath() string {
+	return strings.Join(n.path, ".")
+}
+
+// genericPath returns the path as a string with all slice keys
+// replaced by an asterisk (*).
+func (n *DiffNode) genericPath() string {
+	path := make([]string, 0)
+
+	for _, s := range n.path {
+		if isSliceKey(s) {
+			path = append(path, "[*]")
+		} else {
+			path = append(path, s)
+		}
+	}
+
+	return strings.Join(path, ".")
 }
 
 // isRoot returns true if node's key matches the root key.

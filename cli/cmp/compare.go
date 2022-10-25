@@ -37,6 +37,11 @@ func Compare(a, b interface{}) (*DiffNode, error) {
 // a comparison tree.
 func (c *Comparator) Compare(a, b interface{}) (*DiffNode, error) {
 	diff := NewNode()
+
+	if a == nil && b == nil {
+		return diff, nil
+	}
+
 	err := c.compare(diff, ROOT_KEY, reflect.ValueOf(a), reflect.ValueOf(b))
 	return diff.getChild(ROOT_KEY), err
 }

@@ -228,14 +228,14 @@ func TestStructFieldName(t *testing.T) {
 
 	d, _ := Compare(a, b)
 	ch := d.Changes()
-	assert.Equal(t, "value", ch[0].Path[0])
+	assert.Equal(t, "value", ch[0].Path)
 
 	cmp := NewComparator()
 	cmp.TagName = "customTag"
 
 	d, _ = cmp.Compare(a, b)
 	ch = d.Changes()
-	assert.Equal(t, "v", ch[0].Path[0])
+	assert.Equal(t, "v", ch[0].Path)
 }
 
 func TestSliceId(t *testing.T) {
@@ -264,16 +264,18 @@ func TestSliceId(t *testing.T) {
 
 	expect := []Change{
 		{
-			Path:   []string{"[0]", "id"},
-			Before: 10,
-			After:  nil,
-			Action: DELETE,
+			Path:        "[0].id",
+			GenericPath: "[*].id",
+			Before:      10,
+			After:       nil,
+			Action:      DELETE,
 		},
 		{
-			Path:   []string{"[1]", "id"},
-			Before: nil,
-			After:  20,
-			Action: CREATE,
+			Path:        "[2].id",
+			GenericPath: "[*].id",
+			Before:      nil,
+			After:       20,
+			Action:      CREATE,
 		},
 	}
 
@@ -282,15 +284,15 @@ func TestSliceId(t *testing.T) {
 	d, _ := cmp.Compare(a, b)
 	ch := d.Changes()
 
-	assert.False(t, reflect.DeepEqual(ch, expect))
+	assert.ElementsMatch(t, expect, ch)
 
 	cmp.TagName = "opt"
 
-	expect[0].Path[0] = "10"
-	expect[1].Path[0] = "20"
+	expect[0].Path = "[10].id"
+	expect[1].Path = "[20].id"
 
 	d, _ = cmp.Compare(a, b)
 	ch = d.Changes()
 
-	assert.False(t, reflect.DeepEqual(ch, expect))
+	assert.ElementsMatch(t, expect, ch)
 }
