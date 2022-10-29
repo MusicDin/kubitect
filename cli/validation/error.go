@@ -30,23 +30,6 @@ type ValidationError struct {
 	RealErr         string
 }
 
-// String returns validation error as string.
-// func (e ValidationError) String() string {
-// 	out := fmt.Sprintf("Namespace: %v\n", e.Namespace)
-// 	out += fmt.Sprintf("Field: %v\n", e.Field)
-// 	out += fmt.Sprintf("StructNamespace: %v\n", e.StructNamespace)
-// 	out += fmt.Sprintf("StructField: %v\n", e.StructField)
-// 	out += fmt.Sprintf("Tag: %v\n", e.Tag)
-// 	out += fmt.Sprintf("ActualTag: %v\n", e.ActualTag)
-// 	out += fmt.Sprintf("Kind: %v\n", e.Kind)
-// 	out += fmt.Sprintf("Type: %v\n", e.Type)
-// 	out += fmt.Sprintf("Param: %v\n", e.Param)
-// 	out += fmt.Sprintf("Value: %v\n", e.Value)
-// 	out += fmt.Sprintf("Error: %v\n", e.Err)
-// 	out += fmt.Sprintf("RealError: %v\n", e.RealErr)
-// 	return out
-// }
-
 // Error returns validation error as a string. It also populates the variables
 // in the error message.
 func (e ValidationError) Error() string {
@@ -90,26 +73,15 @@ func (e *ValidationError) prependPath(realKey, key interface{}) {
 
 type ValidationErrors []ValidationError
 
-// String returns all validation errors as string.
-// func (es ValidationErrors) String() string {
-// 	var out string
-
-// 	for _, e := range es {
-// 		out += fmt.Sprintf("%v\n", e)
-// 	}
-
-// 	return out
-// }
-
 // Error returns all validation errors as a string.
 func (es ValidationErrors) Error() string {
-	var out string
+	var out []string
 
 	for _, e := range es {
-		out += fmt.Sprintf("%v\n", e.Error())
+		out = append(out, e.Error())
 	}
 
-	return out
+	return strings.Join(out, "\n")
 }
 
 // append appends validation error(s).
