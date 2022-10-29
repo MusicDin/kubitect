@@ -223,7 +223,6 @@ func TestOneOf(t *testing.T) {
 	assert.NoError(t, Var("42", OneOf(1, 42, 24)))
 	assert.NoError(t, Var(24, OneOf(1, 42, 24)))
 	assert.Error(t, Var(7, OneOf(1, 42, 24)))
-	assert.Error(t, Var(7, OneOf()))
 }
 
 func TestAlpha(t *testing.T) {

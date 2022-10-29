@@ -304,7 +304,7 @@ func MAC() Validator {
 
 // OneOf checks whether the field value equals one of the specified values.
 // If no value is provided, the validation always fails.
-func OneOf(values ...interface{}) Validator {
+func OneOf[T any](values ...T) Validator {
 	var s []string
 
 	for _, v := range values {
