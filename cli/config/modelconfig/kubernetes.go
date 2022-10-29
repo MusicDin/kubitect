@@ -6,8 +6,8 @@ type Kubernetes struct {
 	Version       *Version       `yaml:"version"`
 	DnsMode       *DnsMode       `yaml:"dnsMode"`
 	NetworkPlugin *NetworkPlugin `yaml:"networkPlugin"`
-	Kubespray     *Kubespray     `yaml:"kubespray"`
-	Other         *Other         `yaml:"other"`
+	Kubespray     Kubespray      `yaml:"kubespray"`
+	Other         Other          `yaml:"other"`
 }
 
 func (k Kubernetes) Validate() error {
@@ -15,7 +15,7 @@ func (k Kubernetes) Validate() error {
 		v.Field(&k.Version, v.Required()),
 		v.Field(&k.DnsMode),
 		v.Field(&k.NetworkPlugin),
-		v.Field(&k.Kubespray, v.Required()),
+		v.Field(&k.Kubespray, v.NotEmpty()),
 		v.Field(&k.Other),
 	)
 }

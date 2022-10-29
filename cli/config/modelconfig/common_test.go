@@ -7,8 +7,8 @@ import (
 )
 
 func TestUint8(t *testing.T) {
-	assert.Error(t, Uint8(-1).Validate())
-	assert.Error(t, Uint8(256).Validate())
+	assert.EqualError(t, Uint8(-1).Validate(), "Minimum value for field is 0 (actual: -1).")
+	assert.EqualError(t, Uint8(256).Validate(), "Maximum value for field is 255 (actual: 256).")
 	assert.NoError(t, Uint8(0).Validate())
 	assert.NoError(t, Uint8(255).Validate())
 }
@@ -92,12 +92,12 @@ func TestDataDisk(t *testing.T) {
 	dd := DataDisk{
 		Name: &str,
 		Pool: &str,
-		Size: &(size),
+		Size: &size,
 	}
 
 	assert.NoError(t, dd.Validate())
-	assert.ErrorContains(t, DataDisk{Name: nil}.Validate(), "Field 'size' is required.")
-	assert.ErrorContains(t, DataDisk{Name: nil}.Validate(), "Field 'name' is required.")
+	assert.ErrorContains(t, DataDisk{}.Validate(), "Field 'size' is required.")
+	assert.ErrorContains(t, DataDisk{}.Validate(), "Field 'name' is required.")
 }
 
 func TestVersion(t *testing.T) {

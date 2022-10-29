@@ -24,7 +24,7 @@ func TestWorker_Minimal(t *testing.T) {
 	id := "id"
 
 	w := Worker{
-		Instances: &[]WorkerInstance{
+		Instances: []WorkerInstance{
 			{
 				Id: &id,
 			},
@@ -37,17 +37,17 @@ func TestWorker_Minimal(t *testing.T) {
 
 func TestWorker_MissingID(t *testing.T) {
 	w := Worker{
-		Instances: &[]WorkerInstance{{}},
+		Instances: []WorkerInstance{{}},
 	}
 
-	assert.ErrorContains(t, w.Validate(), "Field 'id' is required.")
+	assert.EqualError(t, w.Validate(), "Field 'id' is required.")
 }
 
 func TestWorker_UniqueID(t *testing.T) {
 	id := "id"
 
 	w := Worker{
-		Instances: &[]WorkerInstance{
+		Instances: []WorkerInstance{
 			{
 				Id: &id,
 			},
@@ -57,7 +57,7 @@ func TestWorker_UniqueID(t *testing.T) {
 		},
 	}
 
-	assert.ErrorContains(t, w.Validate(), "Field 'Id' must be unique for each element in 'instances'.")
+	assert.EqualError(t, w.Validate(), "Field 'Id' must be unique for each element in 'instances'.")
 }
 
 func TestWorker_DataDisk(t *testing.T) {
@@ -65,10 +65,10 @@ func TestWorker_DataDisk(t *testing.T) {
 	size := GB(42)
 
 	w := Worker{
-		Instances: &[]WorkerInstance{
+		Instances: []WorkerInstance{
 			{
 				Id: &name,
-				DataDisks: &[]DataDisk{
+				DataDisks: []DataDisk{
 					{
 						Name: &name,
 						Size: &size,
@@ -86,10 +86,10 @@ func TestWorker_DataDiskUniqueName(t *testing.T) {
 	size := GB(42)
 
 	w := Worker{
-		Instances: &[]WorkerInstance{
+		Instances: []WorkerInstance{
 			{
 				Id: &name,
-				DataDisks: &[]DataDisk{
+				DataDisks: []DataDisk{
 					{
 						Name: &name,
 						Size: &size,
@@ -103,5 +103,5 @@ func TestWorker_DataDiskUniqueName(t *testing.T) {
 		},
 	}
 
-	assert.ErrorContains(t, w.Validate(), "Field 'Name' must be unique for each element in 'dataDisks'.")
+	assert.EqualError(t, w.Validate(), "Field 'Name' must be unique for each element in 'dataDisks'.")
 }

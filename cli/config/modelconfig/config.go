@@ -14,11 +14,11 @@ const (
 )
 
 type Config struct {
-	Hosts      *[]Host     `yaml:"hosts"`
-	Cluster    *Cluster    `yaml:"cluster"`
-	Kubernetes *Kubernetes `yaml:"kubernetes"`
-	Addons     *Addons     `yaml:"addons"`
-	Kubitect   *Kubitect   `yaml:"kubitect"`
+	Hosts      []Host     `yaml:"hosts"`
+	Cluster    Cluster    `yaml:"cluster"`
+	Kubernetes Kubernetes `yaml:"kubernetes"`
+	Addons     Addons     `yaml:"addons"`
+	Kubitect   Kubitect   `yaml:"kubitect"`
 }
 
 func (c Config) Validate() error {
@@ -33,8 +33,8 @@ func (c Config) Validate() error {
 			v.UniqueField("Name"),
 			c.singleDefaultHostValidator(),
 		),
-		v.Field(&c.Cluster, v.Required().Error("Configuration must contain '{.Field}' section.")),
-		v.Field(&c.Kubernetes, v.Required().Error("Configuration must contain '{.Field}' section.")),
+		v.Field(&c.Cluster, v.NotEmpty().Error("Configuration must contain '{.Field}' section.")),
+		v.Field(&c.Kubernetes, v.NotEmpty().Error("Configuration must contain '{.Field}' section.")),
 		v.Field(&c.Addons),
 		v.Field(&c.Kubitect),
 	)
@@ -49,7 +49,7 @@ func (c Config) singleDefaultHostValidator() v.Validator {
 
 	var defs int
 
-	for _, h := range *c.Hosts {
+	for _, h := range c.Hosts {
 		if h.Default != nil && *h.Default {
 			defs++
 		}
@@ -65,7 +65,7 @@ func (c Config) singleDefaultHostValidator() v.Validator {
 // ipInCidrValidator registers a custom validator that checks whether
 // an IP address is within the configured network CIDR.
 func (c Config) ipInCidrValidator() v.Validator {
-	if c.Cluster == nil || c.Cluster.Network == nil || c.Cluster.Network.CIDR == nil {
+	if c.Cluster.Network.CIDR == nil {
 		return v.None
 	}
 
@@ -82,7 +82,7 @@ func (c Config) hostNameValidator() v.Validator {
 	var oneOf []interface{}
 	var names []string
 
-	for _, h := range *c.Hosts {
+	for _, h := range c.Hosts {
 		if h.Name != nil {
 			oneOf = append(oneOf, *h.Name)
 			names = append(names, *h.Name)
@@ -101,14 +101,14 @@ func poolNameValidator(hostName *string) v.Validator {
 		return v.None
 	}
 
-	if c.Hosts == nil || len(*c.Hosts) == 0 {
+	if c.Hosts == nil || len(c.Hosts) == 0 {
 		return v.None
 	}
 
 	// By default, the first host in a list is a default host.
-	host := (*c.Hosts)[0]
+	host := (c.Hosts)[0]
 
-	for _, h := range *c.Hosts {
+	for _, h := range c.Hosts {
 		if h.Default != nil && *h.Default {
 			host = h
 		}
@@ -130,14 +130,14 @@ func poolNameValidator(hostName *string) v.Validator {
 
 	pools := host.DataResourcePools
 
-	if pools == nil || len(*pools) == 0 {
+	if pools == nil || len(pools) == 0 {
 		return v.Fail().Errorf("Field '{.Field}' points to a data resource pool, but matching host '%v' has none configured.", *host.Name)
 	}
 
 	var oneOf []interface{}
 	var names []string
 
-	for _, p := range *host.DataResourcePools {
+	for _, p := range pools {
 		if p.Name != nil {
 			oneOf = append(oneOf, *p.Name)
 			names = append(names, *p.Name)

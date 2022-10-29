@@ -24,7 +24,7 @@ func TestMaster_Minimal(t *testing.T) {
 	id := "id"
 
 	m := Master{
-		Instances: &[]MasterInstance{
+		Instances: []MasterInstance{
 			{
 				Id: &id,
 			},
@@ -32,22 +32,22 @@ func TestMaster_Minimal(t *testing.T) {
 	}
 
 	assert.NoError(t, m.Validate())
-	assert.ErrorContains(t, Master{}.Validate(), "At least one master instance must be configured.")
+	assert.EqualError(t, Master{}.Validate(), "At least one master instance must be configured.")
 }
 
 func TestMaster_MissingID(t *testing.T) {
 	m := Master{
-		Instances: &[]MasterInstance{{}},
+		Instances: []MasterInstance{{}},
 	}
 
-	assert.ErrorContains(t, m.Validate(), "Field 'id' is required.")
+	assert.EqualError(t, m.Validate(), "Field 'id' is required.")
 }
 
 func TestMaster_UniqueID(t *testing.T) {
 	id := "id"
 
 	m := Master{
-		Instances: &[]MasterInstance{
+		Instances: []MasterInstance{
 			{
 				Id: &id,
 			},
@@ -60,7 +60,7 @@ func TestMaster_UniqueID(t *testing.T) {
 		},
 	}
 
-	assert.ErrorContains(t, m.Validate(), "Field 'Id' must be unique for each element in 'instances'")
+	assert.EqualError(t, m.Validate(), "Field 'Id' must be unique for each element in 'instances'.")
 }
 
 func TestMaster_OddNumberOfInstances(t *testing.T) {
@@ -68,7 +68,7 @@ func TestMaster_OddNumberOfInstances(t *testing.T) {
 	id2 := "id2"
 
 	m := Master{
-		Instances: &[]MasterInstance{
+		Instances: []MasterInstance{
 			{
 				Id: &id1,
 			},
@@ -78,7 +78,7 @@ func TestMaster_OddNumberOfInstances(t *testing.T) {
 		},
 	}
 
-	assert.ErrorContains(t, m.Validate(), "Number of master instances must be odd (1, 3, 5 etc.).")
+	assert.EqualError(t, m.Validate(), "Number of master instances must be odd (1, 3, 5 etc.).")
 }
 
 func TestMaster_DataDisk(t *testing.T) {
@@ -86,10 +86,10 @@ func TestMaster_DataDisk(t *testing.T) {
 	size := GB(42)
 
 	m := Master{
-		Instances: &[]MasterInstance{
+		Instances: []MasterInstance{
 			{
 				Id: &name,
-				DataDisks: &[]DataDisk{
+				DataDisks: []DataDisk{
 					{
 						Name: &name,
 						Size: &size,
@@ -107,10 +107,10 @@ func TestMaster_DataDiskUniqueName(t *testing.T) {
 	size := GB(42)
 
 	m := Master{
-		Instances: &[]MasterInstance{
+		Instances: []MasterInstance{
 			{
 				Id: &name,
-				DataDisks: &[]DataDisk{
+				DataDisks: []DataDisk{
 					{
 						Name: &name,
 						Size: &size,
@@ -124,5 +124,5 @@ func TestMaster_DataDiskUniqueName(t *testing.T) {
 		},
 	}
 
-	assert.ErrorContains(t, m.Validate(), "Field 'Name' must be unique for each element in 'dataDisks'.")
+	assert.EqualError(t, m.Validate(), "Field 'Name' must be unique for each element in 'dataDisks'.")
 }

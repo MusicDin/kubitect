@@ -14,5 +14,5 @@ func TestDataResPool(t *testing.T) {
 	}
 
 	assert.NoError(t, drp1.Validate())
-	assert.ErrorContains(t, DataResourcePool{}.Validate(), "Field 'name' is required.")
+	assert.EqualError(t, DataResourcePool{}.Validate(), "Field 'name' is required.")
 }

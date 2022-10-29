@@ -14,5 +14,5 @@ func TestConnSSH(t *testing.T) {
 	}
 
 	assert.NoError(t, ssh.Validate())
-	assert.ErrorContains(t, ConnectionSSH{}.Validate(), "Path to password-less private key of the remote host is required.")
+	assert.EqualError(t, ConnectionSSH{}.Validate(), "Path to password-less private key of the remote host is required.")
 }

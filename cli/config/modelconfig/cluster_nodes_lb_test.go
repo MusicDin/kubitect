@@ -7,11 +7,11 @@ import (
 )
 
 func TestLBPortForwardTarget(t *testing.T) {
-	assert.Error(t, LBPortForwardTarget("wrong").Validate())
+	assert.NoError(t, ALL.Validate())
 	assert.NoError(t, LBPortForwardTarget("all").Validate())
 	assert.NoError(t, LBPortForwardTarget("workers").Validate())
 	assert.NoError(t, LBPortForwardTarget("masters").Validate())
-	assert.NoError(t, ALL.Validate())
+	assert.EqualError(t, LBPortForwardTarget("wrong").Validate(), "Field must be one of the following values: [workers|masters|all] (actual: wrong).")
 }
 
 func TestLBPortForward(t *testing.T) {
@@ -48,7 +48,7 @@ func TestLB_Minimal(t *testing.T) {
 	id := "id1"
 
 	lb := LB{
-		Instances: &[]LBInstance{
+		Instances: []LBInstance{
 			{
 				Id: &id,
 			},
@@ -61,17 +61,19 @@ func TestLB_Minimal(t *testing.T) {
 
 func TestLB_MissingID(t *testing.T) {
 	lb := LB{
-		Instances: &[]LBInstance{{}},
+		Instances: []LBInstance{{}},
 	}
 
-	assert.ErrorContains(t, lb.Validate(), "Field 'id' is required.")
+	assert.EqualError(t, lb.Validate(), "Field 'id' is required.")
 }
 
 func TestLB_UniqueID(t *testing.T) {
 	id := "id1"
+	ip := IPv4("192.168.113.13")
 
 	lb := LB{
-		Instances: &[]LBInstance{
+		VIP: &ip,
+		Instances: []LBInstance{
 			{
 				Id: &id,
 			},
@@ -81,7 +83,7 @@ func TestLB_UniqueID(t *testing.T) {
 		},
 	}
 
-	assert.ErrorContains(t, lb.Validate(), "Field 'Id' must be unique for each element in 'instances'.")
+	assert.EqualError(t, lb.Validate(), "Field 'Id' must be unique for each element in 'instances'.")
 }
 
 func TestLB_VIP(t *testing.T) {
@@ -91,7 +93,7 @@ func TestLB_VIP(t *testing.T) {
 
 	lb := LB{
 		VIP: &ip,
-		Instances: &[]LBInstance{
+		Instances: []LBInstance{
 			{
 				Id: &id1,
 			},
@@ -109,7 +111,7 @@ func TestLB_MissingVIP(t *testing.T) {
 	id2 := "id2"
 
 	lb := LB{
-		Instances: &[]LBInstance{
+		Instances: []LBInstance{
 			{
 				Id: &id1,
 			},
@@ -119,5 +121,5 @@ func TestLB_MissingVIP(t *testing.T) {
 		},
 	}
 
-	assert.ErrorContains(t, lb.Validate(), "Virtual IP (VIP) is required when multiple load balancer instances are configured.")
+	assert.EqualError(t, lb.Validate(), "Virtual IP (VIP) is required when multiple load balancer instances are configured.")
 }

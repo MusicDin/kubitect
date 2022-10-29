@@ -3,17 +3,17 @@ package modelconfig
 import v "cli/validation"
 
 type Cluster struct {
-	Name         *string       `yaml:"name"`
-	Network      *Network      `yaml:"network"`
-	NodeTemplate *NodeTemplate `yaml:"nodeTemplate"`
-	Nodes        *Nodes        `yaml:"nodes"`
+	Name         *string      `yaml:"name"`
+	Network      Network      `yaml:"network"`
+	NodeTemplate NodeTemplate `yaml:"nodeTemplate"`
+	Nodes        Nodes        `yaml:"nodes"`
 }
 
 func (c Cluster) Validate() error {
 	return v.Struct(&c,
 		v.Field(&c.Name, v.Required(), v.AlphaNumericHyp()),
-		v.Field(&c.Network, v.Required()),
-		v.Field(&c.Nodes, v.Required(), c.uniqueIpValidator(), c.uniqueMacValidator()),
+		v.Field(&c.Network),
+		v.Field(&c.Nodes, c.uniqueIpValidator(), c.uniqueMacValidator()),
 		v.Field(&c.NodeTemplate),
 	)
 }
@@ -21,10 +21,6 @@ func (c Cluster) Validate() error {
 // uniqueIpValidator returns a validator that triggers an error if multiple nodes
 // are assigned the same IP address.
 func (c Cluster) uniqueIpValidator() v.Validator {
-	if c.Nodes == nil {
-		return v.None
-	}
-
 	var duplicates []string
 	ips := c.Nodes.IPs()
 
@@ -46,10 +42,6 @@ func (c Cluster) uniqueIpValidator() v.Validator {
 // uniqueMacValidator returns a validator that triggers an error if multiple nodes
 // are assigned the same MAC address.
 func (c Cluster) uniqueMacValidator() v.Validator {
-	if c.Nodes == nil {
-		return v.None
-	}
-
 	var duplicates []string
 	macs := c.Nodes.MACs()
 

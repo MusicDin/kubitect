@@ -13,7 +13,7 @@ func TestHost(t *testing.T) {
 
 	h1 := Host{
 		Name: &name,
-		Connection: &Connection{
+		Connection: Connection{
 			Type: &connType,
 		},
 	}
@@ -24,7 +24,7 @@ func TestHost(t *testing.T) {
 
 	h3 := Host{
 		Name: &name,
-		DataResourcePools: &[]DataResourcePool{
+		DataResourcePools: []DataResourcePool{
 			{
 				Name: &name,
 			},
@@ -35,8 +35,9 @@ func TestHost(t *testing.T) {
 	}
 
 	assert.NoError(t, h1.Validate())
-	assert.ErrorContains(t, h2.Validate(), "Field 'connection' is required.")
+	assert.EqualError(t, h2.Validate(), "Field 'type' is required.")
+	assert.ErrorContains(t, h3.Validate(), "Field 'type' is required.")
 	assert.ErrorContains(t, h3.Validate(), "Field 'Name' must be unique for each element in 'dataResourcePools'.")
 	assert.ErrorContains(t, Host{}.Validate(), "Field 'name' is required.")
-	assert.ErrorContains(t, Host{}.Validate(), "Field 'connection' is required.")
+	assert.ErrorContains(t, Host{}.Validate(), "Field 'type' is required.")
 }

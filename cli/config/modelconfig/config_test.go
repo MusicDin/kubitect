@@ -22,10 +22,10 @@ var (
 	localhost      = Host{
 		Name:    &sample_name1,
 		Default: &sample_default,
-		Connection: &Connection{
+		Connection: Connection{
 			Type: &localhost_type,
 		},
-		DataResourcePools: &[]DataResourcePool{
+		DataResourcePools: []DataResourcePool{
 			{
 				Name: &sample_name1,
 			},
@@ -35,16 +35,16 @@ var (
 		},
 	}
 
-	remotehost_keyfile = File(".")
+	remotehost_keyfile = File("./config_test.go")
 	remotehost_user    = User("user")
 	remotehost_type    = REMOTE
 	remotehost         = Host{
 		Name: &sample_name2,
-		Connection: &Connection{
+		Connection: Connection{
 			Type: &remotehost_type,
 			IP:   &sample_ip,
 			User: &remotehost_user,
-			SSH: &ConnectionSSH{
+			SSH: ConnectionSSH{
 				Keyfile: &remotehost_keyfile,
 			},
 		},
@@ -54,21 +54,21 @@ var (
 	k8s_ks_version = MasterVersion(k8s_version)
 	k8s            = Kubernetes{
 		Version: &k8s_version,
-		Kubespray: &Kubespray{
+		Kubespray: Kubespray{
 			Version: &k8s_ks_version,
 		},
 	}
 
 	cluster = Cluster{
 		Name:    &sample_name1,
-		Network: &net,
+		Network: net,
 	}
 
 	config = Config{
-		Hosts: &[]Host{
+		Hosts: []Host{
 			localhost,
 		},
-		Kubernetes: &k8s,
+		Kubernetes: k8s,
 	}
 )
 
@@ -80,13 +80,13 @@ func TestConfigEmpty(t *testing.T) {
 
 func TestConfig_Valid(t *testing.T) {
 	cls := cluster
-	cls.Nodes = &Nodes{
-		Master: &Master{
-			Instances: &[]MasterInstance{
+	cls.Nodes = Nodes{
+		Master: Master{
+			Instances: []MasterInstance{
 				{
 					Id:   &sample_name1,
 					Host: &sample_name1,
-					DataDisks: &[]DataDisk{
+					DataDisks: []DataDisk{
 						// Correct pool reference
 						{
 							Name: &sample_name1,
@@ -105,16 +105,16 @@ func TestConfig_Valid(t *testing.T) {
 	}
 
 	cfg := config
-	cfg.Cluster = &cls
+	cfg.Cluster = cls
 
 	assert.NoError(t, cfg.Validate())
 }
 
 func TestConfig_InvalidIP(t *testing.T) {
 	cls := cluster
-	cls.Nodes = &Nodes{
-		Master: &Master{
-			Instances: &[]MasterInstance{
+	cls.Nodes = Nodes{
+		Master: Master{
+			Instances: []MasterInstance{
 				{
 					Id:   &sample_name1,
 					Host: &sample_name1,
@@ -125,20 +125,19 @@ func TestConfig_InvalidIP(t *testing.T) {
 	}
 
 	cfg := config
-	cfg.Cluster = &cls
+	cfg.Cluster = cls
 
-	assert.ErrorContains(t, cfg.Validate(), "Field 'ip' must be a valid IP address within '192.168.113.0/24' subnet. (actual: 192.168.114.13)")
+	assert.EqualError(t, cfg.Validate(), "Field 'ip' must be a valid IP address within '192.168.113.0/24' subnet. (actual: 192.168.114.13)")
 }
 
 func TestConfig_MultipleDefaultHosts(t *testing.T) {
 	cls := cluster
-	cls.Nodes = &Nodes{
-		Master: &Master{
-			Instances: &[]MasterInstance{
+	cls.Nodes = Nodes{
+		Master: Master{
+			Instances: []MasterInstance{
 				{
 					Id:   &sample_name1,
 					Host: &sample_name1,
-					IP:   &sample_ip,
 				},
 			},
 		},
@@ -148,22 +147,22 @@ func TestConfig_MultipleDefaultHosts(t *testing.T) {
 	rhDef.Default = &sample_default
 
 	cfg := config
-	cfg.Cluster = &cls
-	cfg.Hosts = &[]Host{
+	cfg.Cluster = cls
+	cfg.Hosts = []Host{
 		localhost,
 		rhDef,
 	}
 
-	assert.ErrorContains(t, cfg.Validate(), "Only one host can be configured as default.")
+	assert.EqualError(t, cfg.Validate(), "Only one host can be configured as default.")
 }
 
 func TestConfig_InvalidHostRef(t *testing.T) {
 	host := "wrong"
 
 	cls := cluster
-	cls.Nodes = &Nodes{
-		Master: &Master{
-			Instances: &[]MasterInstance{
+	cls.Nodes = Nodes{
+		Master: Master{
+			Instances: []MasterInstance{
 				{
 					Id:   &sample_name1,
 					Host: &host,
@@ -173,20 +172,20 @@ func TestConfig_InvalidHostRef(t *testing.T) {
 	}
 
 	cfg := config
-	cfg.Cluster = &cls
+	cfg.Cluster = cls
 
-	assert.ErrorContains(t, cfg.Validate(), "Field 'host' must point to one of the configured hosts: [test] (actual: wrong)")
+	assert.EqualError(t, cfg.Validate(), "Field 'host' must point to one of the configured hosts: [test] (actual: wrong)")
 }
 
 func TestConfig_InvalidPoolHostRef(t *testing.T) {
 	cls := cluster
-	cls.Nodes = &Nodes{
-		Master: &Master{
-			Instances: &[]MasterInstance{
+	cls.Nodes = Nodes{
+		Master: Master{
+			Instances: []MasterInstance{
 				{
 					Id:   &sample_name1,
 					Host: &sample_name2,
-					DataDisks: &[]DataDisk{
+					DataDisks: []DataDisk{
 						{
 							Name: &sample_name1,
 							Pool: &sample_name1,
@@ -199,25 +198,25 @@ func TestConfig_InvalidPoolHostRef(t *testing.T) {
 	}
 
 	cfg := config
-	cfg.Cluster = &cls
-	cfg.Hosts = &[]Host{
+	cfg.Cluster = cls
+	cfg.Hosts = []Host{
 		localhost,
 		remotehost,
 	}
 
-	assert.ErrorContains(t, cfg.Validate(), "Field 'pool' points to a data resource pool, but matching host 'test2' has none configured.")
+	assert.EqualError(t, cfg.Validate(), "Field 'pool' points to a data resource pool, but matching host 'test2' has none configured.")
 }
 
 func TestConfig_InvalidPoolRef(t *testing.T) {
 	pool := "wrong"
 
 	cls := cluster
-	cls.Nodes = &Nodes{
-		Master: &Master{
-			Instances: &[]MasterInstance{
+	cls.Nodes = Nodes{
+		Master: Master{
+			Instances: []MasterInstance{
 				{
 					Id: &sample_name1,
-					DataDisks: &[]DataDisk{
+					DataDisks: []DataDisk{
 						{
 							Name: &sample_name1,
 							Pool: &pool,
@@ -230,21 +229,21 @@ func TestConfig_InvalidPoolRef(t *testing.T) {
 	}
 
 	cfg := config
-	cfg.Cluster = &cls
+	cfg.Cluster = cls
 
-	assert.ErrorContains(t, cfg.Validate(), "Field 'pool' must point to one of the pools configured on a matching host 'test': [test|test2] (actual: wrong)")
+	assert.EqualError(t, cfg.Validate(), "Field 'pool' must point to one of the pools configured on a matching host 'test': [test|test2] (actual: wrong)")
 }
 
 func TestConfig_MainPoolRef(t *testing.T) {
 	pool := "main"
 
 	cls := cluster
-	cls.Nodes = &Nodes{
-		Master: &Master{
-			Instances: &[]MasterInstance{
+	cls.Nodes = Nodes{
+		Master: Master{
+			Instances: []MasterInstance{
 				{
 					Id: &sample_name1,
-					DataDisks: &[]DataDisk{
+					DataDisks: []DataDisk{
 						{
 							Name: &sample_name1,
 							Pool: &pool,
@@ -257,7 +256,7 @@ func TestConfig_MainPoolRef(t *testing.T) {
 	}
 
 	cfg := config
-	cfg.Cluster = &cls
+	cfg.Cluster = cls
 
 	assert.NoError(t, cfg.Validate())
 }

@@ -3,11 +3,11 @@ package modelconfig
 import v "cli/validation"
 
 type WorkerDefault struct {
-	CPU          *VCpu    `yaml:"cpu"`
-	RAM          *GB      `yaml:"ram"`
-	MainDiskSize *GB      `yaml:"mainDiskSize"`
-	Labels       *Labels  `yaml:"labels"`
-	Taints       *[]Taint `yaml:"taints"`
+	CPU          *VCpu   `yaml:"cpu"`
+	RAM          *GB     `yaml:"ram"`
+	MainDiskSize *GB     `yaml:"mainDiskSize"`
+	Labels       Labels  `yaml:"labels"`
+	Taints       []Taint `yaml:"taints"`
 }
 
 func (d WorkerDefault) Validate() error {
@@ -21,60 +21,36 @@ func (d WorkerDefault) Validate() error {
 }
 
 type Worker struct {
-	Default   *WorkerDefault    `yaml:"default"`
-	Instances *[]WorkerInstance `yaml:"instances"`
+	Default   WorkerDefault    `yaml:"default"`
+	Instances []WorkerInstance `yaml:"instances"`
 }
 
 func (w Worker) Validate() error {
 	return v.Struct(&w,
 		v.Field(&w.Default),
-		v.Field(&w.Instances, v.OmitEmpty(), v.UniqueField("Id")),
+		v.Field(&w.Instances, v.UniqueField("Id")),
 	)
 }
 
-func (w Worker) IPs() []string {
-	if w.Instances == nil {
-		return nil
-	}
-
-	var ips []string
-
-	for _, i := range *w.Instances {
-		if i.IP != nil {
-			ips = append(ips, string(*i.IP))
-		}
-	}
-
-	return ips
-}
-
-func (w Worker) MACs() []string {
-	if w.Instances == nil {
-		return nil
-	}
-
-	var macs []string
-
-	for _, i := range *w.Instances {
-		if i.MAC != nil {
-			macs = append(macs, string(*i.MAC))
-		}
-	}
-
-	return macs
-}
-
 type WorkerInstance struct {
-	Id           *string     `yaml:"id" opt:",id"`
-	Host         *string     `yaml:"host"`
-	IP           *IPv4       `yaml:"ip"`
-	MAC          *MAC        `yaml:"mac"`
-	CPU          *VCpu       `yaml:"cpu"`
-	RAM          *GB         `yaml:"ram"`
-	MainDiskSize *GB         `yaml:"mainDiskSize"`
-	DataDisks    *[]DataDisk `yaml:"dataDisks"`
-	Labels       *Labels     `yaml:"labels"`
-	Taints       *[]Taint    `yaml:"taints"`
+	Id           *string    `yaml:"id" opt:",id"`
+	Host         *string    `yaml:"host"`
+	IP           *IPv4      `yaml:"ip"`
+	MAC          *MAC       `yaml:"mac"`
+	CPU          *VCpu      `yaml:"cpu"`
+	RAM          *GB        `yaml:"ram"`
+	MainDiskSize *GB        `yaml:"mainDiskSize"`
+	DataDisks    []DataDisk `yaml:"dataDisks"`
+	Labels       Labels     `yaml:"labels"`
+	Taints       []Taint    `yaml:"taints"`
+}
+
+func (i WorkerInstance) GetIP() *IPv4 {
+	return i.IP
+}
+
+func (i WorkerInstance) GetMAC() *MAC {
+	return i.MAC
 }
 
 func (i WorkerInstance) Validate() error {

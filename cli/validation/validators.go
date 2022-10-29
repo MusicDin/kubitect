@@ -224,18 +224,18 @@ func Max(value int) Validator {
 func Len(value int) Validator {
 	return Validator{
 		Tags: fmt.Sprintf("len=%d", value),
-		Err:  "Length of '{.Field}' must be {.Param} (actual: {.Value}).",
+		Err:  "Length of the field '{.Field}' must be {.Param} (actual: {.Value}).",
 	}
 }
 
 // MinLen checks whether the field length is greater than or equal to the specified value.
 func MinLen(value int) Validator {
-	return Min(value).Error("Minimum length of '{.Field}' is {.Param} (actual: {.Value})")
+	return Min(value).Error("Minimum length of the field '{.Field}' is {.Param} (actual: {.Value})")
 }
 
 // MaxLen checks whether the field length is less than or equal to the specified value.
 func MaxLen(value int) Validator {
-	return Max(value).Error("Maximum length of '{.Field}' is {.Param} (actual: {.Value})")
+	return Max(value).Error("Maximum length of the field '{.Field}' is {.Param} (actual: {.Value})")
 }
 
 // IP checks whether the field value is a valid IP address.

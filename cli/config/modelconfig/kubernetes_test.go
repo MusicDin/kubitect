@@ -35,7 +35,35 @@ func TestKubespray(t *testing.T) {
 		URL:     &url,
 	}
 
-	assert.ErrorContains(t, Kubespray{}.Validate(), "Field 'version' is required.")
+	assert.EqualError(t, Kubespray{}.Validate(), "Field 'version' is required.")
 	assert.NoError(t, ks1.Validate())
 	assert.NoError(t, ks2.Validate())
+}
+
+func TestKubernetes_Empty(t *testing.T) {
+	assert.ErrorContains(t, Kubernetes{}.Validate(), "Field 'version' is required.")
+	assert.ErrorContains(t, Kubernetes{}.Validate(), "Field 'kubespray' is required and cannot be empty.")
+}
+
+func TestKubernetes_Valid(t *testing.T) {
+	ver := Version("v1.2.3")
+	mver := MasterVersion("v1.2.3")
+	boolean := true
+	dnsMode := COREDNS
+	netPlugin := CALICO
+
+	k := Kubernetes{
+		Version:       &ver,
+		DnsMode:       &dnsMode,
+		NetworkPlugin: &netPlugin,
+		Kubespray: Kubespray{
+			Version: &mver,
+		},
+		Other: Other{
+			AutoRenewCertificates: &boolean,
+			CopyKubeconfig:        &boolean,
+		},
+	}
+
+	assert.NoError(t, k.Validate())
 }

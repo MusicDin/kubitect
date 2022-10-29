@@ -7,8 +7,8 @@ import (
 )
 
 func TestConnType(t *testing.T) {
-	assert.Error(t, ConnectionType("").Validate())
-	assert.Error(t, ConnectionType("wrong").Validate())
+	assert.EqualError(t, ConnectionType("").Validate(), "Field must be one of the following values: [localhost|local|remote] (actual: ).")
+	assert.EqualError(t, ConnectionType("wrong").Validate(), "Field must be one of the following values: [localhost|local|remote] (actual: wrong).")
 	assert.NoError(t, ConnectionType("local").Validate())
 	assert.NoError(t, ConnectionType("remote").Validate())
 	assert.NoError(t, LOCALHOST.Validate())
@@ -29,14 +29,13 @@ func TestConn(t *testing.T) {
 		Type: &remote,
 		IP:   &ip,
 		User: &user,
-		SSH: &ConnectionSSH{
+		SSH: ConnectionSSH{
 			Keyfile: &pk,
 		},
 	}
 
 	c3 := Connection{
 		Type: &local,
-		SSH:  &ConnectionSSH{},
 	}
 
 	c4 := Connection{
@@ -49,5 +48,5 @@ func TestConn(t *testing.T) {
 	assert.ErrorContains(t, c4.Validate(), "Field 'ip' is required when connection type is set to 'remote'.")
 	assert.ErrorContains(t, c4.Validate(), "Field 'user' is required when connection type is set to 'remote'.")
 	assert.ErrorContains(t, c4.Validate(), "Field 'ssh' is required when connection type is set to 'remote'.")
-	assert.ErrorContains(t, Connection{}.Validate(), "Field 'type' is required.")
+	assert.EqualError(t, Connection{}.Validate(), "Field 'type' is required.")
 }

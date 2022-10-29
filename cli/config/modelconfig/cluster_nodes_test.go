@@ -7,16 +7,32 @@ import (
 )
 
 func TestNodes_Empty(t *testing.T) {
-	assert.ErrorContains(t, Nodes{}.Validate(), "Field 'master' is required.")
+	assert.EqualError(t, Nodes{}.Validate(), "At least one master instance must be configured.")
+}
+
+func TestCluster_NilInstances(t *testing.T) {
+	n := Nodes{
+		LoadBalancer: LB{
+			Instances: nil,
+		},
+		Master: Master{
+			Instances: nil,
+		},
+		Worker: Worker{
+			Instances: nil,
+		},
+	}
+
+	assert.EqualError(t, n.Validate(), "At least one master instance must be configured.")
 }
 
 func TestNodes_Minimal(t *testing.T) {
 	id := "id"
 
 	n := Nodes{
-		LoadBalancer: &LB{},
-		Master: &Master{
-			Instances: &[]MasterInstance{
+		LoadBalancer: LB{},
+		Master: Master{
+			Instances: []MasterInstance{
 				{
 					Id: &id,
 				},
@@ -29,12 +45,12 @@ func TestNodes_Minimal(t *testing.T) {
 
 func TestNodes_MissingMaster(t *testing.T) {
 	n := Nodes{
-		LoadBalancer: &LB{},
-		Master:       &Master{},
-		Worker:       &Worker{},
+		LoadBalancer: LB{},
+		Master:       Master{},
+		Worker:       Worker{},
 	}
 
-	assert.ErrorContains(t, n.Validate(), "At least one master instance must be configured.")
+	assert.EqualError(t, n.Validate(), "At least one master instance must be configured.")
 }
 
 func TestNodes_MissingLB(t *testing.T) {
@@ -43,8 +59,8 @@ func TestNodes_MissingLB(t *testing.T) {
 	id3 := "id3"
 
 	n := Nodes{
-		Master: &Master{
-			Instances: &[]MasterInstance{
+		Master: Master{
+			Instances: []MasterInstance{
 				{
 					Id: &id1,
 				},
@@ -58,7 +74,7 @@ func TestNodes_MissingLB(t *testing.T) {
 		},
 	}
 
-	assert.ErrorContains(t, n.Validate(), "At least one load balancer instance is required when multiple master instances are configured.")
+	assert.EqualError(t, n.Validate(), "At least one load balancer instance is required when multiple master instances are configured.")
 }
 
 func TestNodes_SingleLB(t *testing.T) {
@@ -67,15 +83,15 @@ func TestNodes_SingleLB(t *testing.T) {
 	id3 := "id3"
 
 	n := Nodes{
-		LoadBalancer: &LB{
-			Instances: &[]LBInstance{
+		LoadBalancer: LB{
+			Instances: []LBInstance{
 				{
 					Id: &id1,
 				},
 			},
 		},
-		Master: &Master{
-			Instances: &[]MasterInstance{
+		Master: Master{
+			Instances: []MasterInstance{
 				{
 					Id: &id1,
 				},
@@ -99,9 +115,9 @@ func TestNodes_MultiLB(t *testing.T) {
 	ip := IPv4("192.168.113.13")
 
 	n := Nodes{
-		LoadBalancer: &LB{
+		LoadBalancer: LB{
 			VIP: &ip,
-			Instances: &[]LBInstance{
+			Instances: []LBInstance{
 				{
 					Id: &id1,
 				},
@@ -113,8 +129,8 @@ func TestNodes_MultiLB(t *testing.T) {
 				},
 			},
 		},
-		Master: &Master{
-			Instances: &[]MasterInstance{
+		Master: Master{
+			Instances: []MasterInstance{
 				{
 					Id: &id1,
 				},

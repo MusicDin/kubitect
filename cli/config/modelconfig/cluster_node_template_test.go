@@ -14,8 +14,8 @@ func TestOSDistro(t *testing.T) {
 }
 
 func TestOSNetworkInterface(t *testing.T) {
-	assert.Error(t, OSNetworkInterface("").Validate())
-	assert.Error(t, OSNetworkInterface("1234567890abcdefg").Validate()) // longer than 16 chars
+	assert.EqualError(t, OSNetworkInterface("").Validate(), "Field can contain only alphanumeric characters. (actual: )")
+	assert.EqualError(t, OSNetworkInterface("1234567890abcdefg").Validate(), "Maximum length of the field is 16 (actual: 1234567890abcdefg)")
 	assert.NoError(t, OSNetworkInterface("ens3").Validate())
 }
 
@@ -44,5 +44,5 @@ func TestNodeTemplateSSH(t *testing.T) {
 
 	assert.NoError(t, NodeTemplateSSH{}.Validate())
 	assert.NoError(t, nts1.Validate())
-	assert.Error(t, nts2.Validate())
+	assert.EqualError(t, nts2.Validate(), "Field 'privateKeyPath' must be a valid file path that points to an existing file. (actual: ./non-existing)")
 }

@@ -45,6 +45,6 @@ func TestNetwork(t *testing.T) {
 
 	assert.NoError(t, net1.Validate())
 	assert.NoError(t, net2.Validate())
-	assert.ErrorContains(t, net3.Validate(), "Field 'bridge' is required when network mode is set to 'bridge'.")
-	assert.ErrorContains(t, Network{}.Validate(), "Field 'cidr' is required.")
+	assert.EqualError(t, net3.Validate(), "Field 'bridge' is required when network mode is set to 'bridge'.")
+	assert.EqualError(t, Network{}.Validate(), "Field 'cidr' is required.")
 }

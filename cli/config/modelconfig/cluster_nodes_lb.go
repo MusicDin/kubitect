@@ -17,60 +17,25 @@ func (def LBDefault) Validate() error {
 }
 
 type LB struct {
-	VIP             *IPv4            `yaml:"vip"`
-	VirtualRouterId *Uint8           `yaml:"virtualRouterId"`
-	Default         *LBDefault       `yaml:"default"`
-	Instances       *[]LBInstance    `yaml:"instances"`
-	ForwardPorts    *[]LBPortForward `yaml:"forwardPorts"`
+	VIP             *IPv4           `yaml:"vip"`
+	VirtualRouterId *Uint8          `yaml:"virtualRouterId"`
+	Default         LBDefault       `yaml:"default"`
+	Instances       []LBInstance    `yaml:"instances"`
+	ForwardPorts    []LBPortForward `yaml:"forwardPorts"`
 }
 
 func (lb LB) Validate() error {
 	return v.Struct(&lb,
 		v.Field(&lb.VIP,
-			v.Required().When(lb.Instances != nil && len(*lb.Instances) > 1).Error("Virtual IP (VIP) is required when multiple load balancer instances are configured."),
-			v.OmitEmpty(), v.Custom(IP_IN_CIDR),
+			v.Required().When(len(lb.Instances) > 1).Error("Virtual IP (VIP) is required when multiple load balancer instances are configured."),
+			v.OmitEmpty(),
+			v.Custom(IP_IN_CIDR),
 		),
 		v.Field(&lb.VirtualRouterId),
 		v.Field(&lb.Default),
-		v.Field(&lb.Instances, v.OmitEmpty(), v.UniqueField("Id")),
+		v.Field(&lb.Instances, v.UniqueField("Id")),
 		v.Field(&lb.ForwardPorts),
 	)
-}
-
-func (lb LB) IPs() []string {
-	if lb.Instances == nil {
-		return nil
-	}
-
-	var ips []string
-
-	if lb.VIP != nil {
-		ips = append(ips, string(*lb.VIP))
-	}
-
-	for _, i := range *lb.Instances {
-		if i.IP != nil {
-			ips = append(ips, string(*i.IP))
-		}
-	}
-
-	return ips
-}
-
-func (lb LB) MACs() []string {
-	if lb.Instances == nil {
-		return nil
-	}
-
-	var macs []string
-
-	for _, i := range *lb.Instances {
-		if i.MAC != nil {
-			macs = append(macs, string(*i.MAC))
-		}
-	}
-
-	return macs
 }
 
 type LBPortForward struct {
@@ -110,6 +75,14 @@ type LBInstance struct {
 	RAM          *GB     `yaml:"ram"`
 	MainDiskSize *GB     `yaml:"mainDiskSize"`
 	Priority     *Uint8  `yaml:"priority"`
+}
+
+func (i LBInstance) GetIP() *IPv4 {
+	return i.IP
+}
+
+func (i LBInstance) GetMAC() *MAC {
+	return i.MAC
 }
 
 func (i LBInstance) Validate() error {

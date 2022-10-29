@@ -50,6 +50,8 @@ func (e ValidationError) Error() string {
 		err = strings.ReplaceAll(err, old, new)
 	}
 
+	err = strings.ReplaceAll(err, " '' ", " ")
+
 	return err
 }
 

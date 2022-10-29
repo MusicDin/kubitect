@@ -3,11 +3,11 @@ package modelconfig
 import v "cli/validation"
 
 type NodeTemplate struct {
-	User         *User            `yaml:"user"`
-	OS           *OS              `yaml:"os"`
-	SSH          *NodeTemplateSSH `yaml:"ssh"`
-	DNS          *[]IP            `yaml:"dns"`
-	UpdateOnBoot *bool            `yaml:"updateOnBoot"`
+	User         *User           `yaml:"user"`
+	OS           OS              `yaml:"os"`
+	SSH          NodeTemplateSSH `yaml:"ssh"`
+	DNS          []IP            `yaml:"dns"`
+	UpdateOnBoot *bool           `yaml:"updateOnBoot"`
 }
 
 func (n NodeTemplate) Validate() error {

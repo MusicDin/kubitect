@@ -64,7 +64,7 @@ func TestError_Empty(t *testing.T) {
 }
 
 func TestError_Population(t *testing.T) {
-	assert.Equal(t, "error:test.error:Error:Test.Error:1", err.Error())
+	assert.EqualError(t, err, "error:test.error:Error:Test.Error:1")
 }
 
 func TestError_PrependPath(t *testing.T) {
@@ -87,44 +87,49 @@ func TestErrors_Population(t *testing.T) {
 
 func TestErrors_Append(t *testing.T) {
 	es := errs
-	es.append(ValidationError{Err: "test"})
 
-	assert.Equal(t, "test", es[len(es)-1].Error())
+	es.append(ValidationError{Err: "test"})
 
 	es.append(ValidationErrors{
 		ValidationError{Err: "test1"},
 		ValidationError{Err: "test2"},
 	})
 
-	assert.Equal(t, "test1", es[len(es)-2].Error())
-	assert.Equal(t, "test2", es[len(es)-1].Error())
+	assert.EqualError(t, es[len(es)-3], "test")
+	assert.EqualError(t, es[len(es)-2], "test1")
+	assert.EqualError(t, es[len(es)-1], "test2")
+}
 
-	prevLen := len(es)
-	es.append(nil)
-	assert.Equal(t, prevLen, len(es))
+func TestErrors_AppendNil(t *testing.T) {
+	prevLen := len(errs)
+
+	errs.append(nil)
+	assert.Len(t, errs, prevLen)
 }
 
 func TestErrors_SubAppend(t *testing.T) {
 	es := errs
-	es.subAppend(ValidationError{Err: "test"}, "T", "t")
 
-	e := es[len(es)-1]
-	assert.Equal(t, "test", e.Error())
-	assert.Equal(t, "t", e.Field)
-	assert.Equal(t, "T", e.StructField)
+	es.subAppend(ValidationError{Err: "test"}, "T", "t")
 
 	es.subAppend(ValidationErrors{
 		ValidationError{Err: "test1", Field: "test1", Namespace: "ns"},
 		ValidationError{Err: "test2"},
 	}, "T", "t")
 
-	e = es[len(es)-1]
-	assert.Equal(t, "test2", e.Error())
+	e := es[len(es)-3]
+	assert.EqualError(t, e, "test")
 	assert.Equal(t, "t", e.Field)
 	assert.Equal(t, "T", e.StructField)
 
 	e = es[len(es)-2]
-	assert.Equal(t, "test1", e.Error())
+	assert.EqualError(t, e, "test1")
 	assert.Equal(t, "test1", e.Field)
 	assert.Equal(t, "t.ns", e.Namespace)
+
+	e = es[len(es)-1]
+	assert.EqualError(t, e, "test2")
+	assert.Equal(t, "t", e.Field)
+	assert.Equal(t, "T", e.StructField)
+
 }

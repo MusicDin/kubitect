@@ -21,7 +21,7 @@ type Connection struct {
 	IP   *IPv4           `yaml:"ip"`
 	Type *ConnectionType `yaml:"type"`
 	User *User           `yaml:"user"`
-	SSH  *ConnectionSSH  `yaml:"ssh"`
+	SSH  ConnectionSSH   `yaml:"ssh"`
 }
 
 func (c Connection) Validate() error {
@@ -34,7 +34,7 @@ func (c Connection) Validate() error {
 		v.Field(&c.User, v.Required().When(isRemote).Error(isRemoteErr)),
 		v.Field(&c.SSH,
 			v.Skip().When(!isRemote),
-			v.Required().When(isRemote).Error(isRemoteErr),
+			v.NotEmpty().When(isRemote).Error(isRemoteErr),
 		),
 	)
 }

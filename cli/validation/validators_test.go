@@ -1,7 +1,6 @@
 package validation
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,12 +8,12 @@ import (
 
 func TestCustomError(t *testing.T) {
 	assert.NotEmpty(t, Var("42", Max(0).Error("")))
-	assert.Error(t, errors.New("test"), Var("42", Max(0).Error("test")))
+	assert.EqualError(t, Var("42", Max(0).Error("test")), "test")
 }
 
 func TestCustomErrorf(t *testing.T) {
 	assert.NotEmpty(t, Var("42", Max(0).Errorf("")))
-	assert.Error(t, errors.New("test"), Var("42", Max(0).Errorf("%s", "test")))
+	assert.EqualError(t, Var("42", Max(0).Errorf("%s", "test")), "test")
 }
 
 func TestWhen(t *testing.T) {
