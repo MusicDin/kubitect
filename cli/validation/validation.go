@@ -20,7 +20,7 @@ var (
 	ErrorMissingStructPointer = fmt.Errorf("validation.Struct: Struct pointer is missing!")
 	ErrorInvalidStructPointer = fmt.Errorf("validation.Struct: First argument must be a pointer to a struct!")
 	ErrorStructFieldNotFound  = fmt.Errorf("validation.Struct: Struct field not found int the struct!")
-	ErrorFieldIsNotPointer    = fmt.Errorf("validators.Field: First argument must be a pointer to a struct field!")
+	ErrorFieldIsNotPointer    = fmt.Errorf("validation.Field: First argument must be a pointer to a struct field!")
 )
 
 // Structure is validatable if it contains Validate method that returns an
@@ -50,7 +50,7 @@ func Var(value interface{}, validators ...Validator) error {
 
 		if err != nil {
 			errs.append(err)
-			break
+			return errs
 		}
 	}
 

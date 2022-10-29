@@ -65,9 +65,35 @@ func TestFail(t *testing.T) {
 }
 
 func TestRequired(t *testing.T) {
+	type Struct struct {
+		value int
+	}
+
 	assert.Error(t, Var(nil, Required()))
 	assert.Error(t, Var("", Required()))
+	assert.NoError(t, Var(Struct{}, Required()))
 	assert.NoError(t, Var("test", Required()))
+}
+
+func TestNotEmpty(t *testing.T) {
+	type Struct struct {
+		value int
+	}
+
+	s1 := Struct{
+		value: 0,
+	}
+
+	s2 := Struct{
+		value: 1,
+	}
+
+	assert.Error(t, Var(nil, NotEmpty()))
+	assert.Error(t, Var("", NotEmpty()))
+	assert.Error(t, Var(Struct{}, NotEmpty()))
+	assert.Error(t, Var(s1, NotEmpty()))
+	assert.NoError(t, Var(s2, NotEmpty()))
+	assert.NoError(t, Var("test", NotEmpty()))
 }
 
 func TestUnique(t *testing.T) {

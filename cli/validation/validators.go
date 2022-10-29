@@ -13,9 +13,10 @@ type Action string
 
 const (
 	UNKNOWN   Action = ""
-	OMITEMPTY Action = "OMITEMPTY"
 	SKIP      Action = "SKIP"
 	FAIL      Action = "FAIL"
+	OMITEMPTY Action = "OMITEMPTY"
+	NOT_EMPTY Action = "NOT_EMPTY"
 )
 
 // Validator represents a validation rule.
@@ -73,16 +74,18 @@ func (v *Validator) validate(value interface{}) (ValidationErrors, bool) {
 	}
 
 	switch v.action {
-	case OMITEMPTY:
-		return nil, isEmpty(value)
 	case SKIP:
 		return nil, true
 	case FAIL:
-		return ValidationErrors{{
-			Tag:       v.Tags,
-			ActualTag: v.Tags,
-			Err:       v.Err,
-		}}, false
+		return v.ToError(), false
+	case OMITEMPTY:
+		return nil, isEmpty(value)
+	case NOT_EMPTY:
+		if isEmpty(value) {
+			return v.ToError(), false
+		} else {
+			return nil, false
+		}
 	}
 
 	errs := validate.Var(value, v.Tags)
@@ -95,6 +98,16 @@ func (v *Validator) validate(value interface{}) (ValidationErrors, bool) {
 	}
 
 	return es, false
+}
+
+func (v Validator) ToError() ValidationErrors {
+	return ValidationErrors{
+		{
+			Tag:       v.Tags,
+			ActualTag: v.Tags,
+			Err:       v.Err,
+		},
+	}
 }
 
 // Error overwrites the validator's default error message with the user-defined error
@@ -160,6 +173,15 @@ func Required() Validator {
 	return Validator{
 		Tags: "required",
 		Err:  "Field '{.Field}' is required.",
+	}
+}
+
+// NotEmpty validator checks whether value is not blank or with zero length.
+func NotEmpty() Validator {
+	return Validator{
+		Tags:   "notempty",
+		Err:    "Field '{.Field}' is required and cannot be empty.",
+		action: NOT_EMPTY,
 	}
 }
 
