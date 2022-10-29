@@ -43,10 +43,6 @@ func (c Config) Validate() error {
 // singleDefaultHostValidator returns a validator that triggers an error
 // if multiple hosts are configured as default.
 func (c Config) singleDefaultHostValidator() v.Validator {
-	if c.Hosts == nil {
-		return v.None
-	}
-
 	var defs int
 
 	for _, h := range c.Hosts {
@@ -75,21 +71,15 @@ func (c Config) ipInCidrValidator() v.Validator {
 // hostNameValidator returns a custom cross-validator that checks whether
 // a host with a given name has been configured.
 func (c Config) hostNameValidator() v.Validator {
-	if c.Hosts == nil {
-		return v.None
-	}
-
-	var oneOf []interface{}
 	var names []string
 
 	for _, h := range c.Hosts {
 		if h.Name != nil {
-			oneOf = append(oneOf, *h.Name)
 			names = append(names, *h.Name)
 		}
 	}
 
-	return v.OneOf(oneOf...).Errorf("Field '{.Field}' must point to one of the configured hosts: [%v] (actual: {.Value})", strings.Join(names, "|"))
+	return v.OneOf(names...).Errorf("Field '{.Field}' must point to one of the configured hosts: [%v] (actual: {.Value})", strings.Join(names, "|"))
 }
 
 // poolNameValidator returns a custom cross-validator that checks whether
@@ -97,11 +87,7 @@ func (c Config) hostNameValidator() v.Validator {
 func poolNameValidator(hostName *string) v.Validator {
 	c, ok := v.TopParent().(*Config)
 
-	if !ok || c == nil {
-		return v.None
-	}
-
-	if c.Hosts == nil || len(c.Hosts) == 0 {
+	if !ok || c == nil || len(c.Hosts) == 0 {
 		return v.None
 	}
 
@@ -128,21 +114,17 @@ func poolNameValidator(hostName *string) v.Validator {
 		return v.None
 	}
 
-	pools := host.DataResourcePools
-
-	if pools == nil || len(pools) == 0 {
+	if len(host.DataResourcePools) == 0 {
 		return v.Fail().Errorf("Field '{.Field}' points to a data resource pool, but matching host '%v' has none configured.", *host.Name)
 	}
 
-	var oneOf []interface{}
-	var names []string
+	var pools []string
 
-	for _, p := range pools {
+	for _, p := range host.DataResourcePools {
 		if p.Name != nil {
-			oneOf = append(oneOf, *p.Name)
-			names = append(names, *p.Name)
+			pools = append(pools, *p.Name)
 		}
 	}
 
-	return v.OneOf(oneOf...).Errorf("Field '{.Field}' must point to one of the pools configured on a matching host '%s': [%s] (actual: {.Value})", *host.Name, strings.Join(names, "|"))
+	return v.OneOf(pools...).Errorf("Field '{.Field}' must point to one of the pools configured on a matching host '%s': [%s] (actual: {.Value})", *host.Name, strings.Join(pools, "|"))
 }

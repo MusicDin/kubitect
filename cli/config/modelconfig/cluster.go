@@ -22,6 +22,7 @@ func (c Cluster) Validate() error {
 // are assigned the same IP address.
 func (c Cluster) uniqueIpValidator() v.Validator {
 	var duplicates []string
+
 	ips := c.Nodes.IPs()
 
 	for i := 0; i < len(ips); i++ {
@@ -43,6 +44,7 @@ func (c Cluster) uniqueIpValidator() v.Validator {
 // are assigned the same MAC address.
 func (c Cluster) uniqueMacValidator() v.Validator {
 	var duplicates []string
+
 	macs := c.Nodes.MACs()
 
 	for i := 0; i < len(macs); i++ {
