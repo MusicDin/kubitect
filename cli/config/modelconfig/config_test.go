@@ -72,7 +72,7 @@ var (
 	}
 )
 
-func TestConfigEmpty(t *testing.T) {
+func TestConfig_Empty(t *testing.T) {
 	assert.ErrorContains(t, Config{}.Validate(), "At least 1 hosts must be configured.")
 	assert.ErrorContains(t, Config{}.Validate(), "Configuration must contain 'cluster' section.")
 	assert.ErrorContains(t, Config{}.Validate(), "Configuration must contain 'kubernetes' section.")
