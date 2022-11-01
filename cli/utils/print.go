@@ -7,21 +7,26 @@ import (
 )
 
 var (
+	green  = color.New(color.FgHiGreen).SprintFunc()
 	red    = color.New(color.FgHiRed).SprintFunc()
 	yellow = color.New(color.FgHiYellow).SprintFunc()
 	blue   = color.New(color.FgHiCyan).SprintFunc()
 )
 
 func PrintError(msg ...any) {
-	printStamp(red("ERROR"), msg)
+	printStamp(red("E"), msg)
 }
 
 func PrintWarning(msg ...any) {
-	printStamp(yellow("WARNING"), msg)
+	printStamp(yellow("W"), msg)
 }
 
 func PrintDebug(msg ...any) {
-	printStamp(blue("DEBUG"), msg)
+	printStamp(blue("D"), msg)
+}
+
+func PrintSuccess(msg ...any) {
+	printStamp(green("S"), msg)
 }
 
 func printStamp(stamp string, msg []any) {

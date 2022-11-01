@@ -1,4 +1,4 @@
-package helpers
+package git
 
 import (
 	"cli/env"
@@ -10,9 +10,9 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
-// GitClone clones a git project with the given URL and version into
+// Clone clones a git project with the given URL and version into
 // a specific directory.
-func GitClone(path string, url string, version string) error {
+func Clone(path string, url string, version string) error {
 
 	if len(path) < 1 {
 		return fmt.Errorf("Git clone destination not provided.")
@@ -54,9 +54,12 @@ func GitClone(path string, url string, version string) error {
 		gitCloneOptions.Progress = os.Stdout
 	}
 
+	os.MkdirAll(path, os.ModePerm)
+
 	_, err = git.PlainClone(path, false, gitCloneOptions)
+
 	if err != nil {
-		return fmt.Errorf("Error cloning project for 'url=%s' and 'version=%s': %w", url, version, err)
+		return fmt.Errorf("Error cloning git project for 'url=%s' and 'version=%s': %v", url, version, err)
 	}
 
 	return nil

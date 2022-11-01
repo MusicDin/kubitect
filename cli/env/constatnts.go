@@ -1,21 +1,27 @@
 package env
 
+import "fmt"
+
 const (
-	// Global constants
+	ConstClusterConfigDir = "config"
+	ConstSharedDir        = "share"
+
 	ConstProjectHomeEnvName = "KUBITECT_HOME"
 	ConstProjectHomeDir     = ".kubitect"
 	ConstProjectClustersDir = "clusters"
-	ConstProjectUrl         = "https://github.com/MusicDin/kubitect"
-	ConstProjectVersion     = "v2.2.0"
-	ConstTerraformVersion   = "1.2.4"
-	ConstTerraformStatePath = "config/terraform/terraform.tfstate"
-	ConstKubeconfigPath     = "config/admin.conf"
-	ConstVenvBinDir         = "bin/venvs"
+
+	ConstProjectUrl       = "https://github.com/MusicDin/kubitect"
+	ConstProjectVersion   = "v2.2.0"
+	ConstKubesprayVersion = "v2.20.0"
+	ConstTerraformVersion = "1.2.4"
+
+	ConstTerraformStatePath = ConstClusterConfigDir + "/terraform/terraform.tfstate"
+	ConstKubeconfigPath     = ConstClusterConfigDir + "/admin.conf"
+	ConstClusterConfigPath  = ConstClusterConfigDir + "/kubitect.yaml"
 
 	// default values
-	DefaultClusterName       = "default"
-	DefaultClusterAction     = "create"
-	DefaultClusterConfigPath = "config/kubitect.yaml"
+	// DefaultClusterName       = "default"
+	// DefaultClusterAction     = "create"
 )
 
 var (
@@ -30,7 +36,7 @@ var (
 		"terraform/output.tf",
 		"terraform/variables.tf",
 		"terraform/versions.tf",
-		"LICENSE",
+		// "LICENSE",
 	}
 
 	// Defines options for "apply --action" command.
@@ -40,3 +46,29 @@ var (
 		"scale",
 	}
 )
+
+type ApplyAction string
+
+const (
+	UNKNOWN ApplyAction = "unknown"
+	CREATE  ApplyAction = "create"
+	UPGRADE ApplyAction = "upgrade"
+	SCALE   ApplyAction = "scale"
+)
+
+func (a ApplyAction) String() string {
+	return string(a)
+}
+
+func ToApplyAction(a string) (ApplyAction, error) {
+	switch a {
+	case CREATE.String(), "":
+		return CREATE, nil
+	case UPGRADE.String():
+		return UPGRADE, nil
+	case SCALE.String():
+		return SCALE, nil
+	default:
+		return UNKNOWN, fmt.Errorf("Unknown cluster action: %s", a)
+	}
+}
