@@ -5,7 +5,7 @@ import (
 	"cli/tools/terraform"
 )
 
-func (c Cluster) Scale(events []*OnChangeEvent) error {
+func scale(c Cluster, events []*OnChangeEvent) error {
 
 	// TODO: Remove nodes
 	// 1.) Extract remove nodes from events
@@ -20,14 +20,12 @@ func (c Cluster) Scale(events []*OnChangeEvent) error {
 		return err
 	}
 
-	infraCfg, err := readInfraConfig(c.Path)
-
-	if err != nil {
+	if err := c.Sync(); err != nil {
 		return err
 	}
 
-	sshUser := string(*infraCfg.Cluster.NodeTemplate.User)
-	sshPKey := string(*infraCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath)
+	sshUser := string(*c.InfraCfg.Cluster.NodeTemplate.User)
+	sshPKey := string(*c.InfraCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath)
 
 	k8sVersion := string(*c.NewCfg.Kubernetes.Version)
 

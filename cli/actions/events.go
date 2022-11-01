@@ -127,6 +127,28 @@ var (
 			path:  "cluster.nodeTemplate",
 			msg:   "Once the cluster is created, further changes to the nodeTemplate properties are not allowed. Such action may render the cluster unusable.",
 		},
+		// Prevent removing nodes
+		{
+			cType:  BLOCK,
+			action: cmp.DELETE,
+			paths: []string{
+				"cluster.nodes.lb.instances.[*]",
+				"cluster.nodes.worker.instances.[*]",
+				"cluster.nodes.master.instances.[*]",
+			},
+			msg: "To remove existing nodes run apply command with '--action scale' flag.",
+		},
+		// Prevent adding nodes
+		{
+			cType:  BLOCK,
+			action: cmp.CREATE,
+			paths: []string{
+				"cluster.nodes.lb.instances.[*]",
+				"cluster.nodes.worker.instances.[*]",
+				"cluster.nodes.master.instances.[*]",
+			},
+			msg: "To add new nodes run apply command with '--action scale' flag.",
+		},
 		// Prevent default CPU, RAM and main disk size changes
 		{
 			cType: BLOCK,

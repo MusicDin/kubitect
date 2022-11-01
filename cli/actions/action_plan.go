@@ -3,13 +3,9 @@ package actions
 import (
 	"cli/cmp"
 	"cli/config/modelconfig"
-	"cli/config/modelinfra"
 	"cli/env"
 	"cli/utils"
-	"cli/validation"
 	"fmt"
-	"path"
-	"path/filepath"
 )
 
 var (
@@ -105,114 +101,4 @@ func triggerEvents(diff *cmp.DiffNode, action env.ApplyAction) ([]*OnChangeEvent
 	}
 
 	return triggered, warns, errs
-}
-
-// readInfraConfig reads the configuration file produced by Terraform.
-func readInfraConfig(clusterPath string) (*modelinfra.Config, error) {
-	path := path.Join(clusterPath, env.ConstClusterConfigDir, infraCfgPath)
-
-	if !utils.Exists(path) {
-		return nil, fmt.Errorf("Terraform did not produce an output file. (%s)", path)
-	}
-
-	config, err := utils.ReadYaml(path, modelinfra.Config{})
-	if err != nil {
-		return nil, err
-	}
-
-	return config, validateInfraConfig(config)
-}
-
-// validateInfraConfig validates infrastructure configuration file.
-// If validation fails, a formatted error is returned.
-func validateInfraConfig(cfg *modelinfra.Config) error {
-	err := cfg.Validate()
-
-	if err == nil {
-		return nil
-	}
-
-	var errs utils.Errors
-	errs = append(errs, fmt.Errorf("Infrastructure configuration file produced by Terraform contains following (%d) errors:\n", len(errs)))
-
-	for _, e := range err.(validation.ValidationErrors) {
-		errs = append(errs, NewValidationError(e.Error(), e.Namespace))
-	}
-
-	return errs
-}
-
-// readOldConfig reads previously applied configuration file if it exists.
-// Otherwise it returns nil.
-func readOldConfig(clusterPath string) (*modelconfig.Config, error) {
-	path := path.Join(clusterPath, env.ConstClusterConfigDir, oldCfgPath)
-
-	if !utils.Exists(path) {
-		return nil, nil
-	}
-
-	config, err := utils.ReadYaml(path, modelconfig.Config{})
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed reading previously applied config: %v", err)
-	}
-
-	return config, nil
-}
-
-// readNewConfig reads configuration file on user-provided path.
-func readNewConfig(path string) (*modelconfig.Config, error) {
-	path, err := filepath.Abs(path)
-	if err != nil {
-		return nil, fmt.Errorf("Filepath '%s' cannot be converted to absolute path: %v", path, err)
-	}
-
-	if !utils.Exists(path) {
-		return nil, fmt.Errorf("File on path '%s' does not exist.", path)
-	}
-
-	config, err := utils.ReadYaml(path, modelconfig.Config{})
-	if err != nil {
-		return nil, err
-	}
-
-	return config, nil
-}
-
-// storeNewConfig makes a copy of the provided (new) configuration file in
-// cluster directory.
-func storeNewConfig(clusterPath, configPath string) error {
-	src := configPath
-	dst := path.Join(clusterPath, env.ConstClusterConfigDir, newCfgPath)
-
-	return utils.CopyFile(src, dst)
-}
-
-// applyNewConfig moves new config to the location of the applied.
-func applyNewConfig(clusterPath string) error {
-	src := path.Join(clusterPath, env.ConstClusterConfigDir, newCfgPath)
-	dst := path.Join(clusterPath, env.ConstClusterConfigDir, oldCfgPath)
-
-	return utils.ForceMove(src, dst)
-}
-
-// validateNewConfig validates configuration file. If validation fails,
-// a formatted error is returned.
-func validateNewConfig(cfg *modelconfig.Config) error {
-	err := cfg.Validate()
-
-	if err == nil {
-		utils.PrintSuccess("Configuration is valid.")
-		return nil
-	}
-
-	var errs utils.Errors
-	errs = append(errs, fmt.Errorf("Validation of the configuration file has failed.\n"))
-	errs = append(errs, fmt.Errorf("Configuration file contains the following (%d) errors:\n", len(errs)))
-
-	for _, e := range err.(validation.ValidationErrors) {
-		errs = append(errs, NewValidationError(e.Error(), e.Namespace))
-	}
-
-	return errs
 }

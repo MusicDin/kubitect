@@ -2,53 +2,148 @@ package actions
 
 import (
 	"cli/config/modelconfig"
+	"cli/config/modelinfra"
 	"cli/env"
+	"cli/tools/virtualenv"
 	"cli/utils"
+	"cli/validation"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 )
 
 type Cluster struct {
-	Name    string
-	Path    string
-	Local   bool
-	Invalid bool
-	NewCfg  *modelconfig.Config
-	OldCfg  *modelconfig.Config
+	Name         string
+	Path         string
+	Local        bool
+	Invalid      bool
+	NewCfg       *modelconfig.Config
+	NewCfgPath   string
+	OldCfg       *modelconfig.Config
+	OldCfgPath   string
+	InfraCfg     *modelinfra.Config
+	InfraCfgPath string
 }
 
 // NewCluster returns new Cluster instance with populated general fields.
 // Cluster name and path are extracted from the provided configuration file.
 // Previously applied configuration is also read, if cluster already exists.
 func NewCluster(userCfgPath string) (Cluster, error) {
+	var err error
 	var c Cluster
 
-	newCfg, err := readNewConfig(userCfgPath)
+	c.NewCfg, err = readConfig(userCfgPath, modelconfig.Config{})
 
 	if err != nil {
 		return c, err
 	}
 
-	if err := validateNewConfig(newCfg); err != nil {
-		return Cluster{}, err
+	if err := validateConfig(c.NewCfg); err != nil {
+		e := fmt.Errorf("Provided configuration file is not valid:")
+		return c, utils.NewErrors(e, err)
 	}
 
-	c.NewCfg = newCfg
-	c.Name = string(*newCfg.Cluster.Name)
+	c.Name = string(*c.NewCfg.Cluster.Name)
 	c.Path = env.ClusterPath(c.Name)
 	c.Local = env.Local
 
-	oldCfg, err := readOldConfig(c.Name)
+	return c, c.Sync()
+}
+
+// Sync ensures that cluster properties are up to data.
+func (c *Cluster) Sync() error {
+	var err error
+
+	c.OldCfgPath = path.Join(c.Path, env.ConstClusterConfigDir, oldCfgPath)
+	c.InfraCfgPath = path.Join(c.Path, env.ConstClusterConfigDir, infraCfgPath)
 
 	if err != nil {
-		return c, err
+		return fmt.Errorf("Error reading previously applied configuration file: %v", err)
 	}
 
-	c.OldCfg = oldCfg
+	c.InfraCfg, err = readConfigIfExists(c.InfraCfgPath, modelinfra.Config{})
 
-	return c, nil
+	if err != nil {
+		return fmt.Errorf("Error reading infrastructure file: %v", err)
+	}
+
+	if c.InfraCfg != nil {
+		if err := validateConfig(c.NewCfg); err != nil {
+			e := fmt.Errorf("Infrastructure file (produced by Terraform) is invalid.")
+			return utils.NewErrors(e, err)
+		}
+	}
+
+	return nil
+}
+
+// readConfig reads configuration file on the given path and converts it into
+// the provided model.
+func readConfig[T validation.Validatable](path string, model T) (*T, error) {
+	if !utils.Exists(path) {
+		return nil, fmt.Errorf("file '%s' does not exist", path)
+	}
+
+	return utils.ReadYaml(path, model)
+}
+
+// readConfig reads configuration file on the given path and converts it into
+// the provided model. If file on the provided path does not exist, neither error
+// nor model is returned.
+func readConfigIfExists[T validation.Validatable](path string, model T) (*T, error) {
+	if !utils.Exists(path) {
+		return nil, nil
+	}
+
+	return utils.ReadYaml(path, model)
+}
+
+// validateConfig validates provided configuration file.
+func validateConfig[T validation.Validatable](config T) error {
+	var errs utils.Errors
+
+	err := config.Validate()
+
+	for _, e := range err.(validation.ValidationErrors) {
+		errs = append(errs, NewValidationError(e.Error(), e.Namespace))
+	}
+
+	return errs
+}
+
+// StoreNewConfig makes a copy of the provided (new) configuration file in
+// cluster directory.
+func (c *Cluster) StoreNewConfig() error {
+	src := c.NewCfgPath
+	dst := path.Join(c.Path, env.ConstClusterConfigDir, newCfgPath)
+
+	c.NewCfgPath = dst
+
+	return utils.CopyFile(src, dst)
+}
+
+// ApplyNewConfig replaces currently applied config with new one.
+func (c Cluster) ApplyNewConfig() error {
+	return utils.ForceMove(c.NewCfgPath, c.OldCfgPath)
+}
+
+// setupMainVE creates main (Kubitect) virtual environment.
+func (c Cluster) SetupMainVE() error {
+	ktVer := env.ConstProjectVersion
+
+	if c.NewCfg.Kubitect.Version != nil {
+		ktVer = string(*c.NewCfg.Kubitect.Version)
+	}
+
+	return virtualenv.Env.Main.Setup(c.Path, ktVer)
+}
+
+// setupKubesprayVE creates Kubespray virtual environment.
+func (c Cluster) SetupKubesprayVE() error {
+	ksVer := string(*c.NewCfg.Kubernetes.Kubespray.Version)
+	return virtualenv.Env.Kubespray.Setup(c.Path, ksVer)
 }
 
 // IsActive returns true if cluster contains terraform state file.

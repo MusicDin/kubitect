@@ -5,19 +5,17 @@ import (
 	"cli/tools/terraform"
 )
 
-func (c Cluster) Create() error {
+func create(c Cluster) error {
 	if err := terraform.Apply(c.Path); err != nil {
 		return err
 	}
 
-	infraCfg, err := readInfraConfig(c.Path)
-
-	if err != nil {
+	if err := c.Sync(); err != nil {
 		return err
 	}
 
-	sshUser := string(*infraCfg.Cluster.NodeTemplate.User)
-	sshPKey := string(*infraCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath)
+	sshUser := string(*c.InfraCfg.Cluster.NodeTemplate.User)
+	sshPKey := string(*c.InfraCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath)
 
 	k8sVersion := string(*c.NewCfg.Kubernetes.Version)
 

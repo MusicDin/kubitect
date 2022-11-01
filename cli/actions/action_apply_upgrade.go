@@ -2,16 +2,9 @@ package actions
 
 import "cli/tools/ansible"
 
-func (c Cluster) Upgrade() error {
-
-	infraCfg, err := readInfraConfig(c.Path)
-
-	if err != nil {
-		return err
-	}
-
-	sshUser := string(*infraCfg.Cluster.NodeTemplate.User)
-	sshPKey := string(*infraCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath)
+func upgrade(c Cluster) error {
+	sshUser := string(*c.InfraCfg.Cluster.NodeTemplate.User)
+	sshPKey := string(*c.InfraCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath)
 
 	k8sVersion := string(*c.NewCfg.Kubernetes.Version)
 

@@ -37,7 +37,7 @@ func (pb Playbook) Exec() error {
 		pb.Inventory = "localhost,"
 	}
 
-	return pb.Exec()
+	return pb.exec()
 }
 
 // exec executes ansible playbook with working directory

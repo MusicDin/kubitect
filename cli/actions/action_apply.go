@@ -4,7 +4,6 @@ import (
 	"cli/env"
 	"cli/tools/ansible"
 	"cli/tools/git"
-	"cli/tools/virtualenv"
 	"cli/utils"
 	"fmt"
 	"os"
@@ -37,39 +36,40 @@ func Apply(userCfgPath string, action env.ApplyAction) error {
 		}
 
 		if len(events) == 0 {
-			return fmt.Errorf("No changes detected. Aborting...")
+			fmt.Println("No changes detected.")
+			return nil
 		}
 	}
 
-	if err := c.Prepare(userCfgPath); err != nil {
+	if err := prepare(c); err != nil {
 		return err
 	}
 
 	switch action {
 	case env.CREATE:
-		err = c.Create()
+		err = create(c)
 	case env.UPGRADE:
-		err = c.Upgrade()
+		err = upgrade(c)
 	case env.SCALE:
-		err = c.Scale(events)
+		err = scale(c, events)
 	}
 
 	if err != nil {
 		return err
 	}
 
-	return applyNewConfig(c.Path)
+	return c.ApplyNewConfig()
 }
 
 // prepare prepares cluster's directory. It ensures that Kubitect project
 // files are present in the directory, new configuration file is stored in
 // the temporary location and that virtual environment is created.
-func (c Cluster) Prepare(userCfgPath string) error {
-	if err := c.Init(); err != nil {
+func prepare(c Cluster) error {
+	if err := initCluster(c); err != nil {
 		return err
 	}
 
-	if err := storeNewConfig(c.Path, userCfgPath); err != nil {
+	if err := c.StoreNewConfig(); err != nil {
 		return err
 	}
 
@@ -87,7 +87,7 @@ func (c Cluster) Prepare(userCfgPath string) error {
 // Init ensures cluster directory exists and that all required files
 // are copied from the Kubitect git project. If local flag is used,
 // project files are copied from the current directory.
-func (c Cluster) Init() error {
+func initCluster(c Cluster) error {
 	cfg := c.NewCfg
 
 	url := env.ConstProjectUrl
@@ -131,21 +131,4 @@ func (c Cluster) Init() error {
 	}
 
 	return os.RemoveAll(tmpDir)
-}
-
-// setupMainVE creates main (Kubitect) virtual environment.
-func (c Cluster) SetupMainVE() error {
-	ktVer := env.ConstProjectVersion
-
-	if c.NewCfg.Kubitect.Version != nil {
-		ktVer = string(*c.NewCfg.Kubitect.Version)
-	}
-
-	return virtualenv.Env.Main.Setup(c.Path, ktVer)
-}
-
-// setupKubesprayVE creates Kubespray virtual environment.
-func (c Cluster) SetupKubesprayVE() error {
-	ksVer := string(*c.NewCfg.Kubernetes.Kubespray.Version)
-	return virtualenv.Env.Kubespray.Setup(c.Path, ksVer)
 }
