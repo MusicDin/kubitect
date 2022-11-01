@@ -42,21 +42,61 @@ func (e *OnChangeEvent) TriggerPath(path string) {
 	e.triggerPaths = append(e.triggerPaths, path)
 }
 
+// triggerEvents checks whether any events is triggered based on the provided
+// changes and action. If any blocking event is triggered or some changes are
+// not covered by any event, an error is thrown.
+func triggerEvents(diff *cmp.DiffNode, action env.ApplyAction) []*OnChangeEvent {
+	events := events(action)
+	triggered := cmp.TriggerEvents(diff, events)
+	nmc := cmp.NonMatchingChanges(diff, events)
+
+	// Changes that are not covered by any event are automatically
+	// considered disallowed (blocking).
+	if len(nmc) > 0 {
+		var paths []string
+
+		for _, ch := range nmc {
+			paths = append(paths, ch.Path)
+		}
+
+		triggered = append(triggered, &OnChangeEvent{
+			msg:   "Disallowed changes.",
+			paths: paths,
+		})
+	}
+
+	return triggered
+}
+
+// events returns a copy of OnChangeEvent-s.
+// Since OnChangeEvents has a setter method, each event
+// must be a pointer.
 func events(a env.ApplyAction) []*OnChangeEvent {
+	var copy []OnChangeEvent
+
 	switch a {
 	case env.CREATE:
-		return ModifyEvents
+		copy = ModifyEvents
 	case env.SCALE:
-		return ScaleEvents
+		copy = ScaleEvents
 	case env.UPGRADE:
-		return UpgradeEvents
+		copy = UpgradeEvents
 	default:
 		return nil
 	}
+
+	var events []*OnChangeEvent
+
+	for _, e := range copy {
+		events = append(events, &e)
+	}
+
+	return events
 }
 
+// Events
 var (
-	UpgradeEvents = []*OnChangeEvent{
+	UpgradeEvents = []OnChangeEvent{
 		{
 			cType: OK,
 			path:  "kubernetes.version",
@@ -67,7 +107,7 @@ var (
 		},
 	}
 
-	ScaleEvents = []*OnChangeEvent{
+	ScaleEvents = []OnChangeEvent{
 		{
 			cType:  OK,
 			action: cmp.DELETE,
@@ -90,7 +130,7 @@ var (
 		},
 	}
 
-	ModifyEvents = []*OnChangeEvent{
+	ModifyEvents = []OnChangeEvent{
 		// Warn data destructive host changes
 		{
 			cType:  WARN,

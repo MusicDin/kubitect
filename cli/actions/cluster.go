@@ -14,6 +14,12 @@ import (
 	"path/filepath"
 )
 
+const (
+	newCfgFileName   = "kubitect.yaml"
+	oldCfgFileName   = "kubitect-applied.yaml"
+	infraCfgFileName = "infrastructure.yaml"
+)
+
 type Cluster struct {
 	Name         string
 	Path         string
@@ -56,8 +62,8 @@ func NewCluster(userCfgPath string) (Cluster, error) {
 func (c *Cluster) Sync() error {
 	var err error
 
-	c.OldCfgPath = path.Join(c.Path, env.ConstClusterConfigDir, oldCfgPath)
-	c.InfraCfgPath = path.Join(c.Path, env.ConstClusterConfigDir, infraCfgPath)
+	c.OldCfgPath = path.Join(c.Path, env.ConstClusterConfigDir, oldCfgFileName)
+	c.InfraCfgPath = path.Join(c.Path, env.ConstClusterConfigDir, infraCfgFileName)
 
 	if err != nil {
 		return fmt.Errorf("Error reading previously applied configuration file: %v", err)
@@ -117,7 +123,7 @@ func validateConfig[T validation.Validatable](config T) error {
 // cluster directory.
 func (c *Cluster) StoreNewConfig() error {
 	src := c.NewCfgPath
-	dst := path.Join(c.Path, env.ConstClusterConfigDir, newCfgPath)
+	dst := path.Join(c.Path, env.ConstClusterConfigDir, newCfgFileName)
 
 	c.NewCfgPath = dst
 
