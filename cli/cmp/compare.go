@@ -6,18 +6,16 @@ import (
 )
 
 const (
-	ROOT_KEY      = "root"
 	TAG_OPTION_ID = "id"
 )
 
 var fieldNameTags = []string{"json", "yaml"}
 
-type CompareFunc func(*DiffNode, interface{}, reflect.Value, reflect.Value) error
+type CompareFunc func(reflect.Value, reflect.Value) (*DiffNode, error)
 
 type Comparator struct {
 	TagName           string
 	RespectSliceOrder bool
-	SkipPrivateFields bool
 }
 
 func NewComparator() *Comparator {
@@ -36,25 +34,22 @@ func Compare(a, b interface{}) (*DiffNode, error) {
 // Compare compares the given elements of the same type and returns
 // a comparison tree.
 func (c *Comparator) Compare(a, b interface{}) (*DiffNode, error) {
-	diff := NewNode()
-
-	if a == nil && b == nil {
-		return diff, nil
-	}
-
-	err := c.compare(diff, ROOT_KEY, reflect.ValueOf(a), reflect.ValueOf(b))
-	return diff.getChild(ROOT_KEY), err
+	return c.compare(reflect.ValueOf(a), reflect.ValueOf(b))
 }
 
 // compare recursively compares given values.
-func (c *Comparator) compare(parent *DiffNode, key interface{}, a, b reflect.Value) error {
+func (c *Comparator) compare(a, b reflect.Value) (*DiffNode, error) {
+	if a.Kind() == reflect.Invalid && b.Kind() == reflect.Invalid {
+		return NewLeaf(NONE, nil, nil), nil
+	}
+
 	cmpFunc := c.getCompareFunc(a, b)
 
 	if cmpFunc == nil {
-		return NewTypeMismatchError(a.Kind(), b.Kind())
+		return nil, NewTypeMismatchError(a.Kind(), b.Kind())
 	}
 
-	return cmpFunc(parent, key, a, b)
+	return cmpFunc(a, b)
 }
 
 // getCompareFunc returns a compare function based on the type of a
@@ -62,11 +57,17 @@ func (c *Comparator) compare(parent *DiffNode, key interface{}, a, b reflect.Val
 func (c *Comparator) getCompareFunc(a, b reflect.Value) CompareFunc {
 	switch {
 	case areOfKind(a, b, reflect.Invalid, reflect.Bool):
-		return c.cmpBool
-	case areOfKind(a, b, reflect.Invalid, reflect.Int):
-		return c.cmpInt
+		return c.cmpBasic
 	case areOfKind(a, b, reflect.Invalid, reflect.String):
-		return c.cmpString
+		return c.cmpBasic
+	case areOfKind(a, b, reflect.Invalid, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64):
+		return c.cmpBasic
+	case areOfKind(a, b, reflect.Invalid, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64):
+		return c.cmpBasic
+	case areOfKind(a, b, reflect.Invalid, reflect.Float32, reflect.Float64):
+		return c.cmpBasic
+	case areOfKind(a, b, reflect.Invalid, reflect.Complex64, reflect.Complex128):
+		return c.cmpBasic
 	case areOfKind(a, b, reflect.Invalid, reflect.Struct):
 		return c.cmpStruct
 	case areOfKind(a, b, reflect.Invalid, reflect.Slice):

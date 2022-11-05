@@ -5,24 +5,27 @@ import (
 	"reflect"
 )
 
-func (c *Comparator) cmpStruct(parent *DiffNode, key interface{}, a, b reflect.Value) error {
-	node := parent.addNode(key)
-
+func (c *Comparator) cmpStruct(a, b reflect.Value) (*DiffNode, error) {
 	if a.Kind() == reflect.Invalid {
-		return c.addPlainStruct(CREATE, node, key, b)
+		return c.addPlainStruct(CREATE, b)
 	}
 
 	if b.Kind() == reflect.Invalid {
-		return c.addPlainStruct(DELETE, node, key, a)
+		return c.addPlainStruct(DELETE, a)
 	}
 
+	node := NewEmptyNode()
+
 	for i := 0; i < a.NumField(); i++ {
-		if c.SkipPrivateFields && !a.CanInterface() {
+		var af, bf reflect.Value
+
+		field := a.Type().Field(i)
+
+		if !field.IsExported() {
 			continue
 		}
 
-		var af, bf reflect.Value
-		field := a.Type().Field(i)
+		fName := field.Name
 		tName := tagName(c.TagName, field)
 
 		if tName == "-" {
@@ -30,7 +33,7 @@ func (c *Comparator) cmpStruct(parent *DiffNode, key interface{}, a, b reflect.V
 		}
 
 		if tName == "" {
-			tName = field.Name
+			tName = fName
 		}
 
 		if a.Kind() != reflect.Invalid {
@@ -41,34 +44,40 @@ func (c *Comparator) cmpStruct(parent *DiffNode, key interface{}, a, b reflect.V
 			bf = b.FieldByName(field.Name)
 		}
 
-		err := c.compare(node, tName, af, bf)
+		child, err := c.compare(af, bf)
+
 		if err != nil {
-			return err
+			return nil, err
 		}
+
+		node.addChild(child, tName, fName)
 	}
 
-	return nil
+	return node, nil
 }
 
 // addPlainStruct recursively adds all elements of the struct to the diff tree
 // by comparing them to a nil value.
-func (c *Comparator) addPlainStruct(a ActionType, n *DiffNode, k interface{}, v reflect.Value) error {
+func (c *Comparator) addPlainStruct(a ActionType, v reflect.Value) (*DiffNode, error) {
 	if a != CREATE && a != DELETE {
-		return fmt.Errorf("Invalid action: %v", a)
-	}
-
-	if v.Kind() == reflect.Ptr {
-		v = reflect.Indirect(v)
+		return nil, fmt.Errorf("addPlainStruct: invalid action: %v", a)
 	}
 
 	if v.Kind() != reflect.Struct {
-		return fmt.Errorf("Cannot add plain struct! Invalid kind: %s", v.Kind())
+		return nil, fmt.Errorf("addPlainStruct: invalid kind: %s", v.Kind())
 	}
 
+	n := NewEmptyNode()
 	x := reflect.New(v.Type()).Elem()
 
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Type().Field(i)
+
+		if !field.IsExported() {
+			continue
+		}
+
+		fName := field.Name
 		tName := tagName(c.TagName, field)
 
 		if tName == "-" {
@@ -76,26 +85,30 @@ func (c *Comparator) addPlainStruct(a ActionType, n *DiffNode, k interface{}, v 
 		}
 
 		if tName == "" {
-			tName = field.Name
+			tName = fName
 		}
 
 		vf := v.Field(i)
 		xf := x.FieldByName(field.Name)
 
 		var err error
+		var child *DiffNode
+
 		switch a {
 		case CREATE:
-			err = c.compare(n, tName, xf, vf)
+			child, err = c.compare(xf, vf)
 		case DELETE:
-			err = c.compare(n, tName, vf, xf)
+			child, err = c.compare(vf, xf)
 		}
 
 		if err != nil {
-			return err
+			return nil, err
 		}
+
+		n.addChild(child, tName, fName)
 	}
 
 	n.setActionToLeafs(a)
 
-	return nil
+	return n, nil
 }

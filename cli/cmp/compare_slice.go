@@ -4,47 +4,37 @@ import (
 	"reflect"
 )
 
-func (c *Comparator) cmpSlice(parent *DiffNode, key interface{}, a, b reflect.Value) error {
-	node := parent.addNode(key)
-
-	if a.Kind() == reflect.Invalid && b.Kind() == reflect.Invalid {
-		return nil
-	}
-
+func (c *Comparator) cmpSlice(a, b reflect.Value) (*DiffNode, error) {
 	if a.Kind() == reflect.Invalid {
 		a = reflect.New(b.Type()).Elem()
-		return c.cmpSliceByIndex(node, key, a, b)
+		return c.cmpSliceByIndex(a, b)
 	}
 
 	if b.Kind() == reflect.Invalid {
 		b = reflect.New(a.Type()).Elem()
-		return c.cmpSliceByIndex(node, key, a, b)
-	}
-
-	if a.Kind() != b.Kind() {
-		return NewTypeMismatchError(a.Kind(), b.Kind())
+		return c.cmpSliceByIndex(a, b)
 	}
 
 	if c.areComparativeById(a, b) {
-		return c.cmpSliceById(node, key, a, b)
+		return c.cmpSliceById(a, b)
 	}
 
-	return c.cmpSliceByIndex(node, key, a, b)
+	return c.cmpSliceByIndex(a, b)
 }
 
 // cmpSliceByIndex compares slice elements located on the same index.
-func (c *Comparator) cmpSliceByIndex(n *DiffNode, key interface{}, a, b reflect.Value) error {
-	pairs := NewPairMap()
+func (c *Comparator) cmpSliceByIndex(a, b reflect.Value) (*DiffNode, error) {
+	var pairs Pairs
 
 	matched := []bool{}
 	for i := 0; i < a.Len(); i++ {
 		ai := a.Index(i)
 
 		if (c.RespectSliceOrder && !containsAtIndex(b, ai, i)) || (!c.RespectSliceOrder && !contains(b, ai, &matched)) {
-			pairs.addA(toSliceKey(i), &ai)
+			pairs.addA(toSliceKey(i), i, &ai)
 		} else {
-			pairs.addA(toSliceKey(i), &ai)
-			pairs.addB(toSliceKey(i), &ai)
+			pairs.addA(toSliceKey(i), i, &ai)
+			pairs.addB(toSliceKey(i), i, &ai)
 		}
 	}
 
@@ -54,27 +44,23 @@ func (c *Comparator) cmpSliceByIndex(n *DiffNode, key interface{}, a, b reflect.
 		bi := b.Index(i)
 
 		if c.RespectSliceOrder && !containsAtIndex(a, bi, i) {
-			pairs.addB(toSliceKey(i), &bi)
+			pairs.addB(toSliceKey(i), i, &bi)
 		}
 
 		if !c.RespectSliceOrder && !contains(a, bi, &matched) {
 			j := a.Len() + missingCount
-			pairs.addB(toSliceKey(j), &bi)
+			pairs.addB(toSliceKey(j), i, &bi)
 			missingCount++
 		}
 	}
 
-	if len(pairs.m) > 0 {
-		return c.diffPairs(n, key, pairs)
-	}
-
-	return nil
+	return c.diffPairs(pairs)
 }
 
 // cmpSliceByIndex compares slice elements based on the id element that is
 // set with a tag.
-func (c *Comparator) cmpSliceById(n *DiffNode, key interface{}, a, b reflect.Value) error {
-	pairs := NewPairMap()
+func (c *Comparator) cmpSliceById(a, b reflect.Value) (*DiffNode, error) {
+	var pairs Pairs
 
 	for i := 0; i < a.Len(); i++ {
 		ai := a.Index(i)
@@ -82,7 +68,7 @@ func (c *Comparator) cmpSliceById(n *DiffNode, key interface{}, a, b reflect.Val
 
 		id := tagOptionId(c.TagName, av)
 		if id != nil {
-			pairs.addA(toSliceKey(id), &ai)
+			pairs.addA(toSliceKey(id), i, &ai)
 		}
 	}
 
@@ -92,11 +78,11 @@ func (c *Comparator) cmpSliceById(n *DiffNode, key interface{}, a, b reflect.Val
 
 		id := tagOptionId(c.TagName, bv)
 		if id != nil {
-			pairs.addB(toSliceKey(id), &bi)
+			pairs.addB(toSliceKey(id), i, &bi)
 		}
 	}
 
-	return c.diffPairs(n, key, pairs)
+	return c.diffPairs(pairs)
 }
 
 // contains checks whether a slice s contains an element x

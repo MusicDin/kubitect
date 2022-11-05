@@ -4,23 +4,14 @@ import (
 	"reflect"
 )
 
-func (c *Comparator) cmpInterface(parent *DiffNode, key interface{}, a, b reflect.Value) error {
+func (c *Comparator) cmpInterface(a, b reflect.Value) (*DiffNode, error) {
 	if a.Kind() == reflect.Invalid {
-		parent.addLeaf(CREATE, key, nil, exportInterface(b))
+		return NewLeaf(CREATE, nil, exportInterface(b)), nil
 	}
 
 	if b.Kind() == reflect.Invalid {
-		parent.addLeaf(DELETE, key, exportInterface(a), nil)
-		return nil
+		return NewLeaf(DELETE, exportInterface(a), nil), nil
 	}
 
-	if a.Kind() != b.Kind() {
-		return NewTypeMismatchError(a.Kind(), b.Kind())
-	}
-
-	if a.IsNil() && b.IsNil() {
-		return nil
-	}
-
-	return c.compare(parent, key, a.Elem(), b.Elem())
+	return c.compare(a.Elem(), b.Elem())
 }

@@ -31,14 +31,14 @@ func triggerEvents[E ChangeEvent](n *DiffNode, events []E, triggered *[]E) {
 
 	for i, e := range *triggered {
 		if triggers(n, e) {
-			(*triggered)[i].TriggerPath(n.genericPath())
+			(*triggered)[i].TriggerPath(n.exactPath())
 			return
 		}
 	}
 
 	for _, e := range events {
 		if triggers(n, e) {
-			e.TriggerPath(n.genericPath())
+			e.TriggerPath(n.exactPath())
 			*triggered = append(*triggered, e)
 			return
 		}

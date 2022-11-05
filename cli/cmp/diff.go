@@ -1,6 +1,9 @@
 package cmp
 
-import "strings"
+import (
+	"reflect"
+	"strings"
+)
 
 type ActionType string
 
@@ -13,18 +16,18 @@ const (
 )
 
 type DiffNode struct {
-	key      string
-	path     []string
-	parent   *DiffNode
-	children []*DiffNode
-	action   ActionType
-	before   interface{}
-	after    interface{}
-	isId     bool
+	key       string
+	structKey string
+	parent    *DiffNode
+	children  []*DiffNode
+	action    ActionType
+	before    interface{}
+	after     interface{}
+	typ       reflect.Type
+	kind      reflect.Kind
 }
 
-// NewNode returns new empty node.
-func NewNode() *DiffNode {
+func NewEmptyNode() *DiffNode {
 	node := &DiffNode{
 		children: make([]*DiffNode, 0),
 		action:   UNKNOWN,
@@ -32,45 +35,44 @@ func NewNode() *DiffNode {
 	return node
 }
 
-// addNode returns a new node that is linked to the current node.
-func (n *DiffNode) addNode(key interface{}) *DiffNode {
-	for _, c := range n.children {
-		if c.key == key {
-			return c
-		}
+func NewNode(before, after interface{}) *DiffNode {
+	node := NewEmptyNode()
+	node.before = before
+	node.after = after
+
+	if before == nil && after == nil {
+		node.typ = reflect.TypeOf(nil)
+		node.kind = reflect.Invalid
+	} else if before == nil {
+		node.typ = reflect.TypeOf(after)
+		node.kind = node.typ.Kind()
+	} else {
+		node.typ = reflect.TypeOf(before)
+		node.kind = node.typ.Kind()
 	}
-
-	var node *DiffNode
-
-	node = NewNode()
-	node.key = toString(key)
-	node.parent = n
-
-	if !node.isRoot() {
-		path := make([]string, len(n.path))
-		copy(path, n.path)
-		node.path = append(path, node.key)
-	}
-
-	n.children = append(n.children, node)
 
 	return node
 }
 
-// addLeaf returns a new leaf that is linked to the current node.
-func (n *DiffNode) addLeaf(a ActionType, key, before, after interface{}) {
-	node := n.addNode(key)
+func NewLeaf(a ActionType, before, after interface{}) *DiffNode {
+	node := NewNode(before, after)
 	node.action = a
-	node.before = before
-	node.after = after
-	node.isId = (fromSliceKey(n.key) == before)
 
-	n.setActionToRoot(a)
+	return node
 }
 
-// setActionToRoot recursively propagates action across parent
-// nodes (to the root node).
-func (n *DiffNode) setActionToRoot(a ActionType) {
+func (n *DiffNode) addChild(c *DiffNode, key, structKey interface{}) {
+	c.parent = n
+	c.key = toString(key)
+	c.structKey = toString(structKey)
+
+	n.children = append(n.children, c)
+
+	n.setAction(c.action)
+}
+
+// setAction sets node action with consideration to the current action.
+func (n *DiffNode) setAction(a ActionType) {
 	switch n.action {
 	case CREATE:
 		if a != CREATE {
@@ -87,14 +89,9 @@ func (n *DiffNode) setActionToRoot(a ActionType) {
 	case UNKNOWN:
 		n.action = a
 	}
-
-	if n.parent != nil {
-		n.parent.setActionToRoot(a)
-	}
 }
 
-// setActionToLeafs recursively propagates action across all
-// children nodes.
+// setActionToLeafs recursively propagates action across all children nodes.
 func (n *DiffNode) setActionToLeafs(a ActionType) {
 	n.action = a
 
@@ -103,8 +100,7 @@ func (n *DiffNode) setActionToLeafs(a ActionType) {
 	}
 }
 
-// getChild returns a child node with a matching key and nil
-// otherwise.
+// getChild returns a child node with a matching key and nil otherwise.
 func (n *DiffNode) getChild(key interface{}) *DiffNode {
 	for _, v := range n.children {
 		if v.key == key {
@@ -114,18 +110,27 @@ func (n *DiffNode) getChild(key interface{}) *DiffNode {
 	return nil
 }
 
+// path returns node's path as a slice of strings.
+func (n *DiffNode) path() []string {
+	if n.parent == nil || n.parent.isRoot() {
+		return []string{n.key}
+	}
+
+	return append(n.parent.path(), n.key)
+}
+
 // exactPath returns node's path as a string with each section being
 // separated with a dot.
 func (n *DiffNode) exactPath() string {
-	return strings.Join(n.path, ".")
+	return strings.Join(n.path(), ".")
 }
 
-// genericPath returns the path as a string with all slice keys
-// replaced by an asterisk (*).
+// genericPath returns the path as a string with all slice keys replaced
+// by an asterisk (*).
 func (n *DiffNode) genericPath() string {
 	path := make([]string, 0)
 
-	for _, s := range n.path {
+	for _, s := range n.path() {
 		if isSliceKey(s) {
 			path = append(path, "[*]")
 		} else {
@@ -136,9 +141,9 @@ func (n *DiffNode) genericPath() string {
 	return strings.Join(path, ".")
 }
 
-// isRoot returns true if node's key matches the root key.
+// isRoot returns true if node's key is empty.
 func (n *DiffNode) isRoot() bool {
-	return n.key == ROOT_KEY
+	return n.key == ""
 }
 
 // isLeaf returns true if node has no children.
@@ -146,7 +151,8 @@ func (n *DiffNode) isLeaf() bool {
 	return len(n.children) == 0
 }
 
-// hasChanged returns true if node's action is not NIL or NONE.
+// hasChanged returns true if node's action indicates a change within the
+// node or any of its children.
 func (n *DiffNode) hasChanged() bool {
 	return !(n.action == NONE || n.action == UNKNOWN)
 }

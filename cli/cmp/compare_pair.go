@@ -4,23 +4,64 @@ import (
 	"reflect"
 )
 
-func (c *Comparator) diffPairs(parent *DiffNode, key interface{}, pl *PairMap) error {
-	for k := range pl.m {
-		null := reflect.ValueOf(nil)
+type Pair struct {
+	key       interface{}
+	structKey interface{}
+	A         *reflect.Value
+	B         *reflect.Value
+}
 
-		if pl.m[k].A == nil {
-			pl.m[k].A = &null
-		}
+type Pairs []*Pair
 
-		if pl.m[k].B == nil {
-			pl.m[k].B = &null
-		}
-
-		err := c.compare(parent, k, *pl.m[k].A, *pl.m[k].B)
-		if err != nil {
-			return err
+func (p *Pairs) get(key, structKey interface{}) *Pair {
+	for _, pair := range *p {
+		if pair.key == toString(key) {
+			return pair
 		}
 	}
 
-	return nil
+	pair := &Pair{
+		key:       toString(key),
+		structKey: toString(structKey),
+	}
+
+	*p = append(*p, pair)
+
+	return pair
+}
+
+func (p *Pairs) addA(key, structKey interface{}, v *reflect.Value) {
+	pair := p.get(key, structKey)
+	pair.A = v
+}
+
+func (p *Pairs) addB(key, structKey interface{}, v *reflect.Value) {
+	pair := p.get(key, structKey)
+	pair.B = v
+}
+
+func (c *Comparator) diffPairs(pl Pairs) (*DiffNode, error) {
+	node := NewEmptyNode()
+
+	for _, p := range pl {
+		null := reflect.ValueOf(nil)
+
+		if p.A == nil {
+			p.A = &null
+		}
+
+		if p.B == nil {
+			p.B = &null
+		}
+
+		child, err := c.compare(*p.A, *p.B)
+
+		if err != nil {
+			return nil, err
+		}
+
+		node.addChild(child, p.key, p.structKey)
+	}
+
+	return node, nil
 }

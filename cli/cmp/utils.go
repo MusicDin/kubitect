@@ -7,12 +7,6 @@ import (
 	"unsafe"
 )
 
-const (
-	flagStickyRO uintptr = 1 << 5
-	flagEmbedRO  uintptr = 1 << 6
-	flagRO       uintptr = flagStickyRO | flagEmbedRO
-)
-
 // toString converts an interface to a string.
 func toString(v interface{}) string {
 	rv := reflect.ValueOf(v)
@@ -53,8 +47,9 @@ func isSliceKey(k interface{}) bool {
 // exportInterface returns an interface of the reflect value.
 func exportInterface(v reflect.Value) interface{} {
 	if !v.CanInterface() {
-		flagTmp := (*uintptr)(unsafe.Pointer(uintptr(unsafe.Pointer(&v)) + 2*unsafe.Sizeof(uintptr(0))))
-		*flagTmp &^= flagRO
+		ptr := unsafe.Pointer(v.UnsafeAddr())
+		typ := v.Type()
+		return reflect.NewAt(typ, ptr).Elem().Interface()
 	}
 	return v.Interface()
 }

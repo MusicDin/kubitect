@@ -8,7 +8,7 @@ import (
 )
 
 type SimpleStruct struct {
-	value interface{}
+	Value interface{}
 }
 
 func TestChanges_Basic(t *testing.T) {
@@ -27,8 +27,8 @@ func TestChanges_StructCreate(t *testing.T) {
 
 	expect := Changes{
 		{
-			Path:        "value",
-			GenericPath: "value",
+			Path:        "Value",
+			GenericPath: "Value",
 			Before:      nil,
 			After:       "24",
 			Action:      CREATE,
@@ -44,8 +44,8 @@ func TestChanges_StructDelete(t *testing.T) {
 
 	expect := Changes{
 		{
-			Path:        "value",
-			GenericPath: "value",
+			Path:        "Value",
+			GenericPath: "Value",
 			Before:      "24",
 			After:       nil,
 			Action:      DELETE,
@@ -62,8 +62,8 @@ func TestChanges_StructModify(t *testing.T) {
 
 	expect := Changes{
 		{
-			Path:        "value",
-			GenericPath: "value",
+			Path:        "Value",
+			GenericPath: "Value",
 			Before:      "24",
 			After:       "42",
 			Action:      MODIFY,
@@ -76,9 +76,9 @@ func TestChanges_StructModify(t *testing.T) {
 
 func TestOutput_Yaml(t *testing.T) {
 	s := SimpleStruct{
-		value: []SimpleStruct{
+		Value: []SimpleStruct{
 			{
-				42,
+				"42",
 			},
 			{
 				24,
@@ -92,7 +92,7 @@ func TestOutput_Yaml(t *testing.T) {
 	d, _ = Compare(true, false)
 	assert.Equal(t, "true -> false", d.ToYaml())
 
-	expect := "value: \n  - value: 42\n  - value: 24"
+	expect := "Value: \n  - Value: \"42\"\n  - Value: 24"
 
 	d, _ = Compare(s, nil)
 	assert.Equal(t, expect, d.ToYaml())
@@ -103,9 +103,9 @@ func TestOutput_Yaml(t *testing.T) {
 
 func TestOutput_Json(t *testing.T) {
 	s := SimpleStruct{
-		value: []SimpleStruct{
+		Value: []SimpleStruct{
 			{
-				42,
+				"42",
 			},
 			{
 				24,
@@ -119,7 +119,7 @@ func TestOutput_Json(t *testing.T) {
 	d, _ = Compare(true, false)
 	assert.Equal(t, "true -> false", d.ToJson())
 
-	expect := "{\n  value: [\n    {\n      value: 42,\n    },\n    {\n      value: 24,\n    },\n  ],\n}"
+	expect := "{\n  Value: [\n    {\n      Value: \"42\",\n    },\n    {\n      Value: 24,\n    },\n  ],\n}"
 
 	d, _ = Compare(s, nil)
 	assert.Equal(t, expect, d.ToJson())
@@ -148,7 +148,7 @@ func (e *TestEvent) TriggerPath(path string) {
 
 func TestEvents_Triggered(t *testing.T) {
 	s := SimpleStruct{
-		value: []SimpleStruct{
+		Value: []SimpleStruct{
 			{
 				42,
 			},
@@ -161,15 +161,15 @@ func TestEvents_Triggered(t *testing.T) {
 	events := []*TestEvent{
 		{
 			action: DELETE,
-			path:   "value",
+			path:   "Value.[*]",
 		},
 	}
 
 	d, _ := Compare(s, nil)
 	triggered := TriggerEvents(d, events)
 	assert.Equal(t, events[0].Paths(), triggered[0].Paths())
-	assert.Equal(t, events[0].Action(), triggered[0].Action())
-	assert.Equal(t, []string{"value"}, triggered[0].triggerPaths)
+	assert.Equal(t, events[0].Paths(), triggered[0].Paths())
+	assert.Equal(t, []string{"Value.[0]", "Value.[1]"}, triggered[0].triggerPaths)
 
 	d, _ = Compare(s, s)
 	triggered = TriggerEvents(d, events)
@@ -178,7 +178,7 @@ func TestEvents_Triggered(t *testing.T) {
 
 func TestEvents_Changes(t *testing.T) {
 	s1 := SimpleStruct{
-		value: []SimpleStruct{
+		Value: []SimpleStruct{
 			{
 				42,
 			},
@@ -189,7 +189,7 @@ func TestEvents_Changes(t *testing.T) {
 	}
 
 	s2 := SimpleStruct{
-		value: []SimpleStruct{
+		Value: []SimpleStruct{
 			{
 				24,
 			},
@@ -199,21 +199,21 @@ func TestEvents_Changes(t *testing.T) {
 	events := []*TestEvent{
 		{
 			action: DELETE,
-			path:   "value",
+			path:   "Value",
 		},
 	}
 
 	expect := Changes{
 		{
-			Path:        "value.[0].value",
-			GenericPath: "value.[*].value",
+			Path:        "Value.[0].Value",
+			GenericPath: "Value.[*].Value",
 			Before:      42,
 			After:       nil,
 			Action:      DELETE,
 		},
 		{
-			Path:        "value.[1].value",
-			GenericPath: "value.[*].value",
+			Path:        "Value.[1].Value",
+			GenericPath: "Value.[*].Value",
 			Before:      24,
 			After:       nil,
 			Action:      DELETE,

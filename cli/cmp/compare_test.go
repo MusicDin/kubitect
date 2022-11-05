@@ -12,20 +12,17 @@ func toInterface(v interface{}) interface{} {
 }
 
 func TestTypeMismatchError(t *testing.T) {
-
 	a := 5
 	b := true
 
 	at := reflect.TypeOf(a).Kind()
 	bt := reflect.TypeOf(b).Kind()
 
-	expected := NewTypeMismatchError(at, bt)
-
 	_, err := Compare(a, b)
-	assert.Error(t, expected, err)
+	assert.EqualError(t, err, NewTypeMismatchError(at, bt).Error())
 }
 
-func TestBool(t *testing.T) {
+func TestBasic_Bool(t *testing.T) {
 	d, _ := Compare(true, true)
 	assert.False(t, d.hasChanged())
 
@@ -39,21 +36,7 @@ func TestBool(t *testing.T) {
 	assert.True(t, d.hasChanged())
 }
 
-func TestInt(t *testing.T) {
-	d, _ := Compare(42, 42)
-	assert.False(t, d.hasChanged())
-
-	d, _ = Compare(42, 24)
-	assert.True(t, d.hasChanged())
-
-	d, _ = Compare(42, nil)
-	assert.True(t, d.hasChanged())
-
-	d, _ = Compare(nil, 42)
-	assert.True(t, d.hasChanged())
-}
-
-func TestString(t *testing.T) {
+func TestBasic_String(t *testing.T) {
 	d, _ := Compare("test", "test")
 	assert.False(t, d.hasChanged())
 
@@ -65,6 +48,158 @@ func TestString(t *testing.T) {
 
 	d, _ = Compare(nil, "test")
 	assert.True(t, d.hasChanged())
+}
+
+func TestBasic_Int(t *testing.T) {
+	d, _ := Compare(1, 1)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(1, 2)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(1, nil)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(nil, 1)
+	assert.True(t, d.hasChanged())
+}
+
+func TestBasic_IntX(t *testing.T) {
+	d, _ := Compare(int8(1), int8(1))
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(int8(1), int8(2))
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(int16(1), int16(1))
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(int16(1), int16(2))
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(int32(1), int32(1))
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(int32(1), int32(2))
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(int64(1), int64(1))
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(int64(1), int64(2))
+	assert.True(t, d.hasChanged())
+
+	_, err := Compare(1, int32(1))
+	assert.EqualError(t, err, NewTypeMismatchError(reflect.Int, reflect.Int32).Error())
+}
+
+func TestBasic_Uint(t *testing.T) {
+	d, _ := Compare(uint(1), uint(1))
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(uint(1), uint(2))
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(uint(1), nil)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(nil, uint(1))
+	assert.True(t, d.hasChanged())
+
+	_, err := Compare(uint(1), 1)
+	assert.EqualError(t, err, NewTypeMismatchError(reflect.Uint, reflect.Int).Error())
+}
+
+func TestBasic_UintX(t *testing.T) {
+	d, _ := Compare(uint8(1), uint8(1))
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(uint8(1), uint8(2))
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(uint16(1), uint16(1))
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(uint16(1), uint16(2))
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(uint32(1), uint32(1))
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(uint32(1), uint32(2))
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(uint64(1), uint64(1))
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(uint64(1), uint64(2))
+	assert.True(t, d.hasChanged())
+
+	_, err := Compare(uint(1), uint32(1))
+	assert.EqualError(t, err, NewTypeMismatchError(reflect.Uint, reflect.Uint32).Error())
+}
+
+func TestBasic_Float(t *testing.T) {
+	d, _ := Compare(float32(24.42), float32(24.42))
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(float32(24.42), float32(42.24))
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(float32(24.42), nil)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(nil, float32(24.42))
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(float64(24.42), float64(24.42))
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(float64(24.42), float64(42.24))
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(float64(24.42), nil)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(nil, float64(24.42))
+	assert.True(t, d.hasChanged())
+
+	_, err := Compare(1.0, float32(1))
+	assert.EqualError(t, err, NewTypeMismatchError(reflect.Float64, reflect.Float32).Error())
+}
+
+func TestBasic_Complex(t *testing.T) {
+	var a128 complex128 = complex(4, 2)
+	var b128 complex128 = complex(2, 4)
+	var a64 complex64 = complex(4, 2)
+	var b64 complex64 = complex(2, 4)
+
+	d, _ := Compare(a64, a64)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(a64, b64)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(a64, nil)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(nil, a64)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(a128, a128)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(a128, b128)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(a128, nil)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(nil, a128)
+	assert.True(t, d.hasChanged())
+
+	_, err := Compare(a64, a128)
+	assert.EqualError(t, err, NewTypeMismatchError(reflect.Complex64, reflect.Complex128).Error())
 }
 
 func TestPointer(t *testing.T) {
@@ -81,6 +216,17 @@ func TestPointer(t *testing.T) {
 	assert.True(t, d.hasChanged())
 
 	d, _ = Compare(nil, &b)
+	assert.True(t, d.hasChanged())
+
+	var i *int
+
+	d, _ = Compare(i, i)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(i, nil)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(nil, i)
 	assert.True(t, d.hasChanged())
 }
 
@@ -101,7 +247,7 @@ func TestSlice(t *testing.T) {
 	assert.True(t, d.hasChanged())
 }
 
-func TestSliceEmpty(t *testing.T) {
+func TestSlice_Empty(t *testing.T) {
 	a := []bool{true}
 	b := []bool{}
 
@@ -122,7 +268,7 @@ func TestSliceEmpty(t *testing.T) {
 	assert.False(t, d.hasChanged())
 }
 
-func TestSliceRespectOrder(t *testing.T) {
+func TestSlice_RespectOrder(t *testing.T) {
 	a := []string{"a", "b"}
 	b := []string{"b", "a"}
 
@@ -142,9 +288,6 @@ func TestMap(t *testing.T) {
 	d, _ := Compare(m1, m1)
 	assert.False(t, d.hasChanged())
 
-	d, _ = Compare(m1, m4)
-	assert.False(t, d.hasChanged())
-
 	d, _ = Compare(m1, m2)
 	assert.True(t, d.hasChanged())
 
@@ -156,12 +299,14 @@ func TestMap(t *testing.T) {
 
 	d, _ = Compare(nil, m2)
 	assert.True(t, d.hasChanged())
+
+	_, err := Compare(m1, m4)
+	assert.EqualError(t, err, "Compared values have mismatched types (interface <> int).")
 }
 
-func TestStructSimple(t *testing.T) {
-
+func TestStruct_Simple(t *testing.T) {
 	type SimpleStruct struct {
-		value interface{}
+		Value interface{}
 	}
 
 	a := SimpleStruct{42}
@@ -180,25 +325,24 @@ func TestStructSimple(t *testing.T) {
 	assert.True(t, d.hasChanged())
 }
 
-func TestStructComplex(t *testing.T) {
-
+func TestStruct_Complex(t *testing.T) {
 	type SimpleStruct struct {
-		value interface{}
+		Value interface{}
 	}
 
 	type ComplexStruct struct {
-		simple SimpleStruct
+		Simple SimpleStruct
 	}
 
 	a := ComplexStruct{
-		simple: SimpleStruct{
-			value: 42,
+		Simple: SimpleStruct{
+			Value: 42,
 		},
 	}
 
 	b := ComplexStruct{
-		simple: SimpleStruct{
-			value: 24,
+		Simple: SimpleStruct{
+			Value: 24,
 		},
 	}
 
@@ -212,10 +356,9 @@ func TestStructComplex(t *testing.T) {
 	assert.True(t, d.hasChanged())
 }
 
-func TestStructFieldName(t *testing.T) {
-
+func TestStruct_UnexportedField(t *testing.T) {
 	type SimpleStruct struct {
-		value interface{} `customTag:"v"`
+		value interface{}
 	}
 
 	a := SimpleStruct{
@@ -226,9 +369,32 @@ func TestStructFieldName(t *testing.T) {
 		value: 24,
 	}
 
+	d, _ := Compare(a, a)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(a, b)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(&a, &b)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(&a, nil)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(nil, &b)
+	assert.True(t, d.hasChanged())
+}
+func TestStruct_FieldName(t *testing.T) {
+	type SimpleStruct struct {
+		Value interface{} `customTag:"v"`
+	}
+
+	a := SimpleStruct{42}
+	b := SimpleStruct{24}
+
 	d, _ := Compare(a, b)
 	ch := d.Changes()
-	assert.Equal(t, "value", ch[0].Path)
+	assert.Equal(t, "Value", ch[0].Path)
 
 	cmp := NewComparator()
 	cmp.TagName = "customTag"
@@ -238,41 +404,47 @@ func TestStructFieldName(t *testing.T) {
 	assert.Equal(t, "v", ch[0].Path)
 }
 
-func TestSliceId(t *testing.T) {
-
+func TestStruct_SkipField(t *testing.T) {
 	type SimpleStruct struct {
-		id interface{} `opt:",id"`
+		Value interface{} `customTag:"-"`
+	}
+
+	a := SimpleStruct{42}
+	b := SimpleStruct{24}
+
+	cmp := NewComparator()
+	cmp.TagName = "customTag"
+
+	d, _ := cmp.Compare(a, b)
+	assert.False(t, d.hasChanged())
+}
+
+func TestSlice_SliceId(t *testing.T) {
+	type SimpleStruct struct {
+		Id interface{} `opt:"id,id"`
 	}
 
 	a := []SimpleStruct{
-		{
-			id: 10,
-		},
-		{
-			id: 42,
-		},
+		{Id: 10},
+		{Id: 42},
 	}
 
 	b := []SimpleStruct{
-		{
-			id: 42,
-		},
-		{
-			id: 20,
-		},
+		{Id: 42},
+		{Id: 20},
 	}
 
 	expect := []Change{
 		{
-			Path:        "[0].id",
-			GenericPath: "[*].id",
+			Path:        "[0].Id",
+			GenericPath: "[*].Id",
 			Before:      10,
 			After:       nil,
 			Action:      DELETE,
 		},
 		{
-			Path:        "[2].id",
-			GenericPath: "[*].id",
+			Path:        "[2].Id",
+			GenericPath: "[*].Id",
 			Before:      nil,
 			After:       20,
 			Action:      CREATE,
@@ -290,6 +462,8 @@ func TestSliceId(t *testing.T) {
 
 	expect[0].Path = "[10].id"
 	expect[1].Path = "[20].id"
+	expect[0].GenericPath = "[*].id"
+	expect[1].GenericPath = "[*].id"
 
 	d, _ = cmp.Compare(a, b)
 	ch = d.Changes()
