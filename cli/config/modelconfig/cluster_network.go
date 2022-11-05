@@ -22,8 +22,6 @@ type Network struct {
 }
 
 func (n Network) Validate() error {
-
-	//v.Required().Errorf("Property '{.Field}' is required when network mode is set to %s.", BRIDGE),
 	return v.Struct(&n,
 		v.Field(&n.CIDR, v.Required()),
 		v.Field(&n.Gateway),

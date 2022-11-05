@@ -260,3 +260,36 @@ func TestConfig_MainPoolRef(t *testing.T) {
 
 	assert.NoError(t, cfg.Validate())
 }
+
+// When disk pool matches a host with no hostname, no extra error should
+// be thrown beside missing host name error.
+func TestConfig_MissingHostName(t *testing.T) {
+	cls := cluster
+	cls.Nodes = Nodes{
+		Master: Master{
+			Instances: []MasterInstance{
+				{
+					Id: &sample_name1,
+					DataDisks: []DataDisk{
+						{
+							Name: &sample_name1,
+							Size: &sample_dd_size,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	cfg := config
+	cfg.Cluster = cls
+	cfg.Hosts = []Host{
+		{
+			Connection: Connection{
+				Type: &localhost_type,
+			},
+		},
+	}
+
+	assert.EqualError(t, cfg.Validate(), "Field 'name' is required.")
+}

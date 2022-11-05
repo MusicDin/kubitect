@@ -43,8 +43,8 @@ const (
 	DEBIAN11 OSDistro = "debian11"
 )
 
-func (distro OSDistro) Validate() error {
-	return v.Var(distro, v.OneOf(UBUNTU, UBUNTU20, UBUNTU22, DEBIAN, DEBIAN11))
+func (d OSDistro) Validate() error {
+	return v.Var(d, v.OneOf(UBUNTU, UBUNTU20, UBUNTU22, DEBIAN, DEBIAN11))
 }
 
 type OSNetworkInterface string
@@ -55,8 +55,8 @@ func (nic OSNetworkInterface) Validate() error {
 
 type OSSource string
 
-func (s OSSource) Validate() error {
-	return v.Var(s) // TODO: URL or FileExists
+func (os OSSource) Validate() error {
+	return v.Var(os) // TODO: URL or FileExists
 }
 
 type NodeTemplateSSH struct {
@@ -64,8 +64,8 @@ type NodeTemplateSSH struct {
 	PrivateKeyPath  *File `yaml:"privateKeyPath"`
 }
 
-func (s NodeTemplateSSH) Validate() error {
-	return v.Struct(&s,
-		v.Field(&s.PrivateKeyPath),
+func (ssh NodeTemplateSSH) Validate() error {
+	return v.Struct(&ssh,
+		v.Field(&ssh.PrivateKeyPath),
 	)
 }

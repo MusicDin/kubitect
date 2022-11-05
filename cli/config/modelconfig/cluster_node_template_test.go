@@ -21,13 +21,19 @@ func TestOSNetworkInterface(t *testing.T) {
 
 func TestOS(t *testing.T) {
 	distro := UBUNTU
+	source := OSSource("./cluster_node_template_test.go")
 
 	os1 := OS{
 		Distro: &distro,
 	}
 
+	os2 := OS{
+		Source: &source,
+	}
+
 	assert.NoError(t, OS{}.Validate())
 	assert.NoError(t, os1.Validate())
+	assert.NoError(t, os2.Validate())
 }
 
 func TestNodeTemplateSSH(t *testing.T) {
