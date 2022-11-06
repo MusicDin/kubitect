@@ -1,49 +1,57 @@
 package cmp
 
-import (
-	"reflect"
-)
+import "reflect"
 
 type Pair struct {
-	key       interface{}
-	structKey interface{}
-	A         *reflect.Value
-	B         *reflect.Value
+	key string
+	A   *reflect.Value
+	B   *reflect.Value
 }
 
-type Pairs []*Pair
+type Pairs struct {
+	pairs []*Pair
+	typ   reflect.Type
+	kind  reflect.Kind
+}
 
-func (p *Pairs) get(key, structKey interface{}) *Pair {
-	for _, pair := range *p {
-		if pair.key == toString(key) {
-			return pair
+func NewPairs(t reflect.Type) Pairs {
+	return Pairs{
+		pairs: make([]*Pair, 0),
+		typ:   t,
+		kind:  t.Kind(),
+	}
+}
+
+func (ps *Pairs) addA(key interface{}, v *reflect.Value) {
+	p := ps.get(key)
+	p.A = v
+}
+
+func (ps *Pairs) addB(key interface{}, v *reflect.Value) {
+	p := ps.get(key)
+	p.B = v
+}
+
+func (ps *Pairs) get(key interface{}) *Pair {
+	for _, p := range ps.pairs {
+		if p.key == toString(key) {
+			return p
 		}
 	}
 
-	pair := &Pair{
-		key:       toString(key),
-		structKey: toString(structKey),
+	p := &Pair{
+		key: toString(key),
 	}
 
-	*p = append(*p, pair)
+	ps.pairs = append(ps.pairs, p)
 
-	return pair
+	return p
 }
 
-func (p *Pairs) addA(key, structKey interface{}, v *reflect.Value) {
-	pair := p.get(key, structKey)
-	pair.A = v
-}
+func (c *Comparator) cmpPairs(ps Pairs) (*DiffNode, error) {
+	node := NewEmptyNode(ps.typ, ps.kind)
 
-func (p *Pairs) addB(key, structKey interface{}, v *reflect.Value) {
-	pair := p.get(key, structKey)
-	pair.B = v
-}
-
-func (c *Comparator) diffPairs(pl Pairs) (*DiffNode, error) {
-	node := NewEmptyNode()
-
-	for _, p := range pl {
+	for _, p := range ps.pairs {
 		null := reflect.ValueOf(nil)
 
 		if p.A == nil {
@@ -60,7 +68,7 @@ func (c *Comparator) diffPairs(pl Pairs) (*DiffNode, error) {
 			return nil, err
 		}
 
-		node.addChild(child, p.key, p.structKey)
+		node.addChild(child, p.key, p.key)
 	}
 
 	return node, nil

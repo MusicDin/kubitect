@@ -14,23 +14,23 @@ func (c *Comparator) cmpMap(a, b reflect.Value) (*DiffNode, error) {
 		return c.addPlainMap(DELETE, a)
 	}
 
-	var pairs Pairs
+	pairs := NewPairs(a.Type())
 
 	for _, k := range a.MapKeys() {
 		ai := a.MapIndex(k)
 		if ai.Kind() != reflect.Invalid {
-			pairs.addA(k, k, &ai)
+			pairs.addA(k, &ai)
 		}
 	}
 
 	for _, k := range b.MapKeys() {
 		bi := b.MapIndex(k)
 		if bi.Kind() != reflect.Invalid {
-			pairs.addB(k, k, &bi)
+			pairs.addB(k, &bi)
 		}
 	}
 
-	return c.diffPairs(pairs)
+	return c.cmpPairs(pairs)
 }
 
 // addPlainMap recursively adds all elements of the map to the diff tree
@@ -41,30 +41,24 @@ func (c *Comparator) addPlainMap(a ActionType, v reflect.Value) (*DiffNode, erro
 	}
 
 	x := reflect.New(v.Type()).Elem()
-	node := NewEmptyNode()
+	pairs := NewPairs(v.Type())
 
 	for _, k := range v.MapKeys() {
 		vi := v.MapIndex(k)
 		xi := x.MapIndex(k)
 
-		var err error
-		var child *DiffNode
-
 		switch a {
 		case CREATE:
-			child, err = c.compare(xi, vi)
+			pairs.addA(k, &xi)
+			pairs.addB(k, &vi)
 		case DELETE:
-			child, err = c.compare(vi, xi)
+			pairs.addA(k, &vi)
+			pairs.addB(k, &xi)
 		}
-
-		if err != nil {
-			return nil, err
-		}
-
-		node.addChild(child, k, k)
 	}
 
+	node, err := c.cmpPairs(pairs)
 	node.setActionToLeafs(a)
 
-	return node, nil
+	return node, err
 }

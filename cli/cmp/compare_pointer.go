@@ -1,8 +1,6 @@
 package cmp
 
-import (
-	"reflect"
-)
+import "reflect"
 
 func (c *Comparator) cmpPointer(a, b reflect.Value) (*DiffNode, error) {
 	if a.Kind() == reflect.Invalid {
@@ -10,7 +8,7 @@ func (c *Comparator) cmpPointer(a, b reflect.Value) (*DiffNode, error) {
 			return c.compare(reflect.ValueOf(nil), reflect.Indirect(b))
 		}
 
-		return NewLeaf(MODIFY, nil, exportInterface(b)), nil
+		return NewLeaf(MODIFY, nil, b.Interface()), nil
 	}
 
 	if b.Kind() == reflect.Invalid {
@@ -18,7 +16,7 @@ func (c *Comparator) cmpPointer(a, b reflect.Value) (*DiffNode, error) {
 			return c.compare(reflect.Indirect(a), reflect.ValueOf(nil))
 		}
 
-		return NewLeaf(DELETE, exportInterface(a), nil), nil
+		return NewLeaf(DELETE, a.Interface(), nil), nil
 	}
 
 	if a.IsNil() && b.IsNil() {

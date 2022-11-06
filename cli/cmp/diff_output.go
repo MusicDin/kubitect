@@ -38,19 +38,19 @@ func (n *DiffNode) ToJsonDiff() string {
 func (n *DiffNode) toYaml(depth int, tagList, diffOnly bool) string {
 	var output string
 
-	if diffOnly && !n.hasChanged() { //&& !n.isId {
+	if diffOnly && !n.hasChanged() { // TODO: && !n.isId {
 		return ""
 	}
 
 	key := n.stringKey() + ": "
 	indent := fmt.Sprintf("%*s", depth*2, "")
-	isListIndex := isSliceKey(n.key)
+	isSliceElem := n.isSliceElem()
 
-	if isListIndex || n.isRoot() {
+	if isSliceElem || n.isRoot() {
 		key = ""
 	}
 
-	if tagList || (isListIndex && n.isLeaf()) {
+	if tagList || (isSliceElem && n.isLeaf()) {
 		if len(indent) > 1 {
 			indent = indent[:len(indent)-2]
 		}
@@ -72,7 +72,7 @@ func (n *DiffNode) toYaml(depth int, tagList, diffOnly bool) string {
 
 	for i, k := range n.sortChildrenKeys() {
 		v := n.getChild(k)
-		tagList = (isListIndex && i == 0)
+		tagList = (isSliceElem && i == 0)
 		output += v.toYaml(depth, tagList, diffOnly)
 	}
 
@@ -83,14 +83,14 @@ func (n *DiffNode) toYaml(depth int, tagList, diffOnly bool) string {
 func (n *DiffNode) toJson(depth int, diffOnly bool) string {
 	var output string
 
-	if diffOnly && !n.hasChanged() { //&& !n.isId {
+	if diffOnly && !n.hasChanged() { // TODO: && !n.isId {
 		return ""
 	}
 
 	key := n.key + ": "
 	indent := fmt.Sprintf("%*s", depth*2, "")
 
-	if isSliceKey(n.key) || n.isRoot() {
+	if n.isSliceElem() || n.isRoot() {
 		key = ""
 	}
 
@@ -100,12 +100,11 @@ func (n *DiffNode) toJson(depth int, diffOnly bool) string {
 	}
 
 	keys := n.sortChildrenKeys()
-	isList := isSliceKey(keys[0])
 
 	annoA := "{"
 	annoB := "}"
 
-	if isList {
+	if n.isSlice() {
 		annoA = "["
 		annoB = "]"
 	}

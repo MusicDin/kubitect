@@ -1,18 +1,14 @@
 package cmp
 
-import (
-	"reflect"
-)
+import "reflect"
 
 func (c *Comparator) cmpSlice(a, b reflect.Value) (*DiffNode, error) {
 	if a.Kind() == reflect.Invalid {
 		a = reflect.New(b.Type()).Elem()
-		return c.cmpSliceByIndex(a, b)
 	}
 
 	if b.Kind() == reflect.Invalid {
 		b = reflect.New(a.Type()).Elem()
-		return c.cmpSliceByIndex(a, b)
 	}
 
 	if c.areComparativeById(a, b) {
@@ -24,17 +20,17 @@ func (c *Comparator) cmpSlice(a, b reflect.Value) (*DiffNode, error) {
 
 // cmpSliceByIndex compares slice elements located on the same index.
 func (c *Comparator) cmpSliceByIndex(a, b reflect.Value) (*DiffNode, error) {
-	var pairs Pairs
+	pairs := NewPairs(a.Type())
 
 	matched := []bool{}
 	for i := 0; i < a.Len(); i++ {
 		ai := a.Index(i)
 
 		if (c.RespectSliceOrder && !containsAtIndex(b, ai, i)) || (!c.RespectSliceOrder && !contains(b, ai, &matched)) {
-			pairs.addA(toSliceKey(i), i, &ai)
+			pairs.addA(i, &ai)
 		} else {
-			pairs.addA(toSliceKey(i), i, &ai)
-			pairs.addB(toSliceKey(i), i, &ai)
+			pairs.addA(i, &ai)
+			pairs.addB(i, &ai)
 		}
 	}
 
@@ -44,23 +40,23 @@ func (c *Comparator) cmpSliceByIndex(a, b reflect.Value) (*DiffNode, error) {
 		bi := b.Index(i)
 
 		if c.RespectSliceOrder && !containsAtIndex(a, bi, i) {
-			pairs.addB(toSliceKey(i), i, &bi)
+			pairs.addB(i, &bi)
 		}
 
 		if !c.RespectSliceOrder && !contains(a, bi, &matched) {
 			j := a.Len() + missingCount
-			pairs.addB(toSliceKey(j), i, &bi)
+			pairs.addB(j, &bi)
 			missingCount++
 		}
 	}
 
-	return c.diffPairs(pairs)
+	return c.cmpPairs(pairs)
 }
 
 // cmpSliceByIndex compares slice elements based on the id element that is
 // set with a tag.
 func (c *Comparator) cmpSliceById(a, b reflect.Value) (*DiffNode, error) {
-	var pairs Pairs
+	pairs := NewPairs(a.Type())
 
 	for i := 0; i < a.Len(); i++ {
 		ai := a.Index(i)
@@ -68,7 +64,7 @@ func (c *Comparator) cmpSliceById(a, b reflect.Value) (*DiffNode, error) {
 
 		id := tagOptionId(c.TagName, av)
 		if id != nil {
-			pairs.addA(toSliceKey(id), i, &ai)
+			pairs.addA(id, &ai)
 		}
 	}
 
@@ -78,11 +74,39 @@ func (c *Comparator) cmpSliceById(a, b reflect.Value) (*DiffNode, error) {
 
 		id := tagOptionId(c.TagName, bv)
 		if id != nil {
-			pairs.addB(toSliceKey(id), i, &bi)
+			pairs.addB(id, &bi)
 		}
 	}
 
-	return c.diffPairs(pairs)
+	return c.cmpPairs(pairs)
+}
+
+// areComparativeById returns true if one of the values contains a
+// tag option representing an ID element.
+func (c *Comparator) areComparativeById(a, b reflect.Value) bool {
+	if a.Len() > 0 {
+		ai := a.Index(0)
+		av := getDeepValue(ai)
+
+		if av.Kind() == reflect.Struct {
+			if tagOptionId(c.TagName, av) != nil {
+				return true
+			}
+		}
+	}
+
+	if b.Len() > 0 {
+		bi := b.Index(0)
+		bv := getDeepValue(bi)
+
+		if bv.Kind() == reflect.Struct {
+			if tagOptionId(c.TagName, bv) != nil {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 // contains checks whether a slice s contains an element x

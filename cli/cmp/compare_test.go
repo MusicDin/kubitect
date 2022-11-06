@@ -230,80 +230,6 @@ func TestPointer(t *testing.T) {
 	assert.True(t, d.hasChanged())
 }
 
-func TestSlice(t *testing.T) {
-	a := []int{1, 2}
-	b := []int{2, 1}
-
-	d, _ := Compare(a, a)
-	assert.False(t, d.hasChanged())
-
-	d, _ = Compare(a, b)
-	assert.False(t, d.hasChanged())
-
-	d, _ = Compare(a, nil)
-	assert.True(t, d.hasChanged())
-
-	d, _ = Compare(nil, b)
-	assert.True(t, d.hasChanged())
-}
-
-func TestSlice_Empty(t *testing.T) {
-	a := []bool{true}
-	b := []bool{}
-
-	d, _ := Compare(a, a)
-	assert.False(t, d.hasChanged())
-
-	d, _ = Compare(a, b)
-	assert.True(t, d.hasChanged())
-
-	// Both slice of length 0 and nil represent slice zero value.
-	d, _ = Compare(b, nil)
-	assert.False(t, d.hasChanged())
-
-	d, _ = Compare(&b, nil)
-	assert.False(t, d.hasChanged())
-
-	d, _ = Compare(nil, b)
-	assert.False(t, d.hasChanged())
-}
-
-func TestSlice_RespectOrder(t *testing.T) {
-	a := []string{"a", "b"}
-	b := []string{"b", "a"}
-
-	cmp := NewComparator()
-	cmp.RespectSliceOrder = true
-
-	d, _ := cmp.Compare(a, b)
-	assert.True(t, d.hasChanged())
-}
-
-func TestMap(t *testing.T) {
-	m1 := map[string]interface{}{"test": 1}
-	m2 := map[string]interface{}{"test": 2}
-	m3 := map[string]interface{}{"test2": 1}
-	m4 := map[string]int{"test": 1}
-
-	d, _ := Compare(m1, m1)
-	assert.False(t, d.hasChanged())
-
-	d, _ = Compare(m1, m2)
-	assert.True(t, d.hasChanged())
-
-	d, _ = Compare(m3, m1)
-	assert.True(t, d.hasChanged())
-
-	d, _ = Compare(m1, nil)
-	assert.True(t, d.hasChanged())
-
-	d, _ = Compare(nil, m2)
-	assert.True(t, d.hasChanged())
-
-	_, err := Compare(m1, m4)
-	assert.EqualError(t, err, "Compared values have mismatched types (interface <> int).")
-}
-
 func TestStruct_Simple(t *testing.T) {
 	type SimpleStruct struct {
 		Value interface{}
@@ -384,6 +310,7 @@ func TestStruct_UnexportedField(t *testing.T) {
 	d, _ = Compare(nil, &b)
 	assert.True(t, d.hasChanged())
 }
+
 func TestStruct_FieldName(t *testing.T) {
 	type SimpleStruct struct {
 		Value interface{} `customTag:"v"`
@@ -419,6 +346,80 @@ func TestStruct_SkipField(t *testing.T) {
 	assert.False(t, d.hasChanged())
 }
 
+func TestMap(t *testing.T) {
+	m1 := map[string]interface{}{"test": 1}
+	m2 := map[string]interface{}{"test": 2}
+	m3 := map[string]interface{}{"test2": 1}
+	m4 := map[string]int{"test": 1}
+
+	d, _ := Compare(m1, m1)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(m1, m2)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(m3, m1)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(m1, nil)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(nil, m2)
+	assert.True(t, d.hasChanged())
+
+	_, err := Compare(m1, m4)
+	assert.EqualError(t, err, "Compared values have mismatched types (interface <> int).")
+}
+
+func TestSlice(t *testing.T) {
+	a := []int{1, 2}
+	b := []int{2, 1}
+
+	d, _ := Compare(a, a)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(a, b)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(a, nil)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(nil, b)
+	assert.True(t, d.hasChanged())
+}
+
+func TestSlice_Empty(t *testing.T) {
+	a := []bool{true}
+	b := []bool{}
+
+	d, _ := Compare(a, a)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(a, b)
+	assert.True(t, d.hasChanged())
+
+	// Both slice of length 0 and nil represent slice zero value.
+	d, _ = Compare(b, nil)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(&b, nil)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(nil, b)
+	assert.False(t, d.hasChanged())
+}
+
+func TestSlice_RespectOrder(t *testing.T) {
+	a := []string{"a", "b"}
+	b := []string{"b", "a"}
+
+	cmp := NewComparator()
+	cmp.RespectSliceOrder = true
+
+	d, _ := cmp.Compare(a, b)
+	assert.True(t, d.hasChanged())
+}
+
 func TestSlice_SliceId(t *testing.T) {
 	type SimpleStruct struct {
 		Id interface{} `opt:"id,id"`
@@ -436,15 +437,17 @@ func TestSlice_SliceId(t *testing.T) {
 
 	expect := []Change{
 		{
-			Path:        "[0].Id",
-			GenericPath: "[*].Id",
+			Path:        "0.Id",
+			StructPath:  "0.Id",
+			GenericPath: "*.Id",
 			Before:      10,
 			After:       nil,
 			Action:      DELETE,
 		},
 		{
-			Path:        "[2].Id",
-			GenericPath: "[*].Id",
+			Path:        "2.Id",
+			StructPath:  "2.Id",
+			GenericPath: "*.Id",
 			Before:      nil,
 			After:       20,
 			Action:      CREATE,
@@ -460,13 +463,68 @@ func TestSlice_SliceId(t *testing.T) {
 
 	cmp.TagName = "opt"
 
-	expect[0].Path = "[10].id"
-	expect[1].Path = "[20].id"
-	expect[0].GenericPath = "[*].id"
-	expect[1].GenericPath = "[*].id"
+	expect[0].Path = "10.id"
+	expect[1].Path = "20.id"
+	expect[0].StructPath = "10.Id"
+	expect[1].StructPath = "20.Id"
 
 	d, _ = cmp.Compare(a, b)
 	ch = d.Changes()
 
 	assert.ElementsMatch(t, expect, ch)
+}
+
+func TestSlice_SliceIdToNilElem(t *testing.T) {
+	type SimpleStruct struct {
+		Id interface{} `cmp:"id,id"`
+	}
+
+	a := []SimpleStruct{
+		{Id: 10},
+		{Id: 42},
+	}
+
+	expect := []Change{
+		{
+			Path:        "10.id",
+			StructPath:  "10.Id",
+			GenericPath: "*.Id",
+			Before:      10,
+			After:       nil,
+			Action:      DELETE,
+		},
+		{
+			Path:        "42.id",
+			StructPath:  "42.Id",
+			GenericPath: "*.Id",
+			Before:      42,
+			After:       nil,
+			Action:      DELETE,
+		},
+	}
+
+	d, _ := Compare(a, nil)
+	ch := d.Changes()
+
+	assert.ElementsMatch(t, expect, ch)
+}
+
+func TestSlice_UnexportedField(t *testing.T) {
+	type SimpleStruct struct {
+		value interface{} `cmp:",id"`
+	}
+
+	a := []SimpleStruct{
+		{42},
+		{24},
+	}
+
+	d, _ := Compare(a, a)
+	assert.False(t, d.hasChanged())
+
+	d, _ = Compare(&a, nil)
+	assert.True(t, d.hasChanged())
+
+	d, _ = Compare(nil, a)
+	assert.True(t, d.hasChanged())
 }

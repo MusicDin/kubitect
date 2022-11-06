@@ -28,6 +28,7 @@ func TestChanges_StructCreate(t *testing.T) {
 	expect := Changes{
 		{
 			Path:        "Value",
+			StructPath:  "Value",
 			GenericPath: "Value",
 			Before:      nil,
 			After:       "24",
@@ -45,6 +46,7 @@ func TestChanges_StructDelete(t *testing.T) {
 	expect := Changes{
 		{
 			Path:        "Value",
+			StructPath:  "Value",
 			GenericPath: "Value",
 			Before:      "24",
 			After:       nil,
@@ -63,6 +65,7 @@ func TestChanges_StructModify(t *testing.T) {
 	expect := Changes{
 		{
 			Path:        "Value",
+			StructPath:  "Value",
 			GenericPath: "Value",
 			Before:      "24",
 			After:       "42",
@@ -77,12 +80,8 @@ func TestChanges_StructModify(t *testing.T) {
 func TestOutput_Yaml(t *testing.T) {
 	s := SimpleStruct{
 		Value: []SimpleStruct{
-			{
-				"42",
-			},
-			{
-				24,
-			},
+			{"42"},
+			{24},
 		},
 	}
 
@@ -104,12 +103,8 @@ func TestOutput_Yaml(t *testing.T) {
 func TestOutput_Json(t *testing.T) {
 	s := SimpleStruct{
 		Value: []SimpleStruct{
-			{
-				"42",
-			},
-			{
-				24,
-			},
+			{"42"},
+			{24},
 		},
 	}
 
@@ -149,19 +144,15 @@ func (e *TestEvent) TriggerPath(path string) {
 func TestEvents_Triggered(t *testing.T) {
 	s := SimpleStruct{
 		Value: []SimpleStruct{
-			{
-				42,
-			},
-			{
-				24,
-			},
+			{42},
+			{24},
 		},
 	}
 
 	events := []*TestEvent{
 		{
 			action: DELETE,
-			path:   "Value.[*]",
+			path:   "Value.*",
 		},
 	}
 
@@ -169,7 +160,7 @@ func TestEvents_Triggered(t *testing.T) {
 	triggered := TriggerEvents(d, events)
 	assert.Equal(t, events[0].Paths(), triggered[0].Paths())
 	assert.Equal(t, events[0].Paths(), triggered[0].Paths())
-	assert.Equal(t, []string{"Value.[0]", "Value.[1]"}, triggered[0].triggerPaths)
+	assert.Equal(t, []string{"Value.0", "Value.1"}, triggered[0].triggerPaths)
 
 	d, _ = Compare(s, s)
 	triggered = TriggerEvents(d, events)
@@ -179,20 +170,14 @@ func TestEvents_Triggered(t *testing.T) {
 func TestEvents_Changes(t *testing.T) {
 	s1 := SimpleStruct{
 		Value: []SimpleStruct{
-			{
-				42,
-			},
-			{
-				24,
-			},
+			{42},
+			{24},
 		},
 	}
 
 	s2 := SimpleStruct{
 		Value: []SimpleStruct{
-			{
-				24,
-			},
+			{24},
 		},
 	}
 
@@ -205,15 +190,17 @@ func TestEvents_Changes(t *testing.T) {
 
 	expect := Changes{
 		{
-			Path:        "Value.[0].Value",
-			GenericPath: "Value.[*].Value",
+			Path:        "Value.0.Value",
+			StructPath:  "Value.0.Value",
+			GenericPath: "Value.*.Value",
 			Before:      42,
 			After:       nil,
 			Action:      DELETE,
 		},
 		{
-			Path:        "Value.[1].Value",
-			GenericPath: "Value.[*].Value",
+			Path:        "Value.1.Value",
+			StructPath:  "Value.1.Value",
+			GenericPath: "Value.*.Value",
 			Before:      24,
 			After:       nil,
 			Action:      DELETE,

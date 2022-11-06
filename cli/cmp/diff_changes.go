@@ -7,6 +7,7 @@ import (
 
 type Change struct {
 	Path        string
+	StructPath  string
 	GenericPath string
 	Before      interface{}
 	After       interface{}
@@ -40,6 +41,7 @@ func (n *DiffNode) Changes() Changes {
 func (n DiffNode) toChange() Change {
 	return Change{
 		Path:        n.exactPath(),
+		StructPath:  n.structPath(),
 		GenericPath: n.genericPath(),
 		Before:      n.before,
 		After:       n.after,

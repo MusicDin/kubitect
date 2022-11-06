@@ -31,8 +31,7 @@ func Compare(a, b interface{}) (*DiffNode, error) {
 	return c.Compare(a, b)
 }
 
-// Compare compares the given elements of the same type and returns
-// a comparison tree.
+// Compare compares the given values and returns a comparison tree.
 func (c *Comparator) Compare(a, b interface{}) (*DiffNode, error) {
 	return c.compare(reflect.ValueOf(a), reflect.ValueOf(b))
 }
@@ -81,34 +80,6 @@ func (c *Comparator) getCompareFunc(a, b reflect.Value) CompareFunc {
 	default:
 		return nil
 	}
-}
-
-// areComparativeById returns true if one of the values contains a
-// tag option representing an ID element.
-func (c *Comparator) areComparativeById(a, b reflect.Value) bool {
-	if a.Len() > 0 {
-		ai := a.Index(0)
-		av := getDeepValue(ai)
-
-		if av.Kind() == reflect.Struct {
-			if tagOptionId(c.TagName, av) != nil {
-				return true
-			}
-		}
-	}
-
-	if b.Len() > 0 {
-		bi := b.Index(0)
-		bv := getDeepValue(bi)
-
-		if bv.Kind() == reflect.Struct {
-			if tagOptionId(c.TagName, bv) != nil {
-				return true
-			}
-		}
-	}
-
-	return false
 }
 
 func areOfKind(a, b reflect.Value, kinds ...reflect.Kind) bool {

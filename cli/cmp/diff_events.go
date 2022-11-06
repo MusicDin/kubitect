@@ -1,8 +1,6 @@
 package cmp
 
-import (
-	"strings"
-)
+import "strings"
 
 type ChangeEvent interface {
 	Action() ActionType // Affected action

@@ -3,7 +3,6 @@ package cmp
 import (
 	"fmt"
 	"reflect"
-	"strings"
 	"unsafe"
 )
 
@@ -19,39 +18,20 @@ func toString(v interface{}) string {
 	}
 }
 
-// toSliceKey wraps index into square brackets.
-func toSliceKey(key interface{}) string {
-	return "[" + toString(key) + "]"
-}
-
-// fromSliceKey unwraps index out of square brackets.
-func fromSliceKey(k interface{}) string {
-	if !isSliceKey(k) {
-		return ""
-	}
-
-	key := toString(k)
-	key = strings.TrimPrefix(key, "[")
-	key = strings.TrimSuffix(key, "]")
-
-	return key
-}
-
-// isSliceKey checks whether given key represents a slice key,
-// which means that it starts with "[" and ends with "]".
-func isSliceKey(k interface{}) bool {
-	s := toString(k)
-	return strings.HasPrefix(s, "[") && strings.HasSuffix(s, "]")
-}
-
 // exportInterface returns an interface of the reflect value.
 func exportInterface(v reflect.Value) interface{} {
-	if !v.CanInterface() {
-		ptr := unsafe.Pointer(v.UnsafeAddr())
-		typ := v.Type()
-		return reflect.NewAt(typ, ptr).Elem().Interface()
+	if !v.CanAddr() {
+		return nil
 	}
-	return v.Interface()
+
+	if v.CanInterface() {
+		return v.Interface()
+	}
+
+	ptr := unsafe.Pointer(v.UnsafeAddr())
+	copy := reflect.NewAt(v.Type(), ptr)
+
+	return copy.Elem().Interface()
 }
 
 // getDeepValue recursively returns the actual value that a
