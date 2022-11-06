@@ -99,11 +99,11 @@ var (
 	UpgradeEvents = []OnChangeEvent{
 		{
 			cType: OK,
-			path:  "kubernetes.version",
+			path:  "Kubernetes.Version",
 		},
 		{
 			cType: OK,
-			path:  "kubernetes.kubespray.version",
+			path:  "Kubernetes.Kubespray.Version",
 		},
 	}
 
@@ -111,22 +111,22 @@ var (
 		{
 			cType:  OK,
 			action: cmp.DELETE,
-			path:   "cluster.nodes.worker.instances.[*]",
+			path:   "Cluster.Nodes.Worker.Instances.*",
 		},
 		{
 			cType:  OK,
 			action: cmp.CREATE,
-			path:   "cluster.nodes.worker.instances.[*]",
+			path:   "Cluster.Nodes.Worker.Instances.*",
 		},
 		{
 			cType:  OK,
 			action: cmp.DELETE,
-			path:   "cluster.nodes.loadBalancer.instances.[*]",
+			path:   "Cluster.Nodes.LoadBalancer.Instances.*",
 		},
 		{
 			cType:  OK,
 			action: cmp.CREATE,
-			path:   "cluster.nodes.loadBalancer.instances.[*]",
+			path:   "Cluster.Nodes.LoadBalancer.Instances.*",
 		},
 	}
 
@@ -135,36 +135,36 @@ var (
 		{
 			cType:  WARN,
 			action: cmp.MODIFY,
-			path:   "hosts[*].mainResourcePoolPath",
+			path:   "Hosts.*.MainResourcePoolPath",
 			msg:    "Changing main resource pool location will trigger recreation of all resources bound to that resource pool, such as virtual machines and data disks.",
 		},
 		{
 			cType:  WARN,
-			action: cmp.MODIFY,
-			path:   "hosts[*].dataResourcePools[*].path",
-			msg:    "Changing data resource pool location will trigger recreation of all resources bound to that resource pool, such as virtual machines and data disks",
+			action: cmp.DELETE,
+			path:   "Hosts.*.DataResourcePools.*",
+			msg:    "Removing data resource pool will destroy all the data on that location.",
 		},
 		{
 			cType:  WARN,
-			action: cmp.DELETE,
-			path:   "hosts[*].dataResourcePools[*]",
-			msg:    "Removing data resource pool will destroy all the data on that location.",
+			action: cmp.MODIFY,
+			path:   "Hosts.*.DataResourcePools.*.Path",
+			msg:    "Changing data resource pool location will trigger recreation of all resources bound to that resource pool, such as virtual machines and data disks",
 		},
 		// Allow other host changes
 		{
 			cType: OK,
-			path:  "hosts",
+			path:  "Hosts",
 		},
 		// Prevent cluster network changes
 		{
 			cType: BLOCK,
-			path:  "cluster.network",
+			path:  "Cluster.Network",
 			msg:   "Once the cluster is created, further changes to the network properties are not allowed. Such action may render the cluster unusable.",
 		},
 		// Prevent nodeTemplate changes
 		{
 			cType: BLOCK,
-			path:  "cluster.nodeTemplate",
+			path:  "Cluster.NodeTemplate",
 			msg:   "Once the cluster is created, further changes to the nodeTemplate properties are not allowed. Such action may render the cluster unusable.",
 		},
 		// Prevent removing nodes
@@ -172,9 +172,9 @@ var (
 			cType:  BLOCK,
 			action: cmp.DELETE,
 			paths: []string{
-				"cluster.nodes.lb.instances.[*]",
-				"cluster.nodes.worker.instances.[*]",
-				"cluster.nodes.master.instances.[*]",
+				"Cluster.Nodes.LoadBalancer.Instances.*",
+				"Cluster.Nodes.Worker.Instances.*",
+				"Cluster.Nodes.Master.Instances.*",
 			},
 			msg: "To remove existing nodes run apply command with '--action scale' flag.",
 		},
@@ -183,9 +183,9 @@ var (
 			cType:  BLOCK,
 			action: cmp.CREATE,
 			paths: []string{
-				"cluster.nodes.lb.instances.[*]",
-				"cluster.nodes.worker.instances.[*]",
-				"cluster.nodes.master.instances.[*]",
+				"Cluster.Nodes.LoadBalancer.Instances.*",
+				"Cluster.Nodes.Worker.Instances.*",
+				"Cluster.Nodes.Master.Instances.*",
 			},
 			msg: "To add new nodes run apply command with '--action scale' flag.",
 		},
@@ -193,15 +193,15 @@ var (
 		{
 			cType: BLOCK,
 			paths: []string{
-				"cluster.nodes.worker.default.cpu",
-				"cluster.nodes.worker.default.ram",
-				"cluster.nodes.worker.default.mainDiskSize",
-				"cluster.nodes.master.default.cpu",
-				"cluster.nodes.master.default.ram",
-				"cluster.nodes.master.default.mainDiskSize",
-				"cluster.nodes.loadBalancer.default.cpu",
-				"cluster.nodes.loadBalancer.default.ram",
-				"cluster.nodes.loadBalancer.default.mainDiskSize",
+				"Cluster.Nodes.Worker.Default.CPU",
+				"Cluster.Nodes.Worker.Default.RAM",
+				"Cluster.Nodes.Worker.Default.MainDiskSize",
+				"Cluster.Nodes.Master.Default.CPU",
+				"Cluster.Nodes.Master.Default.RAM",
+				"Cluster.Nodes.Master.Default.MainDiskSize",
+				"Cluster.Nodes.LoadBalancer.Default.CPU",
+				"Cluster.Nodes.LoadBalancer.Default.RAM",
+				"Cluster.Nodes.LoadBalancer.Default.MainDiskSize",
 			},
 			msg: "Changing any default physical properties of nodes (cpu, ram, mainDiskSize) is not allowed. Such action may render the cluster unusable.",
 		},
@@ -210,15 +210,15 @@ var (
 			cType:  BLOCK,
 			action: cmp.MODIFY,
 			paths: []string{
-				"cluster.nodes.worker.instances.[*].cpu",
-				"cluster.nodes.worker.instances.[*].ram",
-				"cluster.nodes.worker.instances.[*].mainDiskSize",
-				"cluster.nodes.master.instances.[*].cpu",
-				"cluster.nodes.master.instances.[*].ram",
-				"cluster.nodes.master.instances.[*].mainDiskSize",
-				"cluster.nodes.loadBalancer.instances.[*].cpu",
-				"cluster.nodes.loadBalancer.instances.[*].ram",
-				"cluster.nodes.loadBalancer.instances.[*].mainDiskSize",
+				"Cluster.Nodes.Worker.Instances.*.CPU",
+				"Cluster.Nodes.Worker.Instances.*.RAM",
+				"Cluster.Nodes.Worker.Instances.*.MainDiskSize",
+				"Cluster.Nodes.Master.Instances.*.CPU",
+				"Cluster.Nodes.Master.Instances.*.RAM",
+				"Cluster.Nodes.Master.Instances.*.MainDiskSize",
+				"Cluster.Nodes.LoadBalancer.Instances.*.CPU",
+				"Cluster.Nodes.LoadBalancer.Instances.*.RAM",
+				"Cluster.Nodes.LoadBalancer.Instances.*.MainDiskSize",
 			},
 			msg: "Changing any physical properties of nodes (cpu, ram, mainDiskSize) is not allowed. Such action will recreate the node.",
 		},
@@ -227,12 +227,12 @@ var (
 			cType:  BLOCK,
 			action: cmp.MODIFY,
 			paths: []string{
-				"cluster.nodes.worker.instances.[*].ip",
-				"cluster.nodes.worker.instances.[*].mac",
-				"cluster.nodes.master.instances.[*].ip",
-				"cluster.nodes.master.instances.[*].mac",
-				"cluster.nodes.loadBalancer.instances.[*].ip",
-				"cluster.nodes.loadBalancer.instances.[*].mac",
+				"Cluster.Nodes.Worker.Instances.*.IP",
+				"Cluster.Nodes.Worker.Instances.*.MAC",
+				"Cluster.Nodes.Master.Instances.*.IP",
+				"Cluster.Nodes.Master.Instances.*.MAC",
+				"Cluster.Nodes.LoadBalancer.Instances.*.IP",
+				"Cluster.Nodes.LoadBalancer.Instances.*.MAC",
 			},
 			msg: "Changing IP or MAC address of the node is not allowed. Such action may render the cluster unusable.",
 		},
@@ -241,8 +241,8 @@ var (
 			cType:  WARN,
 			action: cmp.MODIFY,
 			paths: []string{
-				"cluster.nodes.worker.instances.[*].dataDisks.[*]",
-				"cluster.nodes.master.instances.[*].dataDisks.[*]",
+				"Cluster.Nodes.Worker.Instances.*.DataDisks.*",
+				"Cluster.Nodes.Master.Instances.*.DataDisks.*",
 			},
 			msg: "Changing data disk properties, will recreate the disk (removing all of its content in the process).",
 		},
@@ -250,8 +250,8 @@ var (
 			cType:  WARN,
 			action: cmp.DELETE,
 			paths: []string{
-				"cluster.nodes.master.instances.[*].dataDisks.[*]",
-				"cluster.nodes.worker.instances.[*].dataDisks.[*]",
+				"Cluster.Nodes.Master.Instances.*.DataDisks.*",
+				"Cluster.Nodes.Worker.Instances.*.DataDisks.*",
 			},
 			msg: "One or more data disks will be removed.",
 		},
@@ -259,43 +259,43 @@ var (
 			cType:  OK,
 			action: cmp.CREATE,
 			paths: []string{
-				"cluster.nodes.master.instances.[*].dataDisks.[*]",
-				"cluster.nodes.worker.instances.[*].dataDisks.[*]",
+				"Cluster.Nodes.Master.Instances.*.DataDisks.*",
+				"Cluster.Nodes.Worker.Instances.*.DataDisks.*",
 			},
 		},
 		// Prevent VIP changes
 		{
 			cType: BLOCK,
-			path:  "cluster.nodes.loadBalancer.vip",
+			path:  "Cluster.Nodes.LoadBalancer.VIP",
 			msg:   "Once the cluster is created, changing virtual IP (VIP) is not allowed. Such action may render the cluster unusable.",
 		},
 		// Allow all other node properties to be changed
 		{
 			cType: OK,
 			paths: []string{
-				"cluster.nodes.master.instances.[*]",
-				"cluster.nodes.worker.instances.[*]",
-				"cluster.nodes.loadBalancer.instances.[*]",
+				"Cluster.Nodes.Master.Instances.*",
+				"Cluster.Nodes.Worker.Instances.*",
+				"Cluster.Nodes.LoadBalancer.Instances.*",
 			},
 		},
 		// Prevent k8s properties changes
 		{
 			cType: BLOCK,
 			paths: []string{
-				"kubernetes.version",
-				"kubernetes.kubespray.version",
+				"Kubernetes.Version",
+				"Kubernetes.Kubespray.Version",
 			},
 			msg: "Changing Kubernetes or Kubespray version is allowed only when upgrading the cluster.\nTo upgrade the cluster run apply command with '--action upgrade' flag.",
 		},
 		// Allow addons changes
 		{
 			cType: OK,
-			path:  "addons",
+			path:  "Addons",
 		},
 		// Allow kubitect (project metadata) changes
 		{
 			cType: OK,
-			path:  "kubitect",
+			path:  "Kubitect",
 		},
 	}
 )

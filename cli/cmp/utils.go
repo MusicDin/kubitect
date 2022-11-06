@@ -40,7 +40,7 @@ func getDeepValue(v reflect.Value) reflect.Value {
 	switch v.Kind() {
 	case reflect.Interface:
 		return getDeepValue(v.Elem())
-	case reflect.Ptr:
+	case reflect.Pointer:
 		return getDeepValue(reflect.Indirect(v))
 	default:
 		return v
