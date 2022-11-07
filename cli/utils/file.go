@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -12,24 +11,37 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// Exists returns true if file metadata is obtained without errors.
+// Otherwise, false is returned.
 func Exists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
 }
 
-// ReadFile reads a file from provided source path and returns it as a string.
+// ReadFile reads a file from the given path and returns it as a string.
 func ReadFile(path string) (string, error) {
 	file, err := ioutil.ReadFile(path)
 
 	if err != nil {
-		return "", fmt.Errorf("Failed to read a file on path '%s': %v", path, err)
+		return "", fmt.Errorf("read file '%s': %v", path, err)
 	}
 
 	return string(file), nil
 }
 
-// CopyFile copies a file from source to destination path. If file already exists
-// on the destination path, it will be overwritten.
+// MakeDir creates a directory named path, along with any necessary parents.
+func MakeDir(path string) error {
+	err := os.MkdirAll(path, os.ModePerm)
+
+	if err != nil {
+		return fmt.Errorf("make directory '%s': %v", path, err)
+	}
+
+	return nil
+}
+
+// Copy gracefully copies a file from source to destination path. Files
+// that already exist on the destination path will be left untouched.
 func Copy(srcPath, dstPath string) error {
 	opt := copy.Options{}
 
@@ -37,9 +49,17 @@ func Copy(srcPath, dstPath string) error {
 		return copy.Untouchable
 	}
 
-	return copy.Copy(srcPath, dstPath, opt)
+	err := copy.Copy(srcPath, dstPath, opt)
+
+	if err != nil {
+		return fmt.Errorf("copy from '%s' to '%s': %v", srcPath, dstPath, err)
+	}
+
+	return nil
 }
 
+// ForceCopy copies a file from source to destination path. Files that
+// already exist on the destination path will be replaced (overwritten).
 func ForceCopy(srcPath, dstPath string) error {
 	opt := copy.Options{}
 
@@ -47,66 +67,40 @@ func ForceCopy(srcPath, dstPath string) error {
 		return copy.Replace
 	}
 
-	return copy.Copy(srcPath, dstPath, opt)
-}
-
-func CopyFile(srcPath, dstPath string) error {
-	return copy.Copy(srcPath, dstPath)
-}
-
-// CopyFile copies a file from source to destination path. If file already exists
-// on the destination path, it will be overwritten.
-func CopyFile1(srcPath, dstPath string) error {
-	sFile, err := os.Open(srcPath)
+	err := copy.Copy(srcPath, dstPath, opt)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("force copy from '%s' to '%s': %v", srcPath, dstPath, err)
 	}
 
-	defer sFile.Close()
-
-	dstDir := filepath.Dir(dstPath)
-
-	err = os.MkdirAll(dstDir, os.ModePerm)
-
-	if err != nil {
-		return fmt.Errorf("Failed to create destination directory (%s) while copying a file: %v", dstDir, err)
-	}
-
-	dFile, err := os.Create(dstPath)
-
-	if err != nil {
-		return err
-	}
-
-	defer dFile.Close()
-
-	_, err = io.Copy(dFile, sFile)
-	return err
+	return nil
 }
 
 // ForceMove forcibly moves a file or directory to a specified location.
 // First the destination file or directory is removed, and then the contents
 // are moved there.
 func ForceMove(srcPath string, dstPath string) error {
-	err := os.RemoveAll(dstPath)
-
-	if err != nil {
-		return fmt.Errorf("Failed to force remove destination file: %w", err)
+	if err := Remove(dstPath); err != nil {
+		return fmt.Errorf("force move: %v", err)
 	}
 
-	dstDir := filepath.Dir(dstPath)
-
-	err = os.MkdirAll(dstDir, os.ModePerm)
-
-	if err != nil {
-		return fmt.Errorf("Failed to create destination directory (%s) while moving files: %v", dstDir, err)
+	if err := MakeDir(filepath.Dir(dstPath)); err != nil {
+		return fmt.Errorf("force move: %v", err)
 	}
 
-	err = os.Rename(srcPath, dstPath)
+	if err := os.Rename(srcPath, dstPath); err != nil {
+		return fmt.Errorf("force move from '%s' to '%s': %v", srcPath, dstPath, err)
+	}
+
+	return nil
+}
+
+// Remove removes directory and any children it contains.
+func Remove(path string) error {
+	err := os.RemoveAll(path)
 
 	if err != nil {
-		return fmt.Errorf("Failed to move file from src (%s) to dst (%s) path: %w", srcPath, dstPath, err)
+		return fmt.Errorf("remove '%s': %v", path, err)
 	}
 
 	return nil

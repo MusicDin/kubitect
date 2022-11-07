@@ -29,20 +29,7 @@ Kubitect is a CLI tool that helps you manage multiple Kubernetes clusters.`,
 // accordingly.
 func Execute() error {
 	err := rootCmd.Execute()
-
-	if err == nil {
-		return nil
-	}
-
-	if _, ok := err.(utils.Error); ok {
-		return err
-	}
-
-	if _, ok := err.(utils.Errors); ok {
-		return err
-	}
-
-	return utils.NewError(err)
+	return utils.FormatError(err)
 }
 
 func init() {

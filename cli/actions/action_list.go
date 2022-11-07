@@ -8,7 +8,7 @@ import (
 // listClusters lists all clusters located in the project clusters directory
 // that contain terraform state file.
 func ListClusters() error {
-	clusters, err := ReadClustersInfo()
+	clusters, err := GetClusters()
 
 	if err != nil {
 		return err

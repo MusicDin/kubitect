@@ -11,29 +11,31 @@ const (
 	defaultAction = "create"
 )
 
-func init() {
-	var configPath string
-	var action string
+var (
+	configPath string
+	action     string
+)
 
-	applyCmd := &cobra.Command{
-		SuggestFor: []string{"create", "scale", "upgrade"},
-		Use:        "apply",
-		GroupID:    "mgmt",
-		Short:      "Create, scale or upgrade the cluster",
-		Long: `
+var applyCmd = &cobra.Command{
+	SuggestFor: []string{"create", "scale", "upgrade"},
+	Use:        "apply",
+	GroupID:    "mgmt",
+	Short:      "Create, scale or upgrade the cluster",
+	Long: `
 Apply new configuration file to create a cluster, or scale or upgrade the existing one.`,
 
-		RunE: func(cmd *cobra.Command, args []string) error {
-			a, err := env.ToApplyAction(action)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		a, err := env.ToApplyAction(action)
 
-			if err != nil {
-				return err
-			}
+		if err != nil {
+			return err
+		}
 
-			return actions.Apply(configPath, a)
-		},
-	}
+		return actions.Apply(configPath, a)
+	},
+}
 
+func init() {
 	rootCmd.AddCommand(applyCmd)
 
 	applyCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "specify path to the cluster config file")

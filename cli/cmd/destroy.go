@@ -29,6 +29,8 @@ Destroys the cluster with a given name.`,
 	destroyCmd.PersistentFlags().BoolVarP(&env.Local, "local", "l", false, "use a current directory as the cluster path")
 	destroyCmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
 
+	destroyCmd.MarkPersistentFlagRequired("cluster")
+
 	// Auto complete cluster names of active clusters for flag 'cluster'.
 	destroyCmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		clusters, err := actions.GetClusters()

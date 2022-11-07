@@ -32,14 +32,17 @@ func (t LevelType) Color() Color {
 	}
 }
 
-type Errors []error
+func FormatError(e error) error {
+	s := e.Error()
 
-// Combines errors together into a single error object.
-// This ensures that each error is correctly displayed
-// in terminal.
-func NewErrors(errs ...error) Errors {
-	return Errors(errs)
+	if strings.ContainsAny(s, lineInitial) {
+		return e
+	}
+
+	return NewError(e)
 }
+
+type Errors []error
 
 func (errs Errors) Error() string {
 	var out []string

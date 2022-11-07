@@ -69,6 +69,6 @@ func ToApplyAction(a string) (ApplyAction, error) {
 	case SCALE.String():
 		return SCALE, nil
 	default:
-		return UNKNOWN, fmt.Errorf("Unknown cluster action: %s", a)
+		return UNKNOWN, fmt.Errorf("unknown cluster action: %s", a)
 	}
 }

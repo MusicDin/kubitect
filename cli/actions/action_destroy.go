@@ -11,10 +11,10 @@ import (
 
 func Destroy(clusterName string) error {
 	if clusterName == "" {
-		return fmt.Errorf("A valid (non-empty) cluster name must be provided.")
+		return fmt.Errorf("a valid (non-empty) cluster name must be provided")
 	}
 
-	clusters, err := ReadClustersInfo()
+	clusters, err := GetClusters()
 
 	if err != nil {
 		return err
@@ -23,14 +23,14 @@ func Destroy(clusterName string) error {
 	c := clusters.Find(clusterName)
 
 	if c == nil {
-		return fmt.Errorf("Cluster '%s' not found.", clusterName)
+		return fmt.Errorf("cluster '%s' not found.", clusterName)
 	}
 
 	if !c.Active() {
-		return fmt.Errorf("Cluster '%s' is already destroyed (or not yet initialized).", clusterName)
+		return fmt.Errorf("cluster '%s' is already destroyed (or not yet initialized).", clusterName)
 	}
 
-	msg := fmt.Sprintf("The '%s' cluster will be destroyed.", clusterName)
+	msg := fmt.Sprintf("Cluster '%s' will be destroyed.", clusterName)
 
 	if err := utils.AskUserConfirmation(msg); err != nil {
 		return err

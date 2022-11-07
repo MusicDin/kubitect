@@ -35,7 +35,6 @@ func StrArrayContains(arr []string, value string) bool {
 // types any variant of "y" or "yes" and false if user types any variant of "n"
 // or "no". Otherwise user is asked again.
 func AskUserConfirmation(msg ...any) error {
-
 	var response string
 
 	// Automatically approve if '--auto-approve' flag is used
