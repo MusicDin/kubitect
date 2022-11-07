@@ -1,10 +1,10 @@
 package cmd
 
-// exportConfigCmd represents the exportConfig command
 // var exportConfigCmd = &cobra.Command{
 // 	Use:   "config",
 // 	Short: "Export cluster configuration file",
-// 	Long:  `Command export config prints content of the cluster configuration file.`,
+// 	Long: `
+// 	Command export config prints content of the cluster configuration file.`,
 
 // 	Run: func(cmd *cobra.Command, args []string) {
 // 		err := exportConfig()

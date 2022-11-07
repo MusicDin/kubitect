@@ -6,18 +6,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var desc = `
-Lists clusters. 
-	
-Local clusters are also listed if current directory is a Kubitect project.
-`
-
 func init() {
 	listCmd := &cobra.Command{
-		Use:     "list",
-		Short:   "Lists clusters",
-		Long:    desc,
-		Aliases: []string{"ls"},
+		Aliases:    []string{"ls"},
+		SuggestFor: []string{"show"},
+		Use:        "list",
+		GroupID:    "support",
+		Short:      "Lists clusters",
+		Long: `
+Lists clusters.
+
+Local clusters are also listed if current directory is a Kubitect project.`,
+
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return actions.ListClusters()
 		},

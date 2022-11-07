@@ -14,8 +14,8 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "kubitect",
 	Short: "Kubitect",
-	Long: `Kubitect is a CLI tool that helps you manage multiple Kubernetes
-clusters.`,
+	Long: `
+Kubitect is a CLI tool that helps you manage multiple Kubernetes clusters.`,
 	Version: env.ConstProjectVersion,
 
 	// This is run when any command is run (also applies to all subcommands).
@@ -48,6 +48,25 @@ func Execute() error {
 func init() {
 	rootCmd.SilenceUsage = true
 	rootCmd.SilenceErrors = true
+	rootCmd.SuggestionsMinimumDistance = 3
+
+	rootCmd.AddGroup(
+		&cobra.Group{
+			Title: "Cluster Management Commands:",
+			ID:    "mgmt",
+		},
+		&cobra.Group{
+			Title: "Support Commands:",
+			ID:    "support",
+		},
+		&cobra.Group{
+			Title: "Other Commands:",
+			ID:    "other",
+		},
+	)
+
+	rootCmd.SetCompletionCommandGroupID("other")
+	rootCmd.SetHelpCommandGroupID("other")
 
 	rootCmd.PersistentFlags().BoolVar(&env.DebugMode, "debug", false, "enable debug messages")
 }

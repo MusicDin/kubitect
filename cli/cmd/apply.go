@@ -7,36 +7,33 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	configPath string
-	action     string
-
+const (
 	defaultAction = "create"
 )
 
-var applyCmd = &cobra.Command{
-	Use:   "apply",
-	Short: "Apply configuration",
-	Long: `
-Apply command creates a desired cluster based on the provided
-configuration file. If cluster already exists, it is modified
-according to the detected changes.
-
-Cluster scaling or upgrading must be explicitly specified using
-action flag.`,
-
-	RunE: func(cmd *cobra.Command, args []string) error {
-		a, err := env.ToApplyAction(action)
-
-		if err != nil {
-			return err
-		}
-
-		return actions.Apply(configPath, a)
-	},
-}
-
 func init() {
+	var configPath string
+	var action string
+
+	applyCmd := &cobra.Command{
+		SuggestFor: []string{"create", "scale", "upgrade"},
+		Use:        "apply",
+		GroupID:    "mgmt",
+		Short:      "Create, scale or upgrade the cluster",
+		Long: `
+Apply new configuration file to create a cluster, or scale or upgrade the existing one.`,
+
+		RunE: func(cmd *cobra.Command, args []string) error {
+			a, err := env.ToApplyAction(action)
+
+			if err != nil {
+				return err
+			}
+
+			return actions.Apply(configPath, a)
+		},
+	}
+
 	rootCmd.AddCommand(applyCmd)
 
 	applyCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "specify path to the cluster config file")
@@ -49,16 +46,5 @@ func init() {
 	// Add completion values for flag 'action'.
 	applyCmd.RegisterFlagCompletionFunc("action", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return env.ProjectApplyActions[:], cobra.ShellCompDirectiveDefault
-	})
-
-	// Auto complete cluster names for flag 'cluster'.
-	applyCmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		clusters, err := actions.ReadClustersInfo()
-
-		if err != nil {
-			return nil, cobra.ShellCompDirectiveNoFileComp
-		}
-
-		return clusters.Names(), cobra.ShellCompDirectiveNoFileComp
 	})
 }

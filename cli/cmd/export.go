@@ -6,9 +6,15 @@ import (
 
 // exportCmd represents the export command
 var exportCmd = &cobra.Command{
-	Use:   "export",
-	Short: "Export specified configuration file",
-	Long:  `.`,
+	Use:     "export",
+	GroupID: "support",
+	Short:   "Export specific configuration file",
+	Long: `
+Exports specific configuration file`,
+
+	Run: func(cmd *cobra.Command, args []string) {
+		cmd.Help()
+	},
 }
 
 func init() {
