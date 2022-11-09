@@ -33,9 +33,11 @@ func (t LevelType) Color() Color {
 }
 
 func FormatError(e error) error {
-	s := e.Error()
+	if e == nil {
+		return nil
+	}
 
-	if strings.ContainsAny(s, lineInitial) {
+	if strings.Contains(e.Error(), lineInitial) {
 		return e
 	}
 
