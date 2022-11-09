@@ -100,7 +100,7 @@ func TestOutput_Yaml(t *testing.T) {
 	assert.Equal(t, expect, d.ToYaml())
 }
 
-func TestOutput_Json(t *testing.T) {
+func TestOutput_YamlDiff(t *testing.T) {
 	s := SimpleStruct{
 		Value: []SimpleStruct{
 			{"42"},
@@ -109,18 +109,48 @@ func TestOutput_Json(t *testing.T) {
 	}
 
 	d, _ := Compare(true, true)
-	assert.Equal(t, "true", d.ToJson())
+	assert.Equal(t, "", d.ToYamlDiff())
 
 	d, _ = Compare(true, false)
-	assert.Equal(t, "true -> false", d.ToJson())
+	assert.Equal(t, "true -> false", d.ToYamlDiff())
 
-	expect := "{\n  Value: [\n    {\n      Value: \"42\",\n    },\n    {\n      Value: 24,\n    },\n  ],\n}"
+	expect := "Value: \n  - Value: \"42\"\n  - Value: 24"
 
 	d, _ = Compare(s, nil)
-	assert.Equal(t, expect, d.ToJson())
+	assert.Equal(t, expect, d.ToYamlDiff())
 
 	d, _ = Compare(nil, s)
-	assert.Equal(t, expect, d.ToJson())
+	assert.Equal(t, expect, d.ToYamlDiff())
+}
+
+func TestOutput_YamlDiffComplex(t *testing.T) {
+
+	type SimpleStruct struct {
+		Id   string `cmp:",id"`
+		List []SimpleStruct
+	}
+
+	s1 := SimpleStruct{
+		List: []SimpleStruct{
+			{Id: "42"},
+		},
+	}
+
+	s2 := SimpleStruct{
+		List: []SimpleStruct{
+			{
+				Id: "42",
+				List: []SimpleStruct{
+					{Id: "24"},
+				},
+			},
+		},
+	}
+
+	expect := "List: \n  - Id: \"42\"\n    List: \n      - Id: \"24\""
+
+	d, _ := Compare(s1, s2)
+	assert.Equal(t, expect, d.ToYamlDiff())
 }
 
 type TestEvent struct {

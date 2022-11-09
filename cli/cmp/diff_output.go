@@ -16,38 +16,28 @@ var (
 
 // ToYaml returns comparison result in YAML like format.
 func (n *DiffNode) ToYaml() string {
-	return strings.TrimSuffix(n.toYaml(0, false, false), "\n")
+	return n.toYaml(0, false, false)
 }
 
 // ToYamlDiff returns only differences of the comparison in YAML like format.
 func (n *DiffNode) ToYamlDiff() string {
-	return strings.TrimSuffix(n.toYaml(0, false, true), "\n")
-}
-
-// ToJson returns comparison result in JSON like format.
-func (n *DiffNode) ToJson() string {
-	return strings.TrimSuffix(n.toJson(0, false), ",\n")
-}
-
-// ToJsonDiff returns only differences of the comparison in JSON like format.
-func (n *DiffNode) ToJsonDiff() string {
-	return strings.TrimSuffix(n.toJson(0, true), ",\n")
+	return n.toYaml(0, false, true)
 }
 
 // toYaml recursively creates a string of differences in YAML format.
 func (n *DiffNode) toYaml(depth int, tagList, diffOnly bool) string {
-	var output string
-
-	if diffOnly && !n.hasChanged() { // TODO: && !n.isId {
+	if diffOnly && !n.isDifferent() {
 		return ""
 	}
 
-	key := n.stringKey() + ": "
-	indent := fmt.Sprintf("%*s", depth*2, "")
-	isSliceElem := n.isSliceElem()
+	var output []string
+	var key string
 
-	if isSliceElem || n.isRoot() {
-		key = ""
+	isSliceElem := n.isSliceElem()
+	indent := fmt.Sprintf("%*s", depth*2, "")
+
+	if !isSliceElem && !n.isRoot() {
+		key = n.stringKey() + ": "
 	}
 
 	if tagList || (isSliceElem && n.isLeaf()) {
@@ -59,66 +49,32 @@ func (n *DiffNode) toYaml(depth int, tagList, diffOnly bool) string {
 
 	if n.isLeaf() {
 		val := n.stringValue()
-		return fmt.Sprintf("%s%s%s\n", indent, key, val)
+		return fmt.Sprintf("%s%s%s", indent, key, val)
 	}
 
-	if len(key) > 0 {
-		output += fmt.Sprintf("%s%s\n", indent, key)
+	if key != "" {
+		output = append(output, fmt.Sprintf("%s%s", indent, key))
 	}
 
 	if !n.isRoot() {
 		depth++
 	}
 
-	for i, k := range n.sortChildrenKeys() {
-		v := n.getChild(k)
-		tagList = (isSliceElem && i == 0)
-		output += v.toYaml(depth, tagList, diffOnly)
+	first := true
+
+	for _, k := range n.sortChildrenKeys() {
+		v := n.child(k)
+
+		if diffOnly && !v.isDifferent() {
+			continue
+		}
+
+		tagList = (isSliceElem && first)
+		output = append(output, v.toYaml(depth, tagList, diffOnly))
+		first = false
 	}
 
-	return output
-}
-
-// toJson recursively creates a string of differences in JSON format.
-func (n *DiffNode) toJson(depth int, diffOnly bool) string {
-	var output string
-
-	if diffOnly && !n.hasChanged() { // TODO: && !n.isId {
-		return ""
-	}
-
-	key := n.key + ": "
-	indent := fmt.Sprintf("%*s", depth*2, "")
-
-	if n.isSliceElem() || n.isRoot() {
-		key = ""
-	}
-
-	if n.isLeaf() {
-		value := n.stringValue()
-		return fmt.Sprintf("%s%s%s,\n", indent, key, value)
-	}
-
-	keys := n.sortChildrenKeys()
-
-	annoA := "{"
-	annoB := "}"
-
-	if n.isSlice() {
-		annoA = "["
-		annoB = "]"
-	}
-
-	output += fmt.Sprintf("%s%s%s\n", indent, key, annoA)
-
-	for _, k := range keys {
-		v := n.getChild(k)
-		output += v.toJson(depth+1, diffOnly)
-	}
-
-	output += fmt.Sprintf("%s%s,\n", indent, annoB)
-
-	return output
+	return strings.Join(output, "\n")
 }
 
 // sortChildrenKeys returns children keys sorted alphabetically.
@@ -131,6 +87,12 @@ func (n *DiffNode) sortChildrenKeys() []string {
 
 	sort.Strings(keys)
 	return keys
+}
+
+// isDifferent returns true if node is either a slice id or it has
+// changed and is not empty.
+func (n *DiffNode) isDifferent() bool {
+	return n.isSliceId || (n.hasChanged() && !n.isEmpty())
 }
 
 // stringKey returns node's key as a string.

@@ -528,3 +528,14 @@ func TestSlice_UnexportedField(t *testing.T) {
 	d, _ = Compare(nil, a)
 	assert.True(t, d.hasChanged())
 }
+
+// Ensures that UNKNOWN action is not propagated
+func Test_ActionPropagation(t *testing.T) {
+	type Struct struct {
+		A string
+		B []string // Produces UNKNOWN action
+	}
+
+	d, _ := Compare(Struct{A: "test"}, Struct{A: "test"})
+	assert.False(t, d.hasChanged())
+}

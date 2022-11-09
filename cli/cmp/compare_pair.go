@@ -1,6 +1,8 @@
 package cmp
 
-import "reflect"
+import (
+	"reflect"
+)
 
 type Pair struct {
 	key string
@@ -9,9 +11,10 @@ type Pair struct {
 }
 
 type Pairs struct {
-	pairs []*Pair
-	typ   reflect.Type
-	kind  reflect.Kind
+	pairs   []*Pair
+	typ     reflect.Type
+	kind    reflect.Kind
+	cmpById bool
 }
 
 func NewPairs(t reflect.Type) Pairs {
@@ -68,8 +71,34 @@ func (c *Comparator) cmpPairs(ps Pairs) (*DiffNode, error) {
 			return nil, err
 		}
 
+		setSliceId(ps, child, c.TagName)
 		node.addChild(child, p.key, p.key)
 	}
 
 	return node, nil
+}
+
+func setSliceId(ps Pairs, child *DiffNode, tagName string) {
+	if !ps.cmpById || len(ps.pairs) == 0 || child == nil {
+		return
+	}
+
+	p := ps.pairs[0]
+
+	var rv reflect.Value
+
+	if p.A != nil && p.A.Kind() != reflect.Invalid {
+		rv = *p.A
+	} else {
+		rv = *p.B
+	}
+
+	fName := tagOptionIdFieldName(tagName, rv)
+
+	for _, c := range child.children {
+		if c.structKey == fName {
+			c.isSliceId = true
+			return
+		}
+	}
 }

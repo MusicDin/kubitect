@@ -33,13 +33,19 @@ func Compare(a, b interface{}) (*DiffNode, error) {
 
 // Compare compares the given values and returns a comparison tree.
 func (c *Comparator) Compare(a, b interface{}) (*DiffNode, error) {
-	return c.compare(reflect.ValueOf(a), reflect.ValueOf(b))
+	d, err := c.compare(reflect.ValueOf(a), reflect.ValueOf(b))
+
+	if d == nil {
+		d = NewLeaf(NONE, nil, nil)
+	}
+
+	return d, err
 }
 
 // compare recursively compares given values.
 func (c *Comparator) compare(a, b reflect.Value) (*DiffNode, error) {
 	if a.Kind() == reflect.Invalid && b.Kind() == reflect.Invalid {
-		return NewLeaf(NONE, nil, nil), nil
+		return nil, nil
 	}
 
 	cmpFunc := c.getCompareFunc(a, b)
@@ -98,34 +104,6 @@ func areOfKind(a, b reflect.Value, kinds ...reflect.Kind) bool {
 	return isA && isB
 }
 
-func tagName(tagName string, field reflect.StructField) string {
-	tags := append([]string{tagName}, fieldNameTags...)
-
-	for _, tag := range tags {
-		tName := strings.SplitN(field.Tag.Get(tag), ",", 2)[0]
-
-		if len(tName) > 0 {
-			return tName
-		}
-	}
-
-	return ""
-}
-
-func tagOptionId(tagName string, v reflect.Value) interface{} {
-	if v.Kind() != reflect.Struct {
-		return nil
-	}
-
-	for i := 0; i < v.NumField(); i++ {
-		if hasTagOption(tagName, v.Type().Field(i), TAG_OPTION_ID) {
-			return exportInterface(v.Field(i))
-		}
-	}
-
-	return nil
-}
-
 func hasTagOption(tagName string, field reflect.StructField, option string) bool {
 	tag := field.Tag.Get(tagName)
 	options := strings.Split(tag, ",")
@@ -144,4 +122,50 @@ func hasTagOption(tagName string, field reflect.StructField, option string) bool
 	}
 
 	return false
+}
+
+func tagName(tagName string, field reflect.StructField) string {
+	tags := append([]string{tagName}, fieldNameTags...)
+
+	for _, tag := range tags {
+		tName := strings.SplitN(field.Tag.Get(tag), ",", 2)[0]
+
+		if len(tName) > 0 {
+			return tName
+		}
+	}
+
+	return ""
+}
+
+func tagOptionId(tagName string, v reflect.Value) interface{} {
+	v = getDeepValue(v)
+
+	if v.Kind() != reflect.Struct {
+		return nil
+	}
+
+	for i := 0; i < v.NumField(); i++ {
+		if hasTagOption(tagName, v.Type().Field(i), TAG_OPTION_ID) {
+			return exportInterface(v.Field(i))
+		}
+	}
+
+	return nil
+}
+
+func tagOptionIdFieldName(tagName string, v reflect.Value) interface{} {
+	v = getDeepValue(v)
+
+	if v.Kind() != reflect.Struct {
+		return nil
+	}
+
+	for i := 0; i < v.NumField(); i++ {
+		if hasTagOption(tagName, v.Type().Field(i), TAG_OPTION_ID) {
+			return v.Type().Field(i).Name
+		}
+	}
+
+	return nil
 }

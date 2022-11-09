@@ -1,6 +1,8 @@
 package cmp
 
-import "reflect"
+import (
+	"reflect"
+)
 
 func (c *Comparator) cmpSlice(a, b reflect.Value) (*DiffNode, error) {
 	if a.Kind() == reflect.Invalid {
@@ -57,23 +59,20 @@ func (c *Comparator) cmpSliceByIndex(a, b reflect.Value) (*DiffNode, error) {
 // set with a tag.
 func (c *Comparator) cmpSliceById(a, b reflect.Value) (*DiffNode, error) {
 	pairs := NewPairs(a.Type())
+	pairs.cmpById = true
 
 	for i := 0; i < a.Len(); i++ {
 		ai := a.Index(i)
-		av := getDeepValue(ai)
 
-		id := tagOptionId(c.TagName, av)
-		if id != nil {
+		if id := tagOptionId(c.TagName, ai); id != nil {
 			pairs.addA(id, &ai)
 		}
 	}
 
 	for i := 0; i < b.Len(); i++ {
 		bi := b.Index(i)
-		bv := getDeepValue(bi)
 
-		id := tagOptionId(c.TagName, bv)
-		if id != nil {
+		if id := tagOptionId(c.TagName, bi); id != nil {
 			pairs.addB(id, &bi)
 		}
 	}

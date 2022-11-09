@@ -25,6 +25,8 @@ type DiffNode struct {
 	action    ActionType
 	before    interface{}
 	after     interface{}
+
+	isSliceId bool
 }
 
 func NewEmptyNode(t reflect.Type, k reflect.Kind) *DiffNode {
@@ -67,6 +69,10 @@ func NewLeaf(a ActionType, before, after interface{}) *DiffNode {
 }
 
 func (n *DiffNode) addChild(c *DiffNode, key, structKey interface{}) {
+	if c == nil {
+		return
+	}
+
 	c.parent = n
 	c.key = toString(key)
 	c.structKey = toString(structKey)
@@ -78,6 +84,10 @@ func (n *DiffNode) addChild(c *DiffNode, key, structKey interface{}) {
 
 // setAction sets node action with consideration to the current action.
 func (n *DiffNode) setAction(a ActionType) {
+	if a == UNKNOWN {
+		return
+	}
+
 	switch n.action {
 	case CREATE:
 		if a != CREATE {
@@ -105,8 +115,8 @@ func (n *DiffNode) setActionToLeafs(a ActionType) {
 	}
 }
 
-// getChild returns a child node with a matching key and nil otherwise.
-func (n *DiffNode) getChild(key interface{}) *DiffNode {
+// child returns a child node with a matching key and nil otherwise.
+func (n *DiffNode) child(key interface{}) *DiffNode {
 	for _, v := range n.children {
 		if v.key == key {
 			return v
@@ -169,6 +179,11 @@ func (n *DiffNode) isSlice() bool {
 // isSliceElem returns true if node's parent is either a slice or an array.
 func (n *DiffNode) isSliceElem() bool {
 	return (n.parent != nil && n.parent.isSlice())
+}
+
+// isSliceElem returns true if node's parent is either a slice or an array.
+func (n *DiffNode) isEmpty() bool {
+	return (n.isLeaf() && n.before == nil && n.after == nil)
 }
 
 // hasChanged returns true if node's action indicates a change within the
