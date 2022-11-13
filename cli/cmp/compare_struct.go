@@ -16,7 +16,7 @@ func (c *Comparator) cmpStruct(a, b reflect.Value) (*DiffNode, error) {
 	}
 
 	t := a.Type()
-	node := NewNode(t, t.Kind())
+	node := NewEmptyNode(t, t.Kind())
 
 	for i := 0; i < a.NumField(); i++ {
 		field := a.Type().Field(i)
@@ -46,6 +46,10 @@ func (c *Comparator) cmpStruct(a, b reflect.Value) (*DiffNode, error) {
 		}
 
 		node.addChild(child, tName, fName)
+	}
+
+	if c.IgnoreEmptyChanges && node.isLeaf() {
+		return nil, nil
 	}
 
 	if action != UNKNOWN {

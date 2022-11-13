@@ -113,12 +113,12 @@ func triggers[E ChangeEvent](n *DiffNode, e E) bool {
 	return false
 }
 
-// excludes returns true if the path of the node excludes paths
-// from all events.
+// excludes returns true if none of the given event paths is a prefix
+// of a node's path.
 func excludes[E ChangeEvent](n *DiffNode, events []E) bool {
 	for _, e := range events {
 		for _, p := range e.Paths() {
-			if strings.Contains(n.genericPath(), p) {
+			if strings.HasPrefix(n.genericPath(), p) {
 				return false
 			}
 		}

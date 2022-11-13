@@ -124,7 +124,6 @@ func TestOutput_YamlDiff(t *testing.T) {
 }
 
 func TestOutput_YamlDiffComplex(t *testing.T) {
-
 	type SimpleStruct struct {
 		Id   string `cmp:",id"`
 		List []SimpleStruct
@@ -147,10 +146,28 @@ func TestOutput_YamlDiffComplex(t *testing.T) {
 		},
 	}
 
-	expect := "List: \n  - Id: \"42\"\n    List: \n      - Id: \"24\""
+	expect := "List: \n  - Id: \"42\"\n    List: \n      - Id: \"24\"\n        List: <nil>"
 
 	d, _ := Compare(s1, s2)
 	assert.Equal(t, expect, d.ToYamlDiff())
+}
+
+func TestOutput_IgnoreEmptyChanges(t *testing.T) {
+	type SimpleStruct struct {
+		Id   *string `cmp:",id"`
+		List []SimpleStruct
+	}
+
+	id := "42"
+
+	cmp := NewComparator()
+	cmp.IgnoreEmptyChanges = true
+
+	d, _ := cmp.Compare(SimpleStruct{Id: &id}, nil)
+	assert.Equal(t, "Id: \"42\"", d.ToYamlDiff())
+
+	d, _ = cmp.Compare(SimpleStruct{}, nil)
+	assert.Equal(t, "", d.ToYamlDiff())
 }
 
 type TestEvent struct {

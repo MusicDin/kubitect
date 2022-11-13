@@ -14,8 +14,9 @@ var fieldNameTags = []string{"json", "yaml"}
 type CompareFunc func(reflect.Value, reflect.Value) (*DiffNode, error)
 
 type Comparator struct {
-	TagName           string
-	RespectSliceOrder bool
+	TagName            string
+	RespectSliceOrder  bool
+	IgnoreEmptyChanges bool // Ignore leafs with "nil -> nil" value
 }
 
 func NewComparator() *Comparator {
@@ -36,7 +37,7 @@ func (c *Comparator) Compare(a, b interface{}) (*DiffNode, error) {
 	d, err := c.compare(reflect.ValueOf(a), reflect.ValueOf(b))
 
 	if d == nil {
-		d = NewLeaf(NONE, nil, nil)
+		d = NewNilNode()
 	}
 
 	return d, err

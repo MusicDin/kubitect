@@ -4,11 +4,11 @@ import "reflect"
 
 func (c *Comparator) cmpBasic(a, b reflect.Value) (*DiffNode, error) {
 	if a.Kind() == reflect.Invalid {
-		return NewLeaf(CREATE, nil, b.Interface()), nil
+		return c.newLeaf(CREATE, nil, b.Interface()), nil
 	}
 
 	if b.Kind() == reflect.Invalid {
-		return NewLeaf(DELETE, a.Interface(), nil), nil
+		return c.newLeaf(DELETE, a.Interface(), nil), nil
 	}
 
 	if a.Kind() != b.Kind() {
@@ -19,8 +19,8 @@ func (c *Comparator) cmpBasic(a, b reflect.Value) (*DiffNode, error) {
 	bi := b.Interface()
 
 	if ai != bi {
-		return NewLeaf(MODIFY, ai, bi), nil
+		return c.newLeaf(MODIFY, ai, bi), nil
 	}
 
-	return NewLeaf(NONE, ai, bi), nil
+	return c.newLeaf(NONE, ai, bi), nil
 }

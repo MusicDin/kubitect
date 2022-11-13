@@ -29,6 +29,12 @@ type DiffNode struct {
 	isSliceId bool
 }
 
+func NewNilNode() *DiffNode {
+	node := NewEmptyNode(reflect.TypeOf(nil), reflect.Invalid)
+	node.action = NONE
+	return node
+}
+
 func NewEmptyNode(t reflect.Type, k reflect.Kind) *DiffNode {
 	node := &DiffNode{
 		children: make([]*DiffNode, 0),
@@ -39,7 +45,7 @@ func NewEmptyNode(t reflect.Type, k reflect.Kind) *DiffNode {
 	return node
 }
 
-func NewNode(before, after interface{}) *DiffNode {
+func (c *Comparator) newNode(before, after interface{}) *DiffNode {
 	var t reflect.Type
 	var k reflect.Kind
 
@@ -61,8 +67,12 @@ func NewNode(before, after interface{}) *DiffNode {
 	return node
 }
 
-func NewLeaf(a ActionType, before, after interface{}) *DiffNode {
-	node := NewNode(before, after)
+func (c *Comparator) newLeaf(a ActionType, before, after interface{}) *DiffNode {
+	if c.IgnoreEmptyChanges && before == nil && after == nil {
+		return nil
+	}
+
+	node := c.newNode(before, after)
 	node.action = a
 
 	return node
@@ -179,11 +189,6 @@ func (n *DiffNode) isSlice() bool {
 // isSliceElem returns true if node's parent is either a slice or an array.
 func (n *DiffNode) isSliceElem() bool {
 	return (n.parent != nil && n.parent.isSlice())
-}
-
-// isSliceElem returns true if node's parent is either a slice or an array.
-func (n *DiffNode) isEmpty() bool {
-	return (n.isLeaf() && n.before == nil && n.after == nil)
 }
 
 // hasChanged returns true if node's action indicates a change within the

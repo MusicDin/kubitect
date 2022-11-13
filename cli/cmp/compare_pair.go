@@ -52,6 +52,10 @@ func (ps *Pairs) get(key interface{}) *Pair {
 }
 
 func (c *Comparator) cmpPairs(ps Pairs) (*DiffNode, error) {
+	if c.IgnoreEmptyChanges && len(ps.pairs) == 0 {
+		return nil, nil
+	}
+
 	node := NewEmptyNode(ps.typ, ps.kind)
 
 	for _, p := range ps.pairs {
