@@ -206,7 +206,6 @@ func TestEvents_Triggered(t *testing.T) {
 	d, _ := Compare(s, nil)
 	triggered := TriggerEvents(d, events)
 	assert.Equal(t, events[0].Paths(), triggered[0].Paths())
-	assert.Equal(t, events[0].Paths(), triggered[0].Paths())
 	assert.Equal(t, []string{"Value.0", "Value.1"}, triggered[0].triggerPaths)
 
 	d, _ = Compare(s, s)

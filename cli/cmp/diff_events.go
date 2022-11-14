@@ -8,7 +8,7 @@ type ChangeEvent interface {
 	TriggerPath(string) // Set path of a change that triggered an event
 }
 
-// triggerEvents returns a list of triggered events.
+// TriggerEvents returns a list of triggered events.
 func TriggerEvents[E ChangeEvent](n *DiffNode, events []E) []E {
 	triggered := new([]E)
 	triggerEvents(n, events, triggered)
@@ -28,7 +28,7 @@ func triggerEvents[E ChangeEvent](n *DiffNode, events []E, triggered *[]E) {
 	}
 
 	for i, e := range *triggered {
-		if triggers(n, e) {
+		if n.action == e.Action() && triggers(n, e) {
 			(*triggered)[i].TriggerPath(n.exactPath())
 			return
 		}
@@ -95,22 +95,42 @@ func categorizeChanges[E ChangeEvent](n *DiffNode, events []E, mismatch bool) (C
 // triggers returns true if the path and action of the node match the
 // path and action of the event.
 func triggers[E ChangeEvent](n *DiffNode, e E) bool {
-	a := n.action
-
 	if n.action == NONE {
 		return false
 	}
 
-	p := n.genericPath()
-	ea := e.Action()
+	a := e.Action()
+	np := n.genericPath()
 
-	for _, ep := range e.Paths() {
-		if ep == p && (ea == a || ea == UNKNOWN) {
+	for _, p := range e.Paths() {
+		if p == np && (a == UNKNOWN || a == n.action) {
 			return true
 		}
 	}
 
 	return false
+}
+
+// conflicts returns true if node and event paths are the same,
+// but their actions do not match (conflict).
+func conflicts[E ChangeEvent](n *DiffNode, events []E) bool {
+	var conflict bool
+
+	for _, e := range events {
+		a := e.Action()
+
+		for _, p := range e.Paths() {
+			if p == n.genericPath() {
+				if a == UNKNOWN || a == n.action {
+					return false
+				}
+
+				conflict = true
+			}
+		}
+	}
+
+	return conflict
 }
 
 // excludes returns true if none of the given event paths is a prefix
@@ -125,26 +145,4 @@ func excludes[E ChangeEvent](n *DiffNode, events []E) bool {
 	}
 
 	return true
-}
-
-// conflicts returns true if node and event paths are the same,
-// but their actions do not match (conflict).
-func conflicts[E ChangeEvent](n *DiffNode, events []E) bool {
-	var matched bool
-
-	for _, e := range events {
-		for _, p := range e.Paths() {
-			if p == n.genericPath() {
-				a := e.Action()
-
-				if a == UNKNOWN || a == n.action {
-					return false
-				}
-
-				matched = true
-			}
-		}
-	}
-
-	return matched
 }
