@@ -184,11 +184,11 @@ func (e TestEvent) Paths() []string {
 	return []string{e.path}
 }
 
-func (e *TestEvent) TriggerPath(path string) {
+func (e *TestEvent) Trigger(path string) {
 	e.triggerPaths = append(e.triggerPaths, path)
 }
 
-func TestEvents_Triggered(t *testing.T) {
+func TestEvents_Trigger(t *testing.T) {
 	s := SimpleStruct{
 		Value: []SimpleStruct{
 			{42},
@@ -204,13 +204,47 @@ func TestEvents_Triggered(t *testing.T) {
 	}
 
 	d, _ := Compare(s, nil)
-	triggered := TriggerEvents(d, events)
-	assert.Equal(t, events[0].Paths(), triggered[0].Paths())
-	assert.Equal(t, []string{"Value.0", "Value.1"}, triggered[0].triggerPaths)
+	TriggerEvents(d, events)
+	assert.Equal(t, events[0].Paths(), events[0].Paths())
+	assert.Equal(t, []string{"Value.0", "Value.1"}, events[0].triggerPaths)
+
+	events[0].triggerPaths = []string{}
 
 	d, _ = Compare(s, s)
-	triggered = TriggerEvents(d, events)
-	assert.Empty(t, triggered)
+	TriggerEvents(d, events)
+	assert.Empty(t, events[0].triggerPaths)
+}
+
+func TestEvents_TriggerF(t *testing.T) {
+	s := SimpleStruct{
+		Value: []SimpleStruct{
+			{42},
+			{24},
+		},
+	}
+
+	events := []TestEvent{
+		{
+			action: DELETE,
+			path:   "Value.*",
+		},
+	}
+
+	var matchedPaths []string
+
+	mf := func(e TestEvent, p string) {
+		matchedPaths = append(matchedPaths, p)
+	}
+
+	d, _ := Compare(s, nil)
+	TriggerEventsF(d, events, mf)
+	assert.Equal(t, []string{"Value.0", "Value.1"}, matchedPaths)
+
+	matchedPaths = []string{}
+
+	d, _ = Compare(s, s)
+	TriggerEventsF(d, events, mf)
+	assert.Empty(t, matchedPaths)
 }
 
 func TestEvents_Changes(t *testing.T) {
@@ -255,13 +289,13 @@ func TestEvents_Changes(t *testing.T) {
 
 	d, _ := Compare(s1, nil)
 	assert.ElementsMatch(t, expect, MatchingChanges(d, events))
-	assert.Empty(t, NonMatchingChanges(d, events))
+	assert.Empty(t, ConflictingChanges(d, events))
 
 	d, _ = Compare(s1, s2)
 	assert.Empty(t, MatchingChanges(d, events))
-	assert.ElementsMatch(t, Changes{expect[0]}, NonMatchingChanges(d, events))
+	assert.ElementsMatch(t, Changes{expect[0]}, ConflictingChanges(d, events))
 
 	d, _ = Compare(s1, s1)
 	assert.Empty(t, MatchingChanges(d, events))
-	assert.Empty(t, NonMatchingChanges(d, events))
+	assert.Empty(t, ConflictingChanges(d, events))
 }

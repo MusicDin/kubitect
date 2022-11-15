@@ -2,80 +2,87 @@ package cmp
 
 import "strings"
 
-type ChangeEvent interface {
+type Event interface {
 	Action() ActionType // Affected action
 	Paths() []string    // Affected paths
-	TriggerPath(string) // Set path of a change that triggered an event
 }
 
-// TriggerEvents returns a list of triggered events.
-func TriggerEvents[E ChangeEvent](n *DiffNode, events []E) []E {
-	triggered := new([]E)
-	triggerEvents(n, events, triggered)
-	return *triggered
+type TriggerEvent interface {
+	Event
+	Trigger(string) // Set path of a change that triggered an event
 }
 
-// triggerEvents detects triggered events and appends them to the triggered slice.
-// Whenever an event is triggered, a TriggerPath method is called with an actual path
-// that has triggered an event.
-func triggerEvents[E ChangeEvent](n *DiffNode, events []E, triggered *[]E) {
+type TriggerFunc[E Event] func(event E, exactPath string)
+
+// TriggerEvents calls Trigger function of each detected event.
+func TriggerEvents[E TriggerEvent](n *DiffNode, events []E) {
 	for _, c := range n.children {
-		triggerEvents(c, events, triggered)
+		TriggerEvents(c, events)
 	}
 
 	if n.isRoot() || !n.hasChanged() {
 		return
 	}
 
-	for i, e := range *triggered {
-		if n.action == e.Action() && triggers(n, e) {
-			(*triggered)[i].TriggerPath(n.exactPath())
+	for _, e := range events {
+		if matches(n, e) {
+			e.Trigger(n.exactPath())
 			return
 		}
 	}
+}
+
+// TriggerEventsF calls trigger function for each detected event.
+func TriggerEventsF[E Event](n *DiffNode, events []E, trigger TriggerFunc[E]) {
+	for _, c := range n.children {
+		TriggerEventsF(c, events, trigger)
+	}
+
+	if n.isRoot() || !n.hasChanged() {
+		return
+	}
 
 	for _, e := range events {
-		if triggers(n, e) {
-			e.TriggerPath(n.exactPath())
-			*triggered = append(*triggered, e)
+		if matches(n, e) {
+			trigger(e, n.exactPath())
 			return
 		}
 	}
 }
 
 // MatchingChanges returns changes that match (trigger) given events.
-func MatchingChanges[E ChangeEvent](n *DiffNode, events []E) Changes {
+func MatchingChanges[E Event](n *DiffNode, events []E) Changes {
 	m, _ := categorizeChanges(n, events, false)
 	return m
 }
 
-// NonMatchingChanges returns changes that are either excluded from
+// ConflictingChanges returns changes that are either excluded from
 // all given events or have a conflicting actions (but their paths match).
-func NonMatchingChanges[E ChangeEvent](n *DiffNode, events []E) Changes {
-	_, mm := categorizeChanges(n, events, false)
-	return mm
+func ConflictingChanges[E Event](n *DiffNode, events []E) Changes {
+	_, c := categorizeChanges(n, events, false)
+	return c
 }
 
 // categorizeChanges returns two slices of changes. The first slice contains
 // changes categorized as matching (those that trigger a specific event) and
 // second contains changes that are completely excluded from these events.
-func categorizeChanges[E ChangeEvent](n *DiffNode, events []E, mismatch bool) (Changes, Changes) {
-	matched := make(Changes, 0)
-	mismatched := make(Changes, 0)
+func categorizeChanges[E Event](n *DiffNode, events []E, mismatch bool) (Changes, Changes) {
+	mat := make(Changes, 0)
+	con := make(Changes, 0)
 
 	if !n.isRoot() {
 		if !n.hasChanged() {
-			return matched, mismatched
+			return mat, con
 		}
 
 		if n.isLeaf() {
 			if mismatch || excludes(n, events) {
-				mismatched = append(mismatched, n.toChange())
+				con = append(con, n.toChange())
 			} else {
-				matched = append(matched, n.toChange())
+				mat = append(mat, n.toChange())
 			}
 
-			return matched, mismatched
+			return mat, con
 		}
 
 		if conflicts(n, events) {
@@ -84,21 +91,17 @@ func categorizeChanges[E ChangeEvent](n *DiffNode, events []E, mismatch bool) (C
 	}
 
 	for _, c := range n.children {
-		m, mm := categorizeChanges(c, events, mismatch)
-		matched = append(matched, m...)
-		mismatched = append(mismatched, mm...)
+		cm, cc := categorizeChanges(c, events, mismatch)
+		mat = append(mat, cm...)
+		con = append(con, cc...)
 	}
 
-	return matched, mismatched
+	return mat, con
 }
 
-// triggers returns true if the path and action of the node match the
+// matches returns true if the path and action of the node match the
 // path and action of the event.
-func triggers[E ChangeEvent](n *DiffNode, e E) bool {
-	if n.action == NONE {
-		return false
-	}
-
+func matches[E Event](n *DiffNode, e E) bool {
 	a := e.Action()
 	np := n.genericPath()
 
@@ -113,7 +116,7 @@ func triggers[E ChangeEvent](n *DiffNode, e E) bool {
 
 // conflicts returns true if node and event paths are the same,
 // but their actions do not match (conflict).
-func conflicts[E ChangeEvent](n *DiffNode, events []E) bool {
+func conflicts[E Event](n *DiffNode, events []E) bool {
 	var conflict bool
 
 	for _, e := range events {
@@ -135,7 +138,7 @@ func conflicts[E ChangeEvent](n *DiffNode, events []E) bool {
 
 // excludes returns true if none of the given event paths is a prefix
 // of a node's path.
-func excludes[E ChangeEvent](n *DiffNode, events []E) bool {
+func excludes[E Event](n *DiffNode, events []E) bool {
 	for _, e := range events {
 		for _, p := range e.Paths() {
 			if strings.HasPrefix(n.genericPath(), p) {
