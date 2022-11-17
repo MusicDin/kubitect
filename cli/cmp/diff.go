@@ -135,14 +135,14 @@ func (n *DiffNode) child(key interface{}) *DiffNode {
 	return nil
 }
 
-// exactPath returns node's path as a string with each section being
+// path returns node's path as a string with each section being
 // separated with a dot.
-func (n *DiffNode) exactPath() string {
+func (n *DiffNode) path() string {
 	if n.parent == nil || n.parent.isRoot() {
 		return n.key
 	}
 
-	return fmt.Sprintf("%s.%s", n.parent.exactPath(), n.key)
+	return fmt.Sprintf("%s.%s", n.parent.path(), n.key)
 }
 
 // structPath returns node's path as a string with each section being
@@ -152,7 +152,7 @@ func (n *DiffNode) structPath() string {
 		return n.structKey
 	}
 
-	return fmt.Sprintf("%s.%s", n.parent.exactPath(), n.structKey)
+	return fmt.Sprintf("%s.%s", n.parent.structPath(), n.structKey)
 }
 
 // genericPath returns the path as a string with all slice keys replaced

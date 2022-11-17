@@ -15,8 +15,14 @@ func (c *Comparator) cmpStruct(a, b reflect.Value) (*DiffNode, error) {
 		action = DELETE
 	}
 
-	t := a.Type()
-	node := NewEmptyNode(t, t.Kind())
+	var node *DiffNode
+
+	if c.PopulateStructNodes {
+		node = c.newNode(exportInterface(a), exportInterface(b))
+	} else {
+		t := a.Type()
+		node = NewEmptyNode(t, t.Kind())
+	}
 
 	for i := 0; i < a.NumField(); i++ {
 		field := a.Type().Field(i)
@@ -26,7 +32,7 @@ func (c *Comparator) cmpStruct(a, b reflect.Value) (*DiffNode, error) {
 		}
 
 		fName := field.Name
-		tName := tagName(c.TagName, field)
+		tName := tagName(c.nameTags(), field)
 
 		if tName == "" {
 			tName = fName

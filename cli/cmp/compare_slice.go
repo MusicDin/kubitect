@@ -64,7 +64,7 @@ func (c *Comparator) cmpSliceById(a, b reflect.Value) (*DiffNode, error) {
 	for i := 0; i < a.Len(); i++ {
 		ai := a.Index(i)
 
-		if id := tagOptionId(c.TagName, ai); id != nil {
+		if id := tagOptionId(c.Tag, ai); id != nil {
 			pairs.addA(id, &ai)
 		}
 	}
@@ -72,7 +72,7 @@ func (c *Comparator) cmpSliceById(a, b reflect.Value) (*DiffNode, error) {
 	for i := 0; i < b.Len(); i++ {
 		bi := b.Index(i)
 
-		if id := tagOptionId(c.TagName, bi); id != nil {
+		if id := tagOptionId(c.Tag, bi); id != nil {
 			pairs.addB(id, &bi)
 		}
 	}
@@ -88,7 +88,7 @@ func (c *Comparator) areComparativeById(a, b reflect.Value) bool {
 		av := getDeepValue(ai)
 
 		if av.Kind() == reflect.Struct {
-			if tagOptionId(c.TagName, av) != nil {
+			if tagOptionId(c.Tag, av) != nil {
 				return true
 			}
 		}
@@ -99,7 +99,7 @@ func (c *Comparator) areComparativeById(a, b reflect.Value) bool {
 		bv := getDeepValue(bi)
 
 		if bv.Kind() == reflect.Struct {
-			if tagOptionId(c.TagName, bv) != nil {
+			if tagOptionId(c.Tag, bv) != nil {
 				return true
 			}
 		}

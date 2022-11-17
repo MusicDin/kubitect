@@ -9,19 +9,19 @@ const (
 	TAG_OPTION_ID = "id"
 )
 
-var fieldNameTags = []string{"json", "yaml"}
-
 type CompareFunc func(reflect.Value, reflect.Value) (*DiffNode, error)
 
 type Comparator struct {
-	TagName            string
-	RespectSliceOrder  bool
-	IgnoreEmptyChanges bool // Ignore leafs with "nil -> nil" value
+	Tag                 string
+	ExtraNameTags       []string
+	RespectSliceOrder   bool // Compares slices by index
+	IgnoreEmptyChanges  bool // Ignore leafs with "nil -> nil" value
+	PopulateStructNodes bool // By default, before and after values are set only for leafs
 }
 
 func NewComparator() *Comparator {
 	return &Comparator{
-		TagName: "cmp",
+		Tag: "cmp",
 	}
 }
 
@@ -89,6 +89,10 @@ func (c *Comparator) getCompareFunc(a, b reflect.Value) CompareFunc {
 	}
 }
 
+func (c *Comparator) nameTags() []string {
+	return append([]string{c.Tag}, c.ExtraNameTags...)
+}
+
 func areOfKind(a, b reflect.Value, kinds ...reflect.Kind) bool {
 	var isA, isB bool
 
@@ -125,9 +129,7 @@ func hasTagOption(tagName string, field reflect.StructField, option string) bool
 	return false
 }
 
-func tagName(tagName string, field reflect.StructField) string {
-	tags := append([]string{tagName}, fieldNameTags...)
-
+func tagName(tags []string, field reflect.StructField) string {
 	for _, tag := range tags {
 		tName := strings.SplitN(field.Tag.Get(tag), ",", 2)[0]
 
@@ -139,7 +141,7 @@ func tagName(tagName string, field reflect.StructField) string {
 	return ""
 }
 
-func tagOptionId(tagName string, v reflect.Value) interface{} {
+func tagOptionId(tag string, v reflect.Value) interface{} {
 	v = getDeepValue(v)
 
 	if v.Kind() != reflect.Struct {
@@ -147,7 +149,7 @@ func tagOptionId(tagName string, v reflect.Value) interface{} {
 	}
 
 	for i := 0; i < v.NumField(); i++ {
-		if hasTagOption(tagName, v.Type().Field(i), TAG_OPTION_ID) {
+		if hasTagOption(tag, v.Type().Field(i), TAG_OPTION_ID) {
 			return exportInterface(v.Field(i))
 		}
 	}
@@ -155,7 +157,7 @@ func tagOptionId(tagName string, v reflect.Value) interface{} {
 	return nil
 }
 
-func tagOptionIdFieldName(tagName string, v reflect.Value) interface{} {
+func tagOptionIdFieldName(tag string, v reflect.Value) interface{} {
 	v = getDeepValue(v)
 
 	if v.Kind() != reflect.Struct {
@@ -163,7 +165,7 @@ func tagOptionIdFieldName(tagName string, v reflect.Value) interface{} {
 	}
 
 	for i := 0; i < v.NumField(); i++ {
-		if hasTagOption(tagName, v.Type().Field(i), TAG_OPTION_ID) {
+		if hasTagOption(tag, v.Type().Field(i), TAG_OPTION_ID) {
 			return v.Type().Field(i).Name
 		}
 	}

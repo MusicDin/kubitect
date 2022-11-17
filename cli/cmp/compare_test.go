@@ -324,7 +324,7 @@ func TestStruct_FieldName(t *testing.T) {
 	assert.Equal(t, "Value", ch[0].Path)
 
 	cmp := NewComparator()
-	cmp.TagName = "customTag"
+	cmp.Tag = "customTag"
 
 	d, _ = cmp.Compare(a, b)
 	ch = d.Changes()
@@ -340,10 +340,29 @@ func TestStruct_SkipField(t *testing.T) {
 	b := SimpleStruct{24}
 
 	cmp := NewComparator()
-	cmp.TagName = "customTag"
+	cmp.Tag = "customTag"
 
 	d, _ := cmp.Compare(a, b)
 	assert.False(t, d.hasChanged())
+}
+
+func TestStruct_PopulateNodes(t *testing.T) {
+	type SimpleStruct struct {
+		Value interface{}
+	}
+
+	a := SimpleStruct{
+		Value: SimpleStruct{
+			Value: 42,
+		},
+	}
+
+	cmp := NewComparator()
+	cmp.PopulateStructNodes = true
+
+	d, _ := cmp.Compare(a, nil)
+	assert.Equal(t, "{{42}}", toString(d.before))
+	assert.Equal(t, "{<nil>}", toString(d.after))
 }
 
 func TestMap(t *testing.T) {
@@ -459,9 +478,9 @@ func TestSlice_SliceId(t *testing.T) {
 	d, _ := cmp.Compare(a, b)
 	ch := d.Changes()
 
-	assert.ElementsMatch(t, expect, ch)
+	changesEqual(t, expect, ch)
 
-	cmp.TagName = "opt"
+	cmp.Tag = "opt"
 
 	expect[0].Path = "10.id"
 	expect[1].Path = "20.id"
@@ -471,7 +490,7 @@ func TestSlice_SliceId(t *testing.T) {
 	d, _ = cmp.Compare(a, b)
 	ch = d.Changes()
 
-	assert.ElementsMatch(t, expect, ch)
+	changesEqual(t, expect, ch)
 }
 
 func TestSlice_SliceIdToNilElem(t *testing.T) {
@@ -506,7 +525,7 @@ func TestSlice_SliceIdToNilElem(t *testing.T) {
 	d, _ := Compare(a, nil)
 	ch := d.Changes()
 
-	assert.ElementsMatch(t, expect, ch)
+	changesEqual(t, expect, ch)
 }
 
 func TestSlice_UnexportedField(t *testing.T) {

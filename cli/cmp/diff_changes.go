@@ -2,6 +2,7 @@ package cmp
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -11,6 +12,8 @@ type Change struct {
 	GenericPath string
 	Before      interface{}
 	After       interface{}
+	Type        reflect.Type
+	Kind        reflect.Kind
 	Action      ActionType
 }
 
@@ -40,9 +43,11 @@ func (n *DiffNode) Changes() Changes {
 // away parent and children references)
 func (n DiffNode) toChange() Change {
 	return Change{
-		Path:        n.exactPath(),
+		Path:        n.path(),
 		StructPath:  n.structPath(),
 		GenericPath: n.genericPath(),
+		Type:        n.typ,
+		Kind:        n.kind,
 		Before:      n.before,
 		After:       n.after,
 		Action:      n.action,
@@ -51,6 +56,9 @@ func (n DiffNode) toChange() Change {
 
 // String returns change as a string.
 func (c Change) String() string {
+	if c.Kind == reflect.Struct {
+		return fmt.Sprintf("(%s) %s", c.Action, c.Path)
+	}
 	return fmt.Sprintf("(%s) %s: %v -> %v", c.Action, c.Path, c.Before, c.After)
 }
 

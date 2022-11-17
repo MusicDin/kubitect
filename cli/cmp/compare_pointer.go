@@ -8,7 +8,7 @@ func (c *Comparator) cmpPointer(a, b reflect.Value) (*DiffNode, error) {
 			return c.compare(reflect.ValueOf(nil), reflect.Indirect(b))
 		}
 
-		return c.newLeaf(MODIFY, nil, b.Interface()), nil
+		return c.newLeaf(CREATE, nil, b.Interface()), nil
 	}
 
 	if b.Kind() == reflect.Invalid {

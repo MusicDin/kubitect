@@ -75,14 +75,14 @@ func (c *Comparator) cmpPairs(ps Pairs) (*DiffNode, error) {
 			return nil, err
 		}
 
-		setSliceId(ps, child, c.TagName)
+		setSliceId(ps, child, c.Tag)
 		node.addChild(child, p.key, p.key)
 	}
 
 	return node, nil
 }
 
-func setSliceId(ps Pairs, child *DiffNode, tagName string) {
+func setSliceId(ps Pairs, child *DiffNode, tag string) {
 	if !ps.cmpById || len(ps.pairs) == 0 || child == nil {
 		return
 	}
@@ -97,7 +97,7 @@ func setSliceId(ps Pairs, child *DiffNode, tagName string) {
 		rv = *p.B
 	}
 
-	fName := tagOptionIdFieldName(tagName, rv)
+	fName := tagOptionIdFieldName(tag, rv)
 
 	for _, c := range child.children {
 		if c.structKey == fName {

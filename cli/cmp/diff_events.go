@@ -9,10 +9,10 @@ type Event interface {
 
 type TriggerEvent interface {
 	Event
-	Trigger(string) // Set path of a change that triggered an event
+	Trigger(Change)
 }
 
-type TriggerFunc[E Event] func(event E, exactPath string)
+type TriggerFunc[E Event] func(E, Change)
 
 // TriggerEvents calls Trigger function of each detected event.
 func TriggerEvents[E TriggerEvent](n *DiffNode, events []E) {
@@ -26,7 +26,7 @@ func TriggerEvents[E TriggerEvent](n *DiffNode, events []E) {
 
 	for _, e := range events {
 		if matches(n, e) {
-			e.Trigger(n.exactPath())
+			e.Trigger(n.toChange())
 			return
 		}
 	}
@@ -44,7 +44,7 @@ func TriggerEventsF[E Event](n *DiffNode, events []E, trigger TriggerFunc[E]) {
 
 	for _, e := range events {
 		if matches(n, e) {
-			trigger(e, n.exactPath())
+			trigger(e, n.toChange())
 			return
 		}
 	}
@@ -63,9 +63,8 @@ func ConflictingChanges[E Event](n *DiffNode, events []E) Changes {
 	return c
 }
 
-// categorizeChanges returns two slices of changes. The first slice contains
-// changes categorized as matching (those that trigger a specific event) and
-// second contains changes that are completely excluded from these events.
+// categorizeChanges categorizes changes into matching and conflicting
+// (non-matching) events.
 func categorizeChanges[E Event](n *DiffNode, events []E, mismatch bool) (Changes, Changes) {
 	mat := make(Changes, 0)
 	con := make(Changes, 0)
@@ -136,10 +135,16 @@ func conflicts[E Event](n *DiffNode, events []E) bool {
 	return conflict
 }
 
-// excludes returns true if none of the given event paths is a prefix
-// of a node's path.
+// excludes returns true if there is no event that both matches the action
+// of the change and has a path that is a prefix of the path of the change.
 func excludes[E Event](n *DiffNode, events []E) bool {
 	for _, e := range events {
+		a := e.Action()
+
+		if a != UNKNOWN && a != n.action {
+			continue
+		}
+
 		for _, p := range e.Paths() {
 			if strings.HasPrefix(n.genericPath(), p) {
 				return false

@@ -37,7 +37,7 @@ func TestChanges_StructCreate(t *testing.T) {
 	}
 
 	d, _ := Compare(nil, s1)
-	assert.Equal(t, expect, d.Changes())
+	changesEqual(t, expect, d.Changes())
 }
 
 func TestChanges_StructDelete(t *testing.T) {
@@ -55,7 +55,7 @@ func TestChanges_StructDelete(t *testing.T) {
 	}
 
 	d, _ := Compare(s1, nil)
-	assert.Equal(t, expect, d.Changes())
+	changesEqual(t, expect, d.Changes())
 }
 
 func TestChanges_StructModify(t *testing.T) {
@@ -74,7 +74,7 @@ func TestChanges_StructModify(t *testing.T) {
 	}
 
 	d, _ := Compare(s1, s2)
-	assert.Equal(t, expect, d.Changes())
+	changesEqual(t, expect, d.Changes())
 }
 
 func TestOutput_Yaml(t *testing.T) {
@@ -184,8 +184,8 @@ func (e TestEvent) Paths() []string {
 	return []string{e.path}
 }
 
-func (e *TestEvent) Trigger(path string) {
-	e.triggerPaths = append(e.triggerPaths, path)
+func (e *TestEvent) Trigger(c Change) {
+	e.triggerPaths = append(e.triggerPaths, c.Path)
 }
 
 func TestEvents_Trigger(t *testing.T) {
@@ -232,8 +232,8 @@ func TestEvents_TriggerF(t *testing.T) {
 
 	var matchedPaths []string
 
-	mf := func(e TestEvent, p string) {
-		matchedPaths = append(matchedPaths, p)
+	mf := func(e TestEvent, c Change) {
+		matchedPaths = append(matchedPaths, c.Path)
 	}
 
 	d, _ := Compare(s, nil)
@@ -288,14 +288,116 @@ func TestEvents_Changes(t *testing.T) {
 	}
 
 	d, _ := Compare(s1, nil)
-	assert.ElementsMatch(t, expect, MatchingChanges(d, events))
+	mc := MatchingChanges(d, events)
 	assert.Empty(t, ConflictingChanges(d, events))
+	changesEqual(t, expect, mc)
 
 	d, _ = Compare(s1, s2)
+	cc := ConflictingChanges(d, events)
 	assert.Empty(t, MatchingChanges(d, events))
-	assert.ElementsMatch(t, Changes{expect[0]}, ConflictingChanges(d, events))
+	changeEquals(t, expect[0], cc[0])
 
 	d, _ = Compare(s1, s1)
 	assert.Empty(t, MatchingChanges(d, events))
 	assert.Empty(t, ConflictingChanges(d, events))
+}
+
+func changesEqual(t *testing.T, a Changes, b Changes) {
+
+	if len(a) != len(b) {
+		assert.Fail(t, "Changes length differs.", "expected: %v\ngot: %v", len(a), len(b))
+	}
+
+	for i := range a {
+		e := diffChanges(a[i], b[i], i)
+
+		if len(e) > 0 {
+			assert.Fail(t, "Changes differ!", e)
+		}
+	}
+}
+
+func changeEquals(t *testing.T, a Change, b Change) {
+	e := diffChanges(a, b, -1)
+
+	if len(e) > 0 {
+		assert.Fail(t, "Change differs!", e)
+	}
+}
+
+func diffChanges(a Change, b Change, i int) string {
+
+	type diff struct {
+		key      string
+		expected interface{}
+		got      interface{}
+	}
+
+	var diffs []diff
+
+	if a.Path != b.Path {
+		diffs = append(diffs, diff{
+			key:      "Path",
+			expected: a.Path,
+			got:      b.Path,
+		})
+	}
+
+	if a.StructPath != b.StructPath {
+		diffs = append(diffs, diff{
+			key:      "StructPath",
+			expected: a.StructPath,
+			got:      b.StructPath,
+		})
+	}
+
+	if a.GenericPath != b.GenericPath {
+		diffs = append(diffs, diff{
+			key:      "GenericPath",
+			expected: a.GenericPath,
+			got:      b.GenericPath,
+		})
+	}
+
+	if a.Before != b.Before {
+		diffs = append(diffs, diff{
+			key:      "Before",
+			expected: a.Before,
+			got:      b.Before,
+		})
+	}
+
+	if a.After != b.After {
+		diffs = append(diffs, diff{
+			key:      "After",
+			expected: a.After,
+			got:      b.After,
+		})
+	}
+
+	if a.Action != b.Action {
+		diffs = append(diffs, diff{
+			key:      "Action",
+			expected: a.Action,
+			got:      b.Action,
+		})
+	}
+
+	if len(diffs) == 0 {
+		return ""
+	}
+
+	var e string
+
+	if i > 0 {
+		e = fmt.Sprintf("Changes[%d]\n\n", i)
+	}
+
+	for _, d := range diffs {
+		e += fmt.Sprintf("(%s)\n", d.key)
+		e += fmt.Sprintf("expected: %v\n", d.expected)
+		e += fmt.Sprintf("got:      %v\n\n", d.got)
+	}
+
+	return e
 }

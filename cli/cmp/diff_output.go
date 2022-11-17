@@ -89,8 +89,7 @@ func (n *DiffNode) sortChildrenKeys() []string {
 	return keys
 }
 
-// isDifferent returns true if node is either a slice id or it has
-// changed.
+// isDifferent returns true if the node has changed or is a slice id.
 func (n *DiffNode) isDifferent() bool {
 	return n.isSliceId || n.hasChanged()
 }
