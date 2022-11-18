@@ -77,6 +77,14 @@ type LBInstance struct {
 	Priority     *Uint8  `yaml:"priority"`
 }
 
+func (i LBInstance) GetTypeName() string {
+	return "lb"
+}
+
+func (i LBInstance) GetID() *string {
+	return i.Id
+}
+
 func (i LBInstance) GetIP() *IPv4 {
 	return i.IP
 }

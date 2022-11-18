@@ -20,6 +20,10 @@ func TestWorkerDefault(t *testing.T) {
 	assert.NoError(t, WorkerDefault{}.Validate())
 }
 
+func TestWorker_Type(t *testing.T) {
+	assert.Equal(t, WorkerInstance{}.GetTypeName(), "worker")
+}
+
 func TestWorker_Minimal(t *testing.T) {
 	id := "id"
 
@@ -40,6 +44,7 @@ func TestWorker_MissingID(t *testing.T) {
 		Instances: []WorkerInstance{{}},
 	}
 
+	assert.Nil(t, w.Instances[0].GetID())
 	assert.EqualError(t, w.Validate(), "Field 'id' is required.")
 }
 

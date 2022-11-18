@@ -44,6 +44,10 @@ func TestLBDefault(t *testing.T) {
 	assert.NoError(t, LBDefault{}.Validate())
 }
 
+func TestLB_Type(t *testing.T) {
+	assert.Equal(t, LBInstance{}.GetTypeName(), "lb")
+}
+
 func TestLB_Minimal(t *testing.T) {
 	id := "id1"
 
@@ -64,6 +68,7 @@ func TestLB_MissingID(t *testing.T) {
 		Instances: []LBInstance{{}},
 	}
 
+	assert.Nil(t, lb.Instances[0].GetID())
 	assert.EqualError(t, lb.Validate(), "Field 'id' is required.")
 }
 

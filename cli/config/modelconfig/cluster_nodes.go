@@ -3,6 +3,8 @@ package modelconfig
 import v "cli/validation"
 
 type Instance interface {
+	GetTypeName() string
+	GetID() *string
 	GetIP() *IPv4
 	GetMAC() *MAC
 }

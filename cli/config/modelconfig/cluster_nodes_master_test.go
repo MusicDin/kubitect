@@ -20,6 +20,10 @@ func TestMasterDefault(t *testing.T) {
 	assert.NoError(t, MasterDefault{}.Validate())
 }
 
+func TestMaster_Type(t *testing.T) {
+	assert.Equal(t, MasterInstance{}.GetTypeName(), "master")
+}
+
 func TestMaster_Minimal(t *testing.T) {
 	id := "id"
 
@@ -40,6 +44,7 @@ func TestMaster_MissingID(t *testing.T) {
 		Instances: []MasterInstance{{}},
 	}
 
+	assert.Nil(t, m.Instances[0].GetID())
 	assert.EqualError(t, m.Validate(), "Field 'id' is required.")
 }
 

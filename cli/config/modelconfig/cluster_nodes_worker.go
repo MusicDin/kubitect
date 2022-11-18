@@ -45,6 +45,14 @@ type WorkerInstance struct {
 	Taints       []Taint    `yaml:"taints"`
 }
 
+func (i WorkerInstance) GetTypeName() string {
+	return "worker"
+}
+
+func (i WorkerInstance) GetID() *string {
+	return i.Id
+}
+
 func (i WorkerInstance) GetIP() *IPv4 {
 	return i.IP
 }

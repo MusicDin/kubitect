@@ -50,6 +50,14 @@ type MasterInstance struct {
 	Taints       []Taint    `yaml:"taints"`
 }
 
+func (i MasterInstance) GetTypeName() string {
+	return "master"
+}
+
+func (i MasterInstance) GetID() *string {
+	return i.Id
+}
+
 func (i MasterInstance) GetIP() *IPv4 {
 	return i.IP
 }
