@@ -41,7 +41,7 @@ func plan(c Cluster, action env.ApplyAction) (Events, error) {
 		fmt.Println("Above warnings indicate potentially destructive actions.")
 	}
 
-	err = utils.AskUserConfirmation("")
+	err = utils.AskUserConfirmation()
 
 	return events, err
 }

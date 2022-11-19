@@ -23,7 +23,7 @@ func Apply(clusterPath string) error {
 		return err
 	}
 
-	// run 'terraform plan' first to show changes
+	// Run 'terraform plan' first to show changes
 	if !env.AutoApprove {
 		changes, err := tf.Plan(context.Background())
 
@@ -33,10 +33,9 @@ func Apply(clusterPath string) error {
 
 		// Ask user for permission if there are any changes
 		if changes {
-			warning := "Proceed with terraform apply?"
-			err := utils.AskUserConfirmation(warning)
+			fmt.Println("Proceed with terraform apply?")
 
-			if err != nil {
+			if err := utils.AskUserConfirmation(); err != nil {
 				return err
 			}
 		}

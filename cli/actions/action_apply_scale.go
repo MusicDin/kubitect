@@ -80,7 +80,7 @@ func scaleDown(c Cluster, events Events) error {
 		fmt.Println("-", name)
 	}
 
-	if err := utils.AskUserConfirmation(""); err != nil {
+	if err := utils.AskUserConfirmation(); err != nil {
 		return err
 	}
 

@@ -30,9 +30,9 @@ func Destroy(clusterName string) error {
 		return fmt.Errorf("cluster '%s' is already destroyed (or not yet initialized).", clusterName)
 	}
 
-	msg := fmt.Sprintf("Cluster '%s' will be destroyed.", clusterName)
+	fmt.Printf("Cluster '%s' will be destroyed.\n", clusterName)
 
-	if err := utils.AskUserConfirmation(msg); err != nil {
+	if err := utils.AskUserConfirmation(); err != nil {
 		return err
 	}
 

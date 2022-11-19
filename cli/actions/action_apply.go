@@ -27,10 +27,10 @@ func Apply(userCfgPath string, action env.ApplyAction) error {
 	}
 
 	if c.OldCfg == nil && (action == env.SCALE || action == env.UPGRADE) {
-		fmt.Printf("Cannot %s cluster '%s' because it is not yet created.\n\n", action, c.Name)
+		fmt.Printf("Cannot %s cluster '%s'. It has not been created yet.\n\n", action, c.Name)
+		fmt.Println("Would you like to create it instead?")
 
-		q := "Would you like to create it instead?"
-		if err := utils.AskUserConfirmation(q); err != nil {
+		if err := utils.AskUserConfirmation(); err != nil {
 			return err
 		}
 
