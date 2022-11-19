@@ -26,10 +26,21 @@ func Apply(userCfgPath string, action env.ApplyAction) error {
 		return err
 	}
 
-	var events []*OnChangeEvent
+	if c.OldCfg == nil && (action == env.SCALE || action == env.UPGRADE) {
+		fmt.Printf("Cannot %s cluster '%s' because it is not yet created.\n\n", action, c.Name)
+
+		q := "Would you like to create it instead?"
+		if err := utils.AskUserConfirmation(q); err != nil {
+			return err
+		}
+
+		action = env.CREATE
+	}
+
+	var events Events
 
 	if c.OldCfg != nil {
-		events, err := plan(c, action)
+		events, err = plan(c, action)
 
 		if err != nil {
 			return err
@@ -63,7 +74,7 @@ func Apply(userCfgPath string, action env.ApplyAction) error {
 
 // prepare prepares cluster's directory. It ensures that Kubitect project
 // files are present in the directory, new configuration file is stored in
-// the temporary location and that virtual environment is created.
+// the temporary location and that main virtual environment is created.
 func prepare(c Cluster) error {
 	if err := initCluster(c); err != nil {
 		return err
@@ -84,9 +95,9 @@ func prepare(c Cluster) error {
 	return ansible.KubitectHostsSetup(c.Path)
 }
 
-// Init ensures cluster directory exists and that all required files
-// are copied from the Kubitect git project. If local flag is used,
-// project files are copied from the current directory.
+// initCluster ensures cluster directory exists and all required files are
+// copied from the Kubitect git project. If local flag is used, project
+// files are copied from the current directory.
 func initCluster(c Cluster) error {
 	cfg := c.NewCfg
 

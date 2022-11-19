@@ -36,7 +36,7 @@ func Destroy(clusterName string) error {
 		return err
 	}
 
-	fmt.Printf("Destroying '%s' cluster...\n", clusterName)
+	fmt.Printf("Destroying cluster '%s'...\n", clusterName)
 
 	if err := terraform.Destroy(c.Path); err != nil {
 		return err

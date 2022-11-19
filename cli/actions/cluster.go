@@ -68,6 +68,8 @@ func (c *Cluster) Sync() error {
 	c.OldCfgPath = path.Join(c.Path, env.ConstClusterConfigDir, oldCfgFileName)
 	c.InfraCfgPath = path.Join(c.Path, env.ConstClusterConfigDir, infraCfgFileName)
 
+	c.OldCfg, err = readConfigIfExists(c.OldCfgPath, modelconfig.Config{})
+
 	if err != nil {
 		return fmt.Errorf("failed to read previously applied configuration file: %v", err)
 	}
