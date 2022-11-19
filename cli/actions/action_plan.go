@@ -7,13 +7,16 @@ import (
 	"fmt"
 )
 
-func plan(c Cluster, action env.ApplyAction) ([]*OnChangeEvent, error) {
+func plan(c Cluster, action env.ApplyAction) (Events, error) {
 	if c.OldCfg == nil {
 		return nil, nil
 	}
 
 	comp := cmp.NewComparator()
-	comp.TagName = "opt"
+	comp.Tag = "opt"
+	comp.ExtraNameTags = []string{"yaml"}
+	comp.IgnoreEmptyChanges = true
+	comp.PopulateStructNodes = true
 
 	diff, err := comp.Compare(c.OldCfg, c.NewCfg)
 
@@ -25,31 +28,20 @@ func plan(c Cluster, action env.ApplyAction) ([]*OnChangeEvent, error) {
 	fmt.Println(diff.ToYamlDiff())
 
 	events := triggerEvents(diff, action)
+	blocking := events.OfType(BLOCK)
 
-	var warns utils.Errors
-	var errs utils.Errors
-
-	for _, t := range events {
-		switch t.cType {
-		case WARN:
-			warns = append(warns, NewConfigChangeWarning(t.msg, t.triggerPaths...))
-		case BLOCK:
-			errs = append(errs, NewConfigChangeError(t.msg, t.triggerPaths...))
-		}
+	if len(blocking) > 0 {
+		return nil, blocking.Errors()
 	}
 
-	if len(errs) > 0 {
-		return nil, errs
+	warnings := events.OfType(WARN)
+
+	if len(warnings) > 0 {
+		fmt.Println(warnings.Errors())
+		fmt.Println("Above warnings indicate potentially destructive actions.")
 	}
 
-	var msg string
-
-	if len(warns) > 0 {
-		fmt.Println(warns)
-		msg = "Above warnings indicate potentially destructive actions."
-	}
-
-	err = utils.AskUserConfirmation(msg)
+	err = utils.AskUserConfirmation("")
 
 	return events, err
 }

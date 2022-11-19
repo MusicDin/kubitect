@@ -3,30 +3,33 @@ package actions
 import (
 	"cli/cmp"
 	"cli/env"
+	"cli/utils"
 )
 
-type ChangeType string
+type EventType string
 
 const (
-	OK ChangeType = "ok"
+	OK         EventType = "ok"
+	SCALE_UP   EventType = "scale_up"
+	SCALE_DOWN EventType = "scale_down"
 
 	// WARN change requires user permission to continue.
-	WARN ChangeType = "warn"
+	WARN EventType = "warn"
 
 	// BLOCK change prevents further actions on the cluster.
-	BLOCK ChangeType = "block"
+	BLOCK EventType = "block"
 )
 
-type OnChangeEvent struct {
-	cType        ChangeType
-	msg          string
-	path         string
-	paths        []string
-	triggerPaths []string
-	action       cmp.ActionType
+type Event struct {
+	eType   EventType
+	msg     string
+	path    string
+	paths   []string
+	changes []cmp.Change
+	action  cmp.ActionType
 }
 
-func (e OnChangeEvent) Paths() []string {
+func (e Event) Paths() []string {
 	if len(e.path) > 0 {
 		return []string{e.path}
 	}
@@ -34,142 +37,172 @@ func (e OnChangeEvent) Paths() []string {
 	return e.paths
 }
 
-func (e OnChangeEvent) Action() cmp.ActionType {
+func (e Event) Action() cmp.ActionType {
 	return e.action
 }
 
-func (e *OnChangeEvent) TriggerPath(path string) {
-	e.triggerPaths = append(e.triggerPaths, path)
-}
+type Events []Event
 
-// triggerEvents checks whether any events is triggered based on the provided
-// changes and action. If any blocking event is triggered or some changes are
-// not covered by any event, an error is thrown.
-func triggerEvents(diff *cmp.DiffNode, action env.ApplyAction) []*OnChangeEvent {
-	events := events(action)
-	triggered := cmp.TriggerEvents(diff, events)
-	nmc := cmp.NonMatchingChanges(diff, events)
-
-	// Changes that are not covered by any event are automatically
-	// considered disallowed (blocking).
-	if len(nmc) > 0 {
-		var paths []string
-
-		for _, ch := range nmc {
-			paths = append(paths, ch.Path)
+// Add adds the event with the corresponding change to the list.
+// If an event with a matching action and path already exists in
+// the list then the change is appended to the existing event.
+func (es *Events) Add(event Event, c cmp.Change) {
+	for i, e := range *es {
+		if e.action == event.action && e.path == event.path {
+			(*es)[i].changes = append((*es)[i].changes, c)
+			return
 		}
-
-		triggered = append(triggered, &OnChangeEvent{
-			msg:   "Disallowed changes.",
-			paths: paths,
-		})
 	}
 
-	return triggered
+	event.changes = []cmp.Change{c}
+	*es = append(*es, event)
 }
 
-// events returns a copy of OnChangeEvent-s.
-// Since OnChangeEvents has a setter method, each event
-// must be a pointer.
-func events(a env.ApplyAction) []*OnChangeEvent {
-	var copy []OnChangeEvent
+// OfType returns events matching the given type.
+func (es Events) OfType(t EventType) Events {
+	var events Events
 
-	switch a {
-	case env.CREATE:
-		copy = ModifyEvents
-	case env.SCALE:
-		copy = ScaleEvents
-	case env.UPGRADE:
-		copy = UpgradeEvents
-	default:
-		return nil
-	}
-
-	var events []*OnChangeEvent
-
-	for _, e := range copy {
-		events = append(events, &e)
+	for _, e := range es {
+		if e.eType == t {
+			events = append(events, e)
+		}
 	}
 
 	return events
 }
 
+// Errors converts events to the utils.Errors.
+func (es Events) Errors() utils.Errors {
+	var err utils.Errors
+
+	for _, e := range es {
+		var paths []string
+
+		for _, c := range e.changes {
+			paths = append(paths, c.Path)
+		}
+
+		switch e.eType {
+		case WARN:
+			err = append(err, NewConfigChangeWarning(e.msg, paths...))
+		case BLOCK:
+			err = append(err, NewConfigChangeError(e.msg, paths...))
+		}
+	}
+
+	return err
+}
+
+// triggerEvents returns triggered events of the corresponding action.
+func triggerEvents(diff *cmp.DiffNode, action env.ApplyAction) Events {
+	var trig Events
+
+	events := events(action)
+
+	cmp.TriggerEventsF(diff, events, trig.Add)
+	cc := cmp.ConflictingChanges(diff, events)
+
+	if len(cc) > 0 {
+		trig = append(trig, Event{
+			eType:   BLOCK,
+			msg:     "Disallowed changes.",
+			changes: cc,
+		})
+	}
+
+	return trig
+}
+
+// events returns events of the corresponding action.
+func events(a env.ApplyAction) []Event {
+	switch a {
+	case env.CREATE:
+		return ModifyEvents
+	case env.SCALE:
+		return ScaleEvents
+	case env.UPGRADE:
+		return UpgradeEvents
+	default:
+		return nil
+	}
+}
+
 // Events
 var (
-	UpgradeEvents = []OnChangeEvent{
+	UpgradeEvents = []Event{
 		{
-			cType: OK,
+			eType: OK,
 			path:  "Kubernetes.Version",
 		},
 		{
-			cType: OK,
+			eType: OK,
 			path:  "Kubernetes.Kubespray.Version",
 		},
 	}
 
-	ScaleEvents = []OnChangeEvent{
+	ScaleEvents = []Event{
 		{
-			cType:  OK,
+			eType:  SCALE_DOWN,
 			action: cmp.DELETE,
 			path:   "Cluster.Nodes.Worker.Instances.*",
 		},
 		{
-			cType:  OK,
+			eType:  SCALE_UP,
 			action: cmp.CREATE,
 			path:   "Cluster.Nodes.Worker.Instances.*",
 		},
 		{
-			cType:  OK,
+			eType:  SCALE_DOWN,
 			action: cmp.DELETE,
 			path:   "Cluster.Nodes.LoadBalancer.Instances.*",
 		},
 		{
-			cType:  OK,
+			eType:  SCALE_UP,
 			action: cmp.CREATE,
 			path:   "Cluster.Nodes.LoadBalancer.Instances.*",
 		},
 	}
 
-	ModifyEvents = []OnChangeEvent{
+	ModifyEvents = []Event{
 		// Warn data destructive host changes
 		{
-			cType:  WARN,
+			eType:  WARN,
 			action: cmp.MODIFY,
 			path:   "Hosts.*.MainResourcePoolPath",
 			msg:    "Changing main resource pool location will trigger recreation of all resources bound to that resource pool, such as virtual machines and data disks.",
 		},
 		{
-			cType:  WARN,
+			eType:  WARN,
 			action: cmp.DELETE,
 			path:   "Hosts.*.DataResourcePools.*",
 			msg:    "Removing data resource pool will destroy all the data on that location.",
 		},
 		{
-			cType:  WARN,
+			eType:  WARN,
 			action: cmp.MODIFY,
 			path:   "Hosts.*.DataResourcePools.*.Path",
 			msg:    "Changing data resource pool location will trigger recreation of all resources bound to that resource pool, such as virtual machines and data disks",
 		},
 		// Allow other host changes
 		{
-			cType: OK,
+			eType: OK,
 			path:  "Hosts",
 		},
 		// Prevent cluster network changes
 		{
-			cType: BLOCK,
+			eType: BLOCK,
 			path:  "Cluster.Network",
 			msg:   "Once the cluster is created, further changes to the network properties are not allowed. Such action may render the cluster unusable.",
 		},
 		// Prevent nodeTemplate changes
 		{
-			cType: BLOCK,
+			eType: BLOCK,
 			path:  "Cluster.NodeTemplate",
 			msg:   "Once the cluster is created, further changes to the nodeTemplate properties are not allowed. Such action may render the cluster unusable.",
 		},
 		// Prevent removing nodes
 		{
-			cType:  BLOCK,
+			eType:  BLOCK,
 			action: cmp.DELETE,
 			paths: []string{
 				"Cluster.Nodes.LoadBalancer.Instances.*",
@@ -180,7 +213,7 @@ var (
 		},
 		// Prevent adding nodes
 		{
-			cType:  BLOCK,
+			eType:  BLOCK,
 			action: cmp.CREATE,
 			paths: []string{
 				"Cluster.Nodes.LoadBalancer.Instances.*",
@@ -191,7 +224,7 @@ var (
 		},
 		// Prevent default CPU, RAM and main disk size changes
 		{
-			cType: BLOCK,
+			eType: BLOCK,
 			paths: []string{
 				"Cluster.Nodes.Worker.Default.CPU",
 				"Cluster.Nodes.Worker.Default.RAM",
@@ -207,7 +240,7 @@ var (
 		},
 		// Prevent CPU, RAM and main disk size changes
 		{
-			cType:  BLOCK,
+			eType:  BLOCK,
 			action: cmp.MODIFY,
 			paths: []string{
 				"Cluster.Nodes.Worker.Instances.*.CPU",
@@ -224,7 +257,7 @@ var (
 		},
 		// Prevent IP and MAC changes
 		{
-			cType:  BLOCK,
+			eType:  BLOCK,
 			action: cmp.MODIFY,
 			paths: []string{
 				"Cluster.Nodes.Worker.Instances.*.IP",
@@ -238,7 +271,7 @@ var (
 		},
 		// Data disk changes
 		{
-			cType:  WARN,
+			eType:  WARN,
 			action: cmp.MODIFY,
 			paths: []string{
 				"Cluster.Nodes.Worker.Instances.*.DataDisks.*",
@@ -247,7 +280,7 @@ var (
 			msg: "Changing data disk properties, will recreate the disk (removing all of its content in the process).",
 		},
 		{
-			cType:  WARN,
+			eType:  WARN,
 			action: cmp.DELETE,
 			paths: []string{
 				"Cluster.Nodes.Master.Instances.*.DataDisks.*",
@@ -256,7 +289,7 @@ var (
 			msg: "One or more data disks will be removed.",
 		},
 		{
-			cType:  OK,
+			eType:  OK,
 			action: cmp.CREATE,
 			paths: []string{
 				"Cluster.Nodes.Master.Instances.*.DataDisks.*",
@@ -265,13 +298,13 @@ var (
 		},
 		// Prevent VIP changes
 		{
-			cType: BLOCK,
+			eType: BLOCK,
 			path:  "Cluster.Nodes.LoadBalancer.VIP",
 			msg:   "Once the cluster is created, changing virtual IP (VIP) is not allowed. Such action may render the cluster unusable.",
 		},
 		// Allow all other node properties to be changed
 		{
-			cType: OK,
+			eType: OK,
 			paths: []string{
 				"Cluster.Nodes.Master.Instances.*",
 				"Cluster.Nodes.Worker.Instances.*",
@@ -280,7 +313,7 @@ var (
 		},
 		// Prevent k8s properties changes
 		{
-			cType: BLOCK,
+			eType: BLOCK,
 			paths: []string{
 				"Kubernetes.Version",
 				"Kubernetes.Kubespray.Version",
@@ -289,12 +322,12 @@ var (
 		},
 		// Allow addons changes
 		{
-			cType: OK,
+			eType: OK,
 			path:  "Addons",
 		},
 		// Allow kubitect (project metadata) changes
 		{
-			cType: OK,
+			eType: OK,
 			path:  "Kubitect",
 		},
 	}

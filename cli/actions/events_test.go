@@ -11,7 +11,7 @@ import (
 )
 
 func TestEventPaths(t *testing.T) {
-	var events []OnChangeEvent
+	var events []Event
 
 	events = append(events, ModifyEvents...)
 	events = append(events, ScaleEvents...)
