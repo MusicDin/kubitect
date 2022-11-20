@@ -7,46 +7,56 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	defaultAction = "create"
-)
+const DefaultAction = "create"
 
 var (
-	configPath string
-	action     string
+	applyShort = "Create, scale or upgrade the cluster"
+	applyLong  = LongDesc(`
+		Apply new configuration file to create a cluster, or scale or upgrade the existing one.`)
 )
 
-var applyCmd = &cobra.Command{
-	SuggestFor: []string{"create", "scale", "upgrade"},
-	Use:        "apply",
-	GroupID:    "mgmt",
-	Short:      "Create, scale or upgrade the cluster",
-	Long: `
-Apply new configuration file to create a cluster, or scale or upgrade the existing one.`,
+type ApplyOptions struct {
+	Config string
+	Action string
 
-	RunE: func(cmd *cobra.Command, args []string) error {
-		a, err := env.ToApplyAction(action)
-
-		if err != nil {
-			return err
-		}
-
-		return actions.Apply(configPath, a)
-	},
+	env.ContextOptions
 }
 
-func init() {
-	rootCmd.AddCommand(applyCmd)
+func NewApplyCmd() *cobra.Command {
+	var opts ApplyOptions
 
-	applyCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "specify path to the cluster config file")
-	applyCmd.PersistentFlags().StringVarP(&action, "action", "a", defaultAction, "specify cluster action [create, upgrade, scale]")
-	applyCmd.PersistentFlags().BoolVarP(&env.Local, "local", "l", false, "use a current directory as the cluster path")
-	applyCmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
+	cmd := &cobra.Command{
+		SuggestFor: []string{"create", "scale", "upgrade"},
+		Use:        "apply",
+		GroupID:    "mgmt",
+		Short:      applyShort,
+		Long:       applyLong,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return opts.Run()
+		},
+	}
 
-	applyCmd.MarkPersistentFlagRequired("config")
+	cmd.PersistentFlags().StringVarP(&opts.Config, "config", "c", "", "specify path to the cluster config file")
+	cmd.PersistentFlags().StringVarP(&opts.Action, "action", "a", DefaultAction, "specify cluster action [create, upgrade, scale]")
+	cmd.PersistentFlags().BoolVarP(&opts.Local, "local", "l", false, "use a current directory as the cluster path")
+	cmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
+	cmd.PersistentFlags().BoolVar(&env.Debug, "debug", false, "enable debug messages")
 
-	// Add completion values for flag 'action'.
-	applyCmd.RegisterFlagCompletionFunc("action", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	cmd.MarkPersistentFlagRequired("config")
+
+	cmd.RegisterFlagCompletionFunc("action", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return env.ProjectApplyActions[:], cobra.ShellCompDirectiveDefault
 	})
+
+	return cmd
+}
+
+func (o *ApplyOptions) Run() error {
+	c, err := actions.NewCluster(o.Context(), o.Config)
+
+	if err != nil {
+		return err
+	}
+
+	return c.Apply(o.Action)
 }

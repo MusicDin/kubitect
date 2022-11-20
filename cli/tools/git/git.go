@@ -12,18 +12,17 @@ import (
 
 // Clone clones a git project with the given URL and version into
 // a specific directory.
-func Clone(path string, url string, version string) error {
-
+func Clone(path, url, version string) error {
 	if len(path) < 1 {
-		return fmt.Errorf("Git clone destination not provided.")
+		return fmt.Errorf("git clone: destination not provided.")
 	}
 
 	if len(url) < 1 {
-		return fmt.Errorf("Git URL not provided.")
+		return fmt.Errorf("git clone: URL not provided.")
 	}
 
 	if len(version) < 1 {
-		return fmt.Errorf("Git version not provided.")
+		return fmt.Errorf("git clone: version not provided.")
 	}
 
 	// Version regex ("v" any number "dot" any number "dot" any number)
@@ -50,7 +49,7 @@ func Clone(path string, url string, version string) error {
 		Depth:             1,
 	}
 
-	if env.DebugMode {
+	if env.Debug {
 		gitCloneOptions.Progress = os.Stdout
 	}
 
@@ -59,7 +58,7 @@ func Clone(path string, url string, version string) error {
 	_, err = git.PlainClone(path, false, gitCloneOptions)
 
 	if err != nil {
-		return fmt.Errorf("Error cloning git project for 'url=%s' and 'version=%s': %v", url, version, err)
+		return fmt.Errorf("git clone: failed to clone project (url: %s, version: %s): %v", url, version, err)
 	}
 
 	return nil

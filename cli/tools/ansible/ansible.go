@@ -3,7 +3,6 @@ package ansible
 import (
 	"cli/env"
 	"context"
-	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -11,12 +10,6 @@ import (
 	"github.com/apenella/go-ansible/pkg/execute"
 	"github.com/apenella/go-ansible/pkg/options"
 	"github.com/apenella/go-ansible/pkg/playbook"
-)
-
-var (
-	MissingPlaybookVenvPath  = errors.New("VenvPath must be provided!")
-	MissingPlaybookFilePath  = errors.New("To run ansible-playbook playbook file path must be specified.")
-	MissingPlaybookInventory = errors.New("To run ansible-playbook an inventory must be specified.")
 )
 
 type Playbook struct {
@@ -44,15 +37,15 @@ func (pb Playbook) Exec() error {
 // set to the cluster path directory.
 func (pb Playbook) exec() error {
 	if len(pb.PlaybookFile) < 1 {
-		return MissingPlaybookFilePath
+		return fmt.Errorf("ansible-playbook: file path not set")
 	}
 
 	if len(pb.Inventory) < 1 {
-		return MissingPlaybookInventory
+		return fmt.Errorf("ansible-playbook (%s): inventory not set", pb.PlaybookFile)
 	}
 
 	if len(pb.VenvPath) < 1 {
-		return MissingPlaybookVenvPath
+		return fmt.Errorf("ansible-playbook (%s): virtual environment path not set", pb.PlaybookFile)
 	}
 
 	privilegeEscalationOptions := &options.AnsiblePrivilegeEscalationOptions{
@@ -74,7 +67,7 @@ func (pb Playbook) exec() error {
 		Tags:      strings.Join(pb.Tags, ","),
 	}
 
-	if env.DebugMode {
+	if env.Debug {
 		playbookOptions.Verbose = true
 	}
 
@@ -122,7 +115,7 @@ func extraVarsToMap(extraVars []string) (map[string]string, error) {
 		tokens := strings.Split(v, "=")
 
 		if len(tokens) != 2 {
-			return nil, fmt.Errorf("Invalid extraVar format for variable '%s'. Correct format is 'key=value'.", v)
+			return nil, fmt.Errorf("extraVarsToMap: variable (%s) must be in 'key=value' format", v)
 		}
 
 		evMap[tokens[0]] = tokens[1]

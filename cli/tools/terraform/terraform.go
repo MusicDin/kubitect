@@ -2,7 +2,7 @@ package terraform
 
 import (
 	"cli/env"
-	"cli/utils"
+	"cli/ui"
 	"context"
 	"fmt"
 	"os"
@@ -15,72 +15,32 @@ import (
 	"github.com/hashicorp/terraform-exec/tfexec"
 )
 
-// Apply prepares Terraform project and applies the configuration.
-func Apply(clusterPath string) error {
-	tf, err := new(clusterPath)
+type Terraform struct {
+	Ctx *env.Context
 
-	if err != nil {
-		return err
-	}
+	tf *tfexec.Terraform
 
-	// Run 'terraform plan' first to show changes
-	if !env.AutoApprove {
-		changes, err := tf.Plan(context.Background())
-
-		if err != nil {
-			return fmt.Errorf("Error running Terraform apply: %v", err)
-		}
-
-		// Ask user for permission if there are any changes
-		if changes {
-			fmt.Println("Proceed with terraform apply?")
-
-			if err := utils.AskUserConfirmation(); err != nil {
-				return err
-			}
-		}
-	}
-
-	err = tf.Apply(context.Background())
-
-	if err != nil {
-		return fmt.Errorf("Error running Terraform apply: %v", err)
-	}
-
-	return nil
+	version    string // Terraform version
+	path       string // Terraform binary path
+	projectDir string // Terraform project dir
 }
 
-// Destroy destroys the Terraform project on the provided path.
-func Destroy(clusterPath string) error {
-	tf, err := new(clusterPath)
-
-	if err != nil {
-		return err
+// NewTerraform returns Terraform object with initialized Terraform project.
+// Terraform is also installed, if binary file is not found locally.
+func NewTerraform(ctx *env.Context, clusterPath string) (*Terraform, error) {
+	t := Terraform{
+		Ctx:        ctx,
+		version:    env.ConstTerraformVersion,
+		projectDir: filepath.Join(clusterPath, "terraform"),
 	}
 
-	err = tf.Destroy(context.Background())
+	binDir := filepath.Join(t.Ctx.ShareDir(), "terraform", t.version)
 
-	if err != nil {
-		return fmt.Errorf("Failed to destroy Terraform project: %v", err)
-	}
-
-	return nil
-}
-
-// new installs terraform with the appropriate version
-// into the bin directory. Afterwards it initializes the project
-// and returns Terraform object.
-func new(clusterPath string) (*tfexec.Terraform, error) {
-	ver := env.ConstTerraformVersion
-
-	binDir := env.BinDirPath("terraform", ver)
-	projDir := filepath.Join(clusterPath, "terraform")
-
-	fmt.Printf("Ensuring Terraform %s is installed...\n", ver)
+	fmt.Printf("Ensuring Terraform %s is installed...\n", t.version)
 
 	fs := &fs.ExactVersion{
 		Product:    product.Terraform,
-		Version:    version.Must(version.NewVersion(ver)),
+		Version:    version.Must(version.NewVersion(t.version)),
 		ExtraPaths: []string{binDir},
 	}
 
@@ -88,18 +48,16 @@ func new(clusterPath string) (*tfexec.Terraform, error) {
 	execPath, err := fs.Find(context.Background())
 
 	if err != nil {
-		fmt.Printf("Terraform %s could not be found locally.\n", ver)
-		fmt.Printf("Installing Terraform %s in '%s'...\n", ver, binDir)
+		fmt.Printf("Terraform %s could not be found locally.\n", t.version)
+		fmt.Printf("Installing Terraform %s in '%s'...\n", t.version, binDir)
 
-		err := os.MkdirAll(binDir, os.ModePerm)
-
-		if err != nil {
-			return nil, fmt.Errorf("Failed creating Terraform install directory: %v", err)
+		if err := os.MkdirAll(binDir, os.ModePerm); err != nil {
+			return nil, fmt.Errorf("failed to create Terraform install directory: %v", err)
 		}
 
 		installer := &releases.ExactVersion{
 			Product:    product.Terraform,
-			Version:    version.Must(version.NewVersion(ver)),
+			Version:    version.Must(version.NewVersion(t.version)),
 			InstallDir: binDir,
 		}
 
@@ -107,30 +65,73 @@ func new(clusterPath string) (*tfexec.Terraform, error) {
 		execPath, err = installer.Install(context.Background())
 
 		if err != nil {
-			return nil, fmt.Errorf("Error installing Terraform: %v", err)
+			return nil, fmt.Errorf("terraform: failed to install Terraform: %v", err)
 		}
 
 	} else {
-		fmt.Printf("Terraform %s found locally (%s).\n", ver, execPath)
+		fmt.Printf("Terraform %s found locally (%s).\n", t.version, execPath)
 	}
 
-	tf, err := tfexec.NewTerraform(projDir, execPath)
+	tf, err := tfexec.NewTerraform(t.projectDir, execPath)
 
 	if err != nil {
-		return nil, fmt.Errorf("Error running NewTerraform: %v", err)
+		return nil, fmt.Errorf("failed to instantiate Terraform: %v", err)
 	}
 
 	tf.SetStdout(os.Stdout)
 	tf.SetStderr(os.Stderr)
 	// tf.SetColor(true)
 
+	t.tf = tf
+	t.path = execPath
+
 	fmt.Println("Initializing Terraform project...")
 
-	err = tf.Init(context.Background())
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize Terraform project: %v", err)
+	if err = tf.Init(context.Background()); err != nil {
+		return nil, fmt.Errorf("failed to initialize Terraform project: %v", err)
 	}
 
-	return tf, nil
+	return &t, nil
+}
+
+// Plan shows Terraform project changes (plan).
+func (t *Terraform) Plan() (bool, error) {
+	changes, err := t.tf.Plan(context.Background())
+
+	if err != nil {
+		err = fmt.Errorf("error running Terraform plan: %v", err)
+	}
+
+	return changes, err
+}
+
+// Apply applies new Terraform configurations.
+func (t *Terraform) Apply() error {
+	changes, err := t.Plan()
+
+	if err != nil {
+		return err
+	}
+
+	// Ask user for permission if there are any changes
+	if changes && !env.AutoApprove {
+		if err := ui.Ask("Proceed with terraform apply?"); err != nil {
+			return err
+		}
+	}
+
+	if err := t.tf.Apply(context.Background()); err != nil {
+		return fmt.Errorf("error running Terraform apply: %v", err)
+	}
+
+	return nil
+}
+
+// Destroy destroys the Terraform project.
+func (t *Terraform) Destroy() error {
+	if err := t.tf.Destroy(context.Background()); err != nil {
+		return fmt.Errorf("failed to destroy Terraform project: %v", err)
+	}
+
+	return nil
 }

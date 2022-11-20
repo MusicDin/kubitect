@@ -3,18 +3,17 @@ package actions
 import (
 	"cli/env"
 	"cli/tools/terraform"
-	"cli/utils"
+	"cli/ui"
 	"fmt"
 	"os"
-	"path/filepath"
 )
 
-func Destroy(clusterName string) error {
+func Destroy(ctx *env.Context, clusterName string) error {
 	if clusterName == "" {
 		return fmt.Errorf("a valid (non-empty) cluster name must be provided")
 	}
 
-	clusters, err := GetClusters()
+	clusters, err := Clusters(ctx)
 
 	if err != nil {
 		return err
@@ -26,24 +25,30 @@ func Destroy(clusterName string) error {
 		return fmt.Errorf("cluster '%s' not found.", clusterName)
 	}
 
-	if !c.Active() {
+	if !c.ContainsAppliedConfig() {
 		return fmt.Errorf("cluster '%s' is already destroyed (or not yet initialized).", clusterName)
 	}
 
 	fmt.Printf("Cluster '%s' will be destroyed.\n", clusterName)
 
-	if err := utils.AskUserConfirmation(); err != nil {
+	if err := ui.Ask(); err != nil {
 		return err
 	}
 
 	fmt.Printf("Destroying cluster '%s'...\n", clusterName)
 
-	if err := terraform.Destroy(c.Path); err != nil {
+	t, err := terraform.NewTerraform(ctx, c.Path)
+
+	if err != nil {
 		return err
 	}
 
-	tfState := filepath.Join(c.Path, env.ConstTerraformStatePath)
-	// TODO: Remove Kubeconfig
+	if err := t.Destroy(); err != nil {
+		return err
+	}
 
-	return os.Remove(tfState)
+	// TODO: Remove Kubeconfig
+	// os.Remove(c.KubeconfigPath())
+
+	return os.Remove(c.TfStatePath())
 }

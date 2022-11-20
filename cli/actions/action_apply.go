@@ -4,43 +4,59 @@ import (
 	"cli/env"
 	"cli/tools/ansible"
 	"cli/tools/git"
-	"cli/utils"
+	"cli/ui"
 	"fmt"
 	"os"
 	"path/filepath"
 )
 
-type Action string
+type ApplyAction string
 
 const (
-	UNKNOWN Action = ""
-	CREATE  Action = "create"
-	SCALE   Action = "scale"
-	UPGRADE Action = "upgrade"
+	UNKNOWN ApplyAction = "unknown"
+	CREATE  ApplyAction = "create"
+	UPGRADE ApplyAction = "upgrade"
+	SCALE   ApplyAction = "scale"
 )
 
-func Apply(userCfgPath string, action env.ApplyAction) error {
-	c, err := NewCluster(userCfgPath)
+func (a ApplyAction) String() string {
+	return string(a)
+}
+
+func ToApplyAction(a string) (ApplyAction, error) {
+	switch a {
+	case CREATE.String(), "":
+		return CREATE, nil
+	case UPGRADE.String():
+		return UPGRADE, nil
+	case SCALE.String():
+		return SCALE, nil
+	default:
+		return UNKNOWN, fmt.Errorf("unknown cluster action: %s", a)
+	}
+}
+
+func (c *Cluster) Apply(action string) error {
+	a, err := ToApplyAction(action)
 
 	if err != nil {
 		return err
 	}
 
-	if c.OldCfg == nil && (action == env.SCALE || action == env.UPGRADE) {
-		fmt.Printf("Cannot %s cluster '%s'. It has not been created yet.\n\n", action, c.Name)
-		fmt.Println("Would you like to create it instead?")
+	if c.AppliedConfig == nil && (a == SCALE || a == UPGRADE) {
+		fmt.Printf("Cannot %s cluster '%s'. It has not been created yet.\n\n", a, c.Name)
 
-		if err := utils.AskUserConfirmation(); err != nil {
+		if err := ui.Ask("Would you like to create it instead?"); err != nil {
 			return err
 		}
 
-		action = env.CREATE
+		a = CREATE
 	}
 
 	var events Events
 
-	if c.OldCfg != nil {
-		events, err = plan(c, action)
+	if c.AppliedConfig != nil {
+		events, err = c.plan(a)
 
 		if err != nil {
 			return err
@@ -56,12 +72,12 @@ func Apply(userCfgPath string, action env.ApplyAction) error {
 		return err
 	}
 
-	switch action {
-	case env.CREATE:
+	switch a {
+	case CREATE:
 		err = create(c)
-	case env.UPGRADE:
+	case UPGRADE:
 		err = upgrade(c)
-	case env.SCALE:
+	case SCALE:
 		err = scale(c, events)
 	}
 
@@ -75,7 +91,7 @@ func Apply(userCfgPath string, action env.ApplyAction) error {
 // prepare prepares cluster's directory. It ensures that Kubitect project
 // files are present in the directory, new configuration file is stored in
 // the temporary location and that main virtual environment is created.
-func prepare(c Cluster) error {
+func prepare(c *Cluster) error {
 	if err := initCluster(c); err != nil {
 		return err
 	}
@@ -98,8 +114,8 @@ func prepare(c Cluster) error {
 // initCluster ensures cluster directory exists and all required files are
 // copied from the Kubitect git project. If local flag is used, project
 // files are copied from the current directory.
-func initCluster(c Cluster) error {
-	cfg := c.NewCfg
+func initCluster(c *Cluster) error {
+	cfg := c.NewConfig
 
 	url := env.ConstProjectUrl
 	version := env.ConstProjectVersion
@@ -112,19 +128,11 @@ func initCluster(c Cluster) error {
 		version = string(*cfg.Kubitect.Version)
 	}
 
-	if env.DebugMode {
-		utils.PrintDebug("kubitect.url: %s", url)
-		utils.PrintDebug("kubitect.version: %s", version)
-	}
+	ui.Printf(ui.DEBUG, "kubitect.url: %s\n", url)
+	ui.Printf(ui.DEBUG, "kubitect.version: %s\n", version)
 
-	if env.Local {
-		wd, err := os.Getwd()
-
-		if err != nil {
-			return err
-		}
-
-		return copyReqFiles(wd, c.Path)
+	if c.Local {
+		return copyReqFiles(c.Ctx.WorkingDir(), c.Path)
 	}
 
 	tmpDir := filepath.Join(c.Path, "tmp")

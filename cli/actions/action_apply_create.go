@@ -5,8 +5,14 @@ import (
 	"cli/tools/terraform"
 )
 
-func create(c Cluster) error {
-	if err := terraform.Apply(c.Path); err != nil {
+func create(c *Cluster) error {
+	t, err := terraform.NewTerraform(c.Ctx, c.Path)
+
+	if err != nil {
+		return err
+	}
+
+	if err := t.Apply(); err != nil {
 		return err
 	}
 
@@ -14,10 +20,10 @@ func create(c Cluster) error {
 		return err
 	}
 
-	sshUser := string(*c.InfraCfg.Cluster.NodeTemplate.User)
-	sshPKey := string(*c.InfraCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath)
+	sshUser := string(*c.InfraConfig.Cluster.NodeTemplate.User)
+	sshPKey := string(*c.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath)
 
-	k8sVersion := string(*c.NewCfg.Kubernetes.Version)
+	k8sVersion := string(*c.NewConfig.Kubernetes.Version)
 
 	if err := ansible.KubitectInit(c.Path, ansible.KUBESPRAY, ansible.GEN_NODES); err != nil {
 		return err

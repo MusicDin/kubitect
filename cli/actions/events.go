@@ -2,8 +2,6 @@ package actions
 
 import (
 	"cli/cmp"
-	"cli/env"
-	"cli/utils"
 )
 
 type EventType string
@@ -41,6 +39,23 @@ func (e Event) Action() cmp.ActionType {
 	return e.action
 }
 
+func (e Event) Error() error {
+	var paths []string
+
+	for _, c := range e.changes {
+		paths = append(paths, c.Path)
+	}
+
+	switch e.eType {
+	case WARN:
+		return NewConfigChangeWarning(e.msg, paths...)
+	case BLOCK:
+		return NewConfigChangeError(e.msg, paths...)
+	}
+
+	return nil
+}
+
 type Events []Event
 
 // Add adds the event with the corresponding change to the list.
@@ -72,32 +87,21 @@ func (es Events) OfType(t EventType) Events {
 }
 
 // Errors converts events to the utils.Errors.
-func (es Events) Errors() utils.Errors {
-	var err utils.Errors
+func (es Events) Errors() []error {
+	var err []error
 
 	for _, e := range es {
-		var paths []string
-
-		for _, c := range e.changes {
-			paths = append(paths, c.Path)
-		}
-
-		switch e.eType {
-		case WARN:
-			err = append(err, NewConfigChangeWarning(e.msg, paths...))
-		case BLOCK:
-			err = append(err, NewConfigChangeError(e.msg, paths...))
-		}
+		err = append(err, e.Error())
 	}
 
 	return err
 }
 
 // triggerEvents returns triggered events of the corresponding action.
-func triggerEvents(diff *cmp.DiffNode, action env.ApplyAction) Events {
+func triggerEvents(diff *cmp.DiffNode, action ApplyAction) Events {
 	var trig Events
 
-	events := events(action)
+	events := action.events()
 
 	cmp.TriggerEventsF(diff, events, trig.Add)
 	cc := cmp.ConflictingChanges(diff, events)
@@ -114,13 +118,13 @@ func triggerEvents(diff *cmp.DiffNode, action env.ApplyAction) Events {
 }
 
 // events returns events of the corresponding action.
-func events(a env.ApplyAction) []Event {
+func (a ApplyAction) events() Events {
 	switch a {
-	case env.CREATE:
+	case CREATE:
 		return ModifyEvents
-	case env.SCALE:
+	case SCALE:
 		return ScaleEvents
-	case env.UPGRADE:
+	case UPGRADE:
 		return UpgradeEvents
 	default:
 		return nil
@@ -129,7 +133,7 @@ func events(a env.ApplyAction) []Event {
 
 // Events
 var (
-	UpgradeEvents = []Event{
+	UpgradeEvents = Events{
 		{
 			eType: OK,
 			path:  "Kubernetes.Version",
@@ -140,7 +144,7 @@ var (
 		},
 	}
 
-	ScaleEvents = []Event{
+	ScaleEvents = Events{
 		{
 			eType:  SCALE_DOWN,
 			action: cmp.DELETE,
@@ -163,7 +167,7 @@ var (
 		},
 	}
 
-	ModifyEvents = []Event{
+	ModifyEvents = Events{
 		// Warn data destructive host changes
 		{
 			eType:  WARN,

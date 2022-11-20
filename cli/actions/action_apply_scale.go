@@ -4,16 +4,22 @@ import (
 	"cli/config/modelconfig"
 	"cli/tools/ansible"
 	"cli/tools/terraform"
-	"cli/utils"
+	"cli/ui"
 	"fmt"
 )
 
-func scale(c Cluster, events Events) error {
+func scale(c *Cluster, events Events) error {
 	if err := scaleDown(c, events); err != nil {
 		return err
 	}
 
-	if err := terraform.Apply(c.Path); err != nil {
+	t, err := terraform.NewTerraform(c.Ctx, c.Path)
+
+	if err != nil {
+		return err
+	}
+
+	if err := t.Apply(); err != nil {
 		return err
 	}
 
@@ -21,7 +27,7 @@ func scale(c Cluster, events Events) error {
 }
 
 // scaleUp adds new nodes to the cluster.
-func scaleUp(c Cluster, events Events) error {
+func scaleUp(c *Cluster, events Events) error {
 	if len(events.OfType(SCALE_UP)) == 0 {
 		return nil
 	}
@@ -30,10 +36,10 @@ func scaleUp(c Cluster, events Events) error {
 		return err
 	}
 
-	sshUser := string(*c.InfraCfg.Cluster.NodeTemplate.User)
-	sshPKey := string(*c.InfraCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath)
+	sshUser := string(*c.InfraConfig.Cluster.NodeTemplate.User)
+	sshPKey := string(*c.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath)
 
-	k8sVersion := string(*c.NewCfg.Kubernetes.Version)
+	k8sVersion := string(*c.NewConfig.Kubernetes.Version)
 
 	if err := ansible.KubitectInit(c.Path, ansible.KUBESPRAY, ansible.GEN_NODES); err != nil {
 		return err
@@ -51,15 +57,15 @@ func scaleUp(c Cluster, events Events) error {
 }
 
 // scaleDown gracefully removes nodes from the cluster.
-func scaleDown(c Cluster, events Events) error {
+func scaleDown(c *Cluster, events Events) error {
 	if len(events) == 0 {
 		return nil
 	}
 
-	sshUser := string(*c.InfraCfg.Cluster.NodeTemplate.User)
-	sshPKey := string(*c.InfraCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath)
+	sshUser := string(*c.InfraConfig.Cluster.NodeTemplate.User)
+	sshPKey := string(*c.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath)
 
-	rmNodes, err := extractNodes(c, events.OfType(SCALE_DOWN))
+	rmNodes, err := extractNodes(events.OfType(SCALE_DOWN))
 
 	if err != nil {
 		return err
@@ -80,7 +86,7 @@ func scaleDown(c Cluster, events Events) error {
 		fmt.Println("-", name)
 	}
 
-	if err := utils.AskUserConfirmation(); err != nil {
+	if err := ui.Ask(); err != nil {
 		return err
 	}
 
@@ -96,7 +102,7 @@ func scaleDown(c Cluster, events Events) error {
 }
 
 // extractNodes returns node instances from the event changes.
-func extractNodes(c Cluster, events Events) ([]modelconfig.Instance, error) {
+func extractNodes(events Events) ([]modelconfig.Instance, error) {
 	var nodes []modelconfig.Instance
 
 	for _, e := range events {

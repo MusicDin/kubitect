@@ -2,13 +2,12 @@ package actions
 
 import (
 	"cli/cmp"
-	"cli/env"
-	"cli/utils"
+	"cli/ui"
 	"fmt"
 )
 
-func plan(c Cluster, action env.ApplyAction) (Events, error) {
-	if c.OldCfg == nil {
+func (c *Cluster) plan(action ApplyAction) (Events, error) {
+	if c.AppliedConfig == nil {
 		return nil, nil
 	}
 
@@ -18,7 +17,7 @@ func plan(c Cluster, action env.ApplyAction) (Events, error) {
 	comp.IgnoreEmptyChanges = true
 	comp.PopulateStructNodes = true
 
-	diff, err := comp.Compare(c.OldCfg, c.NewCfg)
+	diff, err := comp.Compare(c.AppliedConfig, c.NewConfig)
 
 	if err != nil || len(diff.Changes()) == 0 {
 		return nil, err
@@ -31,17 +30,16 @@ func plan(c Cluster, action env.ApplyAction) (Events, error) {
 	blocking := events.OfType(BLOCK)
 
 	if len(blocking) > 0 {
-		return nil, blocking.Errors()
+		ui.PrintBlock(blocking.Errors()...)
+		return nil, fmt.Errorf("Aborted. Configuration file contains errors.")
 	}
 
 	warnings := events.OfType(WARN)
 
 	if len(warnings) > 0 {
-		fmt.Println(warnings.Errors())
+		ui.PrintBlock(warnings.Errors()...)
 		fmt.Println("Above warnings indicate potentially destructive actions.")
 	}
 
-	err = utils.AskUserConfirmation()
-
-	return events, err
+	return events, ui.Ask()
 }

@@ -2,7 +2,7 @@ package actions
 
 import (
 	"cli/env"
-	"cli/utils"
+	"cli/file"
 	"cli/validation"
 	"fmt"
 	"os"
@@ -12,27 +12,27 @@ import (
 // readConfig reads configuration file on the given path and converts it into
 // the provided model.
 func readConfig[T validation.Validatable](path string, model T) (*T, error) {
-	if !utils.Exists(path) {
+	if !file.Exists(path) {
 		return nil, fmt.Errorf("file '%s' does not exist", path)
 	}
 
-	return utils.ReadYaml(path, model)
+	return file.ReadYaml(path, model)
 }
 
 // readConfig reads configuration file on the given path and converts it into
 // the provided model. If file on the provided path does not exist, neither error
 // nor model is returned.
 func readConfigIfExists[T validation.Validatable](path string, model T) (*T, error) {
-	if !utils.Exists(path) {
+	if !file.Exists(path) {
 		return nil, nil
 	}
 
-	return utils.ReadYaml(path, model)
+	return file.ReadYaml(path, model)
 }
 
 // validateConfig validates provided configuration file.
-func validateConfig[T validation.Validatable](config T) error {
-	var errs utils.Errors
+func validateConfig[T validation.Validatable](config T) []error {
+	var errs []error
 
 	err := config.Validate()
 
@@ -58,7 +58,7 @@ func copyReqFiles(srcDir, dstDir string) error {
 		src := filepath.Join(srcDir, path)
 		dst := filepath.Join(dstDir, path)
 
-		if err := utils.ForceCopy(src, dst); err != nil {
+		if err := file.ForceCopy(src, dst); err != nil {
 			return err
 		}
 	}
@@ -69,7 +69,7 @@ func copyReqFiles(srcDir, dstDir string) error {
 // verifyClusterDir verifies if the provided cluster directory
 // exists and if it contains all necessary directories.
 func verifyClusterDir(clusterPath string) error {
-	if !utils.Exists(clusterPath) {
+	if !file.Exists(clusterPath) {
 		return fmt.Errorf("cluster path '%s' does not exist", clusterPath)
 	}
 
@@ -78,7 +78,7 @@ func verifyClusterDir(clusterPath string) error {
 	for _, path := range env.ProjectRequiredFiles {
 		p := filepath.Join(clusterPath, path)
 
-		if !utils.Exists(p) {
+		if !file.Exists(p) {
 			missing = append(missing, path)
 		}
 	}

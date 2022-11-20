@@ -7,33 +7,41 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	var clusterName string
+var (
+	destroyShort = "Destroy the cluster"
+	destroyLong  = LongDesc(`
+		Destroys the cluster with a given name.`)
+)
 
-	destroyCmd := &cobra.Command{
+type DestroyOptions struct {
+	ClusterName string
+
+	env.ContextOptions
+}
+
+func NewDestroyCmd() *cobra.Command {
+	var opts DestroyOptions
+
+	cmd := &cobra.Command{
 		SuggestFor: []string{"remove", "delete", "del"},
 		Use:        "destroy",
 		GroupID:    "mgmt",
-		Short:      "Destroy the cluster",
-		Long: `
-Destroys the cluster with a given name.`,
-
+		Short:      destroyShort,
+		Long:       destroyLong,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return actions.Destroy(clusterName)
+			return opts.Run()
 		},
 	}
 
-	rootCmd.AddCommand(destroyCmd)
+	cmd.PersistentFlags().StringVar(&opts.ClusterName, "cluster", "", "specify the cluster to be used")
+	cmd.PersistentFlags().BoolVarP(&opts.Local, "local", "l", false, "use a current directory as the cluster path")
+	cmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
+	cmd.PersistentFlags().BoolVar(&env.Debug, "debug", false, "enable debug messages")
 
-	destroyCmd.PersistentFlags().StringVar(&clusterName, "cluster", "", "specify the cluster to be used")
-	destroyCmd.PersistentFlags().BoolVarP(&env.Local, "local", "l", false, "use a current directory as the cluster path")
-	destroyCmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
+	cmd.MarkPersistentFlagRequired("cluster")
 
-	destroyCmd.MarkPersistentFlagRequired("cluster")
-
-	// Auto complete cluster names of active clusters for flag 'cluster'.
-	destroyCmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		clusters, err := actions.GetClusters()
+	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		clusters, err := actions.Clusters(opts.Context())
 
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp
@@ -41,4 +49,10 @@ Destroys the cluster with a given name.`,
 
 		return clusters.Names(), cobra.ShellCompDirectiveNoFileComp
 	})
+
+	return cmd
+}
+
+func (o *DestroyOptions) Run() error {
+	return actions.Destroy(o.Context(), o.ClusterName)
 }

@@ -1,4 +1,4 @@
-package utils
+package file
 
 import (
 	"fmt"
@@ -18,8 +18,8 @@ func Exists(path string) bool {
 	return err == nil
 }
 
-// ReadFile reads a file from the given path and returns it as a string.
-func ReadFile(path string) (string, error) {
+// Read reads a file from the given path and returns it as a string.
+func Read(path string) (string, error) {
 	file, err := ioutil.ReadFile(path)
 
 	if err != nil {
@@ -76,10 +76,10 @@ func ForceCopy(srcPath, dstPath string) error {
 	return nil
 }
 
-// ForceMove forcibly moves a file or directory to a specified location.
-// First the destination file or directory is removed, and then the contents
-// are moved there.
-func ForceMove(srcPath string, dstPath string) error {
+// Move moves a file or directory to a specified location. First the
+// destination file or directory is removed, and then the source
+// content is moved.
+func Move(srcPath string, dstPath string) error {
 	if err := Remove(dstPath); err != nil {
 		return fmt.Errorf("force move: %v", err)
 	}
@@ -108,7 +108,7 @@ func Remove(path string) error {
 
 // ReadYaml reads yaml file on the given path and unmarshals it into the given type.
 func ReadYaml[T interface{}](path string, typ T) (*T, error) {
-	yml, err := ReadFile(path)
+	yml, err := Read(path)
 
 	if err != nil {
 		return nil, err
@@ -131,10 +131,5 @@ func UnmarshalYaml[T interface{}](yml string, typ T) (*T, error) {
 // MarshalYaml marshals given object into a string.
 func MarshalYaml(value interface{}) (string, error) {
 	arr, err := yaml.Marshal(value)
-
-	if err != nil {
-		return "", err
-	}
-
-	return string(arr), nil
+	return string(arr), err
 }

@@ -8,56 +8,59 @@ import (
 	"path/filepath"
 )
 
+type VenvType = uint8
+
 type VirtualEnvironment struct {
 	Name             string
 	Path             string
 	RequirementsPath string
+	Initialized      bool
 }
 
-var Env = struct {
-	Main      VirtualEnvironment
-	Kubespray VirtualEnvironment
-}{
-	Main: VirtualEnvironment{
+var (
+	Main = VirtualEnvironment{
 		Name:             "main",
 		RequirementsPath: "ansible/kubitect/requirements.txt",
-	},
-	Kubespray: VirtualEnvironment{
+	}
+
+	Kubespray = VirtualEnvironment{
 		Name:             "kubespray",
 		RequirementsPath: "ansible/kubespray/requirements.txt",
-	},
-}
+	}
+)
 
 // Setup creates virtual environment in the cluster path
 // and installs required pip3 and ansible dependencies.
-func (ve *VirtualEnvironment) Setup(clusterPath, version string) error {
+func (ve *VirtualEnvironment) Setup(ctx *env.Context, clusterPath, version string) error {
+	if !ve.Initialized {
+		return nil
+	}
+
 	fmt.Printf("Setting up '%s' virtual environment...\n", ve.Name)
 
-	ve.Path = env.VenvDirPath(ve.Name, version)
+	ve.Path = filepath.Join(ctx.ShareDir(), ve.Name, version)
 
-	err := ve.create(clusterPath)
-
-	if err != nil {
+	if err := ve.create(ctx, clusterPath); err != nil {
 		return err
 	}
 
-	err = ve.installPipReq(clusterPath)
-
-	if err != nil {
+	if err := ve.installPipReq(ctx, clusterPath); err != nil {
 		return err
 	}
+
+	ve.Initialized = true
 
 	return nil
 }
 
 // create creates virtual environment if it does not yet exist.
-func (ve VirtualEnvironment) create(clusterPath string) error {
+func (ve VirtualEnvironment) create(ctx *env.Context, clusterPath string) error {
 	fmt.Println("Creating virtual environment...")
 
 	cmd := exec.Command("virtualenv", "-p", "python3", ve.Path)
 	cmd.Dir = clusterPath
 
-	if env.DebugMode {
+	if env.Debug {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
@@ -72,7 +75,7 @@ func (ve VirtualEnvironment) create(clusterPath string) error {
 }
 
 // installPipReq installs pip3 requirements into virtual environment.
-func (ve VirtualEnvironment) installPipReq(clusterPath string) error {
+func (ve VirtualEnvironment) installPipReq(ctx *env.Context, clusterPath string) error {
 	fmt.Println("Installing pip3 dependencies...")
 	fmt.Println("This can take up to a minute when the virtual environment is initialized for the first time...")
 
@@ -80,7 +83,7 @@ func (ve VirtualEnvironment) installPipReq(clusterPath string) error {
 	cmd.Path = filepath.Join(ve.Path, "bin", "pip3")
 	cmd.Dir = clusterPath
 
-	if env.DebugMode {
+	if env.Debug {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}

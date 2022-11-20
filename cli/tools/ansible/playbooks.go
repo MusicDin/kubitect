@@ -6,18 +6,17 @@ import (
 	"strings"
 )
 
-type InitTag string
+type KubitectInitTag string
 
 const (
-	INIT      InitTag = "init"
-	KUBESPRAY InitTag = "kubespray"
-	GEN_NODES InitTag = "gen_nodes"
+	INIT      KubitectInitTag = "init"
+	KUBESPRAY KubitectInitTag = "kubespray"
+	GEN_NODES KubitectInitTag = "gen_nodes"
 )
 
 // KubitectInit function calls Ansible playbook that is responsible for initializing
 // the cluster. Different workflow is executed based on the provided tags.
-func KubitectInit(clusterPath string, tags ...InitTag) error {
-
+func KubitectInit(clusterPath string, tags ...KubitectInitTag) error {
 	var sTags []string
 
 	for _, s := range tags {
@@ -25,7 +24,7 @@ func KubitectInit(clusterPath string, tags ...InitTag) error {
 	}
 
 	pb := Playbook{
-		VenvPath:     virtualenv.Env.Main.Path,
+		VenvPath:     virtualenv.Main.Path,
 		PlaybookFile: filepath.Join(clusterPath, "ansible/kubitect/init.yaml"),
 		Tags:         sTags,
 		Local:        true,
@@ -38,7 +37,7 @@ func KubitectInit(clusterPath string, tags ...InitTag) error {
 // hosts meet all the requirements before cluster is created.
 func KubitectHostsSetup(clusterPath string) error {
 	pb := Playbook{
-		VenvPath:     virtualenv.Env.Main.Path,
+		VenvPath:     virtualenv.Main.Path,
 		PlaybookFile: filepath.Join(clusterPath, "ansible/kubitect/hosts-setup.yaml"),
 		Inventory:    filepath.Join(clusterPath, "config/hosts.yaml"),
 		Local:        true,
@@ -64,7 +63,7 @@ func KubitectHostsSetup(clusterPath string) error {
 // cluster installation.
 func KubitectFinalize(clusterPath, sshUser, sshPKey string) error {
 	pb := Playbook{
-		VenvPath:     virtualenv.Env.Main.Path,
+		VenvPath:     virtualenv.Main.Path,
 		PlaybookFile: filepath.Join(clusterPath, "ansible/kubitect/finalize.yaml"),
 		Inventory:    filepath.Join(clusterPath, "config/nodes.yaml"),
 		Become:       true,
@@ -80,7 +79,7 @@ func KubitectFinalize(clusterPath, sshUser, sshPKey string) error {
 // load balancers.
 func HAProxy(clusterPath, sshUser, sshPKey string) error {
 	pb := Playbook{
-		VenvPath:     virtualenv.Env.Main.Path,
+		VenvPath:     virtualenv.Main.Path,
 		PlaybookFile: filepath.Join(clusterPath, "ansible/kubitect/haproxy.yaml"),
 		Inventory:    filepath.Join(clusterPath, "config/nodes.yaml"),
 		Become:       true,
@@ -100,7 +99,7 @@ func KubesprayCreate(clusterPath, sshUser, sshPKey, k8sVersion string) error {
 	}
 
 	pb := Playbook{
-		VenvPath:     virtualenv.Env.Kubespray.Path,
+		VenvPath:     virtualenv.Kubespray.Path,
 		PlaybookFile: filepath.Join(clusterPath, "ansible/kubespray/cluster.yml"),
 		Inventory:    filepath.Join(clusterPath, "config/nodes.yaml"),
 		Become:       true,
@@ -121,7 +120,7 @@ func KubesprayUpgrade(clusterPath, sshUser, sshPKey, k8sVersion string) error {
 	}
 
 	pb := Playbook{
-		VenvPath:     virtualenv.Env.Kubespray.Path,
+		VenvPath:     virtualenv.Kubespray.Path,
 		PlaybookFile: filepath.Join(clusterPath, "ansible/kubespray/upgrade-cluster.yml"),
 		Inventory:    filepath.Join(clusterPath, "config/nodes.yaml"),
 		Become:       true,
@@ -142,7 +141,7 @@ func KubesprayScale(clusterPath, sshUser, sshPKey, k8sVersion string) error {
 	}
 
 	pb := Playbook{
-		VenvPath:     virtualenv.Env.Kubespray.Path,
+		VenvPath:     virtualenv.Kubespray.Path,
 		PlaybookFile: filepath.Join(clusterPath, "ansible/kubespray/scale.yml"),
 		Inventory:    filepath.Join(clusterPath, "config/nodes.yaml"),
 		Become:       true,
@@ -165,7 +164,7 @@ func KubesprayRemoveNodes(clusterPath, sshUser, sshPKey string, removedNodeNames
 	}
 
 	pb := Playbook{
-		VenvPath:     virtualenv.Env.Kubespray.Path,
+		VenvPath:     virtualenv.Kubespray.Path,
 		PlaybookFile: filepath.Join(clusterPath, "ansible/kubespray/remove-node.yml"),
 		Inventory:    filepath.Join(clusterPath, "config/nodes.yaml"),
 		Become:       true,
