@@ -1,7 +1,7 @@
 package actions
 
 import (
-	"cli/tools/ansible"
+	"cli/tools/playbook"
 	"cli/tools/terraform"
 )
 
@@ -25,21 +25,17 @@ func create(c *Cluster) error {
 
 	k8sVersion := string(*c.NewConfig.Kubernetes.Version)
 
-	if err := ansible.KubitectInit(c.Path, ansible.KUBESPRAY, ansible.GEN_NODES); err != nil {
+	if err := playbook.KubitectInit(playbook.TAG_KUBESPRAY, playbook.TAG_GEN_NODES); err != nil {
 		return err
 	}
 
-	if err := c.SetupKubesprayVE(); err != nil {
+	if err := playbook.HAProxy(sshUser, sshPKey); err != nil {
 		return err
 	}
 
-	if err := ansible.HAProxy(c.Path, sshUser, sshPKey); err != nil {
+	if err := playbook.KubesprayCreate(sshUser, sshPKey, k8sVersion); err != nil {
 		return err
 	}
 
-	if err := ansible.KubesprayCreate(c.Path, sshUser, sshPKey, k8sVersion); err != nil {
-		return err
-	}
-
-	return ansible.KubitectFinalize(c.Path, sshUser, sshPKey)
+	return playbook.KubitectFinalize(sshUser, sshPKey)
 }

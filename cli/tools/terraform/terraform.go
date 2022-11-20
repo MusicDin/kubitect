@@ -96,7 +96,15 @@ func NewTerraform(ctx *env.Context, clusterPath string) (*Terraform, error) {
 
 // Plan shows Terraform project changes (plan).
 func (t *Terraform) Plan() (bool, error) {
+	if t.Ctx.ShowTerraformPlan() {
+		t.tf.SetStdout(nil)
+		t.tf.SetStderr(nil)
+	}
+
 	changes, err := t.tf.Plan(context.Background())
+
+	t.tf.SetStdout(os.Stdout)
+	t.tf.SetStderr(os.Stderr)
 
 	if err != nil {
 		err = fmt.Errorf("error running Terraform plan: %v", err)
@@ -114,7 +122,7 @@ func (t *Terraform) Apply() error {
 	}
 
 	// Ask user for permission if there are any changes
-	if changes && !env.AutoApprove {
+	if changes && t.Ctx.ShowTerraformPlan() {
 		if err := ui.Ask("Proceed with terraform apply?"); err != nil {
 			return err
 		}

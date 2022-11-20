@@ -51,7 +51,7 @@ func Ask(msg ...string) error {
 		question = strings.Join(msg, " ")
 	}
 
-	Printf(DEBUG, "\n%s (yes/no)", question)
+	Printf(INFO, "\n%s (yes/no) ", question)
 
 	if _, err := fmt.Scan(&response); err != nil {
 		return fmt.Errorf("ask: %v", err)

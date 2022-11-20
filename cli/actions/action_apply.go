@@ -1,9 +1,8 @@
 package actions
 
 import (
-	"cli/env"
-	"cli/tools/ansible"
 	"cli/tools/git"
+	"cli/tools/playbook"
 	"cli/ui"
 	"fmt"
 	"os"
@@ -92,7 +91,15 @@ func (c *Cluster) Apply(action string) error {
 // files are present in the directory, new configuration file is stored in
 // the temporary location and that main virtual environment is created.
 func prepare(c *Cluster) error {
-	if err := initCluster(c); err != nil {
+	var err error
+
+	if c.Local {
+		err = copyReqFiles(c.Ctx.WorkingDir(), c.Path)
+	} else {
+		err = cloneAndCopyReqFiles(c)
+	}
+
+	if err != nil {
 		return err
 	}
 
@@ -100,40 +107,19 @@ func prepare(c *Cluster) error {
 		return err
 	}
 
-	if err := c.SetupMainVE(); err != nil {
+	if err := playbook.KubitectInit(playbook.TAG_INIT); err != nil {
 		return err
 	}
 
-	if err := ansible.KubitectInit(c.Path, ansible.INIT); err != nil {
-		return err
-	}
-
-	return ansible.KubitectHostsSetup(c.Path)
+	return playbook.KubitectHostsSetup()
 }
 
-// initCluster ensures cluster directory exists and all required files are
-// copied from the Kubitect git project. If local flag is used, project
-// files are copied from the current directory.
-func initCluster(c *Cluster) error {
-	cfg := c.NewConfig
-
-	url := env.ConstProjectUrl
-	version := env.ConstProjectVersion
-
-	if cfg.Kubitect.Url != nil {
-		url = string(*cfg.Kubitect.Url)
-	}
-
-	if cfg.Kubitect.Version != nil {
-		version = string(*cfg.Kubitect.Version)
-	}
+func cloneAndCopyReqFiles(c *Cluster) error {
+	url := c.KubitectURL()
+	version := c.KubitectVersion()
 
 	ui.Printf(ui.DEBUG, "kubitect.url: %s\n", url)
 	ui.Printf(ui.DEBUG, "kubitect.version: %s\n", version)
-
-	if c.Local {
-		return copyReqFiles(c.Ctx.WorkingDir(), c.Path)
-	}
 
 	tmpDir := filepath.Join(c.Path, "tmp")
 

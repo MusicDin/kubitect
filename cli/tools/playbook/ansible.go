@@ -1,7 +1,8 @@
-package ansible
+package playbook
 
 import (
 	"cli/env"
+	"cli/tools/virtualenv"
 	"context"
 	"fmt"
 	"path/filepath"
@@ -13,7 +14,7 @@ import (
 )
 
 type Playbook struct {
-	PlaybookFile string // "clusterPath/PlaybookFile"
+	PlaybookFile string
 	Inventory    string
 	Tags         []string
 	User         string
@@ -22,30 +23,29 @@ type Playbook struct {
 	Local        bool
 	Timeout      int
 	ExtraVars    []string
-	VenvPath     string
-}
-
-func (pb Playbook) Exec() error {
-	if pb.Local {
-		pb.Inventory = "localhost,"
-	}
-
-	return pb.exec()
 }
 
 // exec executes ansible playbook with working directory
 // set to the cluster path directory.
-func (pb Playbook) exec() error {
+func (pb Playbook) Exec(vt virtualenv.VirtualEnvType) error {
+	venv, err := virtualenv.Get(vt)
+
+	if err != nil {
+		return fmt.Errorf("ansible-playbook (%s): failed initializing virtual environment: %v", pb.PlaybookFile, err)
+	}
+
+	if pb.Local {
+		pb.Inventory = "localhost,"
+	} else {
+		pb.Inventory = filepath.Join(venv.ClusterPath, pb.Inventory)
+	}
+
 	if len(pb.PlaybookFile) < 1 {
 		return fmt.Errorf("ansible-playbook: file path not set")
 	}
 
-	if len(pb.Inventory) < 1 {
+	if pb.Inventory == "" {
 		return fmt.Errorf("ansible-playbook (%s): inventory not set", pb.PlaybookFile)
-	}
-
-	if len(pb.VenvPath) < 1 {
-		return fmt.Errorf("ansible-playbook (%s): virtual environment path not set", pb.PlaybookFile)
 	}
 
 	privilegeEscalationOptions := &options.AnsiblePrivilegeEscalationOptions{
@@ -85,18 +85,27 @@ func (pb Playbook) exec() error {
 	}
 
 	playbook := &playbook.AnsiblePlaybookCmd{
-		Binary:                     filepath.Join(pb.VenvPath, "bin", "ansible-playbook"),
+		Binary:                     filepath.Join(venv.Path, "bin", "ansible-playbook"),
 		Exec:                       executor,
-		Playbooks:                  []string{pb.PlaybookFile},
+		Playbooks:                  []string{filepath.Join(venv.ClusterPath, pb.PlaybookFile)},
 		Options:                    playbookOptions,
 		ConnectionOptions:          connectionOptions,
 		PrivilegeEscalationOptions: privilegeEscalationOptions,
 		StdoutCallback:             "yaml",
 	}
 
+	// options.AnsibleSetEnv("ANSIBLE_NO_COLOR", "true")    // disable color
+	// options.AnsibleSetEnv("ANSIBLE_FORCE_COLOR", "true") // force color
+
 	options.AnsibleForceColor()
+	options.AnsibleSetEnv("ANSIBLE_CALLBACKS_ENABLED", "yaml")
+	options.AnsibleSetEnv("ANSIBLE_HOST_PATTERN_MISMATCH", "ignore")
 	options.AnsibleSetEnv("ANSIBLE_DISPLAY_FAILED_STDERR", "true")
 	options.AnsibleSetEnv("ANSIBLE_DISPLAY_SKIPPED_HOSTS", "false")
+	options.AnsibleSetEnv("ANSIBLE_DISPLAY_ARGS_TO_STDOUT", "false")
+	options.AnsibleSetEnv("ANSIBLE_FORKS", "10")
+	options.AnsibleSetEnv("ANSIBLE_STDOUT_CALLBACK", "yaml")
+	options.AnsibleSetEnv("ANSIBLE_STDERR_CALLBACK", "yaml")
 
 	err = playbook.Run(context.TODO())
 	if err != nil {
@@ -109,7 +118,7 @@ func (pb Playbook) exec() error {
 
 // extraVarsToMap converts slice of "key=value" strings into map.
 func extraVarsToMap(extraVars []string) (map[string]string, error) {
-	var evMap map[string]string
+	evMap := make(map[string]string)
 
 	for _, v := range extraVars {
 		tokens := strings.Split(v, "=")

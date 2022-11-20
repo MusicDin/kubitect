@@ -28,6 +28,10 @@ func (c *Context) Local() bool {
 	return c.local
 }
 
+func (c *Context) ShowTerraformPlan() bool {
+	return false
+}
+
 func (c *Context) WorkingDir() string {
 	return c.workingDir
 }

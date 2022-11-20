@@ -46,12 +46,8 @@ func (c ClusterMeta) TfStatePath() string {
 	return filepath.Join(c.Path, DefaultTerraformDir, DefaultTerraformStateFilename)
 }
 
-func (c Cluster) ContainsKubeconfig() bool {
+func (c ClusterMeta) ContainsKubeconfig() bool {
 	return file.Exists(c.KubeconfigPath())
-}
-
-func (c Cluster) ContainsAppliedConfig() bool {
-	return file.Exists(c.AppliedConfigPath())
 }
 
 func (c ClusterMeta) ContainsAppliedConfig() bool {
@@ -98,6 +94,8 @@ func NewCluster(ctx *env.Context, userCfgPath string) (Cluster, error) {
 	c.Name = string(*c.NewConfig.Cluster.Name)
 	c.Path = filepath.Join(c.Ctx.ClustersDir(), c.Name)
 
+	c.SetVirtualEnvironments()
+
 	return c, c.Sync()
 }
 
@@ -126,6 +124,27 @@ func (c *Cluster) Sync() error {
 	return nil
 }
 
+func (c *Cluster) SetVirtualEnvironments() {
+
+	t := virtualenv.MAIN
+
+	virtualenv.Set(t, &virtualenv.VirtualEnv{
+		Name:             string(t),
+		RequirementsPath: "ansible/kubitect/requirements.txt",
+		Path:             filepath.Join(c.Ctx.ShareDir(), "venv", string(t), c.KubitectVersion()),
+		ClusterPath:      c.Path,
+	})
+
+	t = virtualenv.KUBESPRAY
+
+	virtualenv.Set(t, &virtualenv.VirtualEnv{
+		Name:             string(t),
+		RequirementsPath: "ansible/kubespray/requirements.txt",
+		Path:             filepath.Join(c.Ctx.ShareDir(), "venv", string(t), c.KubesprayVersion()),
+		ClusterPath:      c.Path,
+	})
+}
+
 // StoreNewConfig makes a copy of the provided (new) configuration file in
 // cluster directory.
 func (c *Cluster) StoreNewConfig() error {
@@ -138,25 +157,32 @@ func (c *Cluster) StoreNewConfig() error {
 }
 
 // ApplyNewConfig replaces currently applied config with new one.
-func (c Cluster) ApplyNewConfig() error {
+func (c *Cluster) ApplyNewConfig() error {
 	return file.Move(c.NewConfigPath, c.AppliedConfigPath())
 }
 
-// setupMainVE creates main (Kubitect) virtual environment.
-func (c *Cluster) SetupMainVE() error {
-	ktVer := env.ConstProjectVersion
-
-	if c.NewConfig.Kubitect.Version != nil {
-		ktVer = string(*c.NewConfig.Kubitect.Version)
+func (c *Cluster) KubitectURL() string {
+	if c.NewConfig.Kubitect.Url != nil {
+		return string(*c.NewConfig.Kubitect.Url)
 	}
 
-	return virtualenv.Main.Setup(c.Ctx, c.Path, ktVer)
+	return env.ConstProjectUrl
 }
 
-// setupKubesprayVE creates Kubespray virtual environment.
-func (c *Cluster) SetupKubesprayVE() error {
-	ksVer := string(*c.NewConfig.Kubernetes.Kubespray.Version)
-	return virtualenv.Kubespray.Setup(c.Ctx, c.Path, ksVer)
+func (c *Cluster) KubitectVersion() string {
+	if c.NewConfig.Kubitect.Version != nil {
+		return string(*c.NewConfig.Kubitect.Version)
+	}
+
+	return env.ConstProjectVersion
+}
+
+func (c *Cluster) KubesprayVersion() string {
+	if c.NewConfig.Kubernetes.Kubespray.Version != nil {
+		return string(*c.NewConfig.Kubernetes.Kubespray.Version)
+	}
+
+	return env.ConstKubesprayVersion
 }
 
 type ClustersMeta []ClusterMeta
