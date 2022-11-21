@@ -107,18 +107,6 @@ func NewCluster(ctx *env.Context, configPath string) (Cluster, error) {
 func (c *Cluster) Sync() error {
 	var err error
 
-	if c.NewConfig == nil {
-		c.NewConfig, err = readConfigIfExists(c.NewConfigPath, modelconfig.Config{})
-
-		if err != nil {
-			return fmt.Errorf("failed to read current configuration file: %v", err)
-		}
-	}
-
-	if err != nil {
-		return fmt.Errorf("failed to read previously applied configuration file: %v", err)
-	}
-
 	c.AppliedConfig, err = readConfigIfExists(c.AppliedConfigPath(), modelconfig.Config{})
 
 	if err != nil {
@@ -235,6 +223,11 @@ func (cs Clusters) CountByName(name string) int {
 
 // GetClusters returns list of clusters from both global (project) and local
 // clusters directory (if working directory is a Kubitect project).
+//
+// Note:
+//   Configs of retrieved clusters are not synced.
+//   Therefore, run Cluster.Sync() for the a specific cluster
+//   before accessing them.
 func GetClusters(ctx *env.Context) (Clusters, error) {
 	cs, err := clusters(ctx, false)
 
