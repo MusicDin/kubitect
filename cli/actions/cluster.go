@@ -38,20 +38,24 @@ func (c ClusterMeta) InfrastructureConfigPath() string {
 	return filepath.Join(c.Path, DefaultConfigDir, DefaultInfraConfigFilename)
 }
 
-func (c ClusterMeta) KubeconfigPath() string {
-	return filepath.Join(c.Path, DefaultConfigDir, DefaultKubeconfigFilename)
+func (c ClusterMeta) ContainsAppliedConfig() bool {
+	return file.Exists(c.TfStatePath())
 }
 
 func (c ClusterMeta) TfStatePath() string {
 	return filepath.Join(c.Path, DefaultTerraformDir, DefaultTerraformStateFilename)
 }
 
+func (c ClusterMeta) KubeconfigPath() string {
+	return filepath.Join(c.Path, DefaultConfigDir, DefaultKubeconfigFilename)
+}
+
 func (c ClusterMeta) ContainsKubeconfig() bool {
 	return file.Exists(c.KubeconfigPath())
 }
 
-func (c ClusterMeta) ContainsAppliedConfig() bool {
-	return file.Exists(c.TfStatePath())
+func (c ClusterMeta) Kubeconfig() (string, error) {
+	return file.Read(c.KubeconfigPath())
 }
 
 func (c ClusterMeta) Valid() bool {
@@ -195,7 +199,7 @@ func (cs ClustersMeta) Names() []string {
 	return names
 }
 
-func (cs ClustersMeta) Find(name string) *ClusterMeta {
+func (cs ClustersMeta) FindByName(name string) *ClusterMeta {
 	for _, c := range cs {
 		if c.Name == name {
 			return &c
@@ -203,6 +207,18 @@ func (cs ClustersMeta) Find(name string) *ClusterMeta {
 	}
 
 	return nil
+}
+
+func (cs ClustersMeta) CountByName(name string) int {
+	var i = 0
+
+	for _, c := range cs {
+		if c.Name == name {
+			i++
+		}
+	}
+
+	return i
 }
 
 // Clusters returns cluster meta list of clusters from both project and local

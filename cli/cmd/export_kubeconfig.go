@@ -1,59 +1,93 @@
 package cmd
 
-// exportKubeconfigCmd represents the exportKubeconfig command
-// var exportKubeconfigCmd = &cobra.Command{
-// 	Use:   "kubeconfig",
-// 	Short: "Export cluster kubeconfig file",
-// 	Long:  `Command export kubeconfig prints content of the kubeconfig file.`,
-// 	Run: func(cmd *cobra.Command, args []string) {
-// 		err := exportKubeconfig()
-// 		if err != nil {
-// 			fmt.Fprintln(os.Stderr, err)
-// 			os.Exit(1)
-// 		}
-// 	},
-// }
+import (
+	"cli/actions"
+	"cli/env"
+	"fmt"
+	"os"
 
-// func init() {
-// 	exportCmd.AddCommand(exportKubeconfigCmd)
+	"github.com/spf13/cobra"
+)
 
-// 	exportKubeconfigCmd.PersistentFlags().StringVar(&env.ClusterName, "cluster", env.DefaultClusterName, "specify the cluster to be used")
-// 	exportKubeconfigCmd.PersistentFlags().BoolVarP(&env.Local, "local", "l", false, "use a current directory as the cluster path")
+var (
+	exportKcShort = "Export cluster kubeconfig file"
 
-// 	// Auto complete cluster names of active clusters that also contain kubeconfig
-// 	// for the flag 'cluster'.
-// 	exportKubeconfigCmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	exportKcLong = LongDesc(`
+		Command export kubeconfig outputs cluster's kubeconfig file to standard output.`)
 
-// 		clusterNames, err := GetClusters([]ClusterFilter{IsActive, ContainsKubeconfig})
-// 		if err != nil {
-// 			return nil, cobra.ShellCompDirectiveNoFileComp
-// 		}
+	exportKcExample = Example(`
+		To save kubeconfig to a specific file, redirect command output to a file:
+		> kubitect export kubeconfig --cluster lake > lake.yaml
+					
+		Use kubeconfig with kubectl to access cluster:
+		> kubectl --kubeconfig lake.yaml get nodes`)
+)
 
-// 		return clusterNames, cobra.ShellCompDirectiveNoFileComp
-// 	})
-// }
+type ExportKcOptions struct {
+	ClusterName string
 
-// // exportKubeconfig exports (prints) content of the cluster Kubeconfig file.
-// func exportKubeconfig() error {
+	env.ContextOptions
+}
 
-// 	kubeconfigPath := filepath.Join(env.ClusterPath, env.ConstKubeconfigPath)
+func NewExportKcCmd() *cobra.Command {
+	var opts ExportKcOptions
 
-// 	err := utils.VerifyClusterDir(env.ClusterPath)
-// 	if err != nil {
-// 		return fmt.Errorf("Cluster '%s' does not exist: %w", env.ClusterName, err)
-// 	}
+	cmd := &cobra.Command{
+		SuggestFor: []string{"kubecfg", "kube", "kc"},
+		Use:        "kubeconfig",
+		GroupID:    "main",
+		Short:      exportKcShort,
+		Long:       exportKcLong,
+		Example:    exportKcExample,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return opts.Run()
+		},
+	}
 
-// 	_, err = os.Stat(kubeconfigPath)
-// 	if err != nil {
-// 		return fmt.Errorf("Kubeconfig for cluster '%s' does not exist: %w", env.ClusterName, err)
-// 	}
+	// cmd.PersistentFlags().BoolVarP(&opts.Local, "local", "l", false, "use a current directory as the cluster path")
+	cmd.PersistentFlags().StringVar(&opts.ClusterName, "cluster", "", "specify the cluster to be used")
+	cmd.MarkPersistentFlagRequired("cluster")
 
-// 	kubeconfig, err := ioutil.ReadFile(kubeconfigPath)
-// 	if err != nil {
-// 		return fmt.Errorf("Failed reading Kubeconfig file: %w", err)
-// 	}
+	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		// clusterNames, err := GetClusters([]ClusterFilter{IsActive, ContainsKubeconfig})
+		clusters, err := actions.Clusters(opts.Context())
 
-// 	fmt.Print(string(kubeconfig))
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
 
-// 	return nil
-// }
+		return clusters.Names(), cobra.ShellCompDirectiveNoFileComp
+	})
+
+	return cmd
+}
+
+func (o *ExportKcOptions) Run() error {
+	cs, err := actions.Clusters(o.Context())
+
+	c := cs.FindByName(o.ClusterName)
+
+	if c == nil {
+		return fmt.Errorf("cluster '%s' does not exist: %v", o.ClusterName, err)
+	}
+
+	count := cs.CountByName(o.ClusterName)
+
+	if count > 1 {
+		return fmt.Errorf("multiple clusters (%d) have been found with the name '%s'", count, o.ClusterName)
+	}
+
+	if !c.ContainsKubeconfig() {
+		return fmt.Errorf("cluster '%s' does not have a Kubeconfig file", o.ClusterName)
+	}
+
+	kc, err := c.Kubeconfig()
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprint(os.Stdout, kc)
+
+	return nil
+}

@@ -19,7 +19,7 @@ func Destroy(ctx *env.Context, clusterName string) error {
 		return err
 	}
 
-	c := clusters.Find(clusterName)
+	c := clusters.FindByName(clusterName)
 
 	if c == nil {
 		return fmt.Errorf("cluster '%s' not found.", clusterName)
