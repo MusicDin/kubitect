@@ -25,6 +25,12 @@ func Destroy(ctx *env.Context, clusterName string) error {
 		return fmt.Errorf("cluster '%s' not found.", clusterName)
 	}
 
+	count := clusters.CountByName(clusterName)
+
+	if count > 1 {
+		return fmt.Errorf("cannot destroy the cluster: multiple clusters (%d) have been found with the name '%s'", count, clusterName)
+	}
+
 	if !c.ContainsAppliedConfig() {
 		return fmt.Errorf("cluster '%s' is already destroyed (or not yet initialized).", clusterName)
 	}
@@ -47,8 +53,9 @@ func Destroy(ctx *env.Context, clusterName string) error {
 		return err
 	}
 
-	// TODO: Remove Kubeconfig
-	// os.Remove(c.KubeconfigPath())
+	if err := os.Remove(c.TfStatePath()); err != nil {
+		return err
+	}
 
-	return os.Remove(c.TfStatePath())
+	return os.Remove(c.KubeconfigPath())
 }

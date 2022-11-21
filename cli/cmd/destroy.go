@@ -10,7 +10,11 @@ import (
 var (
 	destroyShort = "Destroy the cluster"
 	destroyLong  = LongDesc(`
-		Destroys the cluster with a given name.`)
+		Destroy the cluster with a given name.`)
+
+	destroyExample = Example(`
+		To destroy a cluster named 'cls':
+		> kubitect destroy --cluster cls`)
 )
 
 type DestroyOptions struct {
@@ -28,6 +32,7 @@ func NewDestroyCmd() *cobra.Command {
 		GroupID:    "mgmt",
 		Short:      destroyShort,
 		Long:       destroyLong,
+		Example:    destroyExample,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return opts.Run()
 		},

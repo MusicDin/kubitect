@@ -3,6 +3,7 @@ package cmd
 import (
 	"cli/actions"
 	"cli/env"
+	"cli/file"
 	"fmt"
 	"os"
 
@@ -11,12 +12,11 @@ import (
 
 var (
 	exportKcShort = "Export cluster kubeconfig file"
-
-	exportKcLong = LongDesc(`
+	exportKcLong  = LongDesc(`
 		Command export kubeconfig outputs cluster's kubeconfig file to standard output.`)
 
 	exportKcExample = Example(`
-		To save kubeconfig to a specific file, redirect command output to a file:
+		To save a kubeconfig to the specific file, redirect command output to that file:
 		> kubitect export kubeconfig --cluster lake > lake.yaml
 					
 		Use kubeconfig with kubectl to access cluster:
@@ -44,19 +44,25 @@ func NewExportKcCmd() *cobra.Command {
 		},
 	}
 
-	// cmd.PersistentFlags().BoolVarP(&opts.Local, "local", "l", false, "use a current directory as the cluster path")
 	cmd.PersistentFlags().StringVar(&opts.ClusterName, "cluster", "", "specify the cluster to be used")
 	cmd.MarkPersistentFlagRequired("cluster")
 
 	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		// clusterNames, err := GetClusters([]ClusterFilter{IsActive, ContainsKubeconfig})
+		var names []string
+
 		clusters, err := actions.Clusters(opts.Context())
 
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp
 		}
 
-		return clusters.Names(), cobra.ShellCompDirectiveNoFileComp
+		for _, c := range clusters {
+			if c.ContainsKubeconfig() {
+				names = append(names, c.Name)
+			}
+		}
+
+		return names, cobra.ShellCompDirectiveNoFileComp
 	})
 
 	return cmd
@@ -68,7 +74,7 @@ func (o *ExportKcOptions) Run() error {
 	c := cs.FindByName(o.ClusterName)
 
 	if c == nil {
-		return fmt.Errorf("cluster '%s' does not exist: %v", o.ClusterName, err)
+		return fmt.Errorf("cluster '%s' does not exist", o.ClusterName)
 	}
 
 	count := cs.CountByName(o.ClusterName)
@@ -81,7 +87,7 @@ func (o *ExportKcOptions) Run() error {
 		return fmt.Errorf("cluster '%s' does not have a Kubeconfig file", o.ClusterName)
 	}
 
-	kc, err := c.Kubeconfig()
+	kc, err := file.Read(c.KubeconfigPath())
 
 	if err != nil {
 		return err

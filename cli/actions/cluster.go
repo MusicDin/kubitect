@@ -38,10 +38,6 @@ func (c ClusterMeta) InfrastructureConfigPath() string {
 	return filepath.Join(c.Path, DefaultConfigDir, DefaultInfraConfigFilename)
 }
 
-func (c ClusterMeta) ContainsAppliedConfig() bool {
-	return file.Exists(c.TfStatePath())
-}
-
 func (c ClusterMeta) TfStatePath() string {
 	return filepath.Join(c.Path, DefaultTerraformDir, DefaultTerraformStateFilename)
 }
@@ -50,12 +46,12 @@ func (c ClusterMeta) KubeconfigPath() string {
 	return filepath.Join(c.Path, DefaultConfigDir, DefaultKubeconfigFilename)
 }
 
-func (c ClusterMeta) ContainsKubeconfig() bool {
-	return file.Exists(c.KubeconfigPath())
+func (c ClusterMeta) ContainsAppliedConfig() bool {
+	return file.Exists(c.TfStatePath())
 }
 
-func (c ClusterMeta) Kubeconfig() (string, error) {
-	return file.Read(c.KubeconfigPath())
+func (c ClusterMeta) ContainsKubeconfig() bool {
+	return file.Exists(c.KubeconfigPath())
 }
 
 func (c ClusterMeta) Valid() bool {

@@ -13,7 +13,7 @@ var (
 	listShort = "Lists clusters"
 	listLong  = LongDesc(`
 		Lists all clusters located in the project directory.
-		Local clusters are also listed if current (working) directory is Kubitect project.`)
+		Local clusters are also listed if current (working) directory is a Kubitect project.`)
 )
 
 type ListOptions struct {

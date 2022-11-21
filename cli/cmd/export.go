@@ -8,8 +8,9 @@ var (
 	exportShort = "Export specific configuration file"
 	exportLong  = LongDesc(`
 		Exports specific configuration file`)
+
 	exportExample = Example(`
-		Export kubeconfig for cluster 'cls-name'.
+		Export kubeconfig for cluster 'cls-name':
 		> kubitect export kubeconfig --cluster cls-name`)
 )
 
@@ -33,6 +34,7 @@ func NewExportCmd() *cobra.Command {
 	)
 
 	cmd.AddCommand(NewExportKcCmd())
+	cmd.AddCommand(NewExportConfigCmd())
 
 	return cmd
 }

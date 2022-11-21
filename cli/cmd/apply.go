@@ -12,7 +12,17 @@ const DefaultAction = "create"
 var (
 	applyShort = "Create, scale or upgrade the cluster"
 	applyLong  = LongDesc(`
-		Apply new configuration file to create a cluster, or scale or upgrade the existing one.`)
+		Apply new configuration file to create a cluster, or to modify, scale or upgrade the existing one.`)
+
+	applyExample = Example(`
+		Create a new cluster or modify an existing one:
+		> kubitect apply --config cluster.yaml
+		
+		To upgrade an existing cluster, bump the Kubernetes version in current cluster config and run:
+		> kubitect apply --config cluster.yaml --action upgrade
+		
+		To scale an existing cluster, add or remove node instances in current cluster config and run:
+		> kubitect apply --config cluster.yaml --action scale`)
 )
 
 type ApplyOptions struct {
@@ -31,6 +41,7 @@ func NewApplyCmd() *cobra.Command {
 		GroupID:    "mgmt",
 		Short:      applyShort,
 		Long:       applyLong,
+		Example:    applyExample,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return opts.Run()
 		},

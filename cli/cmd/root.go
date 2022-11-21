@@ -7,30 +7,27 @@ import (
 )
 
 var (
-	rootLong = LongDesc(`Kubitect is a CLI tool that helps you manage multiple Kubernetes clusters.`)
+	rootLong = LongDesc(`
+		Kubitect is a CLI tool that helps you manage multiple Kubernetes clusters.`)
 )
 
-// Root command (cli name)
-var rootCmd = &cobra.Command{
-	Use:     "kubitect",
-	Short:   "Kubitect",
-	Long:    rootLong,
-	Version: env.ConstProjectVersion,
-}
-
-// Execute adds all child commands to the root command and sets the flags
-// accordingly.
 func Execute() error {
-	return rootCmd.Execute()
-	// return utils.FormatError(err)
+	return NewRootCmd().Execute()
 }
 
-func init() {
-	rootCmd.SilenceUsage = true
-	rootCmd.SilenceErrors = true
-	rootCmd.SuggestionsMinimumDistance = 3
+func NewRootCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "kubitect",
+		Short:   "Kubitect",
+		Long:    rootLong,
+		Version: env.ConstProjectVersion,
+	}
 
-	rootCmd.AddGroup(
+	cmd.SilenceUsage = true
+	cmd.SilenceErrors = true
+	cmd.SuggestionsMinimumDistance = 3
+
+	cmd.AddGroup(
 		&cobra.Group{
 			Title: "Cluster Management Commands:",
 			ID:    "mgmt",
@@ -45,13 +42,13 @@ func init() {
 		},
 	)
 
-	rootCmd.AddCommand(
-		NewApplyCmd(),
-		NewDestroyCmd(),
-		NewExportCmd(),
-		NewListCmd(),
-	)
+	cmd.AddCommand(NewApplyCmd())
+	cmd.AddCommand(NewDestroyCmd())
+	cmd.AddCommand(NewExportCmd())
+	cmd.AddCommand(NewListCmd())
 
-	rootCmd.SetCompletionCommandGroupID("other")
-	rootCmd.SetHelpCommandGroupID("other")
+	cmd.SetCompletionCommandGroupID("other")
+	cmd.SetHelpCommandGroupID("other")
+
+	return cmd
 }

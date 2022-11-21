@@ -1,60 +1,96 @@
 package cmd
 
-// var exportConfigCmd = &cobra.Command{
-// 	Use:   "config",
-// 	Short: "Export cluster configuration file",
-// 	Long: `
-// 	Command export config prints content of the cluster configuration file.`,
+import (
+	"cli/actions"
+	"cli/env"
+	"cli/file"
+	"fmt"
+	"os"
 
-// 	Run: func(cmd *cobra.Command, args []string) {
-// 		err := exportConfig()
-// 		if err != nil {
-// 			fmt.Fprintln(os.Stderr, err)
-// 			os.Exit(1)
-// 		}
-// 	},
-// }
+	"github.com/spf13/cobra"
+)
 
-// func init() {
-// 	exportCmd.AddCommand(exportConfigCmd)
+var (
+	exportConfigShort = "Export cluster config file"
+	exportConfigLong  = LongDesc(`
+		Command export config outputs cluster's configuration file to standard output.`)
 
-// 	exportConfigCmd.PersistentFlags().StringVar(&env.ClusterName, "cluster", env.DefaultClusterName, "specify the cluster to be used")
-// 	exportConfigCmd.PersistentFlags().BoolVarP(&env.Local, "local", "l", false, "use a current directory as the cluster path")
+	exportConfigExample = Example(`
+		To save a config to the specific file, redirect command output to that file:
+		> kubitect export config --cluster lake > cls.yaml`)
+)
 
-// 	// Auto complete cluster names of clusters that contain Kubitect config
-// 	// for the flag 'cluster'
-// 	exportConfigCmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+type ExportConfigOptions struct {
+	ClusterName string
 
-// 		clusterNames, err := GetClusters([]ClusterFilter{ContainsConfig})
-// 		if err != nil {
-// 			return nil, cobra.ShellCompDirectiveNoFileComp
-// 		}
+	env.ContextOptions
+}
 
-// 		return clusterNames, cobra.ShellCompDirectiveNoFileComp
-// 	})
-// }
+func NewExportConfigCmd() *cobra.Command {
+	var opts ExportConfigOptions
 
-// // exportConfig exports (prints) content of the cluster configuration file.
-// func exportConfig() error {
+	cmd := &cobra.Command{
+		SuggestFor: []string{"cfg"},
+		Use:        "config",
+		GroupID:    "main",
+		Short:      exportConfigShort,
+		Long:       exportConfigLong,
+		Example:    exportConfigExample,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return opts.Run()
+		},
+	}
 
-// 	configPath := filepath.Join(env.ClusterPath, env.DefaultClusterConfigPath)
+	cmd.PersistentFlags().StringVar(&opts.ClusterName, "cluster", "", "specify the cluster to be used")
+	cmd.MarkPersistentFlagRequired("cluster")
 
-// 	err := utils.VerifyClusterDir(env.ClusterPath)
-// 	if err != nil {
-// 		return fmt.Errorf("Cluster '%s' does not exist: %w", env.ClusterName, err)
-// 	}
+	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		var names []string
 
-// 	_, err = os.Stat(configPath)
-// 	if err != nil {
-// 		return fmt.Errorf("Cluster configuration for cluster '%s' does not exist: %w", env.ClusterName, err)
-// 	}
+		clusters, err := actions.Clusters(opts.Context())
 
-// 	config, err := ioutil.ReadFile(configPath)
-// 	if err != nil {
-// 		return fmt.Errorf("Failed reading Kubeconfig file: %w", err)
-// 	}
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
 
-// 	fmt.Print(string(config))
+		for _, c := range clusters {
+			if c.ContainsAppliedConfig() {
+				names = append(names, c.Name)
+			}
+		}
 
-// 	return nil
-// }
+		return names, cobra.ShellCompDirectiveNoFileComp
+	})
+
+	return cmd
+}
+
+func (o *ExportConfigOptions) Run() error {
+	cs, err := actions.Clusters(o.Context())
+
+	c := cs.FindByName(o.ClusterName)
+
+	if c == nil {
+		return fmt.Errorf("cluster '%s' does not exist", o.ClusterName)
+	}
+
+	count := cs.CountByName(o.ClusterName)
+
+	if count > 1 {
+		return fmt.Errorf("multiple clusters (%d) have been found with the name '%s'", count, o.ClusterName)
+	}
+
+	if !c.ContainsAppliedConfig() {
+		return fmt.Errorf("cluster '%s' does not contain a config file", o.ClusterName)
+	}
+
+	config, err := file.Read(c.AppliedConfigPath())
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprint(os.Stdout, config)
+
+	return nil
+}
