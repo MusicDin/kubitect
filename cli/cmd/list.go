@@ -37,7 +37,7 @@ func NewListCmd() *cobra.Command {
 }
 
 func (o *ListOptions) Run() error {
-	clusters, err := actions.Clusters(o.Context())
+	clusters, err := actions.GetClusters(o.Context())
 
 	if err != nil {
 		return err

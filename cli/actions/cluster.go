@@ -25,6 +25,8 @@ const (
 )
 
 type ClusterMeta struct {
+	Ctx *env.Context
+
 	Name  string
 	Path  string
 	Local bool
@@ -62,13 +64,6 @@ func (c ClusterMeta) Valid() bool {
 	return verifyClusterDir(c.Path) == nil
 }
 
-func (c ClusterMeta) Cluster(ctx *env.Context) *Cluster {
-	return &Cluster{
-		ClusterMeta: c,
-		Ctx:         ctx,
-	}
-}
-
 type Cluster struct {
 	ClusterMeta
 
@@ -78,8 +73,6 @@ type Cluster struct {
 	NewConfig     *modelconfig.Config
 	AppliedConfig *modelconfig.Config
 	InfraConfig   *modelinfra.Config
-
-	Ctx *env.Context
 }
 
 // NewCluster returns new Cluster instance with populated general fields.
@@ -208,9 +201,9 @@ func (c *Cluster) KubesprayVersion() string {
 	return env.ConstKubesprayVersion
 }
 
-type ClustersMeta []ClusterMeta
+type Clusters []Cluster
 
-func (cs ClustersMeta) Names() []string {
+func (cs Clusters) Names() []string {
 	var names []string
 	for _, c := range cs {
 		names = append(names, c.Name)
@@ -218,7 +211,7 @@ func (cs ClustersMeta) Names() []string {
 	return names
 }
 
-func (cs ClustersMeta) FindByName(name string) *ClusterMeta {
+func (cs Clusters) FindByName(name string) *Cluster {
 	for _, c := range cs {
 		if c.Name == name {
 			return &c
@@ -228,7 +221,7 @@ func (cs ClustersMeta) FindByName(name string) *ClusterMeta {
 	return nil
 }
 
-func (cs ClustersMeta) CountByName(name string) int {
+func (cs Clusters) CountByName(name string) int {
 	var i = 0
 
 	for _, c := range cs {
@@ -240,16 +233,16 @@ func (cs ClustersMeta) CountByName(name string) int {
 	return i
 }
 
-// Clusters returns cluster meta list of clusters from both project and local
-// directory (if working directory is the Kubitect project).
-func Clusters(ctx *env.Context) (ClustersMeta, error) {
-	cs, err := clusters(ctx.ClustersDir(), false)
+// GetClusters returns list of clusters from both global (project) and local
+// clusters directory (if working directory is a Kubitect project).
+func GetClusters(ctx *env.Context) (Clusters, error) {
+	cs, err := clusters(ctx, false)
 
 	if err != nil {
 		return nil, err
 	}
 
-	lcs, err := clusters(ctx.LocalClustersDir(), true)
+	lcs, err := clusters(ctx, true)
 
 	if err == nil {
 		cs = append(cs, lcs...)
@@ -258,27 +251,39 @@ func Clusters(ctx *env.Context) (ClustersMeta, error) {
 	return cs, nil
 }
 
-// clusters returns cluster meta list of clusters located in the given directory.
-func clusters(clustersPath string, local bool) (ClustersMeta, error) {
-	files, err := ioutil.ReadDir(clustersPath)
+// clusters returns list of clusters located either in global (project) or
+// local clusters directory.
+func clusters(ctx *env.Context, local bool) (Clusters, error) {
+	var path string
+
+	if local {
+		path = ctx.LocalClustersDir()
+	} else {
+		path = ctx.ClustersDir()
+	}
+
+	files, err := ioutil.ReadDir(path)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed reading cluster directory: %v", err)
 	}
 
-	var clusters ClustersMeta
+	var cs Clusters
 
-	for _, file := range files {
-		if file.IsDir() {
-			name := file.Name()
+	for _, f := range files {
+		if f.IsDir() {
+			name := f.Name()
 
-			clusters = append(clusters, ClusterMeta{
-				Name:  name,
-				Path:  filepath.Join(clustersPath, name),
-				Local: local,
+			cs = append(cs, Cluster{
+				ClusterMeta: ClusterMeta{
+					Ctx:   ctx,
+					Name:  name,
+					Path:  filepath.Join(path, name),
+					Local: local,
+				},
 			})
 		}
 	}
 
-	return clusters, nil
+	return cs, nil
 }

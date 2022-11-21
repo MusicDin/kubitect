@@ -47,7 +47,7 @@ func NewExportConfigCmd() *cobra.Command {
 	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		var names []string
 
-		clusters, err := actions.Clusters(opts.Context())
+		clusters, err := actions.GetClusters(opts.Context())
 
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp
@@ -66,7 +66,7 @@ func NewExportConfigCmd() *cobra.Command {
 }
 
 func (o *ExportConfigOptions) Run() error {
-	cs, err := actions.Clusters(o.Context())
+	cs, err := actions.GetClusters(o.Context())
 
 	c := cs.FindByName(o.ClusterName)
 
