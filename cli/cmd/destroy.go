@@ -3,6 +3,7 @@ package cmd
 import (
 	"cli/actions"
 	"cli/env"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -59,5 +60,28 @@ func NewDestroyCmd() *cobra.Command {
 }
 
 func (o *DestroyOptions) Run() error {
-	return actions.Destroy(o.Context(), o.ClusterName)
+
+	if o.ClusterName == "" {
+		return fmt.Errorf("a valid (non-empty) cluster name must be provided")
+	}
+
+	clusters, err := actions.Clusters(o.Context())
+
+	if err != nil {
+		return err
+	}
+
+	c := clusters.FindByName(o.ClusterName)
+
+	if c == nil {
+		return fmt.Errorf("cluster '%s' not found.", c.Name)
+	}
+
+	count := clusters.CountByName(c.Name)
+
+	if count > 1 {
+		return fmt.Errorf("cannot destroy the cluster: multiple clusters (%d) have been found with the name '%s'", count, c.Name)
+	}
+
+	return c.Cluster(o.Context()).Destroy()
 }

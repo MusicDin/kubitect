@@ -1,72 +1,106 @@
 package cmd
 
-// purgeCmd represents the purge command
-// var purgeCmd = &cobra.Command{
-// 	Use:   "purge",
-// 	Short: "Purge the cluster directory",
-// 	Long: `Purges the cluster directory. If cluster is not specifed (using --cluster flag)
-// the operation is executed on the 'default' cluster.`,
+import (
+	"cli/actions"
+	"cli/env"
+	"cli/file"
+	"cli/ui"
+	"fmt"
 
-// 	Run: func(cmd *cobra.Command, args []string) {
-// 		err := purge()
-// 		if err != nil {
-// 			fmt.Fprintln(os.Stderr, err)
-// 			os.Exit(1)
-// 		}
-// 	},
-// }
+	"github.com/spf13/cobra"
+)
 
-// func init() {
-// 	rootCmd.AddCommand(purgeCmd)
+var (
+	purgeShort = "Purge the cluster directory"
+	purgeLong  = LongDesc(`
+		Purge the directory of a given cluster.
+		Directories of active clusters cannot be purged.`)
 
-// 	purgeCmd.PersistentFlags().StringVar(&env.ClusterName, "cluster", env.DefaultClusterName, "specify the cluster to be used")
-// 	purgeCmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
+	purgeExample = Example(`
+		Purge the directory of cluster 'cls-name':
+		> kubitect purge --cluster cls-name`)
+)
 
-// 	// Auto complete cluster names of inactive clusters for flag 'cluster'.
-// 	purgeCmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+type PurgeOptions struct {
+	ClusterName string
 
-// 		clusterNames, err := GetClusters([]ClusterFilter{IsInactive})
-// 		if err != nil {
-// 			return nil, cobra.ShellCompDirectiveNoFileComp
-// 		}
+	env.ContextOptions
+}
 
-// 		return clusterNames, cobra.ShellCompDirectiveNoFileComp
-// 	})
-// }
+func NewPurgeCmd() *cobra.Command {
+	var opts PurgeOptions
 
-// // purge function removes cluster's directory along with all of its content.
-// // Active clusters (clusters that contain terraform state file) cannot be
-// // purged and therfore the action will be aborted.
-// func purge() error {
+	cmd := &cobra.Command{
+		Use:     "purge",
+		GroupID: "support",
+		Short:   purgeShort,
+		Long:    purgeLong,
+		Example: purgeExample,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return opts.Run()
+		},
+	}
 
-// 	// Fail if cluster path is not pointing on a valid cluster directory.
-// 	err := utils.VerifyClusterDir(env.ClusterPath)
-// 	if err != nil {
-// 		return err
-// 	}
+	cmd.PersistentFlags().StringVar(&opts.ClusterName, "cluster", "", "specify the cluster to be used")
+	cmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
 
-// 	tfStatePath := filepath.Join(env.ClusterPath, env.ConstTerraformStatePath)
+	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		var names []string
 
-// 	// Abort purge if terraform state file exists.
-// 	if utils.Exists(tfStatePath) {
-// 		return fmt.Errorf("Only destroyed clusters can be purged! Cluster '%s' is still active and therefore cannot be purged.", env.ClusterName)
-// 	}
+		clusters, err := actions.Clusters(opts.Context())
 
-// 	// Ask user for permission.
-// 	err = utils.AskUserConfirmation("The '%s' cluster directory will be removed.", env.ClusterName)
-// 	if err != nil {
-// 		return err
-// 	}
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
 
-// 	fmt.Printf("Purging '%s' cluster...\n", env.ClusterName)
+		for _, c := range clusters {
+			if !c.ContainsTfStateConfig() {
+				names = append(names, c.Name)
+			}
+		}
 
-// 	// Remove terraform state file
-// 	err = os.RemoveAll(env.ClusterPath)
-// 	if err != nil {
-// 		return fmt.Errorf("Failed removing cluster's directory: %v", err)
-// 	}
+		return names, cobra.ShellCompDirectiveNoFileComp
+	})
 
-// 	fmt.Printf("Cluster '%s' has been successfully purged.\n", env.ClusterName)
+	return cmd
+}
 
-// 	return nil
-// }
+func (o *PurgeOptions) Run() error {
+	cs, err := actions.Clusters(o.Context())
+
+	if err != nil {
+		return err
+	}
+
+	c := cs.FindByName(o.ClusterName)
+
+	if c == nil {
+		return fmt.Errorf("cluster '%s' does not exist", c.Name)
+	}
+
+	count := cs.CountByName(c.Name)
+
+	if count > 1 {
+		return fmt.Errorf("multiple clusters (%d) have been found with the name '%s'", count, c.Name)
+	}
+
+	if c.ContainsTfStateConfig() {
+		return fmt.Errorf("cluster '%s' cannot be purged: only destroyed clusters can be purged", c.Name)
+	}
+
+	fmt.Printf("Cluster '%s' will be purged. This will remove cluster's directory including all of its content.", c.Name)
+
+	if err := ui.Ask(); err != nil {
+		return err
+	}
+
+	fmt.Printf("Purging cluster '%s'...\n", c.Name)
+
+	if err := file.Remove(c.Path); err != nil {
+		return fmt.Errorf("failed to purge cluster '%s': %v", c.Name, err)
+	}
+
+	fmt.Printf("Cluster '%s' has been successfully purged.\n", c.Name)
+
+	return nil
+}

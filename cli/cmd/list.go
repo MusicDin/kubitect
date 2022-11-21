@@ -53,7 +53,7 @@ func (o *ListOptions) Run() error {
 	for _, c := range clusters {
 		var opt []string
 
-		if c.ContainsAppliedConfig() {
+		if c.ContainsTfStateConfig() {
 			opt = append(opt, "active")
 		}
 

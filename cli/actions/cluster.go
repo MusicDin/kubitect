@@ -47,6 +47,10 @@ func (c ClusterMeta) KubeconfigPath() string {
 }
 
 func (c ClusterMeta) ContainsAppliedConfig() bool {
+	return file.Exists(c.AppliedConfigPath())
+}
+
+func (c ClusterMeta) ContainsTfStateConfig() bool {
 	return file.Exists(c.TfStatePath())
 }
 
@@ -56,6 +60,13 @@ func (c ClusterMeta) ContainsKubeconfig() bool {
 
 func (c ClusterMeta) Valid() bool {
 	return verifyClusterDir(c.Path) == nil
+}
+
+func (c ClusterMeta) Cluster(ctx *env.Context) *Cluster {
+	return &Cluster{
+		ClusterMeta: c,
+		Ctx:         ctx,
+	}
 }
 
 type Cluster struct {
@@ -74,12 +85,12 @@ type Cluster struct {
 // NewCluster returns new Cluster instance with populated general fields.
 // Cluster name and path are extracted from the provided configuration file.
 // Previously applied configuration is also read, if cluster already exists.
-func NewCluster(ctx *env.Context, userCfgPath string) (Cluster, error) {
+func NewCluster(ctx *env.Context, configPath string) (Cluster, error) {
 	var err error
 	var c Cluster
 
 	c.Ctx = ctx
-	c.NewConfigPath = userCfgPath
+	c.NewConfigPath = configPath
 	c.NewConfig, err = readConfig(c.NewConfigPath, modelconfig.Config{})
 
 	if err != nil {
@@ -99,9 +110,21 @@ func NewCluster(ctx *env.Context, userCfgPath string) (Cluster, error) {
 	return c, c.Sync()
 }
 
-// Sync ensures that cluster properties are up to data.
+// Sync ensures that cluster configuration files are up to data.
 func (c *Cluster) Sync() error {
 	var err error
+
+	if c.NewConfig == nil {
+		c.NewConfig, err = readConfigIfExists(c.NewConfigPath, modelconfig.Config{})
+
+		if err != nil {
+			return fmt.Errorf("failed to read current configuration file: %v", err)
+		}
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to read previously applied configuration file: %v", err)
+	}
 
 	c.AppliedConfig, err = readConfigIfExists(c.AppliedConfigPath(), modelconfig.Config{})
 
