@@ -9,7 +9,7 @@ import (
 func NewValidationError(msg string, path string) error {
 	return ui.ErrorBlock{
 		Level: ui.ERROR,
-		Content: []ui.ErrorContent{
+		Content: []ui.Content{
 			ui.NewErrorLine("Error type:", "Validation Error"),
 			ui.NewErrorSection("Config path:", path),
 			ui.NewErrorSection("Error:", strings.Split(msg, "\n")...),
@@ -20,7 +20,7 @@ func NewValidationError(msg string, path string) error {
 func NewConfigChangeError(msg string, paths ...string) error {
 	return ui.ErrorBlock{
 		Level: ui.ERROR,
-		Content: []ui.ErrorContent{
+		Content: []ui.Content{
 			ui.NewErrorLine("Error type:", "Config Change"),
 			ui.NewErrorSection("Config paths:", paths...),
 			ui.NewErrorSection("Error:", strings.Split(msg, "\n")...),
@@ -31,7 +31,7 @@ func NewConfigChangeError(msg string, paths ...string) error {
 func NewConfigChangeWarning(msg string, paths ...string) error {
 	return ui.ErrorBlock{
 		Level: ui.WARN,
-		Content: []ui.ErrorContent{
+		Content: []ui.Content{
 			ui.NewErrorLine("Warning type:", "Config Change"),
 			ui.NewErrorSection("Config path:", paths...),
 			ui.NewErrorSection("Warning:", strings.Split(msg, "\n")...),
@@ -47,7 +47,7 @@ func NewInvalidWorkingDirError(missingFiles []string) error {
 
 	return ui.ErrorBlock{
 		Level: ui.ERROR,
-		Content: []ui.ErrorContent{
+		Content: []ui.Content{
 			ui.NewErrorLine("Error type:", "Invalid working directory"),
 			ui.NewErrorSection("Missing files:", missingFiles...),
 			ui.NewErrorSection("Error:", e...),
@@ -60,7 +60,7 @@ func NewInvalidProjectDirError(clusterPath string, missingFiles ...string) error
 
 	return ui.ErrorBlock{
 		Level: ui.ERROR,
-		Content: []ui.ErrorContent{
+		Content: []ui.Content{
 			ui.NewErrorLine("Error type:", "Invalid project directory"),
 			ui.NewErrorSection("Missing files:", missingFiles...),
 			ui.NewErrorSection("Error:", e),

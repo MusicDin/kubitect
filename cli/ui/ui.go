@@ -3,7 +3,6 @@ package ui
 import (
 	"cli/env"
 	"fmt"
-	"os"
 	"strings"
 )
 
@@ -31,7 +30,21 @@ func (l Level) String() string {
 	}
 }
 
-type Ui struct {
+type GlobalUi struct {
+	streams *Streams
+}
+
+// Ui singleton
+var globalUi *GlobalUi
+
+func Ui() *GlobalUi {
+	if globalUi == nil {
+		globalUi = &GlobalUi{
+			streams: StandardStreams(),
+		}
+	}
+
+	return globalUi
 }
 
 // Ask asks user for confirmation. If user confirms with either "y" or "yes"
@@ -53,7 +66,7 @@ func Ask(msg ...string) error {
 
 	Printf(INFO, "\n%s (yes/no) ", question)
 
-	if _, err := fmt.Scan(&response); err != nil {
+	if _, err := fmt.Fscan(Ui().streams.In.File, &response); err != nil {
 		return fmt.Errorf("ask: %v", err)
 	}
 
@@ -72,10 +85,10 @@ func Print(level Level, msg ...any) {
 		return
 	}
 
-	w := os.Stdout
+	w := Ui().streams.Out.File
 
 	if level == ERROR || level == WARN {
-		w = os.Stderr
+		w = Ui().streams.Err.File
 	}
 
 	fmt.Fprint(w, msg...)
@@ -101,7 +114,7 @@ func PrintBlock(err ...error) {
 
 		es = append(es, ErrorBlock{
 			Level: ERROR,
-			Content: []ErrorContent{
+			Content: []Content{
 				NewErrorLine("Error:", fmt.Sprint(e)),
 			},
 		})
@@ -112,6 +125,6 @@ func PrintBlock(err ...error) {
 			e.Level = INFO
 		}
 
-		fmt.Fprintln(os.Stderr, e)
+		fmt.Fprintln(Ui().streams.Err.File, e.Format())
 	}
 }

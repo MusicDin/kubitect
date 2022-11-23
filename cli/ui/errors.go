@@ -1,10 +1,9 @@
 package ui
 
 import (
+	"cli/env"
 	"fmt"
 	"strings"
-
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 // Error line symbols
@@ -25,131 +24,213 @@ func (t Level) Color() Color {
 	}
 }
 
-type ErrorContent interface {
-	Format(Color) string
+type Lines []string
+
+func (l *Lines) Append(lines ...string) {
+	*l = append(*l, lines...)
 }
 
-type ErrorBlock struct {
-	Level   Level
-	Content []ErrorContent
+func (l *Lines) Prepend(lines ...string) {
+	*l = append(lines, *l...)
 }
 
-func (e ErrorBlock) Error() string {
-	var out string
-
-	c := e.Level.Color()
-
-	for _, cont := range e.Content {
-		out += cont.Format(c)
+func (l *Lines) Color(c Color) {
+	for i := range *l {
+		(*l)[i] = c((*l)[i])
 	}
-
-	return fmt.Sprintf("%s\n%s%s", c(lineInitial), out, c(lineFinal))
 }
 
-// ErrorLine is ErrorContent that contains a title and an error line.
-// When formatted, the title is colored based on the error type.
-// Similarly, a vertical line that is prepended to each terminal line
-// is colored based on the error type. A line containing line breaks
-// is split into several lines accordingly.
-type ErrorLine struct {
+func (l *Lines) Prefix(p string) {
+	for i := range *l {
+		(*l)[i] = p + (*l)[i]
+	}
+}
+
+func (l *Lines) Glue(lines Lines) {
+	x := len(*l) - 1
+	(*l)[x] = (*l)[x] + lines[0]
+	l.Append(lines[1:]...)
+}
+
+type Block struct {
+	// color      Color
+	content []Content
+}
+
+type Content struct {
 	title string
-	line  string
+	lines Lines
+
+	// Print each line into a new Indents each line
+	linesIndent int
+
+	// When set to true, title is not formatted if len(lines) == 0.
+	linesRequired bool
+
+	// Lines are printed directly after title (without new line).
+	// When compact is set to true, indentation is ignored.
+	compact bool
 }
 
-func NewErrorLine(title string, line string) ErrorContent {
-	return ErrorLine{
-		title: title,
-		line:  line,
-	}
-}
-
-// Format formats an error line.
-func (e ErrorLine) Format(c Color) string {
-	if len(e.line) == 0 {
-		out := format(e.title, c, 0, true)
-		return strings.Replace(out, e.title, c(e.title), 1)
-	}
-
-	var out string
-
-	for i, l := range strings.Split(e.line, "\n") {
-		if i == 0 && len(e.title) > 0 {
-			out = fmt.Sprintf("%s %s", e.title, l)
-			out = format(out, c, 0, true)
-			out = strings.Replace(out, e.title, c(e.title), 1)
-			continue
-		}
-
-		out += format(l, c, 0, true)
-	}
-
-	return out
-}
-
-// ErrorSection is ErrorContent that contains a title and multiple error
-// lines. When formatted, the title is colored based on the error type.
-// Similarly, a vertical line that is prepended to each terminal line
-// is colored based on the error type. Error lines are also prepended with
-// an additional indentation.
-type ErrorSection struct {
-	title string
-	lines []string
-}
-
-func NewErrorSection(title string, lines ...string) ErrorContent {
-	return ErrorSection{
+func NewContent(title string, lines ...string) Content {
+	return Content{
 		title: title,
 		lines: lines,
 	}
 }
 
-// Format formats an error section.
-func (e ErrorSection) Format(c Color) string {
-	if len(e.lines) == 0 {
-		return ""
+// format formats the content into lines that fit the
+// width of the terminal.
+func (c Content) format(color Color, indent int) []string {
+	if c.linesRequired && len(c.lines) == 0 {
+		return nil
 	}
 
-	titleLine := ErrorLine{
-		title: e.title,
+	out, colsLeft := format(c.title, indent, 0)
+	out.Color(color)
+
+	if c.compact {
+		c.linesIndent = 0
+	} else {
+		colsLeft = 0
 	}
 
-	out := titleLine.Format(c)
+	prefix := fmt.Sprintf("%*s", c.linesIndent, "")
 
-	for _, line := range e.lines {
-		for _, s := range strings.Split(line, "\n") {
-			out += format(s, c, 2, true)
+	for i, l := range c.lines {
+		lines, _ := format(l, len(prefix)+indent, colsLeft)
+		lines.Prefix(prefix)
+
+		if c.compact && i == 0 {
+			out.Glue(lines)
+			continue
 		}
+
+		out = append(out, lines...)
 	}
 
 	return out
 }
 
-// format formats a line according to the terminal width.
-func format(msg string, c Color, spacing int, newLine bool) string {
-	prefix := fmt.Sprintf("%s %*s", c(lineMiddle), spacing, "")
-	indent := len([]rune(lineMiddle)) + spacing + 2
+// // TODO
+func (e ErrorBlock) Error() string {
+	// var out string
 
-	width, _, err := terminal.GetSize(0)
+	// c := e.Level.Color()
 
-	if err != nil || width < indent+1 {
-		width = indent + 1
+	// for _, cont := range e.Content {
+	// 	out += cont.format(c, 2)
+	// }
+
+	// TODO: c.format(Colors.NONE, 0)
+
+	return "" //fmt.Sprintf("%s\n%s%s", c(lineInitial), out, c(lineFinal))
+}
+
+// ErrorBlock contains multiple ErrorContent objects.
+// When formatted, a "block symbols" are prepended
+// to each line to form a block.
+type ErrorBlock struct {
+	Level   Level
+	Content []Content
+}
+
+func (e ErrorBlock) Format() string {
+	var lines Lines
+
+	color := e.Level.Color()
+
+	if env.NoColor {
+		color = Colors.NONE
 	}
 
-	lw := width - indent // line width
-	cw := lw             // current line width
+	prefix := lineMiddle + " "
+	indent := len([]rune(prefix))
 
-	out := prefix
+	for _, c := range e.Content {
+		for _, l := range c.format(color, indent) {
+			lines.Append(color(prefix) + l)
+		}
+	}
 
-	for _, s := range strings.Split(msg, " ") {
+	lines.Prepend(color(lineInitial))
+	lines.Append(color(lineFinal))
+
+	return strings.Join(lines, "\n")
+}
+
+// BlockLine is contains a title and a line. When formatted,
+// a title is colored and line is printed in the same line
+// as title.
+func NewErrorLine(title string, lines ...string) Content {
+	return Content{
+		title:   title,
+		lines:   lines,
+		compact: true,
+	}
+}
+
+// BlockSection contains a title and multiple lines. When
+// formatted, a title is colored and lines are printed in
+// a new line with additional indentation.
+func NewErrorSection(title string, lines ...string) Content {
+	return Content{
+		title:         title,
+		lines:         lines,
+		linesIndent:   2,
+		linesRequired: true,
+	}
+}
+
+// format formats given string into multiple lines that fit the
+// width of the output stream. Argument startAt defines where the
+//
+func format(str string, indent, startAt int) (Lines, int) {
+	var lines Lines
+
+	width := Ui().streams.Out.Columns()
+
+	if width <= indent {
+		width = defaultColumns
+	}
+
+	for _, m := range strings.Split(str, "\n") {
+		ls, colsLeft := fmtLine(m, width-indent, startAt)
+		lines = append(lines, ls...)
+		startAt = colsLeft
+	}
+
+	return lines, startAt
+}
+
+// fmtLine formats a message according to the given width.
+// If word cannot fit into a current line, it tries to fit
+// it into a new line. If word is still to long, it writes
+// the word character by character.
+//
+// It returns formatted message and number of columns left
+// in a line.
+func fmtLine(line string, width int, startAt int) ([]string, int) {
+	var out string
+
+	lw := width   // total line width
+	cw := startAt // current line width
+
+	if cw <= 0 {
+		cw = lw
+	}
+
+	for _, s := range strings.Split(line, " ") {
 		sw := len(s)
+
+		// add space
+		if 0 < cw && cw < lw {
+			out += " "
+			cw -= 1
+		}
 
 		// word fits into current line
 		if sw <= cw {
-			if cw < lw {
-				out += " "
-				cw -= 1
-			}
-
 			out += s
 			cw -= sw
 			continue
@@ -157,32 +238,22 @@ func format(msg string, c Color, spacing int, newLine bool) string {
 
 		// word fits into new line
 		if sw <= lw {
-			out += "\n" + prefix + s
+			out += "\n" + s
 			cw = lw - sw
 			continue
 		}
 
 		// type word char by char
-
-		if cw < lw {
-			out += " "
-			cw -= 1
-		}
-
-		for _, r := range s {
-			if cw == 0 {
-				out += "\n" + prefix
+		for _, c := range s {
+			if cw < 1 {
+				out += "\n"
 				cw = lw
 			}
 
-			out += string(r)
+			out += string(c)
 			cw--
 		}
 	}
 
-	if newLine {
-		out += "\n"
-	}
-
-	return out
+	return strings.Split(out, "\n"), cw
 }

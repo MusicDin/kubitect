@@ -6,6 +6,7 @@ import (
 	"cli/env"
 	"cli/file"
 	"cli/tools/virtualenv"
+	"cli/ui"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -91,7 +92,8 @@ func NewCluster(ctx *env.Context, configPath string) (Cluster, error) {
 	}
 
 	if err := validateConfig(c.NewConfig); err != nil {
-		return c, fmt.Errorf("Provided configuration file is not valid.\n%v", err)
+		ui.PrintBlock(err...)
+		return c, fmt.Errorf("Provided configuration file is not valid.")
 	}
 
 	c.Local = c.Ctx.Local()
@@ -121,7 +123,8 @@ func (c *Cluster) Sync() error {
 
 	if c.InfraConfig != nil {
 		if err := validateConfig(c.NewConfig); err != nil {
-			return fmt.Errorf("Infrastructure file (produced by Terraform) is invalid.\n%v", err)
+			ui.PrintBlock(err...)
+			return fmt.Errorf("Infrastructure file (produced by Terraform) is invalid.")
 		}
 	}
 
