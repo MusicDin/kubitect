@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Error line symbols
+// Block symbols
 const (
 	lineInitial = "\u250C" // .-
 	lineMiddle  = "\u2502" // |
@@ -31,6 +31,10 @@ func (b BasicBlock) Format(stream *OutputStream, level Level) string {
 		for _, l := range c.format(stream, color, indent) {
 			lines.Append(color(prefix) + l)
 		}
+	}
+
+	if len(lines) == 0 {
+		return ""
 	}
 
 	lines.Prepend(color(lineInitial))
@@ -59,19 +63,19 @@ func (c Content) format(s *OutputStream, color Color, indent int) []string {
 		return nil
 	}
 
-	out, colsLeft := Format(s, c.title, indent, 0)
+	out, pivot := Format(s, c.title, indent, 0)
 	out.Color(color)
 
 	if c.compact {
 		c.linesIndent = 0
 	} else {
-		colsLeft = 0
+		pivot = 0
 	}
 
 	prefix := fmt.Sprintf("%*s", c.linesIndent, "")
 
 	for i, l := range c.lines {
-		lines, _ := Format(s, l, len(prefix)+indent, colsLeft)
+		lines, _ := Format(s, l, len(prefix)+indent, pivot)
 		lines.Prefix(prefix)
 
 		if c.compact && i == 0 {

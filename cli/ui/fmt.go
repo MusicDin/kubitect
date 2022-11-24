@@ -7,12 +7,11 @@ import "strings"
 // Argument startAt defines where in the current row should the
 // string be printed from.
 //
-// It returns formatted lines and number of columns left in the
-// current line.
+// It returns formatted lines and index of the current column.
 func Format(o *OutputStream, str string, indent, startAt int) (Lines, int) {
-	var lines Lines
+	var lines []string
 
-	if o == nil {
+	if o == nil || !o.IsTerminal() {
 		lines = strings.Split(str, "\n")
 
 		if startAt > 0 {
@@ -28,10 +27,10 @@ func Format(o *OutputStream, str string, indent, startAt int) (Lines, int) {
 		width = defaultColumns
 	}
 
-	for _, m := range strings.Split(str, "\n") {
-		ls, colsLeft := fmtLine(m, width-indent, startAt)
-		lines = append(lines, ls...)
-		startAt = colsLeft
+	for _, line := range strings.Split(str, "\n") {
+		l, i := fmtLine(line, width-indent, startAt)
+		lines = append(lines, l...)
+		startAt = i
 	}
 
 	return lines, startAt
@@ -42,23 +41,22 @@ func Format(o *OutputStream, str string, indent, startAt int) (Lines, int) {
 // it into a new line. If word is still to long, it writes
 // the word character by character.
 //
-// It returns formatted message and number of columns left
-// in a line.
+// It returns formatted message and index of the current
+// column (pivot).
 func fmtLine(line string, width int, startAt int) ([]string, int) {
 	var out string
 
-	lw := width   // total line width
-	cw := startAt // current line width
+	cw := width - startAt // current line width
 
 	if cw <= 0 {
-		cw = lw
+		cw = width
 	}
 
 	for _, s := range strings.Split(line, " ") {
 		sw := len(s)
 
 		// add space
-		if 0 < cw && cw < lw {
+		if 0 < cw && cw < width {
 			out += " "
 			cw -= 1
 		}
@@ -71,9 +69,9 @@ func fmtLine(line string, width int, startAt int) ([]string, int) {
 		}
 
 		// word fits into new line
-		if sw <= lw {
+		if sw <= width {
 			out += "\n" + s
-			cw = lw - sw
+			cw = width - sw
 			continue
 		}
 
@@ -81,7 +79,7 @@ func fmtLine(line string, width int, startAt int) ([]string, int) {
 		for _, c := range s {
 			if cw < 1 {
 				out += "\n"
-				cw = lw
+				cw = width
 			}
 
 			out += string(c)
@@ -89,5 +87,5 @@ func fmtLine(line string, width int, startAt int) ([]string, int) {
 		}
 	}
 
-	return strings.Split(out, "\n"), cw
+	return strings.Split(out, "\n"), (width - cw)
 }

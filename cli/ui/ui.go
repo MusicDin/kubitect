@@ -15,21 +15,6 @@ const (
 	ERROR
 )
 
-func (l Level) String() string {
-	switch l {
-	case DEBUG:
-		return "DEBUG"
-	case INFO:
-		return "INFO"
-	case WARN:
-		return "WARN"
-	case ERROR:
-		return "ERROR"
-	default:
-		return ""
-	}
-}
-
 func (t Level) Color() Color {
 	if env.NoColor {
 		return Colors.NONE
@@ -45,26 +30,26 @@ func (t Level) Color() Color {
 	}
 }
 
-type GlobalUi struct {
-	streams *Streams
+type Ui struct {
+	Streams *Streams
 }
 
-func (u *GlobalUi) OutStream(level Level) *OutputStream {
+func (u *Ui) OutStream(level Level) *OutputStream {
 	switch level {
 	case ERROR, WARN:
-		return u.streams.Err
+		return u.Streams.Err
 	default:
-		return u.streams.Out
+		return u.Streams.Out
 	}
 }
 
 // Ui singleton
-var globalUi *GlobalUi
+var globalUi *Ui
 
-func Ui() *GlobalUi {
+func GlobalUi() *Ui {
 	if globalUi == nil {
-		globalUi = &GlobalUi{
-			streams: StandardStreams(),
+		globalUi = &Ui{
+			Streams: StandardStreams(),
 		}
 	}
 
@@ -73,12 +58,19 @@ func Ui() *GlobalUi {
 
 // Ask asks user for confirmation. If user confirms with either "y" or "yes"
 // nil is returned. Otherwise, if user enters "n" or "no" an error is returned.
-func Ask(msg ...string) error {
+func (u *Ui) Ask(msg ...string) error {
 	var question string
 	var response string
 
 	// Automatically approve if '--auto-approve' flag is used
 	if env.AutoApprove {
+		return nil
+	}
+
+	si := u.Streams.In
+
+	// Auto approve if stdin is not a terminal
+	if si == nil || !si.IsTerminal() {
 		return nil
 	}
 
@@ -88,9 +80,9 @@ func Ask(msg ...string) error {
 		question = strings.Join(msg, " ")
 	}
 
-	Printf(INFO, "\n%s (yes/no) ", question)
+	u.Printf(INFO, "\n%s (yes/no) ", question)
 
-	if _, err := fmt.Fscan(Ui().streams.In.File, &response); err != nil {
+	if _, err := fmt.Fscan(si.File, &response); err != nil {
 		return fmt.Errorf("ask: %v", err)
 	}
 
@@ -100,33 +92,31 @@ func Ask(msg ...string) error {
 	case "n", "no":
 		return fmt.Errorf("User aborted...")
 	default:
-		return Ask(msg...)
+		return u.Ask(msg...)
 	}
 }
 
-func Print(level Level, msg ...any) {
+func (u *Ui) Print(level Level, msg ...any) {
 	if level == DEBUG && !env.Debug {
 		return
 	}
 
-	w := Ui().OutStream(level).File
+	w := u.OutStream(level).File
 
 	fmt.Fprint(w, msg...)
 }
 
-func Println(level Level, msg ...any) {
-	Print(level, msg...)
-	Print(level, "\n")
+func (u *Ui) Println(level Level, msg ...any) {
+	u.Print(level, msg...)
+	u.Print(level, "\n")
 }
 
-func Printf(level Level, format string, args ...interface{}) {
-	Print(level, fmt.Sprintf(format, args...))
+func (u *Ui) Printf(level Level, format string, args ...interface{}) {
+	u.Print(level, fmt.Sprintf(format, args...))
 }
 
-func PrintBlockE(err ...error) {
+func (u *Ui) PrintBlockE(err ...error) {
 	var eb ErrorBlock
-
-	s := Ui().OutStream(eb.Severity)
 
 	for _, e := range err {
 		switch e.(type) {
@@ -139,6 +129,8 @@ func PrintBlockE(err ...error) {
 				},
 			)
 		}
+
+		s := u.OutStream(eb.Severity)
 
 		fmt.Fprintln(s.File, eb.Format(s, eb.Severity))
 	}
