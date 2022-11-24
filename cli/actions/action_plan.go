@@ -30,14 +30,14 @@ func (c *Cluster) plan(action ApplyAction) (Events, error) {
 	blocking := events.OfType(BLOCK)
 
 	if len(blocking) > 0 {
-		ui.PrintBlock(blocking.Errors()...)
+		ui.PrintBlockE(blocking.Errors()...)
 		return nil, fmt.Errorf("Aborted. Configuration file contains errors.")
 	}
 
 	warnings := events.OfType(WARN)
 
 	if len(warnings) > 0 {
-		ui.PrintBlock(warnings.Errors()...)
+		ui.PrintBlockE(warnings.Errors()...)
 		fmt.Println("Above warnings indicate potentially destructive actions.")
 	}
 

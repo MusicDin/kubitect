@@ -30,8 +30,32 @@ func (l Level) String() string {
 	}
 }
 
+func (t Level) Color() Color {
+	if env.NoColor {
+		return Colors.NONE
+	}
+
+	switch t {
+	case WARN:
+		return Colors.YELLOW
+	case ERROR:
+		return Colors.RED
+	default:
+		return Colors.NONE
+	}
+}
+
 type GlobalUi struct {
 	streams *Streams
+}
+
+func (u *GlobalUi) OutStream(level Level) *OutputStream {
+	switch level {
+	case ERROR, WARN:
+		return u.streams.Err
+	default:
+		return u.streams.Out
+	}
 }
 
 // Ui singleton
@@ -85,11 +109,7 @@ func Print(level Level, msg ...any) {
 		return
 	}
 
-	w := Ui().streams.Out.File
-
-	if level == ERROR || level == WARN {
-		w = Ui().streams.Err.File
-	}
+	w := Ui().OutStream(level).File
 
 	fmt.Fprint(w, msg...)
 }
@@ -103,28 +123,23 @@ func Printf(level Level, format string, args ...interface{}) {
 	Print(level, fmt.Sprintf(format, args...))
 }
 
-func PrintBlock(err ...error) {
-	var es []ErrorBlock
+func PrintBlockE(err ...error) {
+	var eb ErrorBlock
+
+	s := Ui().OutStream(eb.Severity)
 
 	for _, e := range err {
-		if b, ok := e.(ErrorBlock); ok {
-			es = append(es, b)
-			continue
+		switch e.(type) {
+		case ErrorBlock:
+			eb = e.(ErrorBlock)
+		default:
+			eb = NewErrorBlock(ERROR,
+				[]Content{
+					NewErrorLine("Error:", fmt.Sprint(e)),
+				},
+			)
 		}
 
-		es = append(es, ErrorBlock{
-			Level: ERROR,
-			Content: []Content{
-				NewErrorLine("Error:", fmt.Sprint(e)),
-			},
-		})
-	}
-
-	for _, e := range es {
-		if env.NoColor {
-			e.Level = INFO
-		}
-
-		fmt.Fprintln(Ui().streams.Err.File, e.Format())
+		fmt.Fprintln(s.File, eb.Format(s, eb.Severity))
 	}
 }
