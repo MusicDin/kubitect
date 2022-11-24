@@ -1,7 +1,7 @@
 package modelconfig
 
 import (
-	v "cli/validation"
+	v "cli/lib/validation"
 	"fmt"
 )
 

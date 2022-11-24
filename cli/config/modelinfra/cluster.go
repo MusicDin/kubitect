@@ -2,7 +2,7 @@ package modelinfra
 
 import (
 	"cli/config/modelconfig"
-	v "cli/validation"
+	v "cli/lib/validation"
 )
 
 type Cluster struct {

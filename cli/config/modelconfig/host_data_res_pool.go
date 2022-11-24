@@ -1,6 +1,6 @@
 package modelconfig
 
-import v "cli/validation"
+import v "cli/lib/validation"
 
 type DataResourcePool struct {
 	Name *string `yaml:"name" opt:",id"`

@@ -1,7 +1,7 @@
 package actions
 
 import (
-	"cli/cmp"
+	"cli/lib/cmp"
 	"cli/ui"
 	"fmt"
 )
@@ -30,16 +30,16 @@ func (c *Cluster) plan(action ApplyAction) (Events, error) {
 	blocking := events.OfType(BLOCK)
 
 	if len(blocking) > 0 {
-		ui.PrintBlockE(blocking.Errors()...)
+		ui.GlobalUi().PrintBlockE(blocking.Errors()...)
 		return nil, fmt.Errorf("Aborted. Configuration file contains errors.")
 	}
 
 	warnings := events.OfType(WARN)
 
 	if len(warnings) > 0 {
-		ui.PrintBlockE(warnings.Errors()...)
+		ui.GlobalUi().PrintBlockE(warnings.Errors()...)
 		fmt.Println("Above warnings indicate potentially destructive actions.")
 	}
 
-	return events, ui.Ask()
+	return events, ui.GlobalUi().Ask()
 }

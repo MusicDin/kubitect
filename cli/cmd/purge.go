@@ -90,7 +90,7 @@ func (o *PurgeOptions) Run() error {
 
 	fmt.Printf("Cluster '%s' will be purged. This will remove cluster's directory including all of its content.", o.ClusterName)
 
-	if err := ui.Ask(); err != nil {
+	if err := ui.GlobalUi().Ask(); err != nil {
 		return err
 	}
 

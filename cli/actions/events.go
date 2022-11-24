@@ -1,7 +1,7 @@
 package actions
 
 import (
-	"cli/cmp"
+	"cli/lib/cmp"
 )
 
 type EventType string

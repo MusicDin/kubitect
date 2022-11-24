@@ -3,7 +3,7 @@ package actions
 import (
 	"cli/env"
 	"cli/file"
-	"cli/validation"
+	"cli/lib/validation"
 	"fmt"
 	"os"
 	"path/filepath"

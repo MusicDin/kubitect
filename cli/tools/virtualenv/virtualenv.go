@@ -2,8 +2,8 @@ package virtualenv
 
 import (
 	"cli/env"
+	"cli/ui"
 	"fmt"
-	"os"
 	"os/exec"
 	"path/filepath"
 )
@@ -73,8 +73,8 @@ func (ve *VirtualEnv) create() error {
 	cmd.Dir = ve.ClusterPath
 
 	if env.Debug {
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
+		cmd.Stdout = ui.GlobalUi().Streams.Out.File
+		cmd.Stderr = ui.GlobalUi().Streams.Err.File
 	}
 
 	err := cmd.Run()
@@ -96,8 +96,8 @@ func (ve *VirtualEnv) installPipReq() error {
 	cmd.Dir = ve.ClusterPath
 
 	if env.Debug {
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
+		cmd.Stdout = ui.GlobalUi().Streams.Out.File
+		cmd.Stderr = ui.GlobalUi().Streams.Err.File
 	}
 
 	err := cmd.Run()

@@ -92,7 +92,7 @@ func NewCluster(ctx *env.Context, configPath string) (Cluster, error) {
 	}
 
 	if err := validateConfig(c.NewConfig); err != nil {
-		ui.PrintBlockE(err...)
+		ui.GlobalUi().PrintBlockE(err...)
 		return c, fmt.Errorf("Provided configuration file is not valid.")
 	}
 
@@ -123,7 +123,7 @@ func (c *Cluster) Sync() error {
 
 	if c.InfraConfig != nil {
 		if err := validateConfig(c.NewConfig); err != nil {
-			ui.PrintBlockE(err...)
+			ui.GlobalUi().PrintBlockE(err...)
 			return fmt.Errorf("Infrastructure file (produced by Terraform) is invalid.")
 		}
 	}

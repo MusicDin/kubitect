@@ -1,8 +1,6 @@
 package modelconfig
 
-import (
-	v "cli/validation"
-)
+import v "cli/lib/validation"
 
 // Uint8 is intentionally set to int to avoid panic if value is set
 // outside the uint8 size.

@@ -82,7 +82,7 @@ func scaleDown(c *Cluster, events Events) error {
 		fmt.Println("-", name)
 	}
 
-	if err := ui.Ask(); err != nil {
+	if err := ui.GlobalUi().Ask(); err != nil {
 		return err
 	}
 

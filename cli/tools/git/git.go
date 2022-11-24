@@ -2,6 +2,7 @@ package git
 
 import (
 	"cli/env"
+	"cli/ui"
 	"fmt"
 	"os"
 	"regexp"
@@ -40,7 +41,7 @@ func Clone(path, url, version string) error {
 		refName = plumbing.NewBranchReferenceName(version)
 	}
 
-	gitCloneOptions := &git.CloneOptions{
+	opts := &git.CloneOptions{
 		URL:               url,
 		ReferenceName:     refName,
 		Tags:              git.NoTags,
@@ -50,12 +51,12 @@ func Clone(path, url, version string) error {
 	}
 
 	if env.Debug {
-		gitCloneOptions.Progress = os.Stdout
+		opts.Progress = ui.GlobalUi().Streams.Out.File
 	}
 
 	os.MkdirAll(path, os.ModePerm)
 
-	_, err = git.PlainClone(path, false, gitCloneOptions)
+	_, err = git.PlainClone(path, false, opts)
 
 	if err != nil {
 		return fmt.Errorf("git clone: failed to clone project (url: %s, version: %s): %v", url, version, err)

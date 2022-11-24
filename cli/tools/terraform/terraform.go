@@ -78,8 +78,8 @@ func NewTerraform(ctx *env.Context, clusterPath string) (*Terraform, error) {
 		return nil, fmt.Errorf("failed to instantiate Terraform: %v", err)
 	}
 
-	tf.SetStdout(os.Stdout)
-	tf.SetStderr(os.Stderr)
+	t.tf.SetStdout(ui.GlobalUi().Streams.Out.File)
+	t.tf.SetStdout(ui.GlobalUi().Streams.Err.File)
 	// tf.SetColor(true)
 
 	t.tf = tf
@@ -103,8 +103,8 @@ func (t *Terraform) Plan() (bool, error) {
 
 	changes, err := t.tf.Plan(context.Background())
 
-	t.tf.SetStdout(os.Stdout)
-	t.tf.SetStderr(os.Stderr)
+	t.tf.SetStdout(ui.GlobalUi().Streams.Out.File)
+	t.tf.SetStdout(ui.GlobalUi().Streams.Err.File)
 
 	if err != nil {
 		err = fmt.Errorf("error running Terraform plan: %v", err)
@@ -123,7 +123,7 @@ func (t *Terraform) Apply() error {
 
 	// Ask user for permission if there are any changes
 	if changes && t.Ctx.ShowTerraformPlan() {
-		if err := ui.Ask("Proceed with terraform apply?"); err != nil {
+		if err := ui.GlobalUi().Ask("Proceed with terraform apply?"); err != nil {
 			return err
 		}
 	}

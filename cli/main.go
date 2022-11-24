@@ -10,7 +10,7 @@ func main() {
 	err := cmd.Execute()
 
 	if err != nil {
-		ui.PrintBlockE(err)
+		ui.GlobalUi().PrintBlockE(err)
 		os.Exit(1)
 	}
 }

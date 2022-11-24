@@ -1,6 +1,6 @@
 package modelinfra
 
-import v "cli/validation"
+import v "cli/lib/validation"
 
 type Config struct {
 	Cluster Cluster `yaml:"cluster"`

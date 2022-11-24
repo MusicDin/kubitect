@@ -3,6 +3,7 @@ package playbook
 import (
 	"cli/env"
 	"cli/tools/virtualenv"
+	"cli/ui"
 	"context"
 	"fmt"
 	"path/filepath"
@@ -81,7 +82,9 @@ func (pb Playbook) Exec(vt virtualenv.VirtualEnvType) error {
 	}
 
 	executor := &execute.DefaultExecute{
-		CmdRunDir: filepath.Dir(pb.PlaybookFile),
+		CmdRunDir:   filepath.Dir(pb.PlaybookFile),
+		Write:       ui.GlobalUi().Streams.Out.File,
+		WriterError: ui.GlobalUi().Streams.Err.File,
 	}
 
 	playbook := &playbook.AnsiblePlaybookCmd{
@@ -108,6 +111,7 @@ func (pb Playbook) Exec(vt virtualenv.VirtualEnvType) error {
 	options.AnsibleSetEnv("ANSIBLE_STDERR_CALLBACK", "yaml")
 
 	err = playbook.Run(context.TODO())
+
 	if err != nil {
 		pb := filepath.Base(pb.PlaybookFile)
 		return fmt.Errorf("ansible-playbook (%s): %v", pb, err)

@@ -1,6 +1,6 @@
 package modelconfig
 
-import v "cli/validation"
+import v "cli/lib/validation"
 
 type Addons struct {
 	Kubespray *string `yaml:"kubespray" opt:"-"`

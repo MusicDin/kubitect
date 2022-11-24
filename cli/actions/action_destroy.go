@@ -14,7 +14,7 @@ func (c *Cluster) Destroy() error {
 
 	fmt.Printf("Cluster '%s' will be destroyed.\n", c.Name)
 
-	if err := ui.Ask(); err != nil {
+	if err := ui.GlobalUi().Ask(); err != nil {
 		return err
 	}
 

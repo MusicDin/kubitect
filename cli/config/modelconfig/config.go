@@ -1,7 +1,7 @@
 package modelconfig
 
 import (
-	v "cli/validation"
+	v "cli/lib/validation"
 	"strings"
 )
 
@@ -29,7 +29,7 @@ func (c Config) Validate() error {
 
 	return v.Struct(&c,
 		v.Field(&c.Hosts,
-			v.MinLen(1).Error("At least {.Param} {.Field} must be configured."),
+			v.MinLen(1).Error("At least {.Param} host must be configured."),
 			v.UniqueField("Name"),
 			c.singleDefaultHostValidator(),
 		),

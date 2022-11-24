@@ -45,7 +45,7 @@ func (c *Cluster) Apply(action string) error {
 	if c.AppliedConfig == nil && (a == SCALE || a == UPGRADE) {
 		fmt.Printf("Cannot %s cluster '%s'. It has not been created yet.\n\n", a, c.Name)
 
-		if err := ui.Ask("Would you like to create it instead?"); err != nil {
+		if err := ui.GlobalUi().Ask("Would you like to create it instead?"); err != nil {
 			return err
 		}
 
@@ -118,8 +118,8 @@ func cloneAndCopyReqFiles(c *Cluster) error {
 	url := c.KubitectURL()
 	version := c.KubitectVersion()
 
-	ui.Printf(ui.DEBUG, "kubitect.url: %s\n", url)
-	ui.Printf(ui.DEBUG, "kubitect.version: %s\n", version)
+	ui.GlobalUi().Printf(ui.DEBUG, "kubitect.url: %s\n", url)
+	ui.GlobalUi().Printf(ui.DEBUG, "kubitect.version: %s\n", version)
 
 	tmpDir := filepath.Join(c.Path, "tmp")
 

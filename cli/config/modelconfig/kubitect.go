@@ -1,6 +1,6 @@
 package modelconfig
 
-import v "cli/validation"
+import v "cli/lib/validation"
 
 type Kubitect struct {
 	Url     *URL           `yaml:"url"`
