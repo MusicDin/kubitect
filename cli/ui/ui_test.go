@@ -9,7 +9,14 @@ import (
 )
 
 func TestUi_Global(t *testing.T) {
-	if GlobalUi() != GlobalUi() {
+	ui := GlobalUi()
+
+	assert.NotNil(t, ui)
+	assert.NotNil(t, ui.Streams.In.File)
+	assert.NotNil(t, ui.Streams.Out.File)
+	assert.NotNil(t, ui.Streams.Err.File)
+
+	if ui != GlobalUi() {
 		t.Error("GlobalUi is not a singleton")
 	}
 }

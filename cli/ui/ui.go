@@ -30,11 +30,14 @@ func (t Level) Color() Color {
 	}
 }
 
+// Global Ui singleton
+var globalUi *Ui
+
 type Ui struct {
 	Streams *Streams
 }
 
-func (u *Ui) OutStream(level Level) *OutputStream {
+func (u *Ui) Stream(level Level) *OutputStream {
 	switch level {
 	case ERROR, WARN:
 		return u.Streams.Err
@@ -42,9 +45,6 @@ func (u *Ui) OutStream(level Level) *OutputStream {
 		return u.Streams.Out
 	}
 }
-
-// Ui singleton
-var globalUi *Ui
 
 func GlobalUi() *Ui {
 	if globalUi == nil {
@@ -101,7 +101,7 @@ func (u *Ui) Print(level Level, msg ...any) {
 		return
 	}
 
-	w := u.OutStream(level).File
+	w := u.Stream(level).File
 
 	fmt.Fprint(w, msg...)
 }
@@ -130,7 +130,7 @@ func (u *Ui) PrintBlockE(err ...error) {
 			)
 		}
 
-		s := u.OutStream(eb.Severity)
+		s := u.Stream(eb.Severity)
 
 		fmt.Fprintln(s.File, eb.Format(s, eb.Severity))
 	}

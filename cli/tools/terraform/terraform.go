@@ -78,8 +78,8 @@ func NewTerraform(ctx *env.Context, clusterPath string) (*Terraform, error) {
 		return nil, fmt.Errorf("failed to instantiate Terraform: %v", err)
 	}
 
-	t.tf.SetStdout(ui.GlobalUi().Streams.Out.File)
-	t.tf.SetStdout(ui.GlobalUi().Streams.Err.File)
+	tf.SetStdout(ui.GlobalUi().Streams.Out.File)
+	tf.SetStderr(ui.GlobalUi().Streams.Err.File)
 	// tf.SetColor(true)
 
 	t.tf = tf
@@ -88,7 +88,7 @@ func NewTerraform(ctx *env.Context, clusterPath string) (*Terraform, error) {
 	fmt.Println("Initializing Terraform project...")
 
 	if err = tf.Init(context.Background()); err != nil {
-		return nil, fmt.Errorf("failed to initialize Terraform project: %v", err)
+		return nil, fmt.Errorf("failed to initialize Terraform project")
 	}
 
 	return &t, nil
@@ -104,10 +104,10 @@ func (t *Terraform) Plan() (bool, error) {
 	changes, err := t.tf.Plan(context.Background())
 
 	t.tf.SetStdout(ui.GlobalUi().Streams.Out.File)
-	t.tf.SetStdout(ui.GlobalUi().Streams.Err.File)
+	t.tf.SetStderr(ui.GlobalUi().Streams.Err.File)
 
 	if err != nil {
-		err = fmt.Errorf("error running Terraform plan: %v", err)
+		err = fmt.Errorf("error running Terraform plan")
 	}
 
 	return changes, err
@@ -129,7 +129,7 @@ func (t *Terraform) Apply() error {
 	}
 
 	if err := t.tf.Apply(context.Background()); err != nil {
-		return fmt.Errorf("error running Terraform apply: %v", err)
+		return fmt.Errorf("error running Terraform apply")
 	}
 
 	return nil
@@ -138,7 +138,7 @@ func (t *Terraform) Apply() error {
 // Destroy destroys the Terraform project.
 func (t *Terraform) Destroy() error {
 	if err := t.tf.Destroy(context.Background()); err != nil {
-		return fmt.Errorf("failed to destroy Terraform project: %v", err)
+		return fmt.Errorf("failed to destroy Terraform project")
 	}
 
 	return nil

@@ -88,7 +88,7 @@ func (o *PurgeOptions) Run() error {
 		return fmt.Errorf("cluster '%s' cannot be purged: only destroyed clusters can be purged", o.ClusterName)
 	}
 
-	fmt.Printf("Cluster '%s' will be purged. This will remove cluster's directory including all of its content.", o.ClusterName)
+	fmt.Printf("Cluster '%s' will be purged. This will remove cluster's directory including all of its content.\n", o.ClusterName)
 
 	if err := ui.GlobalUi().Ask(); err != nil {
 		return err
