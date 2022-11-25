@@ -2,34 +2,27 @@ package git
 
 import (
 	"cli/env"
+	"cli/file"
 	"cli/ui"
 	"fmt"
-	"os"
 	"regexp"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
+// Version regex ("v" any number "dot" any number "dot" any number)
+var versionRegex = regexp.MustCompile("^v(\\d+)(.{1}\\d+){2}$")
+
 // Clone clones a git project with the given URL and version into
 // a specific directory.
 func Clone(path, url, version string) error {
-	if len(path) < 1 {
-		return fmt.Errorf("git clone: destination not provided.")
-	}
-
 	if len(url) < 1 {
-		return fmt.Errorf("git clone: URL not provided.")
+		return fmt.Errorf("git clone: URL not provided")
 	}
 
 	if len(version) < 1 {
-		return fmt.Errorf("git clone: version not provided.")
-	}
-
-	// Version regex ("v" any number "dot" any number "dot" any number)
-	versionRegex, err := regexp.Compile("^v(\\d+)(.{1}\\d+){2}$")
-	if err != nil {
-		return err
+		return fmt.Errorf("git clone: version not provided")
 	}
 
 	// If version matches version regex, set reference name to tag,
@@ -54,11 +47,11 @@ func Clone(path, url, version string) error {
 		opts.Progress = ui.GlobalUi().Streams.Out.File
 	}
 
-	os.MkdirAll(path, os.ModePerm)
+	if err := file.MakeDir(path); err != nil {
+		return fmt.Errorf("git clone: %v", err)
+	}
 
-	_, err = git.PlainClone(path, false, opts)
-
-	if err != nil {
+	if _, err := git.PlainClone(path, false, opts); err != nil {
 		return fmt.Errorf("git clone: failed to clone project (url: %s, version: %s): %v", url, version, err)
 	}
 
