@@ -45,6 +45,10 @@ func MakeDir(path string) error {
 func Copy(srcPath, dstPath string) error {
 	opt := copy.Options{}
 
+	if Exists(dstPath) {
+		return fmt.Errorf("copy from '%s' to '%s': destination already exists", srcPath, dstPath)
+	}
+
 	opt.OnDirExists = func(src, dest string) copy.DirExistsAction {
 		return copy.Untouchable
 	}
@@ -81,15 +85,15 @@ func ForceCopy(srcPath, dstPath string) error {
 // content is moved.
 func Move(srcPath string, dstPath string) error {
 	if err := Remove(dstPath); err != nil {
-		return fmt.Errorf("force move: %v", err)
+		return fmt.Errorf("move: %v", err)
 	}
 
 	if err := MakeDir(filepath.Dir(dstPath)); err != nil {
-		return fmt.Errorf("force move: %v", err)
+		return fmt.Errorf("move: %v", err)
 	}
 
 	if err := os.Rename(srcPath, dstPath); err != nil {
-		return fmt.Errorf("force move from '%s' to '%s': %v", srcPath, dstPath, err)
+		return fmt.Errorf("move from '%s' to '%s': %v", srcPath, dstPath, err)
 	}
 
 	return nil
@@ -130,6 +134,6 @@ func UnmarshalYaml[T interface{}](yml string, typ T) (*T, error) {
 
 // MarshalYaml marshals given object into a string.
 func MarshalYaml(value interface{}) (string, error) {
-	arr, err := yaml.Marshal(value)
-	return string(arr), err
+	yaml, err := yaml.Marshal(value)
+	return string(yaml), err
 }
