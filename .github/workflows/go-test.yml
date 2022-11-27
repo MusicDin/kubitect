@@ -1,0 +1,19 @@
+name: go test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Install Go
+      uses: actions/setup-go@v3
+      with:
+        go-version-file: "cli/go.mod"
+    - name: Run Go Tests
+      run: |
+        cd cli
+        go test ./... -v 
+    
