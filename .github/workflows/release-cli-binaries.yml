@@ -1,4 +1,4 @@
-name: Release CLI Binaries
+name: cli release
 
 on:
   release:
