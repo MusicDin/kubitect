@@ -9,10 +9,8 @@ import "strings"
 //
 // It returns formatted lines and index of the current column.
 func Format(o *OutputStream, str string, indent, startAt int) (Lines, int) {
-	var lines []string
-
 	if o == nil || !o.IsTerminal() {
-		lines = strings.Split(str, "\n")
+		lines := strings.Split(str, "\n")
 
 		if startAt > 0 {
 			lines[0] = " " + lines[0]
@@ -21,6 +19,9 @@ func Format(o *OutputStream, str string, indent, startAt int) (Lines, int) {
 		return lines, 1
 	}
 
+	var lines []string
+	var pivot int
+
 	width := o.Columns()
 
 	if width <= indent {
@@ -28,12 +29,13 @@ func Format(o *OutputStream, str string, indent, startAt int) (Lines, int) {
 	}
 
 	for _, line := range strings.Split(str, "\n") {
-		l, i := fmtLine(line, width-indent, startAt)
-		lines = append(lines, l...)
-		startAt = i
+		var ls []string
+		ls, pivot = fmtLine(line, width-indent, startAt)
+		lines = append(lines, ls...)
+		startAt = 0
 	}
 
-	return lines, startAt
+	return lines, pivot
 }
 
 // fmtLine formats a message according to the given width.

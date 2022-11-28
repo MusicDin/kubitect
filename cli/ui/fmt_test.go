@@ -52,6 +52,14 @@ func TestFmtLine_pivot(t *testing.T) {
 	lines, pivot = fmtLine("test", 10, 9)
 	assert.Equal(t, " \ntest", strings.Join(lines, "\n"))
 	assert.Equal(t, 4, pivot)
+
+	lines, pivot = fmtLine("\ntest test test", 10, 5)
+	assert.Equal(t, " \n\ntest test\ntest", strings.Join(lines, "\n"))
+	assert.Equal(t, 4, pivot)
+
+	lines, pivot = fmtLine("\ntest test test", 10, 4)
+	assert.Equal(t, " \ntest\ntest test", strings.Join(lines, "\n"))
+	assert.Equal(t, 9, pivot)
 }
 
 func TestFmtLine_ContinuosFormat(t *testing.T) {
@@ -77,6 +85,9 @@ func TestFormat_TerminalStream(t *testing.T) {
 	assert.Equal(t, "te\nst", testFormat(s, "test", s.Columns()-2))
 	assert.Equal(t, "t\ne\ns\nt", testFormat(s, "test", s.Columns()-1))
 	assert.Equal(t, "test", testFormat(s, "test", s.Columns())) // (width <= indentation) => defaultCols
+	assert.Equal(t, "te\nst", testFormat(s, "te\nst", 0))
+	assert.Equal(t, "te\n\nst", testFormat(s, "te\n\nst", 0))
+	assert.Equal(t, "te\nst\n", testFormat(s, "test\n", s.Columns()-2))
 }
 
 func TestFormat_NonTerminalStream(t *testing.T) {
@@ -86,6 +97,10 @@ func TestFormat_NonTerminalStream(t *testing.T) {
 	assert.Equal(t, "test", testFormat(s, "test", s.Columns()-2))
 	assert.Equal(t, "test", testFormat(s, "test", s.Columns()-1))
 	assert.Equal(t, "test", testFormat(s, "test", s.Columns()))
+	assert.Equal(t, "\ntest", testFormat(s, "\ntest", 0))
+	assert.Equal(t, "te\nst", testFormat(s, "te\nst", 0))
+	assert.Equal(t, "test\n", testFormat(s, "test\n", 0))
+	assert.Equal(t, "te\nst", testFormat(s, "te\nst", s.Columns()))
 
 	lines, pivot := Format(s, "test", 0, 42)
 	assert.Equal(t, " test", strings.Join(lines, "\n"))
