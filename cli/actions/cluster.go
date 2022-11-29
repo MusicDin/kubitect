@@ -165,7 +165,7 @@ func (c *Cluster) StoreNewConfig() error {
 
 // ApplyNewConfig replaces currently applied config with new one.
 func (c *Cluster) ApplyNewConfig() error {
-	return file.Move(c.NewConfigPath, c.AppliedConfigPath())
+	return file.ForceCopy(c.NewConfigPath, c.AppliedConfigPath())
 }
 
 func (c *Cluster) KubitectURL() string {

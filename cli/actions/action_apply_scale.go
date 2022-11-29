@@ -9,6 +9,14 @@ import (
 )
 
 func scale(c *Cluster, events Events) error {
+	if err := playbook.KubitectInit(playbook.TAG_INIT); err != nil {
+		return err
+	}
+
+	if err := playbook.KubitectHostsSetup(); err != nil {
+		return err
+	}
+
 	if err := scaleDown(c, events); err != nil {
 		return err
 	}
@@ -101,6 +109,7 @@ func extractNodes(events Events) ([]modelconfig.Instance, error) {
 		for _, ch := range e.changes {
 			if i, ok := ch.Before.(modelconfig.Instance); ok {
 				nodes = append(nodes, i)
+				continue
 			}
 
 			return nil, fmt.Errorf("%v cannot be scaled", ch.Type.Name())

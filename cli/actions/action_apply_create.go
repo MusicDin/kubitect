@@ -25,7 +25,11 @@ func create(c *Cluster) error {
 
 	k8sVersion := string(*c.NewConfig.Kubernetes.Version)
 
-	if err := playbook.KubitectInit(playbook.TAG_KUBESPRAY, playbook.TAG_GEN_NODES); err != nil {
+	if err := playbook.KubitectInit(playbook.TAG_INIT, playbook.TAG_KUBESPRAY, playbook.TAG_GEN_NODES); err != nil {
+		return err
+	}
+
+	if err := playbook.KubitectHostsSetup(); err != nil {
 		return err
 	}
 

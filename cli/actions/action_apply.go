@@ -2,7 +2,6 @@ package actions
 
 import (
 	"cli/tools/git"
-	"cli/tools/playbook"
 	"cli/ui"
 	"fmt"
 	"os"
@@ -45,7 +44,9 @@ func (c *Cluster) Apply(action string) error {
 	if c.AppliedConfig == nil && (a == SCALE || a == UPGRADE) {
 		fmt.Printf("Cannot %s cluster '%s'. It has not been created yet.\n\n", a, c.Name)
 
-		if err := ui.GlobalUi().Ask("Would you like to create it instead?"); err != nil {
+		err := ui.GlobalUi().Ask("Would you like to create it instead?")
+
+		if err != nil {
 			return err
 		}
 
@@ -103,15 +104,7 @@ func prepare(c *Cluster) error {
 		return err
 	}
 
-	if err := c.StoreNewConfig(); err != nil {
-		return err
-	}
-
-	if err := playbook.KubitectInit(playbook.TAG_INIT); err != nil {
-		return err
-	}
-
-	return playbook.KubitectHostsSetup()
+	return c.StoreNewConfig()
 }
 
 func cloneAndCopyReqFiles(c *Cluster) error {

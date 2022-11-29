@@ -30,9 +30,8 @@ func (c *Cluster) Destroy() error {
 		return err
 	}
 
-	if err := os.Remove(c.TfStatePath()); err != nil {
-		return err
-	}
+	os.Remove(c.TfStatePath())
+	os.Remove(c.KubeconfigPath())
 
-	return os.Remove(c.KubeconfigPath())
+	return nil
 }

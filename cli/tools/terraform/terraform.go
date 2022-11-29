@@ -15,63 +15,31 @@ import (
 )
 
 type Terraform struct {
-	Ctx *env.Context
-
-	version    string // Terraform version
-	binPath    string // Terraform binary path
-	projectDir string // Terraform project dir
+	Version    string // Terraform version
+	BinPath    string // Terraform binary path
+	WorkingDir string // Terraform project dir
+	ShowPlan   bool
 }
 
 // NewTerraform returns Terraform object with initialized Terraform project.
 // Terraform is also installed, if binary file is not found locally.
 func NewTerraform(ctx *env.Context, clusterPath string) (*Terraform, error) {
-	var err error
+	ver := env.ConstTerraformVersion
 
-	t := &Terraform{
-		Ctx:        ctx,
-		version:    env.ConstTerraformVersion,
-		projectDir: filepath.Join(clusterPath, "terraform"),
-	}
-
-	binDir := filepath.Join(t.Ctx.ShareDir(), "terraform", t.version)
-
-	fmt.Printf("Ensuring Terraform %s is installed...\n", t.version)
-
-	fs := &fs.ExactVersion{
-		Product:    product.Terraform,
-		Version:    version.Must(version.NewVersion(t.version)),
-		ExtraPaths: []string{binDir},
-	}
-
-	// Search for local Terraform installation before installing it.
-	t.binPath, err = fs.Find(context.Background())
-
-	if err == nil {
-		fmt.Printf("Terraform %s found locally (%s).\n", t.version, t.binPath)
-		return t, t.init()
-	}
-
-	fmt.Printf("Terraform %s could not be found locally.\n", t.version)
-	fmt.Printf("Installing Terraform %s in '%s'...\n", t.version, binDir)
-
-	if err := os.MkdirAll(binDir, os.ModePerm); err != nil {
-		return nil, fmt.Errorf("failed to create Terraform install directory: %v", err)
-	}
-
-	installer := &releases.ExactVersion{
-		Product:    product.Terraform,
-		Version:    version.Must(version.NewVersion(t.version)),
-		InstallDir: binDir,
-	}
-
-	// Install specific version of Terraform into shared directory.
-	t.binPath, err = installer.Install(context.Background())
+	binDir := filepath.Join(ctx.ShareDir(), "terraform", ver)
+	binPath, err := findOrInstall(ver, binDir)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to install Terraform: %v", err)
+		return nil, err
 	}
 
-	return t, t.init()
+	tf := &Terraform{
+		Version:    ver,
+		BinPath:    binPath,
+		WorkingDir: filepath.Join(clusterPath, "terraform"),
+	}
+
+	return tf, tf.init()
 }
 
 // init initializes a Terraform project.
@@ -91,7 +59,7 @@ func (t *Terraform) init() error {
 func (t *Terraform) Plan() (bool, error) {
 	cmd := t.NewCmd("plan")
 
-	cmd.HasOutput(env.Debug || t.Ctx.ShowTerraformPlan())
+	cmd.ShowOutput(env.Debug || t.ShowPlan)
 
 	cmd.AddArg("detailed-exitcode")
 	cmd.AddArg("input", false)
@@ -118,8 +86,10 @@ func (t *Terraform) Apply() error {
 	}
 
 	// Ask user for permission if there are any changes
-	if changes && t.Ctx.ShowTerraformPlan() {
-		if err := ui.GlobalUi().Ask("Proceed with terraform apply?"); err != nil {
+	if changes && t.ShowPlan {
+		err := ui.GlobalUi().Ask("Proceed with terraform apply?")
+
+		if err != nil {
 			return err
 		}
 	}
@@ -152,4 +122,49 @@ func (t *Terraform) Destroy() error {
 	_, err := cmd.Run()
 
 	return err
+}
+
+// findOrInstall first searches for Terraform binary locally and if
+// binary is not found, it is installed in given binDir.
+func findOrInstall(ver, binDir string) (string, error) {
+	var binPath string
+	var err error
+
+	fmt.Printf("Ensuring Terraform %s is installed...\n", ver)
+
+	fs := &fs.ExactVersion{
+		Product:    product.Terraform,
+		Version:    version.Must(version.NewVersion(ver)),
+		ExtraPaths: []string{binDir},
+	}
+
+	// Search for local Terraform installation before installing it.
+	binPath, err = fs.Find(context.Background())
+
+	if err == nil {
+		fmt.Printf("Terraform %s found locally (%s).\n", ver, binPath)
+		return binPath, nil
+	}
+
+	fmt.Printf("Terraform %s could not be found locally.\n", ver)
+	fmt.Printf("Installing Terraform %s in '%s'...\n", ver, binDir)
+
+	if err := os.MkdirAll(binDir, os.ModePerm); err != nil {
+		return "", fmt.Errorf("failed to create Terraform install directory: %v", err)
+	}
+
+	installer := &releases.ExactVersion{
+		Product:    product.Terraform,
+		Version:    version.Must(version.NewVersion(ver)),
+		InstallDir: binDir,
+	}
+
+	// Install specific version of Terraform into shared directory.
+	binPath, err = installer.Install(context.Background())
+
+	if err != nil {
+		return "", fmt.Errorf("failed to install Terraform: %v", err)
+	}
+
+	return binPath, nil
 }

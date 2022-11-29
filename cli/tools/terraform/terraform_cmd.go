@@ -10,25 +10,25 @@ import (
 )
 
 type TerraformCmd struct {
-	showOutput bool
+	binPath    string
+	workingDir string
 
-	path       string
-	projectDir string
+	showOutput bool
 	action     string
 	args       map[string]string
 }
 
 func (t *Terraform) NewCmd(action string) *TerraformCmd {
 	return &TerraformCmd{
+		binPath:    t.BinPath,
+		workingDir: t.WorkingDir,
 		showOutput: true,
-		path:       t.binPath,
-		projectDir: t.projectDir,
 		action:     action,
 		args:       make(map[string]string),
 	}
 }
 
-func (c *TerraformCmd) HasOutput(b bool) {
+func (c *TerraformCmd) ShowOutput(b bool) {
 	c.showOutput = b
 }
 
@@ -69,8 +69,8 @@ func (c *TerraformCmd) Args() []string {
 }
 
 func (c *TerraformCmd) Run() (int, error) {
-	cmd := exec.Command(c.path, c.Args()...)
-	cmd.Dir = c.projectDir
+	cmd := exec.Command(c.binPath, c.Args()...)
+	cmd.Dir = c.workingDir
 
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Pdeathsig: syscall.SIGTERM,
