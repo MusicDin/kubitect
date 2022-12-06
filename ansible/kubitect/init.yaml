@@ -4,11 +4,31 @@
   gather_facts: false
   any_errors_fatal: true
   roles:
-    - role: config/cluster/copy
-      vars_files:
-        - "{{ config_path }}"
     - role: config/cluster/import
-    - role: config/cluster/verify
+      tags:
+        - init
+        - kubespray
+
+    - role: config/infra/import
+      tags:
+        - kubespray
+
     - role: generate/inventory/hosts
+      tags:
+        - init
+
+    - role: generate/inventory/nodes
+      tags:
+        - gen_nodes
+
+    - role: kubespray
+      tags:
+        - kubespray
+
     - role: generate/main-tf
+      tags:
+        - init
+    
     - role: generate/ssh-keys
+      tags:
+        - init

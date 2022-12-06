@@ -2,16 +2,15 @@ package main
 
 import (
 	"cli/cmd"
-	"fmt"
+	"cli/ui"
 	"os"
 )
 
 func main() {
-
 	err := cmd.Execute()
 
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		ui.GlobalUi().PrintBlockE(err)
 		os.Exit(1)
 	}
 }
