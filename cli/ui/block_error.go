@@ -7,7 +7,7 @@ type ErrorBlock struct {
 }
 
 func (e ErrorBlock) Error() string {
-	return e.Format(nil, e.Severity)
+	return e.Format(nil, Colors.NONE)
 }
 
 func NewErrorBlock(level Level, content []Content) ErrorBlock {

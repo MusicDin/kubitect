@@ -58,7 +58,7 @@ func TestStreams_Empty(t *testing.T) {
 }
 
 func TestStreams_Terminal(t *testing.T) {
-	s := mockUi(t).Streams
+	s := MockUi(t).Streams
 
 	if isTerminal(s.Out.File) {
 		t.Error("isTerminal produced wrong output (expected: false)")

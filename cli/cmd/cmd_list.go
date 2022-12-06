@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"cli/actions"
-	"cli/env"
 	"fmt"
 	"strings"
 
@@ -17,7 +15,7 @@ var (
 )
 
 type ListOptions struct {
-	env.ContextOptions
+	GenericOptions
 }
 
 func NewListCmd() *cobra.Command {
@@ -37,7 +35,9 @@ func NewListCmd() *cobra.Command {
 }
 
 func (o *ListOptions) Run() error {
-	clusters, err := actions.GetClusters(o.Context())
+	gc := o.GlobalContext()
+
+	clusters, err := AllClusters(gc)
 
 	if err != nil {
 		return err

@@ -1,4 +1,4 @@
-package actions
+package event
 
 import (
 	"cli/config/modelconfig"

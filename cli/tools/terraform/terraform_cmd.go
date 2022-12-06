@@ -1,7 +1,6 @@
 package terraform
 
 import (
-	"cli/env"
 	"cli/ui"
 	"fmt"
 	"os/exec"
@@ -12,19 +11,21 @@ import (
 type TerraformCmd struct {
 	binPath    string
 	workingDir string
-
-	showOutput bool
 	action     string
 	args       map[string]string
+
+	showOutput bool
+	ui         *ui.Ui
 }
 
 func (t *Terraform) NewCmd(action string) *TerraformCmd {
 	return &TerraformCmd{
-		binPath:    t.BinPath,
+		binPath:    t.binPath,
 		workingDir: t.WorkingDir,
-		showOutput: true,
 		action:     action,
 		args:       make(map[string]string),
+		showOutput: true,
+		ui:         t.Ui,
 	}
 }
 
@@ -47,7 +48,7 @@ func (c *TerraformCmd) AddArg(key string, value ...interface{}) {
 }
 
 func (c *TerraformCmd) Args() []string {
-	if env.NoColor {
+	if c.ui.NoColor {
 		c.AddArg("no-color")
 	}
 
@@ -77,8 +78,8 @@ func (c *TerraformCmd) Run() (int, error) {
 	}
 
 	if c.showOutput {
-		cmd.Stdout = ui.GlobalUi().Streams.Out.File
-		cmd.Stderr = ui.GlobalUi().Streams.Err.File
+		cmd.Stdout = c.ui.Streams.Out.File
+		cmd.Stderr = c.ui.Streams.Err.File
 	}
 
 	err := cmd.Run()

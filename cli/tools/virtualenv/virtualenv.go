@@ -1,80 +1,53 @@
 package virtualenv
 
 import (
-	"cli/env"
 	"cli/ui"
 	"fmt"
 	"os/exec"
 	"path/filepath"
 )
 
-type VirtualEnvType string
-
-const (
-	MAIN      VirtualEnvType = "main"
-	KUBESPRAY VirtualEnvType = "kubespray"
-)
-
 type VirtualEnv struct {
 	Name             string
 	Path             string
-	ClusterPath      string
+	WorkingDir       string
 	RequirementsPath string
 	initialized      bool
+	Ui               *ui.Ui
 }
 
-var virtualEnvs map[VirtualEnvType]*VirtualEnv
-
-func Set(t VirtualEnvType, v *VirtualEnv) {
-	if virtualEnvs == nil {
-		virtualEnvs = make(map[VirtualEnvType]*VirtualEnv)
-	}
-
-	virtualEnvs[t] = v
-}
-
-func Get(t VirtualEnvType) (*VirtualEnv, error) {
-	v, ok := virtualEnvs[t]
-
-	if ok {
-		return v, v.setup()
-	}
-
-	return nil, fmt.Errorf("Virtual environment %v does not exist!", t)
-}
-
-// setup creates virtual environment in the cluster path
+// Init creates virtual environment in the cluster path
 // and installs required pip3 and ansible dependencies.
-func (ve *VirtualEnv) setup() error {
-	if ve.initialized {
+func (e *VirtualEnv) Init() error {
+	if e.initialized {
 		return nil
 	}
 
-	fmt.Printf("Setting up '%s' virtual environment...\n", ve.Name)
+	e.Ui.Printf(ui.INFO, "Setting up '%s' virtual environment...\n", e.Name)
 
-	if err := ve.create(); err != nil {
+	if err := e.create(); err != nil {
 		return err
 	}
 
-	if err := ve.installPipReq(); err != nil {
+	if err := e.installPipReq(); err != nil {
 		return err
 	}
 
-	ve.initialized = true
+	e.initialized = true
 
 	return nil
 }
 
 // create creates virtual environment if it does not yet exist.
-func (ve *VirtualEnv) create() error {
-	fmt.Println("Creating virtual environment...")
+func (e *VirtualEnv) create() error {
+	e.Ui.Println(ui.INFO, "Creating virtual environment...")
 
-	cmd := exec.Command("virtualenv", "-p", "python3", ve.Path)
-	cmd.Dir = ve.ClusterPath
+	cmd := exec.Command("virtualenv", "-p", "python3", e.Path)
+	cmd.Dir = e.WorkingDir
 
-	if env.Debug {
-		cmd.Stdout = ui.GlobalUi().Streams.Out.File
-		cmd.Stderr = ui.GlobalUi().Streams.Err.File
+	if e.Ui.Debug {
+		cmd.Stdout = e.Ui.Streams.Out.File
+		cmd.Stderr = e.Ui.Streams.Err.File
 	}
 
 	err := cmd.Run()
@@ -87,17 +60,17 @@ func (ve *VirtualEnv) create() error {
 }
 
 // installPipReq installs pip3 requirements into virtual environment.
-func (ve *VirtualEnv) installPipReq() error {
-	fmt.Println("Installing pip3 dependencies...")
-	fmt.Println("This can take up to a minute when the virtual environment is initialized for the first time...")
+func (e *VirtualEnv) installPipReq() error {
+	e.Ui.Println(ui.INFO, "Installing pip3 dependencies...")
+	e.Ui.Println(ui.INFO, "This can take up to a minute when the virtual environment is initialized for the first time...")
 
-	cmd := exec.Command("pip3", "install", "-r", ve.RequirementsPath)
-	cmd.Path = filepath.Join(ve.Path, "bin", "pip3")
-	cmd.Dir = ve.ClusterPath
+	cmd := exec.Command("pip3", "install", "-r", e.RequirementsPath)
+	cmd.Path = filepath.Join(e.Path, "bin", "pip3")
+	cmd.Dir = e.WorkingDir
 
-	if env.Debug {
-		cmd.Stdout = ui.GlobalUi().Streams.Out.File
-		cmd.Stderr = ui.GlobalUi().Streams.Err.File
+	if e.Ui.Debug {
+		cmd.Stdout = e.Ui.Streams.Out.File
+		cmd.Stderr = e.Ui.Streams.Err.File
 	}
 
 	err := cmd.Run()

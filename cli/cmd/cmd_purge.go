@@ -1,10 +1,7 @@
 package cmd
 
 import (
-	"cli/actions"
-	"cli/env"
 	"cli/file"
-	"cli/ui"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -24,7 +21,7 @@ var (
 type PurgeOptions struct {
 	ClusterName string
 
-	env.ContextOptions
+	GenericOptions
 }
 
 func NewPurgeCmd() *cobra.Command {
@@ -42,12 +39,12 @@ func NewPurgeCmd() *cobra.Command {
 	}
 
 	cmd.PersistentFlags().StringVar(&opts.ClusterName, "cluster", "", "specify the cluster to be used")
-	cmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
+	cmd.PersistentFlags().BoolVar(&opts.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
 
 	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		var names []string
 
-		clusters, err := actions.GetClusters(opts.Context())
+		clusters, err := AllClusters(opts.GlobalContext())
 
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp
@@ -66,7 +63,8 @@ func NewPurgeCmd() *cobra.Command {
 }
 
 func (o *PurgeOptions) Run() error {
-	cs, err := actions.GetClusters(o.Context())
+	gc := o.GlobalContext()
+	cs, err := AllClusters(gc)
 
 	if err != nil {
 		return err
@@ -90,7 +88,7 @@ func (o *PurgeOptions) Run() error {
 
 	fmt.Printf("Cluster '%s' will be purged. This will remove cluster's directory including all of its content.\n", o.ClusterName)
 
-	if err := ui.GlobalUi().Ask(); err != nil {
+	if err := gc.ui.Ask(); err != nil {
 		return err
 	}
 

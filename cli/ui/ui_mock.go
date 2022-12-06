@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func mockUi(t *testing.T) *Ui {
+func MockUi(t *testing.T) *Ui {
 	t.Helper()
 
 	return &Ui{

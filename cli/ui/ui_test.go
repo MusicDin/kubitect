@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"cli/env"
 	"fmt"
 	"testing"
 
@@ -21,19 +20,33 @@ func TestUi_Global(t *testing.T) {
 	}
 }
 
+func TestUiOptions(t *testing.T) {
+	opts := UiOptions{
+		Debug:       true,
+		AutoApprove: true,
+		NoColor:     true,
+	}
+
+	ui := NewUi(opts)
+
+	assert.NotNil(t, ui)
+	assert.NotNil(t, ui.Streams.In.File)
+	assert.NotNil(t, ui.Streams.Out.File)
+	assert.NotNil(t, ui.Streams.Err.File)
+	assert.True(t, ui.autoApprove)
+	assert.True(t, ui.NoColor)
+	assert.True(t, ui.Debug)
+}
+
 func TestUi_AskAutoApprove(t *testing.T) {
-	ui := mockUi(t)
+	ui := MockUi(t)
+	ui.autoApprove = true
 
 	assert.NoError(t, ui.Ask())
-
-	env.AutoApprove = true
-	err := ui.Ask()
-	env.AutoApprove = false
-	assert.NoError(t, err)
 }
 
 func TestUi_Print(t *testing.T) {
-	ui := mockUi(t)
+	ui := MockUi(t)
 
 	ui.Print(DEBUG, "not-printed")
 
@@ -53,7 +66,7 @@ func TestUi_Print(t *testing.T) {
 }
 
 func TestUi_PrintBlock(t *testing.T) {
-	ui := mockUi(t)
+	ui := MockUi(t)
 
 	expect := "┌\n│ Error: \n│ test\n└\n"
 

@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"cli/actions"
-	"cli/env"
 	"cli/file"
 	"fmt"
 	"os"
@@ -11,31 +9,34 @@ import (
 )
 
 var (
-	exportConfigShort = "Export cluster config file"
-	exportConfigLong  = LongDesc(`
-		Command export config outputs cluster's configuration file to standard output.`)
+	exportKcShort = "Export cluster kubeconfig file"
+	exportKcLong  = LongDesc(`
+		Command export kubeconfig outputs cluster's kubeconfig file to standard output.`)
 
-	exportConfigExample = Example(`
-		To save a config to the specific file, redirect command output to that file:
-		> kubitect export config --cluster lake > cls.yaml`)
+	exportKcExample = Example(`
+		To save a kubeconfig to the specific file, redirect command output to that file:
+		> kubitect export kubeconfig --cluster lake > lake.yaml
+					
+		Use kubeconfig with kubectl to access cluster:
+		> kubectl --kubeconfig lake.yaml get nodes`)
 )
 
-type ExportConfigOptions struct {
+type ExportKcOptions struct {
 	ClusterName string
 
-	env.ContextOptions
+	GenericOptions
 }
 
-func NewExportConfigCmd() *cobra.Command {
-	var opts ExportConfigOptions
+func NewExportKcCmd() *cobra.Command {
+	var opts ExportKcOptions
 
 	cmd := &cobra.Command{
-		SuggestFor: []string{"cfg"},
-		Use:        "config",
+		SuggestFor: []string{"kubecfg", "kube", "kc"},
+		Use:        "kubeconfig",
 		GroupID:    "main",
-		Short:      exportConfigShort,
-		Long:       exportConfigLong,
-		Example:    exportConfigExample,
+		Short:      exportKcShort,
+		Long:       exportKcLong,
+		Example:    exportKcExample,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return opts.Run()
 		},
@@ -47,14 +48,14 @@ func NewExportConfigCmd() *cobra.Command {
 	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		var names []string
 
-		clusters, err := actions.GetClusters(opts.Context())
+		clusters, err := AllClusters(opts.GlobalContext())
 
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp
 		}
 
 		for _, c := range clusters {
-			if c.ContainsAppliedConfig() {
+			if c.ContainsKubeconfig() {
 				names = append(names, c.Name)
 			}
 		}
@@ -65,8 +66,8 @@ func NewExportConfigCmd() *cobra.Command {
 	return cmd
 }
 
-func (o *ExportConfigOptions) Run() error {
-	cs, err := actions.GetClusters(o.Context())
+func (o *ExportKcOptions) Run() error {
+	cs, err := AllClusters(o.GlobalContext())
 
 	c := cs.FindByName(o.ClusterName)
 
@@ -80,17 +81,17 @@ func (o *ExportConfigOptions) Run() error {
 		return fmt.Errorf("multiple clusters (%d) have been found with the name '%s'", count, o.ClusterName)
 	}
 
-	if !c.ContainsAppliedConfig() {
-		return fmt.Errorf("cluster '%s' does not contain a config file", o.ClusterName)
+	if !c.ContainsKubeconfig() {
+		return fmt.Errorf("cluster '%s' does not have a Kubeconfig file", o.ClusterName)
 	}
 
-	config, err := file.Read(c.AppliedConfigPath())
+	kc, err := file.Read(c.KubeconfigPath())
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Fprint(os.Stdout, config)
+	fmt.Fprint(os.Stdout, kc)
 
 	return nil
 }

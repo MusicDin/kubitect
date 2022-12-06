@@ -1,50 +1,12 @@
 package ui
 
 import (
-	"cli/env"
 	"fmt"
 	"strings"
 )
 
-type Level uint8
-
-const (
-	DEBUG Level = iota
-	INFO
-	WARN
-	ERROR
-)
-
-func (t Level) Color() Color {
-	if env.NoColor {
-		return Colors.NONE
-	}
-
-	switch t {
-	case WARN:
-		return Colors.YELLOW
-	case ERROR:
-		return Colors.RED
-	default:
-		return Colors.NONE
-	}
-}
-
 // Global Ui singleton
 var globalUi *Ui
-
-type Ui struct {
-	Streams *Streams
-}
-
-func (u *Ui) Stream(level Level) *OutputStream {
-	switch level {
-	case ERROR, WARN:
-		return u.Streams.Err
-	default:
-		return u.Streams.Out
-	}
-}
 
 func GlobalUi() *Ui {
 	if globalUi == nil {
@@ -56,6 +18,62 @@ func GlobalUi() *Ui {
 	return globalUi
 }
 
+type Level uint8
+
+const (
+	DEBUG Level = iota
+	INFO
+	WARN
+	ERROR
+)
+
+type UiOptions struct {
+	NoColor     bool
+	Debug       bool
+	AutoApprove bool
+}
+
+type Ui struct {
+	Streams *Streams
+
+	NoColor     bool
+	Debug       bool
+	autoApprove bool
+}
+
+func NewUi(o UiOptions) *Ui {
+	return &Ui{
+		Streams:     StandardStreams(),
+		NoColor:     o.NoColor,
+		Debug:       o.Debug,
+		autoApprove: o.AutoApprove,
+	}
+}
+
+func (u *Ui) Stream(level Level) *OutputStream {
+	switch level {
+	case ERROR, WARN:
+		return u.Streams.Err
+	default:
+		return u.Streams.Out
+	}
+}
+
+func (ui *Ui) Color(l Level) Color {
+	if ui.NoColor {
+		return Colors.NONE
+	}
+
+	switch l {
+	case WARN:
+		return Colors.YELLOW
+	case ERROR:
+		return Colors.RED
+	default:
+		return Colors.NONE
+	}
+}
+
 // Ask asks user for confirmation. If user confirms with either "y" or "yes"
 // nil is returned. Otherwise, if user enters "n" or "no" an error is returned.
 func (u *Ui) Ask(msg ...string) error {
@@ -63,7 +81,7 @@ func (u *Ui) Ask(msg ...string) error {
 	var response string
 
 	// Automatically approve if '--auto-approve' flag is used
-	if env.AutoApprove {
+	if u.autoApprove {
 		return nil
 	}
 
@@ -97,7 +115,7 @@ func (u *Ui) Ask(msg ...string) error {
 }
 
 func (u *Ui) Print(level Level, msg ...any) {
-	if level == DEBUG && !env.Debug {
+	if level == DEBUG && !u.Debug {
 		return
 	}
 
@@ -132,6 +150,6 @@ func (u *Ui) PrintBlockE(err ...error) {
 
 		s := u.Stream(eb.Severity)
 
-		fmt.Fprintln(s.File, eb.Format(s, eb.Severity))
+		fmt.Fprintln(s.File, eb.Format(s, u.Color(eb.Severity)))
 	}
 }

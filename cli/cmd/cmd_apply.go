@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"cli/actions"
+	"cli/cluster"
 	"cli/env"
 
 	"github.com/spf13/cobra"
@@ -29,7 +29,7 @@ type ApplyOptions struct {
 	Config string
 	Action string
 
-	env.ContextOptions
+	GenericOptions
 }
 
 func NewApplyCmd() *cobra.Command {
@@ -50,8 +50,8 @@ func NewApplyCmd() *cobra.Command {
 	cmd.PersistentFlags().StringVarP(&opts.Config, "config", "c", "", "specify path to the cluster config file")
 	cmd.PersistentFlags().StringVarP(&opts.Action, "action", "a", DefaultAction, "specify cluster action [create, upgrade, scale]")
 	cmd.PersistentFlags().BoolVarP(&opts.Local, "local", "l", false, "use a current directory as the cluster path")
-	cmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
-	cmd.PersistentFlags().BoolVar(&env.Debug, "debug", false, "enable debug messages")
+	cmd.PersistentFlags().BoolVar(&opts.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
+	cmd.PersistentFlags().BoolVar(&opts.Debug, "debug", false, "enable debug messages")
 
 	cmd.MarkPersistentFlagRequired("config")
 
@@ -63,7 +63,7 @@ func NewApplyCmd() *cobra.Command {
 }
 
 func (o *ApplyOptions) Run() error {
-	c, err := actions.NewCluster(o.Context(), o.Config)
+	c, err := cluster.NewCluster(o.GlobalContext(), o.Config)
 
 	if err != nil {
 		return err

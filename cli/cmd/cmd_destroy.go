@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"cli/actions"
-	"cli/env"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -21,7 +19,7 @@ var (
 type DestroyOptions struct {
 	ClusterName string
 
-	env.ContextOptions
+	GenericOptions
 }
 
 func NewDestroyCmd() *cobra.Command {
@@ -40,14 +38,13 @@ func NewDestroyCmd() *cobra.Command {
 	}
 
 	cmd.PersistentFlags().StringVar(&opts.ClusterName, "cluster", "", "specify the cluster to be used")
-	cmd.PersistentFlags().BoolVarP(&opts.Local, "local", "l", false, "use a current directory as the cluster path")
-	cmd.PersistentFlags().BoolVar(&env.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
-	cmd.PersistentFlags().BoolVar(&env.Debug, "debug", false, "enable debug messages")
+	cmd.PersistentFlags().BoolVar(&opts.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
+	cmd.PersistentFlags().BoolVar(&opts.Debug, "debug", false, "enable debug messages")
 
 	cmd.MarkPersistentFlagRequired("cluster")
 
 	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		clusters, err := actions.GetClusters(opts.Context())
+		clusters, err := AllClusters(opts.GlobalContext())
 
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp
@@ -60,12 +57,11 @@ func NewDestroyCmd() *cobra.Command {
 }
 
 func (o *DestroyOptions) Run() error {
-
 	if o.ClusterName == "" {
 		return fmt.Errorf("a valid (non-empty) cluster name must be provided")
 	}
 
-	clusters, err := actions.GetClusters(o.Context())
+	clusters, err := AllClusters(o.GlobalContext())
 
 	if err != nil {
 		return err

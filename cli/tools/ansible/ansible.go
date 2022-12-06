@@ -1,8 +1,6 @@
-package playbook
+package ansible
 
 import (
-	"cli/env"
-	"cli/tools/virtualenv"
 	"cli/ui"
 	"context"
 	"fmt"
@@ -26,19 +24,17 @@ type Playbook struct {
 	ExtraVars    []string
 }
 
-// exec executes ansible playbook with working directory
-// set to the cluster path directory.
-func (pb Playbook) Exec(vt virtualenv.VirtualEnvType) error {
-	venv, err := virtualenv.Get(vt)
+type Ansible struct {
+	BinPath    string
+	WorkingDir string
 
-	if err != nil {
-		return fmt.Errorf("ansible-playbook (%s): failed initializing virtual environment: %v", pb.PlaybookFile, err)
-	}
+	Ui *ui.Ui
+}
 
+// Exec executes given ansible playbook.
+func (a *Ansible) Exec(pb Playbook) error {
 	if pb.Local {
 		pb.Inventory = "localhost,"
-	} else {
-		pb.Inventory = filepath.Join(venv.ClusterPath, pb.Inventory)
 	}
 
 	if len(pb.PlaybookFile) < 1 {
@@ -68,7 +64,7 @@ func (pb Playbook) Exec(vt virtualenv.VirtualEnvType) error {
 		Tags:      strings.Join(pb.Tags, ","),
 	}
 
-	if env.Debug {
+	if a.Ui.Debug {
 		playbookOptions.Verbose = true
 	}
 
@@ -83,14 +79,14 @@ func (pb Playbook) Exec(vt virtualenv.VirtualEnvType) error {
 
 	executor := &execute.DefaultExecute{
 		CmdRunDir:   filepath.Dir(pb.PlaybookFile),
-		Write:       ui.GlobalUi().Streams.Out.File,
-		WriterError: ui.GlobalUi().Streams.Err.File,
+		Write:       a.Ui.Streams.Out.File,
+		WriterError: a.Ui.Streams.Err.File,
 	}
 
 	playbook := &playbook.AnsiblePlaybookCmd{
-		Binary:                     filepath.Join(venv.Path, "bin", "ansible-playbook"),
+		Binary:                     a.BinPath,
 		Exec:                       executor,
-		Playbooks:                  []string{filepath.Join(venv.ClusterPath, pb.PlaybookFile)},
+		Playbooks:                  []string{pb.PlaybookFile},
 		Options:                    playbookOptions,
 		ConnectionOptions:          connectionOptions,
 		PrivilegeEscalationOptions: privilegeEscalationOptions,

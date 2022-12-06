@@ -20,10 +20,9 @@ type BasicBlock struct {
 	content []Content
 }
 
-func (b BasicBlock) Format(stream *OutputStream, level Level) string {
+func (b BasicBlock) Format(stream *OutputStream, color Color) string {
 	var lines Lines
 
-	color := level.Color()
 	prefix := lineMiddle + " "
 	indent := len([]rune(prefix))
 

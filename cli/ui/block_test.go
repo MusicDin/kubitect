@@ -16,7 +16,7 @@ func TestBlock_Basic(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, "┌\n│ Title:\n│ Line\n└", b.Format(nil, INFO))
+	assert.Equal(t, "┌\n│ Title:\n│ Line\n└", b.Format(nil, Colors.NONE))
 }
 
 func TestBlock_LinesIndent(t *testing.T) {
@@ -30,7 +30,7 @@ func TestBlock_LinesIndent(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, "┌\n│ Title:\n│   Line\n└", b.Format(nil, INFO))
+	assert.Equal(t, "┌\n│ Title:\n│   Line\n└", b.Format(nil, Colors.NONE))
 }
 
 func TestBlock_LinesRequired(t *testing.T) {
@@ -43,7 +43,7 @@ func TestBlock_LinesRequired(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, "", b.Format(nil, INFO))
+	assert.Equal(t, "", b.Format(nil, Colors.NONE))
 }
 
 func TestBlock_IndentCompact(t *testing.T) {
@@ -57,7 +57,7 @@ func TestBlock_IndentCompact(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, "┌\n│ Title: Line\n└", b.Format(nil, INFO))
+	assert.Equal(t, "┌\n│ Title: Line\n└", b.Format(nil, Colors.NONE))
 }
 
 func TestBlockError_Line(t *testing.T) {

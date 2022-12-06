@@ -95,7 +95,7 @@ func (i LBInstance) GetMAC() *MAC {
 
 func (i LBInstance) Validate() error {
 	return v.Struct(&i,
-		v.Field(&i.Id, v.Required()),
+		v.Field(&i.Id, v.Required(), v.AlphaNumericHypUS()),
 		v.Field(&i.Host, v.OmitEmpty(), v.Custom(VALID_HOST)),
 		v.Field(&i.IP, v.OmitEmpty(), v.Custom(IP_IN_CIDR)),
 		v.Field(&i.MAC),

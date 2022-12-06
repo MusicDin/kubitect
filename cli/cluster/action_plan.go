@@ -1,12 +1,12 @@
-package actions
+package cluster
 
 import (
+	"cli/cluster/event"
 	"cli/lib/cmp"
-	"cli/ui"
 	"fmt"
 )
 
-func (c *Cluster) plan(action ApplyAction) (Events, error) {
+func (c *Cluster) plan(action ApplyAction) (event.Events, error) {
 	if c.AppliedConfig == nil {
 		return nil, nil
 	}
@@ -26,20 +26,34 @@ func (c *Cluster) plan(action ApplyAction) (Events, error) {
 	fmt.Printf("Following changes have been detected:\n\n")
 	fmt.Println(diff.ToYamlDiff())
 
-	events := triggerEvents(diff, action)
-	blocking := events.OfType(BLOCK)
+	events := event.TriggerEvents(diff, action.events())
+	blocking := events.Blocking()
 
 	if len(blocking) > 0 {
-		ui.GlobalUi().PrintBlockE(blocking.Errors()...)
+		c.Ui().PrintBlockE(blocking.Errors()...)
 		return nil, fmt.Errorf("Aborted. Configuration file contains errors.")
 	}
 
-	warnings := events.OfType(WARN)
+	warnings := events.Warns()
 
 	if len(warnings) > 0 {
-		ui.GlobalUi().PrintBlockE(warnings.Errors()...)
+		c.Ui().PrintBlockE(warnings.Errors()...)
 		fmt.Println("Above warnings indicate potentially destructive actions.")
 	}
 
-	return events, ui.GlobalUi().Ask()
+	return events, c.Ui().Ask()
+}
+
+// events returns events of the corresponding action.
+func (a ApplyAction) events() event.Events {
+	switch a {
+	case CREATE:
+		return event.ModifyEvents
+	case SCALE:
+		return event.ScaleEvents
+	case UPGRADE:
+		return event.UpgradeEvents
+	default:
+		return nil
+	}
 }
