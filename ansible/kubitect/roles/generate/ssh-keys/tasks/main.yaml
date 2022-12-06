@@ -22,6 +22,6 @@
     size: 4096
     state: present
     mode: 0600
-    force: yes
+    force: true
   when:
     - not ssh_key.stat.exists or not ssh_pub_key.stat.exists

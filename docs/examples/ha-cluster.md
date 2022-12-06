@@ -1,9 +1,13 @@
-<h1 align="center">Highly available cluster</h1>
+<div markdown="1" class="text-center">
+# Highly available cluster
+</div>
+
+<div markdown="1" class="text-justify">
 
 This example shows how to use Kubitect to set up a highly available cluster that spreads over 5 hosts.
 Such topology provides redundancy in case any node or even host fails.
 
-<div align=center>
+<div text="text-center">
   <img 
     src="/assets/images/topology-ha-arch.png" 
     alt="Architecture of the highly available cluster"
@@ -91,7 +95,7 @@ This would cause the entire cluster to become unavailable.
 To avoid this single point of failure, a failover (backup) load balancer can be configured.
 Its main purpose is to serve incoming requests on the same virtual (shared) IP address if the primary load balancer fails, as shown in the following figure.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/topology-ha-base.png" 
@@ -303,7 +307,7 @@ cluster:
     kubernetes:
       version: v1.23.7
       kubespray:
-        version: v2.19.0
+        version: v2.20.0
     ```
 
 ## Step 5: Applying the configuration
@@ -313,6 +317,4 @@ Apply the cluster configuration.
 kubitect apply --config ha.yaml
 ```
 
-
-
-
+</div>

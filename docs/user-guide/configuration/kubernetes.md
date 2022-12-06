@@ -1,7 +1,11 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 [tag 2.2.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.2.0
 
-<h1 align="center">Kubernetes configuration</h1>
+<div markdown="1" class="text-center">
+# Kubernetes configuration
+</div>
+
+<div markdown="1" class="text-justify">
 
 The Kubernetes section of the configuration file contains properties that are closely related to Kubernetes, such as Kubernetes version, network plugin, and DNS mode. 
 In addition, the Kubespray project version and URL can also be specified in this section of the Kubitect configuration.
@@ -21,7 +25,7 @@ All Kubespray versions can be found on on their GitHub [release page](https://gi
 ```yaml
 kubernetes:
   kubespray:
-    version: v2.19.0
+    version: v2.20.0
 ```
 
 ### Kubespray URL
@@ -133,5 +137,7 @@ The minimalistic Kubernetes configuration encompasses setting Kubernetes and Kub
 kuberentes:
   version: v1.23.7
   kubespray:
-    version: v2.19.0
+    version: v2.20.0
 ```
+
+</div>

@@ -1,3 +1,4 @@
+---
 - name: Initialize cluster directory and verify cluster config
   hosts: localhost
   gather_facts: false

@@ -20,7 +20,7 @@ valid_network_plugins:
   - canal
   - kube-router
 
-valid_dns_modes:  
+valid_dns_modes:
   - coredns
   - kubedns
 
@@ -40,7 +40,7 @@ reserved_ports:
   - 22   # SSH
 
 regex:
-  # Allow non negative number 
+  # Allow non negative number
   non_negative_number: "^[0-9]+$"
   # Allow a-z (lower case only), numbers (0-9) and hyphens (-)
   names_strict: "^[a-z0-9-]+$"
@@ -48,7 +48,7 @@ regex:
   names_normal: "^[a-zA-Z0-9-_]+$"
 
 config_example_hosts: |
-  
+
   Please see the following example:
   ---
   hosts:

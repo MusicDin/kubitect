@@ -4,7 +4,11 @@ hide:
   # - toc
 ---
 
-<h1 align="center">CLI reference</h1>
+<div markdown="1" class="text-center">
+# CLI reference
+</div>
+
+<div markdown="1" class="text-justify">
 
 This document contains a reference of the Kubitect CLI tool.
 It documents each command along with its flags.
@@ -267,3 +271,4 @@ This can be especially handy with the `apply` command.
 kubitect [command] --debug
 ```
 
+</div>

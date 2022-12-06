@@ -1,4 +1,8 @@
-<h1 align="center">Scaling the cluster</h1>
+<div markdown="1" class="text-center">
+# Scaling the cluster
+</div>
+
+<div markdown="1" class="text-justify">
 
 Any cluster created with Kubitect can be subsequently scaled.
 To do so, simply change the configuration and reapply it using the `scale` action.
@@ -42,3 +46,5 @@ kubitect apply --config my-cluster.yaml --cluster my-cluster --action scale
 ```
 
 As a result, the worker node with ID 2 is removed and the worker nodes with IDs 3 and 4 are added to the cluster.
+
+</div>

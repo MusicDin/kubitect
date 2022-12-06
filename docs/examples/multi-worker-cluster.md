@@ -1,8 +1,12 @@
-<h1 align="center">Multi-worker cluster</h1>
+<div markdown="1" class="text-center">
+# Multi-worker cluster
+</div>
+
+<div markdown="1" class="text-justify">
 
 This example shows how to use Kubitect to set up a Kubernetes cluster with **one master and three worker nodes**.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/topology-1m3w-arch.png" 
@@ -26,7 +30,7 @@ cluster:
     master:
       instances:
         - id: 1
-          ip: 192.168.113.10 # (1)
+          ip: 192.168.113.10 # (1)!
     worker:
       instances:
         - id: 1
@@ -77,7 +81,7 @@ cluster:
       networkPlugin: calico
       dnsMode: coredns
       kubespray:
-        version: v2.19.0
+        version: v2.20.0
     ```
 
 ## Step 2: Applying the configuration
@@ -86,3 +90,5 @@ Apply the cluster:
 ```sh
 kubitect apply --config multi-worker.yaml
 ```
+
+</div>

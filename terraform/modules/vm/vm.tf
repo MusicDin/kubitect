@@ -62,7 +62,7 @@ resource "libvirt_volume" "vm_data_disks" {
   for_each = { for disk in var.vm_data_disks : disk.name => disk }
 
   name = "${var.vm_name}-${each.key}-data-disk"
-  pool = (each.value.pool == null || each.value.pool == "main"
+  pool = (each.value.pool == "main"
     ? var.main_resource_pool_name
     : "${var.cluster_name}-${each.value.pool}-data-resource-pool"
   )

@@ -84,7 +84,7 @@
       loop: "{{ node.dataDisks if node.dataDisks else [] }}"
       when:
         - not item.name | default(none)
-    
+
     - name: Fail if data disks names are not unique
       fail:
         msg: |
@@ -103,7 +103,7 @@
       loop: "{{ node.dataDisks if node.dataDisks else [] }}"
       when:
         - (not item.size | default(none)) or (item.size | int <= 0)
-      
+
     - name: Fail if node's data disk pool is invalid
       vars:
         node_host: "{{ node.host | default( config.hosts[0].name ) }}"
@@ -129,7 +129,7 @@
       fail:
         msg: |
           The {{ type }} node instance (with id {{ node.id }}) has an invalid 'priority' value (none).
-      when: 
+      when:
         - node.priority is none
 
     - name: Fail if load balancer priority is invalid
@@ -142,4 +142,3 @@
   when:
     - type == 'loadBalancer'
     - node.priority is defined
-

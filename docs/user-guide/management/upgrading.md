@@ -1,4 +1,6 @@
-<h1 align="center">Upgrading the cluster</h1>
+<div markdown="1" class="text-center">
+# Upgrading the cluster
+</div>
 
 A running Kubernetes cluster can be upgraded to a higher version by increasing the Kubernetes version in the cluster's configuration file and reapplying it using the `upgrade` action.
 

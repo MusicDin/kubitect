@@ -4,7 +4,11 @@ hide:
   - toc
 ---
 
-<h1 align="center">Configuration reference</h1>
+<div markdown="1" class="text-center">
+# Configuration reference
+</div>
+
+<div markdown="1" class="text-justify">
 
 This document contains a reference of the Kubitect configuration file and documents all possible configuration properties.
 
@@ -22,6 +26,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
 
     `[*]` annotates an array.
 
+</div>
 
 ## *Kubitect* section
 

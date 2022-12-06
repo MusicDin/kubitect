@@ -1,5 +1,4 @@
 ---
-
 # Custom config path provided by user. Empty (undefined) var
 # means that the user did not provide custom config.
 #config_path:

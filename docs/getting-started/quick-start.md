@@ -1,10 +1,14 @@
-<h1 align="center">Quick start</h1>
+<div markdown="1" class="text-center">
+# Quick start
+</div>
 
-<div align=center>
+<div markdown="1" class="text-justify">
+
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/topology-1m1w-arch.png" 
-    alt="Arhitecture of the cluster with one master and one worker node"
+    alt="Architecture of the cluster with one master and one worker node"
     width="75%">
 </div>
 
@@ -33,3 +37,5 @@ Test if the cluster works by displaying all cluster nodes.
 ```
 kubectl get nodes --kubeconfig kubeconfig.yaml
 ```
+
+</div>

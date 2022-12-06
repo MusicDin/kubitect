@@ -1,6 +1,10 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 
-<h1 align="center">Cluster network</h1>
+<div markdown="1" class="text-center">
+# Cluster network
+</div>
+
+<div markdown="1" class="text-justify">
 
 This document describes **how to define the cluster network** in the Kubitect configuration.
 It defines either the properties of the network to be created or the network to which the cluster nodes are to be assigned.
@@ -59,7 +63,7 @@ In bridge mode, the network CIDR should specify the network to which the cluster
 ```yaml
 cluster:
   network:
-    cidr: 192.168.113.0/24 # (1)
+    cidr: 192.168.113.0/24 # (1)!
 ```
 
 1.  In `nat` mode - Any unused private network within a local network.
@@ -72,7 +76,6 @@ cluster:
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
 The network gateway (or default gateway) defines the IP address of the router.
-
 By default, it does not need to be specified because the first client IP in the network range is used as the gateway address.
 If the gateway IP differs from this, it must be specified manually.
 
@@ -82,7 +85,7 @@ Also note that the gateway IP address must be within the specified network range
 cluster:
   network:
     cidr: 10.10.0.0/20
-    gateway: 10.10.0.230 # (1)
+    gateway: 10.10.0.230 # (1)!
 ```
 
 1. If this option is omitted, `10.10.0.1` is used as the gateway IP (first client IP in the network range).
@@ -135,3 +138,5 @@ cluster:
     cidr: 10.10.64.0/24 
     bridge: br0 
 ```
+
+</div>

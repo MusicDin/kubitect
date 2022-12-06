@@ -1,9 +1,9 @@
 #
-# Configuration defines a localhost cluster that contains 
-# only single master node that also acts as a worker node. 
+# Configuration defines a localhost cluster that contains
+# only single master node that also acts as a worker node.
 # It also defines a dedicated virtual NAT network.
 #
-
+---
 hosts:
   - name: localhost
     connection:

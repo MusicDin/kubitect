@@ -1,14 +1,18 @@
-<h1 align="center">Rook cluster</h1>
+<div markdown="1" class="text-center">
+# Rook cluster
+</div>
+
+<div markdown="1" class="text-justify">
 
 !!! warning "Important"
 
     Since the Rook addon is still under development, it may not work as expected.
     Therefore, any feedback would be greatly appreciated.
 
-This example shows how to use Kubitect to set up distributed storage with Rook.
+This example shows how to use Kubitect to set up **distributed storage with Rook**.
 For distributed storage, we add an additional data disk to each virtual machine as shown on the figure below.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/rook-cluster-arch.png" 
@@ -46,7 +50,7 @@ cluster:
         - id: 1
           dataDisks:
             - name: rook
-              pool: rook-pool # (1)
+              pool: rook-pool # (1)!
               size: 256
         - id: 2
           dataDisks:
@@ -130,7 +134,7 @@ This behavior can be restricted with node selectors.
     kubernetes:
       version: v1.23.7
       kubespray:
-        version: v2.19.0
+        version: v2.20.0
 
     addons:
       rook:
@@ -158,7 +162,7 @@ In this example, we label all worker nodes with the label `rook`.
 To ensure that scaling the cluster does not subsequently affect Rook, we set label's value to false by default.
 Only the nodes where Rook should be deployed are labeled `#!yaml rook: true`, as shown in the figure below.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/rook-cluster-labels.png" 
@@ -178,7 +182,7 @@ cluster:
       instances:
         - id: 1
           labels:
-            rook: true # (1)
+            rook: true # (1)!
         - id: 2
           labels:
             rook: true
@@ -198,7 +202,7 @@ To restrict on which nodes Rook resources can be deployed, we need to configure 
 
 We want to deploy Rook on the nodes labeled with the label `#!yaml rook: true`, as shown in the figure below.
 
-<div align=center>
+<div class="text-center">
   <img
     class="mobile-w-100"
     src="/assets/images/rook-cluster-node-selector.png" 
@@ -276,7 +280,7 @@ addons:
     kubernetes:
       version: v1.23.7
       kubespray:
-        version: v2.19.0
+        version: v2.20.0
 
     addons:
       rook:
@@ -290,3 +294,5 @@ addons:
 ```sh
 kubitect apply --config rook-sample.yaml
 ```
+
+</div>

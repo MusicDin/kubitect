@@ -16,8 +16,8 @@
       set_fact:
         nodes_labels: >-
           {{
-            nodes_labels | default([]) + 
-            [{ 'name': item.name, 'labels': hostvars[item.name].node_labels }] 
+            nodes_labels | default([]) +
+            [{ 'name': item.name, 'labels': hostvars[item.name].node_labels }]
           }}
       loop: "{{ nodes }}"
       loop_control:

@@ -38,7 +38,7 @@
     msg: |
       The names of the hosts are not unique!
       {{ config_example_hosts }}
-  when: 
+  when:
     - config.hosts | map(attribute='name') | unique | length | string != hosts_count
 
 # Verify connection type
@@ -58,7 +58,7 @@
       ({{ item.connection.type }})!
       Valid values are: [ local, remote ]
   loop: "{{ config.hosts }}"
-  when: 
+  when:
     - item.connection.type != 'local'
     - item.connection.type != 'localhost'
     - item.connection.type != 'remote'
@@ -68,7 +68,7 @@
     msg: |
       Only one host can have 'connection.type' set to 'localhost' or 'local'.
   when:
-    - config.hosts | selectattr('connection.type', 'in', ('localhost', 'local')) | length > 1 
+    - config.hosts | selectattr('connection.type', 'in', ('localhost', 'local')) | length > 1
 
 - name: Fail if remote host is missing a user attribute
   fail:
@@ -87,7 +87,7 @@
       The IP address of the remote host is required to establish an SSH connection with it.
   loop: "{{ config.hosts }}"
   when:
-    - item.connection.type == 'remote' 
+    - item.connection.type == 'remote'
     - not item.connection.ip | default(none)
 
 - name: Fail if remote host IP address is invalid
@@ -130,7 +130,7 @@
       The host ({{ item.name }}) has an invalid 'mainResourcePoolPath' value!
       The main resource pool path cannot be an empty string.
   loop: "{{ config.hosts }}"
-  when: 
+  when:
     - item.mainResourcePoolPath is defined
     - item.mainResourcePoolPath is none or item.mainResourcePoolPath | length == 0
 
@@ -142,7 +142,7 @@
           The host ({{ item.name }}) has a data resource pool with no name!
           Make sure that each data resource pool has a name.
       loop: "{{ config.hosts }}"
-      when: 
+      when:
         - item.dataResourcePools | length != item.dataResourcePools | selectattr('name', 'defined') | rejectattr('name', 'none') | length
 
     - name: Fail if data resource pool names are not unique
@@ -151,9 +151,8 @@
           The host ({{ item.name }}) contains data resource pools with duplicate names!
           Make sure that the data resource pool names on the same host are unique.
       loop: "{{ config.hosts }}"
-      when: 
+      when:
         - item.dataResourcePools | length != item.dataResourcePools | map(attribute='name') | unique | length
-  when: 
+  when:
     - item.dataResourcePools is defined
     - item.dataResourcePools is not none
-  
