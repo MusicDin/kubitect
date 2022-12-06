@@ -14,16 +14,9 @@ Kubernetes is configured on the deployed virtual machines using [Kubespray](http
 
 </br>
 
-![Go Test Badge](https://github.com/marmiha/kubitect/actions/workflows/go-test.yml/badge.svg)
-![Release Badge](https://github.com/marmiha/kubitect/actions/workflows/release-cli-binaries.yml/badge.svg)
-[![Go Reference](https://pkg.go.dev/badge/github.com/MusicDin/kubitect.svg)](https://pkg.go.dev/github.com/MusicDin/kubitect)
-
 ### Documentation
 
 Kubitect documentation is accessible at **[:book: kubitect.io](https://kubitect.io/getting-started/installation/)**.
-
-![Docs Workflow Badge](https://github.com/marmiha/kubitect/actions/workflows/docs.yml/badge.svg)
-[![MkDocs](https://img.shields.io/badge/docs-kubitect.io-blue)](https://kubitect.io)
 
 </br>
 
