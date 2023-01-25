@@ -3,6 +3,8 @@ package cluster
 import (
 	"cli/cluster/executors"
 	"cli/cluster/executors/kubespray"
+	"cli/cluster/provisioner"
+	"cli/cluster/provisioner/terraform"
 	"cli/config/modelconfig"
 	"cli/config/modelinfra"
 	"cli/env"
@@ -21,8 +23,6 @@ type Cluster struct {
 	NewConfig     *modelconfig.Config
 	AppliedConfig *modelconfig.Config
 	InfraConfig   *modelinfra.Config
-
-	exec *executors.Executor
 }
 
 // NewCluster returns new Cluster instance with populated general fields.
@@ -81,21 +81,13 @@ func (c *Cluster) Sync() error {
 	return nil
 }
 
-func (c *Cluster) NewExecutor() executors.Executor {
-	exec := &kubespray.KubesprayExecutor{
-		ClusterName: c.Name,
-		ClusterPath: c.Path,
-		K8sVersion:  string(*c.NewConfig.Kubernetes.Version),
-		Ui:          c.Ui(),
+func (c *Cluster) Executor() executors.Executor {
+
+	if c.exec != nil {
+		return c.exec
 	}
 
-	// FIXME: Once main.tf generation is migrated from ansible, this can be removed
-	if c.InfraConfig != nil {
-		exec.SshUser = string(*c.InfraConfig.Cluster.NodeTemplate.User)
-		exec.SshPKey = string(*c.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath)
-	}
-
-	exec.Venvs = kubespray.VirtualEnvironments{
+	venvs := kubespray.VirtualEnvironments{
 		MAIN: &virtualenv.VirtualEnv{
 			Name:             "main",
 			Path:             filepath.Join(c.ShareDir(), "venv", "main", c.KubitectVersion()),
@@ -112,7 +104,35 @@ func (c *Cluster) NewExecutor() executors.Executor {
 		},
 	}
 
-	return exec
+	return kubespray.NewKubespray(
+		c.Name,
+		c.Path,
+		string(*c.NewConfig.Kubernetes.Version),
+		string(*c.InfraConfig.Cluster.NodeTemplate.User),
+		string(*c.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath),
+		venvs,
+		c.Ui(),
+	)
+}
+
+func (c *Cluster) Provisioner() provisioner.Provisioner {
+	if c.prov != nil {
+		return c.prov
+	}
+
+	tfVer := env.ConstTerraformVersion
+
+	c.prov = terraform.NewTerraform(
+		tfVer,
+		c.Path,
+		filepath.Join(c.ShareDir(), "terraform", tfVer),
+		filepath.Join(c.Path, "terraform"),
+		c.NewConfig.Hosts,
+		true,
+		c.Ui(),
+	)
+
+	return c.prov
 }
 
 // ApplyNewConfig replaces currently applied config with new one.

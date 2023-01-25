@@ -24,11 +24,3 @@
     - role: kubespray
       tags:
         - kubespray
-
-    - role: generate/main-tf
-      tags:
-        - init
-    
-    - role: generate/ssh-keys
-      tags:
-        - init

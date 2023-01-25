@@ -19,7 +19,7 @@ func (c *ClusterMeta) Destroy() error {
 
 	c.Ui().Printf(ui.INFO, "Destroying cluster '%s'...\n", c.Name)
 
-	if err := c.Terraform().Destroy(); err != nil {
+	if err := c.Provisioner().Destroy(); err != nil {
 		return err
 	}
 

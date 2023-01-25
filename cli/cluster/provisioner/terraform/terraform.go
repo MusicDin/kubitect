@@ -1,6 +1,8 @@
 package terraform
 
 import (
+	"cli/cluster/provisioner"
+	"cli/config/modelconfig"
 	"cli/ui"
 	"context"
 	"fmt"
@@ -12,19 +14,106 @@ import (
 	"github.com/hashicorp/hc-install/releases"
 )
 
-type Terraform struct {
+type terraform struct {
 	binPath string
 
 	Version    string
 	BinDir     string
 	WorkingDir string
 	ShowPlan   bool
-	Ui         *ui.Ui
+
+	clusterPath string
+	hosts       []modelconfig.Host
+
+	initialized bool
+
+	Ui *ui.Ui
+}
+
+func NewTerraform(
+	version,
+	clusterPath,
+	binDir,
+	workingDir string,
+	hosts []modelconfig.Host,
+	showPlan bool,
+	ui *ui.Ui,
+) provisioner.Provisioner {
+	return &terraform{
+		Version:    version,
+		BinDir:     binDir,
+		WorkingDir: workingDir,
+		ShowPlan:   showPlan,
+
+		clusterPath: clusterPath,
+		hosts:       hosts,
+
+		Ui: ui,
+	}
+}
+
+func (t *terraform) Init() error {
+	if t.initialized {
+		return nil
+	}
+
+	binPath, err := t.findOrInstall()
+	if err != nil {
+		return err
+	}
+
+	t.binPath = binPath
+
+	cmd := t.NewCmd("init")
+
+	cmd.AddArg("force-copy")
+	cmd.AddArg("input", false)
+	cmd.AddArg("get", true)
+
+	_, err = cmd.Run()
+
+	if err == nil {
+		t.initialized = true
+	}
+
+	return err
+}
+
+// init initializes a Terraform project.
+func (t *terraform) init() error {
+	if t.binPath != "" {
+		return nil
+	}
+
+	binPath, err := t.findOrInstall()
+	if err != nil {
+		return err
+	}
+
+	t.binPath = binPath
+
+	cmd := t.NewCmd("init")
+
+	cmd.AddArg("force-copy")
+	cmd.AddArg("input", false)
+	cmd.AddArg("get", true)
+
+	_, err = cmd.Run()
+
+	return err
 }
 
 // Plan shows Terraform project changes (plan).
-func (t *Terraform) Plan() (bool, error) {
-	t.init()
+// It returns a potential error and whether there
+// are changes or not.
+func (t *terraform) Plan() (bool, error) {
+	if err := NewMainTemplate(t.hosts).Write(t.clusterPath); err != nil {
+		return false, err
+	}
+
+	if err := t.init(); err != nil {
+		return false, err
+	}
 
 	cmd := t.NewCmd("plan")
 
@@ -47,9 +136,7 @@ func (t *Terraform) Plan() (bool, error) {
 }
 
 // Apply applies new Terraform configurations.
-func (t *Terraform) Apply() error {
-	t.init()
-
+func (t *terraform) Apply() error {
 	changes, err := t.Plan()
 
 	if err != nil {
@@ -75,13 +162,15 @@ func (t *Terraform) Apply() error {
 	cmd.AddArg("refresh", true)
 
 	_, err = cmd.Run()
-
 	return err
 }
 
 // Destroy destroys the Terraform project.
-func (t *Terraform) Destroy() error {
-	t.init()
+func (t *terraform) Destroy() error {
+	err := t.init()
+	if err != nil {
+		return err
+	}
 
 	cmd := t.NewCmd("destroy")
 
@@ -92,39 +181,13 @@ func (t *Terraform) Destroy() error {
 	cmd.AddArg("parallelism", 10)
 	cmd.AddArg("refresh", true)
 
-	_, err := cmd.Run()
-
-	return err
-}
-
-// init initializes a Terraform project.
-func (t *Terraform) init() error {
-	if t.binPath != "" {
-		return nil
-	}
-
-	binPath, err := t.findOrInstall()
-
-	if err != nil {
-		return err
-	}
-
-	t.binPath = binPath
-
-	cmd := t.NewCmd("init")
-
-	cmd.AddArg("force-copy")
-	cmd.AddArg("input", false)
-	cmd.AddArg("get", true)
-
 	_, err = cmd.Run()
-
 	return err
 }
 
 // findOrInstall first searches for Terraform binary locally and if
 // binary is not found, it is installed in given binDir.
-func (t *Terraform) findOrInstall() (string, error) {
+func (t *terraform) findOrInstall() (string, error) {
 	var binPath string
 	var err error
 
