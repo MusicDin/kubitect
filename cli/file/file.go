@@ -18,7 +18,7 @@ func Exists(path string) bool {
 	return err == nil
 }
 
-// Read reads a file on the given path and returns it as a string.
+// Read reads file on a given path and returns its content as a string.
 func Read(path string) (string, error) {
 	file, err := ioutil.ReadFile(path)
 

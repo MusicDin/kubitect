@@ -9,7 +9,7 @@ const (
 	ConstProjectUrl       = "https://github.com/MusicDin/kubitect"
 	ConstProjectVersion   = "v2.2.0"
 	ConstKubesprayVersion = "v2.20.0"
-	ConstTerraformVersion = "1.2.4"
+	ConstTerraformVersion = "1.3.7"
 )
 
 // Defines required files/directories that are copied from tmp git project.
@@ -19,6 +19,7 @@ var ProjectRequiredFiles = [...]string{
 	"terraform/modules/",
 	"terraform/templates/",
 	"terraform/scripts/",
+	"terraform/main.tf.tpl",
 	"terraform/defaults.yaml",
 	"terraform/output.tf",
 	"terraform/variables.tf",

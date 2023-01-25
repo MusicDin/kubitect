@@ -18,7 +18,7 @@ type TerraformCmd struct {
 	ui         *ui.Ui
 }
 
-func (t *Terraform) NewCmd(action string) *TerraformCmd {
+func (t *terraform) NewCmd(action string) *TerraformCmd {
 	return &TerraformCmd{
 		binPath:    t.binPath,
 		workingDir: t.WorkingDir,

@@ -117,7 +117,7 @@ func generatePublicKey(privateKey *rsa.PrivateKey) ([]byte, error) {
 
 // Write keys creates the specified directory and writes the keys to it.
 func (p keyPair) WriteKeys(dir, keyName string) error {
-	err := os.MkdirAll(dir, 0600)
+	err := os.MkdirAll(dir, 0700)
 	if err != nil {
 		return err
 	}

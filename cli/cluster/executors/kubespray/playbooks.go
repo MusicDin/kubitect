@@ -9,7 +9,7 @@ import (
 )
 
 // play executes a playbook using ansible from a given virtual environment.
-func (e *KubesprayExecutor) play(ve *virtualenv.VirtualEnv, pb ansible.Playbook) error {
+func (e *kubespray) play(ve *virtualenv.VirtualEnv, pb ansible.Playbook) error {
 	if err := ve.Init(); err != nil {
 		return fmt.Errorf("kubespray exec: failed initializing virtual environment: %v", err)
 	}
@@ -33,7 +33,7 @@ const (
 
 // KubitectInit function calls Ansible playbook that is responsible for initializing
 // the cluster. Different workflow is executed based on the provided tags.
-func (e *KubesprayExecutor) KubitectInit(tags ...PlaybookTag) error {
+func (e *kubespray) KubitectInit(tags ...PlaybookTag) error {
 	var sTags []string
 
 	for _, s := range tags {
@@ -51,7 +51,7 @@ func (e *KubesprayExecutor) KubitectInit(tags ...PlaybookTag) error {
 
 // KubitectHostsSetup function calls an Ansible playbook that ensures Kubitect target
 // hosts meet all the requirements before cluster is created.
-func (e *KubesprayExecutor) KubitectHostsSetup() error {
+func (e *kubespray) KubitectHostsSetup() error {
 	pb := ansible.Playbook{
 		PlaybookFile: filepath.Join(e.ClusterPath, "ansible/kubitect/hosts-setup.yaml"),
 		Inventory:    filepath.Join(e.ClusterPath, "config/hosts.yaml"),
@@ -63,7 +63,7 @@ func (e *KubesprayExecutor) KubitectHostsSetup() error {
 
 // KubitectFinalize function calls an Ansible playbook that finalizes Kubernetes
 // cluster installation.
-func (e *KubesprayExecutor) KubitectFinalize() error {
+func (e *kubespray) KubitectFinalize() error {
 	pb := ansible.Playbook{
 		PlaybookFile: filepath.Join(e.ClusterPath, "ansible/kubitect/finalize.yaml"),
 		Inventory:    filepath.Join(e.ClusterPath, "config/nodes.yaml"),
@@ -78,7 +78,7 @@ func (e *KubesprayExecutor) KubitectFinalize() error {
 
 // HAProxy function calls an Ansible playbook that configures HAProxy
 // load balancers.
-func (e *KubesprayExecutor) HAProxy() error {
+func (e *kubespray) HAProxy() error {
 	pb := ansible.Playbook{
 		PlaybookFile: filepath.Join(e.ClusterPath, "ansible/kubitect/haproxy.yaml"),
 		Inventory:    filepath.Join(e.ClusterPath, "config/nodes.yaml"),
@@ -93,7 +93,7 @@ func (e *KubesprayExecutor) HAProxy() error {
 
 // KubesprayCreate function calls an Ansible playbook that configures Kubernetes
 // cluster.
-func (e *KubesprayExecutor) KubesprayCreate() error {
+func (e *kubespray) KubesprayCreate() error {
 	vars := []string{
 		"kube_version=" + e.K8sVersion,
 	}
@@ -113,7 +113,7 @@ func (e *KubesprayExecutor) KubesprayCreate() error {
 
 // KubesprayUpgrade function calls an Ansible playbook that upgrades Kubernetes
 // nodes to a newer version.
-func (e *KubesprayExecutor) KubesprayUpgrade() error {
+func (e *kubespray) KubesprayUpgrade() error {
 	vars := []string{
 		"kube_version=" + e.K8sVersion,
 	}
@@ -133,7 +133,7 @@ func (e *KubesprayExecutor) KubesprayUpgrade() error {
 
 // KubesprayScale function calls an Ansible playbook that configures virtual machines
 // that are freshly added to the cluster.
-func (e *KubesprayExecutor) KubesprayScale() error {
+func (e *kubespray) KubesprayScale() error {
 	vars := []string{
 		"kube_version=" + e.K8sVersion,
 	}
@@ -153,7 +153,7 @@ func (e *KubesprayExecutor) KubesprayScale() error {
 
 // KubesprayRemoveNodes function calls an Ansible playbook that removes the nodes with
 // the provided names.
-func (e *KubesprayExecutor) KubesprayRemoveNodes(removedNodeNames []string) error {
+func (e *kubespray) KubesprayRemoveNodes(removedNodeNames []string) error {
 	vars := []string{
 		"skip_confirmation=yes",
 		"delete_nodes_confirmation=yes",

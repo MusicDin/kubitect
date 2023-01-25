@@ -1,9 +1,11 @@
 package cluster
 
 import (
+	"cli/cluster/executors"
+	"cli/cluster/provisioner"
+	"cli/cluster/provisioner/terraform"
 	"cli/env"
 	"cli/file"
-	"cli/tools/terraform"
 	"cli/ui"
 	"path/filepath"
 )
@@ -41,7 +43,8 @@ type ClusterMeta struct {
 	Path  string
 	Local bool
 
-	tf *terraform.Terraform
+	exec executors.Executor
+	prov provisioner.Provisioner
 }
 
 func (c ClusterMeta) AppliedConfigPath() string {
@@ -72,17 +75,22 @@ func (c ClusterMeta) ContainsKubeconfig() bool {
 	return file.Exists(c.KubeconfigPath())
 }
 
-func (c *ClusterMeta) Terraform() *terraform.Terraform {
-	if c.tf != nil {
-		return c.tf
+func (c *ClusterMeta) Provisioner() provisioner.Provisioner {
+	if c.prov != nil {
+		return c.prov
 	}
 
 	tfVer := env.ConstTerraformVersion
 
-	return &terraform.Terraform{
-		Version:    tfVer,
-		WorkingDir: filepath.Join(c.Path, "terraform"),
-		BinDir:     filepath.Join(c.ShareDir(), "terraform", tfVer),
-		Ui:         c.Ui(),
-	}
+	c.prov = terraform.NewTerraform(
+		tfVer,
+		c.Path,
+		filepath.Join(c.ShareDir(), "terraform", tfVer),
+		filepath.Join(c.Path, "terraform"),
+		nil,
+		true,
+		c.Ui(),
+	)
+
+	return c.prov
 }

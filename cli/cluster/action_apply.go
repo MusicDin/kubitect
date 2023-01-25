@@ -4,10 +4,12 @@ import (
 	"cli/cluster/event"
 	"cli/env"
 	"cli/file"
+	"cli/lib/keygen"
 	"cli/tools/git"
 	"cli/ui"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 )
 
@@ -79,9 +81,9 @@ func (c *Cluster) Apply(a string) error {
 	case CREATE:
 		err = c.create()
 	case UPGRADE:
-		err = c.create()
+		err = c.upgrade()
 	case SCALE:
-		err = c.create()
+		err = c.scale(events)
 	}
 
 	if err != nil {
@@ -94,11 +96,11 @@ func (c *Cluster) Apply(a string) error {
 // create creates a new cluster or modifies the current
 // one if the cluster already exists.
 func (c *Cluster) create() error {
-	if err := c.NewExecutor().Init(); err != nil {
+	if err := c.generateMissingSshKeys(); err != nil {
 		return err
 	}
 
-	if err := c.Terraform().Apply(); err != nil {
+	if err := c.Provisioner().Apply(); err != nil {
 		return err
 	}
 
@@ -106,18 +108,16 @@ func (c *Cluster) create() error {
 		return err
 	}
 
-	exec := c.NewExecutor()
-
-	if err := exec.Init(); err != nil {
+	if err := c.Executor().Init(); err != nil {
 		return err
 	}
 
-	return exec.Create()
+	return c.Executor().Create()
 }
 
 // upgrade upgrades an existing cluster.
 func (c *Cluster) upgrade() error {
-	if err := c.Terraform().Apply(); err != nil {
+	if err := c.Provisioner().Apply(); err != nil {
 		return err
 	}
 
@@ -125,24 +125,20 @@ func (c *Cluster) upgrade() error {
 		return err
 	}
 
-	exec := c.NewExecutor()
-
-	if err := exec.Init(); err != nil {
+	if err := c.Executor().Init(); err != nil {
 		return err
 	}
 
-	return exec.Upgrade()
+	return c.Executor().Upgrade()
 }
 
 // scale scales an existing cluster.
 func (c *Cluster) scale(events event.Events) error {
-	exec := c.NewExecutor()
-
-	if err := exec.ScaleDown(events); err != nil {
+	if err := c.Executor().ScaleDown(events); err != nil {
 		return err
 	}
 
-	if err := c.Terraform().Apply(); err != nil {
+	if err := c.Provisioner().Apply(); err != nil {
 		return err
 	}
 
@@ -150,7 +146,7 @@ func (c *Cluster) scale(events event.Events) error {
 		return err
 	}
 
-	return exec.ScaleUp(events)
+	return c.Executor().ScaleUp(events)
 }
 
 // prepare prepares cluster's directory. It ensures that Kubitect project
@@ -197,6 +193,27 @@ func (c *Cluster) prepare() error {
 	}
 
 	return fmt.Errorf("cluster directory (%s) is missing some required files", srcDir)
+}
+
+// generateMissingSshKeys generates SSH keys if the user has not
+// specified a path to existing keys.
+func (c *Cluster) generateMissingSshKeys() error {
+	sshKeysPath := c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath
+
+	if sshKeysPath != nil {
+		return nil
+	}
+
+	c.Ui().Print(ui.INFO, "Generating new SSH keys...")
+
+	kp, err := keygen.NewKeyPair(4096)
+	if err != nil {
+		return err
+	}
+
+	defSshKeyPath := path.Join(c.Path, "config", ".ssh")
+
+	return kp.WriteKeys(defSshKeyPath, "id_rsa")
 }
 
 // cloneAndCopyReqFiles first clones a project using git and then
