@@ -22,6 +22,16 @@ func TestKeyWrite(t *testing.T) {
 	assert.Equal(t, "test", string(keyFile))
 }
 
+func TestKeyWrite_InvalidPath(t *testing.T) {
+	keyPath := path.Join(t.TempDir(), "invalid", "id_rsa")
+	key := key{
+		value: []byte("test"),
+	}
+
+	err := key.Write(keyPath)
+	assert.ErrorContains(t, err, "no such file or directory")
+}
+
 func TestGeneratePrivateKey(t *testing.T) {
 	key, err := generatePrivateKey(512)
 	assert.NoError(t, err)
@@ -71,7 +81,7 @@ func TestWriteKeyPair(t *testing.T) {
 	kp, err := NewKeyPair(512)
 	assert.NoError(t, err)
 
-	err = kp.WriteKeys(kpPath)
+	err = kp.WriteKeys(kpPath, "id_rsa")
 	assert.NoError(t, err)
 
 	privKeyPath := path.Join(kpPath, "id_rsa")
@@ -89,6 +99,14 @@ func TestWriteKeyPair_InvalidPath(t *testing.T) {
 	kp, err := NewKeyPair(512)
 	assert.NoError(t, err)
 
-	err = kp.WriteKeys("#")
-	assert.EqualError(t, err, "open #/id_rsa: no such file or directory")
+	err = kp.WriteKeys("", "id_rsa")
+	assert.EqualError(t, err, "mkdir : no such file or directory")
+}
+
+func TestWriteKeyPair_InvalidKeyName(t *testing.T) {
+	kp, err := NewKeyPair(512)
+	assert.NoError(t, err)
+
+	err = kp.WriteKeys(t.TempDir(), "")
+	assert.ErrorContains(t, err, "is a directory")
 }

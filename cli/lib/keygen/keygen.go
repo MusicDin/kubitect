@@ -7,10 +7,13 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path"
 
 	"golang.org/x/crypto/ssh"
 )
+
+const keyPerm = 0600
 
 type (
 	Key interface {
@@ -22,13 +25,16 @@ type (
 	}
 )
 
+// Write writes the key to the specified path.
+// Note that the directory to which the key is
+// written must exist.
 func (k key) Write(path string) error {
 	return ioutil.WriteFile(path, k.value, 0600)
 }
 
 type (
 	KeyPair interface {
-		WriteKeys(dir string) error
+		WriteKeys(dir, keyName string) error
 		PublicKey() Key
 		PrivateKey() Key
 	}
@@ -47,6 +53,7 @@ func (p keyPair) PublicKey() Key {
 	return p.public
 }
 
+// NewKeyPair creates a private and public key pair.
 func NewKeyPair(bitSize int) (KeyPair, error) {
 	privateKey, err := generatePrivateKey(bitSize)
 	if err != nil {
@@ -108,11 +115,17 @@ func generatePublicKey(privateKey *rsa.PrivateKey) ([]byte, error) {
 	return ssh.MarshalAuthorizedKey(publicRsaKey), nil
 }
 
-func (p keyPair) WriteKeys(dir string) error {
-	err := p.PrivateKey().Write(path.Join(dir, "id_rsa"))
+// Write keys creates the specified directory and writes the keys to it.
+func (p keyPair) WriteKeys(dir, keyName string) error {
+	err := os.MkdirAll(dir, 0600)
 	if err != nil {
 		return err
 	}
 
-	return p.PublicKey().Write(path.Join(dir, "id_rsa.pub"))
+	err = p.PrivateKey().Write(path.Join(dir, keyName))
+	if err != nil {
+		return err
+	}
+
+	return p.PublicKey().Write(path.Join(dir, keyName+".pub"))
 }
