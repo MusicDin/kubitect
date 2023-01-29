@@ -29,6 +29,7 @@ func MockTerraform(t *testing.T) *terraform {
 		version:    env.ConstTerraformVersion,
 		binDir:     binDir,
 		projectDir: projDir,
+		env:        []string{binDir},
 	}
 }
 

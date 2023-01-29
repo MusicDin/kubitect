@@ -41,6 +41,10 @@ type (
 		// Indicates that terraform project has
 		// been already initialized.
 		initialized bool
+
+		// Environment variables for exec
+		// Note: used only for testing findAndInstall
+		env []string
 	}
 )
 
@@ -236,6 +240,10 @@ func (t *terraform) runCmd(action string, args []string, showOutput bool) (int, 
 
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Pdeathsig: syscall.SIGTERM,
+	}
+
+	if len(t.env) > 0 {
+		cmd.Env = t.env
 	}
 
 	if showOutput || ui.Debug() {

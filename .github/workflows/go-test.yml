@@ -13,7 +13,7 @@ jobs:
       with:
         go-version-file: "cli/go.mod"
     - name: Install Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.8
     - name: Install virtualenv
