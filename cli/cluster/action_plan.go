@@ -3,6 +3,7 @@ package cluster
 import (
 	"cli/cluster/event"
 	"cli/lib/cmp"
+	"cli/ui"
 	"fmt"
 )
 
@@ -30,18 +31,18 @@ func (c *Cluster) plan(action ApplyAction) (event.Events, error) {
 	blocking := events.Blocking()
 
 	if len(blocking) > 0 {
-		c.Ui().PrintBlockE(blocking.Errors()...)
+		ui.PrintBlockE(blocking.Errors()...)
 		return nil, fmt.Errorf("Aborted. Configuration file contains errors.")
 	}
 
 	warnings := events.Warns()
 
 	if len(warnings) > 0 {
-		c.Ui().PrintBlockE(warnings.Errors()...)
+		ui.PrintBlockE(warnings.Errors()...)
 		fmt.Println("Above warnings indicate potentially destructive actions.")
 	}
 
-	return events, c.Ui().Ask()
+	return events, ui.Ask()
 }
 
 // events returns events of the corresponding action.

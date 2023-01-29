@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"cli/ui/streams"
 	"fmt"
 	"strings"
 )
@@ -12,15 +13,17 @@ const (
 	lineFinal   = "\u2514" // '-
 )
 
-type Block interface {
-	Format(*OutputStream, Level)
-}
+type (
+	Block interface {
+		Format(streams.OutputStream, Color) string
+	}
 
-type BasicBlock struct {
-	content []Content
-}
+	block struct {
+		content []Content
+	}
+)
 
-func (b BasicBlock) Format(stream *OutputStream, color Color) string {
+func (b block) Format(stream streams.OutputStream, color Color) string {
 	var lines Lines
 
 	prefix := lineMiddle + " "
@@ -28,7 +31,7 @@ func (b BasicBlock) Format(stream *OutputStream, color Color) string {
 
 	for _, c := range b.content {
 		for _, l := range c.format(stream, color, indent) {
-			lines.Append(color(prefix) + l)
+			lines = lines.append(color(prefix) + l)
 		}
 	}
 
@@ -36,8 +39,8 @@ func (b BasicBlock) Format(stream *OutputStream, color Color) string {
 		return ""
 	}
 
-	lines.Prepend(color(lineInitial))
-	lines.Append(color(lineFinal))
+	lines = lines.prepend(color(lineInitial))
+	lines = lines.append(color(lineFinal))
 
 	return strings.Join(lines, "\n")
 }
@@ -57,13 +60,13 @@ type Content struct {
 	compact bool
 }
 
-func (c Content) format(s *OutputStream, color Color, indent int) []string {
+func (c Content) format(s streams.OutputStream, color Color, indent int) []string {
 	if c.linesRequired && len(c.lines) == 0 {
 		return nil
 	}
 
 	out, pivot := Format(s, c.title, indent, 0)
-	out.Color(color)
+	out = out.setColor(color)
 
 	if c.compact {
 		c.linesIndent = 0
@@ -75,14 +78,14 @@ func (c Content) format(s *OutputStream, color Color, indent int) []string {
 
 	for i, l := range c.lines {
 		lines, _ := Format(s, l, len(prefix)+indent, pivot)
-		lines.Prefix(prefix)
+		lines = lines.setPrefix(prefix)
 
 		if c.compact && i == 0 {
-			out.Glue(lines)
+			out = out.glue(lines...)
 			continue
 		}
 
-		out.Append(lines...)
+		out = out.append(lines...)
 	}
 
 	return out
@@ -90,28 +93,36 @@ func (c Content) format(s *OutputStream, color Color, indent int) []string {
 
 type Lines []string
 
-func (l *Lines) Append(lines ...string) {
-	*l = append(*l, lines...)
+func (l Lines) append(elems ...string) Lines {
+	return append(l, elems...)
 }
 
-func (l *Lines) Prepend(lines ...string) {
-	*l = append(lines, *l...)
+func (l Lines) prepend(elems ...string) Lines {
+	return append(elems, l...)
 }
 
-func (l *Lines) Color(c Color) {
-	for i := range *l {
-		(*l)[i] = c((*l)[i])
+func (l Lines) glue(elems ...string) Lines {
+	if len(l) == 0 {
+		return elems
 	}
+
+	x := len(l) - 1
+	l[x] = l[x] + elems[0]
+
+	return l.append(elems[1:]...)
 }
 
-func (l *Lines) Prefix(p string) {
-	for i := range *l {
-		(*l)[i] = p + (*l)[i]
+func (l Lines) setColor(c Color) Lines {
+	for i := range l {
+		l[i] = c(l[i])
 	}
+	return l
 }
 
-func (l *Lines) Glue(lines Lines) {
-	x := len(*l) - 1
-	(*l)[x] = (*l)[x] + lines[0]
-	l.Append(lines[1:]...)
+func (l Lines) setPrefix(p string) Lines {
+	for i := range l {
+		l[i] = p + l[i]
+	}
+
+	return l
 }

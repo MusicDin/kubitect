@@ -2,26 +2,9 @@ package kubespray
 
 import (
 	"cli/tools/ansible"
-	"cli/tools/virtualenv"
-	"fmt"
 	"path/filepath"
 	"strings"
 )
-
-// play executes a playbook using ansible from a given virtual environment.
-func (e *kubespray) play(ve *virtualenv.VirtualEnv, pb ansible.Playbook) error {
-	if err := ve.Init(); err != nil {
-		return fmt.Errorf("kubespray exec: failed initializing virtual environment: %v", err)
-	}
-
-	ansible := ansible.Ansible{
-		BinPath:    filepath.Join(ve.Path, "bin", "ansible-playbook"),
-		WorkingDir: e.ClusterPath,
-		Ui:         e.Ui,
-	}
-
-	return ansible.Exec(pb)
-}
 
 type PlaybookTag string
 
@@ -41,54 +24,54 @@ func (e *kubespray) KubitectInit(tags ...PlaybookTag) error {
 	}
 
 	pb := ansible.Playbook{
-		PlaybookFile: filepath.Join(e.ClusterPath, "ansible/kubitect/init.yaml"),
-		Tags:         sTags,
-		Local:        true,
+		Path:  filepath.Join(e.ClusterPath, "ansible/kubitect/init.yaml"),
+		Tags:  sTags,
+		Local: true,
 	}
 
-	return e.play(e.Venvs.MAIN, pb)
+	return e.Ansible.Exec(pb)
 }
 
 // KubitectHostsSetup function calls an Ansible playbook that ensures Kubitect target
 // hosts meet all the requirements before cluster is created.
 func (e *kubespray) KubitectHostsSetup() error {
 	pb := ansible.Playbook{
-		PlaybookFile: filepath.Join(e.ClusterPath, "ansible/kubitect/hosts-setup.yaml"),
-		Inventory:    filepath.Join(e.ClusterPath, "config/hosts.yaml"),
-		Local:        true,
+		Path:      filepath.Join(e.ClusterPath, "ansible/kubitect/hosts-setup.yaml"),
+		Inventory: filepath.Join(e.ClusterPath, "config/hosts.yaml"),
+		Local:     true,
 	}
 
-	return e.play(e.Venvs.MAIN, pb)
+	return e.Ansible.Exec(pb)
 }
 
 // KubitectFinalize function calls an Ansible playbook that finalizes Kubernetes
 // cluster installation.
 func (e *kubespray) KubitectFinalize() error {
 	pb := ansible.Playbook{
-		PlaybookFile: filepath.Join(e.ClusterPath, "ansible/kubitect/finalize.yaml"),
-		Inventory:    filepath.Join(e.ClusterPath, "config/nodes.yaml"),
-		Become:       true,
-		User:         e.SshUser,
-		PrivateKey:   e.SshPKey,
-		Timeout:      3000,
+		Path:       filepath.Join(e.ClusterPath, "ansible/kubitect/finalize.yaml"),
+		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
+		Become:     true,
+		User:       e.SshUser,
+		PrivateKey: e.SshPKey,
+		Timeout:    3000,
 	}
 
-	return e.play(e.Venvs.MAIN, pb)
+	return e.Ansible.Exec(pb)
 }
 
 // HAProxy function calls an Ansible playbook that configures HAProxy
 // load balancers.
 func (e *kubespray) HAProxy() error {
 	pb := ansible.Playbook{
-		PlaybookFile: filepath.Join(e.ClusterPath, "ansible/kubitect/haproxy.yaml"),
-		Inventory:    filepath.Join(e.ClusterPath, "config/nodes.yaml"),
-		Become:       true,
-		User:         e.SshUser,
-		PrivateKey:   e.SshPKey,
-		Timeout:      3000,
+		Path:       filepath.Join(e.ClusterPath, "ansible/kubitect/haproxy.yaml"),
+		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
+		Become:     true,
+		User:       e.SshUser,
+		PrivateKey: e.SshPKey,
+		Timeout:    3000,
 	}
 
-	return e.play(e.Venvs.MAIN, pb)
+	return e.Ansible.Exec(pb)
 }
 
 // KubesprayCreate function calls an Ansible playbook that configures Kubernetes
@@ -99,16 +82,16 @@ func (e *kubespray) KubesprayCreate() error {
 	}
 
 	pb := ansible.Playbook{
-		PlaybookFile: filepath.Join(e.ClusterPath, "ansible/kubespray/cluster.yml"),
-		Inventory:    filepath.Join(e.ClusterPath, "config/nodes.yaml"),
-		Become:       true,
-		User:         e.SshUser,
-		PrivateKey:   e.SshPKey,
-		Timeout:      3000,
-		ExtraVars:    vars,
+		Path:       filepath.Join(e.ClusterPath, "ansible/kubespray/cluster.yml"),
+		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
+		Become:     true,
+		User:       e.SshUser,
+		PrivateKey: e.SshPKey,
+		Timeout:    3000,
+		ExtraVars:  vars,
 	}
 
-	return e.play(e.Venvs.KUBESPRAY, pb)
+	return e.Ansible.Exec(pb)
 }
 
 // KubesprayUpgrade function calls an Ansible playbook that upgrades Kubernetes
@@ -119,16 +102,16 @@ func (e *kubespray) KubesprayUpgrade() error {
 	}
 
 	pb := ansible.Playbook{
-		PlaybookFile: filepath.Join(e.ClusterPath, "ansible/kubespray/upgrade-cluster.yml"),
-		Inventory:    filepath.Join(e.ClusterPath, "config/nodes.yaml"),
-		Become:       true,
-		User:         e.SshUser,
-		PrivateKey:   e.SshPKey,
-		Timeout:      3000,
-		ExtraVars:    vars,
+		Path:       filepath.Join(e.ClusterPath, "ansible/kubespray/upgrade-cluster.yml"),
+		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
+		Become:     true,
+		User:       e.SshUser,
+		PrivateKey: e.SshPKey,
+		Timeout:    3000,
+		ExtraVars:  vars,
 	}
 
-	return e.play(e.Venvs.KUBESPRAY, pb)
+	return e.Ansible.Exec(pb)
 }
 
 // KubesprayScale function calls an Ansible playbook that configures virtual machines
@@ -139,16 +122,16 @@ func (e *kubespray) KubesprayScale() error {
 	}
 
 	pb := ansible.Playbook{
-		PlaybookFile: filepath.Join(e.ClusterPath, "ansible/kubespray/scale.yml"),
-		Inventory:    filepath.Join(e.ClusterPath, "config/nodes.yaml"),
-		Become:       true,
-		User:         e.SshUser,
-		PrivateKey:   e.SshPKey,
-		Timeout:      3000,
-		ExtraVars:    vars,
+		Path:       filepath.Join(e.ClusterPath, "ansible/kubespray/scale.yml"),
+		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
+		Become:     true,
+		User:       e.SshUser,
+		PrivateKey: e.SshPKey,
+		Timeout:    3000,
+		ExtraVars:  vars,
 	}
 
-	return e.play(e.Venvs.KUBESPRAY, pb)
+	return e.Ansible.Exec(pb)
 }
 
 // KubesprayRemoveNodes function calls an Ansible playbook that removes the nodes with
@@ -161,14 +144,14 @@ func (e *kubespray) KubesprayRemoveNodes(removedNodeNames []string) error {
 	}
 
 	pb := ansible.Playbook{
-		PlaybookFile: filepath.Join(e.ClusterPath, "ansible/kubespray/remove-node.yml"),
-		Inventory:    filepath.Join(e.ClusterPath, "config/nodes.yaml"),
-		Become:       true,
-		User:         e.SshUser,
-		PrivateKey:   e.SshPKey,
-		Timeout:      3000,
-		ExtraVars:    vars,
+		Path:       filepath.Join(e.ClusterPath, "ansible/kubespray/remove-node.yml"),
+		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
+		Become:     true,
+		User:       e.SshUser,
+		PrivateKey: e.SshPKey,
+		Timeout:    3000,
+		ExtraVars:  vars,
 	}
 
-	return e.play(e.Venvs.KUBESPRAY, pb)
+	return e.Ansible.Exec(pb)
 }

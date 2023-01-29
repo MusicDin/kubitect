@@ -47,9 +47,9 @@ func (c *Cluster) Apply(a string) error {
 	}
 
 	if c.AppliedConfig == nil && (action == SCALE || action == UPGRADE) {
-		c.Ui().Printf(ui.INFO, "Cannot %s cluster '%s'. It has not been created yet.\n\n", action, c.Name)
+		ui.Printf(ui.INFO, "Cannot %s cluster '%s'. It has not been created yet.\n\n", action, c.Name)
 
-		err := c.Ui().Ask("Would you like to create it instead?")
+		err := ui.Ask("Would you like to create it instead?")
 
 		if err != nil {
 			return err
@@ -68,7 +68,7 @@ func (c *Cluster) Apply(a string) error {
 		}
 
 		if len(events) == 0 {
-			c.Ui().Println(ui.INFO, "No changes detected.")
+			ui.Println(ui.INFO, "No changes detected.")
 			return nil
 		}
 	}
@@ -162,18 +162,12 @@ func (c *Cluster) prepare() error {
 		err = copyReqFiles(srcDir, dstDir)
 	} else {
 		srcDir = filepath.Join(dstDir, "tmp")
+		proj := git.NewGitProject(c.KubitectURL(), c.KubitectVersion())
 
-		proj := git.GitProject{
-			Url:     c.KubitectURL(),
-			Version: c.KubitectVersion(),
-			Path:    srcDir,
-			Ui:      c.Ui(),
-		}
+		ui.Printf(ui.DEBUG, "kubitect.url: %s\n", proj.Url())
+		ui.Printf(ui.DEBUG, "kubitect.version: %s\n", proj.Version())
 
-		c.Ui().Printf(ui.DEBUG, "kubitect.url: %s\n", proj.Url)
-		c.Ui().Printf(ui.DEBUG, "kubitect.version: %s\n", proj.Version)
-
-		err = cloneAndCopyReqFiles(proj, c.Path)
+		err = cloneAndCopyReqFiles(proj, srcDir, c.Path)
 	}
 
 	if err == nil {
@@ -186,7 +180,7 @@ func (c *Cluster) prepare() error {
 		return err
 	}
 
-	c.Ui().PrintBlockE(e)
+	ui.PrintBlockE(e)
 
 	if srcDir == c.WorkingDir() {
 		return fmt.Errorf("current (working) directory is missing some required files\n\nAre you sure you are in the right directory?")
@@ -204,7 +198,7 @@ func (c *Cluster) generateMissingSshKeys() error {
 		return nil
 	}
 
-	c.Ui().Print(ui.INFO, "Generating new SSH keys...")
+	ui.Print(ui.INFO, "Generating new SSH keys...")
 
 	kp, err := keygen.NewKeyPair(4096)
 	if err != nil {
@@ -219,20 +213,20 @@ func (c *Cluster) generateMissingSshKeys() error {
 // cloneAndCopyReqFiles first clones a project using git and then
 // copies project required files from the cloned directory to the
 // destination directory.
-func cloneAndCopyReqFiles(git git.GitProject, dstDir string) error {
-	if err := os.RemoveAll(git.Path); err != nil {
+func cloneAndCopyReqFiles(proj git.GitProject, tmpDir, dstDir string) error {
+	if err := os.RemoveAll(tmpDir); err != nil {
 		return err
 	}
 
-	if err := git.Clone(); err != nil {
+	if err := proj.Clone(tmpDir); err != nil {
 		return err
 	}
 
-	if err := copyReqFiles(git.Path, dstDir); err != nil {
+	if err := copyReqFiles(tmpDir, dstDir); err != nil {
 		return err
 	}
 
-	return os.RemoveAll(git.Path)
+	return os.RemoveAll(tmpDir)
 }
 
 // copyReqFiles copies project required files from source directory

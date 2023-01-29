@@ -41,7 +41,7 @@ func (cs MetaClusters) CountByName(name string) int {
 
 // AllClusters returns list of clusters meta from both global (project)
 // and local clusters directory (if working directory is a Kubitect project).
-func AllClusters(c *GlobalContext) (MetaClusters, error) {
+func AllClusters(c *AppContext) (MetaClusters, error) {
 	cs, err := clusters(c, false)
 
 	if err != nil {
@@ -59,7 +59,7 @@ func AllClusters(c *GlobalContext) (MetaClusters, error) {
 
 // clusters returns list of clusters meta located in either global (project)
 // or local clusters directory.
-func clusters(c *GlobalContext, local bool) (MetaClusters, error) {
+func clusters(c *AppContext, local bool) (MetaClusters, error) {
 	var path string
 
 	if local {

@@ -1,6 +1,9 @@
 package ui
 
-import "strings"
+import (
+	"cli/ui/streams"
+	"strings"
+)
 
 // format formats given string into multiple lines that fit the
 // width (columns) of the output stream.
@@ -8,7 +11,7 @@ import "strings"
 // string be printed from.
 //
 // It returns formatted lines and index of the current column.
-func Format(o *OutputStream, str string, indent, startAt int) (Lines, int) {
+func Format(o streams.OutputStream, str string, indent, startAt int) (Lines, int) {
 	if o == nil || !o.IsTerminal() {
 		lines := strings.Split(str, "\n")
 
@@ -23,10 +26,6 @@ func Format(o *OutputStream, str string, indent, startAt int) (Lines, int) {
 	var pivot int
 
 	width := o.Columns()
-
-	if width <= indent {
-		width = defaultColumns
-	}
 
 	for _, line := range strings.Split(str, "\n") {
 		var ls []string

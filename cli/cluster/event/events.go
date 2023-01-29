@@ -64,7 +64,7 @@ type Events []Event
 
 // Blocking returns events of type BLOCK.
 func (es Events) Blocking() Events {
-	return es.OfType(WARN)
+	return es.OfType(BLOCK)
 }
 
 // Warns returns events of type WARN.

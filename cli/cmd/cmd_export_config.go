@@ -21,7 +21,7 @@ var (
 type ExportConfigOptions struct {
 	ClusterName string
 
-	GenericOptions
+	AppOptions
 }
 
 func NewExportConfigCmd() *cobra.Command {
@@ -45,7 +45,7 @@ func NewExportConfigCmd() *cobra.Command {
 	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		var names []string
 
-		clusters, err := AllClusters(opts.GlobalContext())
+		clusters, err := AllClusters(opts.AppContext())
 
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp
@@ -64,7 +64,7 @@ func NewExportConfigCmd() *cobra.Command {
 }
 
 func (o *ExportConfigOptions) Run() error {
-	cs, err := AllClusters(o.GlobalContext())
+	cs, err := AllClusters(o.AppContext())
 
 	c := cs.FindByName(o.ClusterName)
 

@@ -4,15 +4,11 @@ import (
 	"cli/cluster/event"
 	"cli/cluster/executors"
 	"cli/config/modelconfig"
+	"cli/tools/ansible"
 	"cli/tools/virtualenv"
-	"cli/ui"
 	"fmt"
+	"path"
 )
-
-type VirtualEnvironments struct {
-	MAIN      *virtualenv.VirtualEnv
-	KUBESPRAY *virtualenv.VirtualEnv
-}
 
 type kubespray struct {
 	ClusterName string
@@ -20,32 +16,36 @@ type kubespray struct {
 	K8sVersion  string
 	SshUser     string
 	SshPKey     string
-
-	Venvs VirtualEnvironments
-
-	Ui *ui.Ui
+	Ansible     ansible.Ansible
 }
 
-func NewKubespray(
+func NewKubesprayExecutor(
 	clusterName string,
 	clusterPath string,
 	k8sVersion string,
 	sshUser string,
 	sshPKey string,
+	virtualEnv virtualenv.VirtualEnv,
+) (
+	executors.Executor,
+	error,
+) {
+	err := virtualEnv.Init()
+	if err != nil {
+		return nil, fmt.Errorf("kubespray exec: initialize virtual environment: %v", err)
+	}
 
-	venvs VirtualEnvironments,
+	ansibleBinDir := path.Join(virtualEnv.Path(), "bin")
+	ansible := ansible.NewAnsible(ansibleBinDir)
 
-	Ui *ui.Ui,
-) executors.Executor {
 	return &kubespray{
 		ClusterName: clusterName,
 		ClusterPath: clusterPath,
 		K8sVersion:  k8sVersion,
 		SshUser:     sshUser,
 		SshPKey:     sshPKey,
-		Venvs:       venvs,
-		Ui:          Ui,
-	}
+		Ansible:     ansible,
+	}, nil
 }
 
 func (e *kubespray) Init() error {
@@ -120,13 +120,8 @@ func (e *kubespray) ScaleDown(events event.Events) error {
 	}
 
 	rmNodes, err := extractRemovedNodes(events)
-
-	if err != nil {
+	if err != nil || len(rmNodes) == 0 {
 		return err
-	}
-
-	if len(rmNodes) == 0 {
-		return nil
 	}
 
 	var names []string

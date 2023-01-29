@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-type GlobalContext struct {
+type AppContext struct {
 	workingDir string
 	homeDir    string
 	local      bool
@@ -14,34 +14,34 @@ type GlobalContext struct {
 	ui         *ui.Ui
 }
 
-func (c *GlobalContext) Local() bool {
+func (c *AppContext) Local() bool {
 	return c.local
 }
 
-func (c *GlobalContext) ShowTerraformPlan() bool {
+func (c *AppContext) ShowTerraformPlan() bool {
 	return c.showTfPlan
 }
 
-func (c *GlobalContext) WorkingDir() string {
+func (c *AppContext) WorkingDir() string {
 	return c.workingDir
 }
 
-func (c *GlobalContext) HomeDir() string {
+func (c *AppContext) HomeDir() string {
 	return c.homeDir
 }
 
-func (c *GlobalContext) ShareDir() string {
+func (c *AppContext) ShareDir() string {
 	return path.Join(c.homeDir, DefaultShareDir)
 }
 
-func (c *GlobalContext) ClustersDir() string {
+func (c *AppContext) ClustersDir() string {
 	return filepath.Join(c.homeDir, DefaultClustersDir)
 }
 
-func (c *GlobalContext) LocalClustersDir() string {
+func (c *AppContext) LocalClustersDir() string {
 	return filepath.Join(c.workingDir, DefaultHomeDir, DefaultClustersDir)
 }
 
-func (c *GlobalContext) Ui() *ui.Ui {
+func (c *AppContext) Ui() *ui.Ui {
 	return c.ui
 }

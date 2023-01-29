@@ -4,7 +4,6 @@ import (
 	"cli/cluster/executors"
 	"cli/cluster/provisioner"
 	"cli/cluster/provisioner/terraform"
-	"cli/env"
 	"cli/file"
 	"cli/ui"
 	"path/filepath"
@@ -80,16 +79,12 @@ func (c *ClusterMeta) Provisioner() provisioner.Provisioner {
 		return c.prov
 	}
 
-	tfVer := env.ConstTerraformVersion
-
-	c.prov = terraform.NewTerraform(
-		tfVer,
+	c.prov, _ = terraform.NewTerraformProvisioner(
 		c.Path,
-		filepath.Join(c.ShareDir(), "terraform", tfVer),
-		filepath.Join(c.Path, "terraform"),
-		nil,
+		c.ShareDir(),
 		true,
-		c.Ui(),
+		nil,
+		// c.Ui(),
 	)
 
 	return c.prov

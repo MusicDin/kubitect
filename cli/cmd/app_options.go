@@ -13,7 +13,7 @@ const (
 	DefaultClustersDir = "clusters"
 )
 
-type GenericOptions struct {
+type AppOptions struct {
 	// Automatically approve user prompts
 	AutoApprove bool
 
@@ -30,7 +30,7 @@ type GenericOptions struct {
 	ShowTerraformPlan bool
 }
 
-func (o *GenericOptions) GlobalContext() *GlobalContext {
+func (o *AppOptions) AppContext() *AppContext {
 	wd, err := os.Getwd()
 
 	if err != nil {
@@ -56,11 +56,13 @@ func (o *GenericOptions) GlobalContext() *GlobalContext {
 		AutoApprove: o.AutoApprove,
 	}
 
-	return &GlobalContext{
+	// Initialize global ui
+	ui.GlobalUi(uiOpts)
+
+	return &AppContext{
 		homeDir:    hd,
 		workingDir: wd,
 		local:      o.Local,
 		showTfPlan: o.ShowTerraformPlan,
-		ui:         ui.NewUi(uiOpts),
 	}
 }

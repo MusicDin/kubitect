@@ -1,19 +1,30 @@
 package ui
 
-type ErrorBlock struct {
-	BasicBlock
+type (
+	ErrorBlock interface {
+		Block
+		Error() string
+		Severity() Level
+	}
 
-	Severity Level
-}
+	errorBlock struct {
+		block
+		severity Level
+	}
+)
 
-func (e ErrorBlock) Error() string {
+func (e errorBlock) Error() string {
 	return e.Format(nil, Colors.NONE)
 }
 
+func (e errorBlock) Severity() Level {
+	return e.severity
+}
+
 func NewErrorBlock(level Level, content []Content) ErrorBlock {
-	return ErrorBlock{
-		Severity:   level,
-		BasicBlock: BasicBlock{content},
+	return errorBlock{
+		severity: level,
+		block:    block{content},
 	}
 }
 

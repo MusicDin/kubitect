@@ -10,6 +10,7 @@ import (
 	"cli/env"
 	"cli/file"
 	"cli/tools/virtualenv"
+	"cli/ui"
 	"fmt"
 	"path/filepath"
 )
@@ -45,7 +46,7 @@ func NewCluster(ctx ClusterContext, configPath string) (*Cluster, error) {
 	}
 
 	if err := validateConfig(c.NewConfig); err != nil {
-		c.Ui().PrintBlockE(err...)
+		ui.PrintBlockE(err...)
 		return c, fmt.Errorf("Provided configuration file is not valid.")
 	}
 
@@ -73,7 +74,7 @@ func (c *Cluster) Sync() error {
 
 	if c.InfraConfig != nil {
 		if err := validateConfig(c.NewConfig); err != nil {
-			c.Ui().PrintBlockE(err...)
+			ui.PrintBlockE(err...)
 			return fmt.Errorf("Infrastructure file (produced by Terraform) is invalid.")
 		}
 	}
@@ -87,32 +88,23 @@ func (c *Cluster) Executor() executors.Executor {
 		return c.exec
 	}
 
-	venvs := kubespray.VirtualEnvironments{
-		MAIN: &virtualenv.VirtualEnv{
-			Name:             "main",
-			Path:             filepath.Join(c.ShareDir(), "venv", "main", c.KubitectVersion()),
-			RequirementsPath: "ansible/kubitect/requirements.txt",
-			WorkingDir:       c.Path,
-			Ui:               c.Ui(),
-		},
-		KUBESPRAY: &virtualenv.VirtualEnv{
-			Name:             "kubespray",
-			Path:             filepath.Join(c.ShareDir(), "venv", "kubespray", c.KubesprayVersion()),
-			RequirementsPath: "ansible/kubespray/requirements.txt",
-			WorkingDir:       c.Path,
-			Ui:               c.Ui(),
-		},
-	}
+	veName := "venv"
+	vePath := filepath.Join(c.ShareDir(), "venv", "kubespray", c.KubesprayVersion())
+	veReqPath := "ansible/kubespray/requirements.txt"
+	veWorkingDir := c.Path
 
-	return kubespray.NewKubespray(
+	ve := virtualenv.NewVirtualEnv(veName, vePath, veWorkingDir, veReqPath)
+
+	c.exec, _ = kubespray.NewKubesprayExecutor(
 		c.Name,
 		c.Path,
 		string(*c.NewConfig.Kubernetes.Version),
 		string(*c.InfraConfig.Cluster.NodeTemplate.User),
 		string(*c.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath),
-		venvs,
-		c.Ui(),
+		ve,
 	)
+
+	return c.exec
 }
 
 func (c *Cluster) Provisioner() provisioner.Provisioner {
@@ -120,16 +112,11 @@ func (c *Cluster) Provisioner() provisioner.Provisioner {
 		return c.prov
 	}
 
-	tfVer := env.ConstTerraformVersion
-
-	c.prov = terraform.NewTerraform(
-		tfVer,
+	c.prov, _ = terraform.NewTerraformProvisioner(
 		c.Path,
-		filepath.Join(c.ShareDir(), "terraform", tfVer),
-		filepath.Join(c.Path, "terraform"),
-		c.NewConfig.Hosts,
+		c.ShareDir(),
 		true,
-		c.Ui(),
+		c.NewConfig.Hosts,
 	)
 
 	return c.prov
