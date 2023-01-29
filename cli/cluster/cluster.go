@@ -8,9 +8,9 @@ import (
 	"cli/config/modelconfig"
 	"cli/config/modelinfra"
 	"cli/env"
-	"cli/file"
 	"cli/tools/virtualenv"
 	"cli/ui"
+	"cli/utils/file"
 	"fmt"
 	"path/filepath"
 )

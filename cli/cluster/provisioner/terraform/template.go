@@ -2,7 +2,7 @@ package terraform
 
 import (
 	"cli/config/modelconfig"
-	"cli/lib/template"
+	"cli/utils/template"
 	"fmt"
 	"os"
 	"path"

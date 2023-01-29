@@ -2,7 +2,7 @@ package event
 
 import (
 	"cli/config/modelconfig"
-	"cli/lib/cmp"
+	"cli/utils/cmp"
 	"fmt"
 	"reflect"
 	"strings"

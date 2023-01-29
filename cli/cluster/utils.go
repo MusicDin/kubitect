@@ -1,8 +1,8 @@
 package cluster
 
 import (
-	"cli/file"
-	"cli/lib/validation"
+	"cli/utils/file"
+	"cli/utils/validation"
 	"fmt"
 )
 

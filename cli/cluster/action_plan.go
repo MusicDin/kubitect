@@ -2,8 +2,8 @@ package cluster
 
 import (
 	"cli/cluster/event"
-	"cli/lib/cmp"
 	"cli/ui"
+	"cli/utils/cmp"
 	"fmt"
 )
 

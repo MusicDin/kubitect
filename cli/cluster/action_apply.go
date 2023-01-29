@@ -3,10 +3,10 @@ package cluster
 import (
 	"cli/cluster/event"
 	"cli/env"
-	"cli/file"
-	"cli/lib/keygen"
 	"cli/tools/git"
 	"cli/ui"
+	"cli/utils/file"
+	"cli/utils/keygen"
 	"fmt"
 	"os"
 	"path"

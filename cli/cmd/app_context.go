@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"cli/ui"
+	"cli/env"
+	"fmt"
 	"path"
 	"path/filepath"
 )
@@ -11,7 +12,6 @@ type AppContext struct {
 	homeDir    string
 	local      bool
 	showTfPlan bool
-	ui         *ui.Ui
 }
 
 func (c *AppContext) Local() bool {
@@ -42,6 +42,18 @@ func (c *AppContext) LocalClustersDir() string {
 	return filepath.Join(c.workingDir, DefaultHomeDir, DefaultClustersDir)
 }
 
-func (c *AppContext) Ui() *ui.Ui {
-	return c.ui
+func (c *AppContext) VerifyRequirements() error {
+	var missing []string
+
+	for _, app := range env.ProjectRequiredApps {
+		if !AppExists(app) {
+			missing = append(missing, app)
+		}
+	}
+
+	if len(missing) > 0 {
+		return fmt.Errorf("Some requirements are not met: %v", missing)
+	}
+
+	return nil
 }

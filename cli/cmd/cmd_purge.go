@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"cli/file"
 	"cli/ui"
+	"cli/utils/file"
 	"fmt"
 
 	"github.com/spf13/cobra"

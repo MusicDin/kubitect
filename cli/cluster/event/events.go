@@ -1,7 +1,7 @@
 package event
 
 import (
-	"cli/lib/cmp"
+	"cli/utils/cmp"
 )
 
 type EventType string

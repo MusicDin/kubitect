@@ -12,6 +12,13 @@ const (
 	ConstTerraformVersion = "1.3.7"
 )
 
+// Defines applications that Kubitect depends on.
+var ProjectRequiredApps = []string{
+	"virtualenv",
+	"python3",
+	"git",
+}
+
 // Defines required files/directories that are copied from tmp git project.
 var ProjectRequiredFiles = [...]string{
 	"ansible/",

@@ -1,6 +1,6 @@
 package modelconfig
 
-import v "cli/lib/validation"
+import v "cli/utils/validation"
 
 type Host struct {
 	Name                 *string            `yaml:"name" opt:",id"`

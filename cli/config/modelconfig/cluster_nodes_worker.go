@@ -1,6 +1,6 @@
 package modelconfig
 
-import v "cli/lib/validation"
+import v "cli/utils/validation"
 
 type WorkerDefault struct {
 	CPU          *VCpu   `yaml:"cpu"`

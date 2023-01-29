@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -44,4 +45,10 @@ func EnvVar(key, def string) string {
 	}
 
 	return def
+}
+
+// AppExists returns true if command with a given name is found in PATH.
+func AppExists(cmd string) bool {
+	_, err := exec.LookPath(cmd)
+	return err == nil
 }

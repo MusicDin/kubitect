@@ -1,9 +1,9 @@
 package git
 
 import (
-	"cli/file"
 	"cli/ui"
 	"fmt"
+	"os"
 	"regexp"
 
 	"github.com/go-git/go-git/v5"
@@ -74,7 +74,7 @@ func (g *gitProject) Clone(dstPath string) error {
 		opts.Progress = ui.Streams().Out().File()
 	}
 
-	if err := file.MakeDir(dstPath); err != nil {
+	if err := os.MkdirAll(dstPath, 0700); err != nil {
 		return fmt.Errorf("git clone: %v", err)
 	}
 

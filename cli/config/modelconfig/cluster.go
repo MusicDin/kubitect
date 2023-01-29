@@ -1,6 +1,6 @@
 package modelconfig
 
-import v "cli/lib/validation"
+import v "cli/utils/validation"
 
 type Cluster struct {
 	Name         *string      `yaml:"name"`

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"cli/file"
+	"cli/utils/file"
 	"fmt"
 	"os"
 

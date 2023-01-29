@@ -4,8 +4,7 @@ import (
 	"cli/cluster/executors"
 	"cli/cluster/provisioner"
 	"cli/cluster/provisioner/terraform"
-	"cli/file"
-	"cli/ui"
+	"cli/utils/file"
 	"path/filepath"
 )
 
@@ -31,8 +30,6 @@ type ClusterContext interface {
 
 	Local() bool
 	ShowTerraformPlan() bool
-
-	Ui() *ui.Ui
 }
 
 type ClusterMeta struct {
