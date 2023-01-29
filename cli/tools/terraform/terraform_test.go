@@ -29,12 +29,17 @@ func MockTerraform(t *testing.T) *terraform {
 		version:    env.ConstTerraformVersion,
 		binDir:     binDir,
 		projectDir: projDir,
-		env:        []string{binDir},
 	}
 }
 
-func MockInvalidTerraform(t *testing.T) *terraform {
+func MockMissingTerraform(t *testing.T) *terraform {
 	tf := MockTerraform(t)
+	tf.version = "1.0.0"
+	return tf
+}
+
+func MockInvalidTerraform(t *testing.T) *terraform {
+	tf := MockMissingTerraform(t)
 
 	// Create a file on binDir path
 	tf.binDir = path.Join(tf.projectDir, "invalid")
@@ -50,7 +55,7 @@ func TestNewTerraform(t *testing.T) {
 }
 
 func TestTerraform_Init(t *testing.T) {
-	tf := MockTerraform(t)
+	tf := MockMissingTerraform(t)
 	tfPath := path.Join(tf.binDir, "terraform")
 
 	assert.NoError(t, tf.init())
