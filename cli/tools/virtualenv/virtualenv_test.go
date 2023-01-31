@@ -24,8 +24,7 @@ func MockVirtualEnv(t *testing.T) *virtualEnv {
 	tmpDir := t.TempDir()
 
 	return &virtualEnv{
-		name:             "mock",
-		path:             tmpDir + "env",
+		path:             path.Join(tmpDir, "env"),
 		workingDir:       tmpDir,
 		requirementsPath: MockReqFile(t),
 	}
@@ -37,6 +36,7 @@ func TestCreate(t *testing.T) {
 	env := MockVirtualEnv(t)
 
 	assert.NoError(t, env.create())
+	assert.Equal(t, "env", path.Base(env.Path()))
 }
 
 func TestInstallPipReq(t *testing.T) {
@@ -50,7 +50,7 @@ func TestInstallPipReq(t *testing.T) {
 
 func TestInit(t *testing.T) {
 	tmpDir := t.TempDir()
-	env := NewVirtualEnv("test", tmpDir, tmpDir, MockReqFile(t))
+	env := NewVirtualEnv(tmpDir, tmpDir, MockReqFile(t))
 
 	assert.NoError(t, env.Init())
 	assert.NoError(t, env.Init()) // Instant, since environment already exists
@@ -58,14 +58,14 @@ func TestInit(t *testing.T) {
 
 func TestInit_InvalidReqPath(t *testing.T) {
 	tmpDir := t.TempDir()
-	env := NewVirtualEnv("test", tmpDir, tmpDir, "")
+	env := NewVirtualEnv(tmpDir, tmpDir, "")
 
 	assert.ErrorContains(t, env.Init(), "failed to install pip3 requirements:")
 }
 
 func TestInit_InvalidWorkingDir(t *testing.T) {
 	tmpDir := t.TempDir()
-	env := NewVirtualEnv("test", tmpDir, tmpDir+"invalid", "")
+	env := NewVirtualEnv(tmpDir, tmpDir+"invalid", "")
 
 	assert.ErrorContains(t, env.Init(), "failed to create virtual environment:")
 }

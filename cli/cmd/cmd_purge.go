@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cli/app"
 	"cli/ui"
 	"cli/utils/file"
 	"fmt"
@@ -22,7 +23,7 @@ var (
 type PurgeOptions struct {
 	ClusterName string
 
-	AppOptions
+	app.AppContextOptions
 }
 
 func NewPurgeCmd() *cobra.Command {

@@ -14,7 +14,6 @@ type (
 	}
 
 	virtualEnv struct {
-		name             string
 		path             string
 		workingDir       string
 		requirementsPath string
@@ -22,9 +21,8 @@ type (
 	}
 )
 
-func NewVirtualEnv(name, path, workingDir, reqPath string) VirtualEnv {
+func NewVirtualEnv(path, workingDir, reqPath string) VirtualEnv {
 	return &virtualEnv{
-		name:             name,
 		path:             path,
 		workingDir:       workingDir,
 		requirementsPath: reqPath,
@@ -42,8 +40,7 @@ func (e *virtualEnv) Init() error {
 		return nil
 	}
 
-	ui.Printf(ui.INFO, "Setting up '%s' virtual environment...\n", e.name)
-	ui.Println(ui.INFO, "Creating virtual environment...")
+	ui.Println(ui.INFO, "Setting up virtual environment...")
 
 	if err := e.create(); err != nil {
 		return err

@@ -8,6 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewGit(t *testing.T) {
+	p := NewGitProject(env.ConstProjectUrl, env.ConstProjectVersion)
+	assert.Equal(t, env.ConstProjectUrl, p.Url())
+	assert.Equal(t, env.ConstProjectVersion, p.Version())
+}
+
 func TestClone_Branch(t *testing.T) {
 	u := ui.MockGlobalUi(t)
 	p := NewGitProject(env.ConstProjectUrl, "master")

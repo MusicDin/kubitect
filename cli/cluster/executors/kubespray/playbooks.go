@@ -51,8 +51,8 @@ func (e *kubespray) KubitectFinalize() error {
 		Path:       filepath.Join(e.ClusterPath, "ansible/kubitect/finalize.yaml"),
 		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
 		Become:     true,
-		User:       e.SshUser,
-		PrivateKey: e.SshPKey,
+		User:       e.SshUser(),
+		PrivateKey: e.SshPKey(),
 		Timeout:    3000,
 	}
 
@@ -66,8 +66,8 @@ func (e *kubespray) HAProxy() error {
 		Path:       filepath.Join(e.ClusterPath, "ansible/kubitect/haproxy.yaml"),
 		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
 		Become:     true,
-		User:       e.SshUser,
-		PrivateKey: e.SshPKey,
+		User:       e.SshUser(),
+		PrivateKey: e.SshPKey(),
 		Timeout:    3000,
 	}
 
@@ -78,15 +78,15 @@ func (e *kubespray) HAProxy() error {
 // cluster.
 func (e *kubespray) KubesprayCreate() error {
 	vars := []string{
-		"kube_version=" + e.K8sVersion,
+		"kube_version=" + e.K8sVersion(),
 	}
 
 	pb := ansible.Playbook{
 		Path:       filepath.Join(e.ClusterPath, "ansible/kubespray/cluster.yml"),
 		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
 		Become:     true,
-		User:       e.SshUser,
-		PrivateKey: e.SshPKey,
+		User:       e.SshUser(),
+		PrivateKey: e.SshPKey(),
 		Timeout:    3000,
 		ExtraVars:  vars,
 	}
@@ -98,15 +98,15 @@ func (e *kubespray) KubesprayCreate() error {
 // nodes to a newer version.
 func (e *kubespray) KubesprayUpgrade() error {
 	vars := []string{
-		"kube_version=" + e.K8sVersion,
+		"kube_version=" + e.K8sVersion(),
 	}
 
 	pb := ansible.Playbook{
 		Path:       filepath.Join(e.ClusterPath, "ansible/kubespray/upgrade-cluster.yml"),
 		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
 		Become:     true,
-		User:       e.SshUser,
-		PrivateKey: e.SshPKey,
+		User:       e.SshUser(),
+		PrivateKey: e.SshPKey(),
 		Timeout:    3000,
 		ExtraVars:  vars,
 	}
@@ -118,15 +118,15 @@ func (e *kubespray) KubesprayUpgrade() error {
 // that are freshly added to the cluster.
 func (e *kubespray) KubesprayScale() error {
 	vars := []string{
-		"kube_version=" + e.K8sVersion,
+		"kube_version=" + e.K8sVersion(),
 	}
 
 	pb := ansible.Playbook{
 		Path:       filepath.Join(e.ClusterPath, "ansible/kubespray/scale.yml"),
 		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
 		Become:     true,
-		User:       e.SshUser,
-		PrivateKey: e.SshPKey,
+		User:       e.SshUser(),
+		PrivateKey: e.SshPKey(),
 		Timeout:    3000,
 		ExtraVars:  vars,
 	}
@@ -147,8 +147,8 @@ func (e *kubespray) KubesprayRemoveNodes(removedNodeNames []string) error {
 		Path:       filepath.Join(e.ClusterPath, "ansible/kubespray/remove-node.yml"),
 		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
 		Become:     true,
-		User:       e.SshUser,
-		PrivateKey: e.SshPKey,
+		User:       e.SshUser(),
+		PrivateKey: e.SshPKey(),
 		Timeout:    3000,
 		ExtraVars:  vars,
 	}

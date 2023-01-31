@@ -70,22 +70,6 @@ func MockRemoteHost(t *testing.T, name string, def bool, verify bool) modelconfi
 	return host
 }
 
-func TestNewTerraformProvisioner(t *testing.T) {
-	hosts := []modelconfig.Host{
-		MockLocalHost(t, "test1", false),
-		MockLocalHost(t, "test2", true),
-		MockRemoteHost(t, "test3", false, false),
-	}
-
-	_, err := NewTerraformProvisioner(clsPath(t), "shared/path", true, hosts)
-	assert.NoError(t, err)
-}
-
-func TestNewTerraformProvisioner_InvalidHosts(t *testing.T) {
-	_, err := NewTerraformProvisioner(clsPath(t), "shared/path", true, nil)
-	assert.ErrorContains(t, err, "hosts list is empty")
-}
-
 func TestHostUri_Empty(t *testing.T) {
 	uri, err := hostUri(modelconfig.Host{})
 	assert.NoError(t, err)
@@ -121,6 +105,8 @@ func TestHostUri_Remote_Verify(t *testing.T) {
 }
 
 func TestHostUri_NoHomeVar(t *testing.T) {
+	home := os.Getenv("HOME")
+	defer func() { os.Setenv("HOME", home) }()
 	assert.NoError(t, os.Setenv("HOME", ""))
 
 	h := MockRemoteHost(t, "remote", false, false)

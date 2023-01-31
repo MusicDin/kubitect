@@ -5,6 +5,7 @@ import (
 	"cli/env"
 	"cli/tools/git"
 	"cli/ui"
+	"cli/utils/cmp"
 	"cli/utils/file"
 	"cli/utils/keygen"
 	"fmt"
@@ -26,6 +27,20 @@ func (a ApplyAction) String() string {
 	return string(a)
 }
 
+// events returns events of the corresponding action.
+func (a ApplyAction) events() event.Events {
+	switch a {
+	case CREATE:
+		return event.ModifyEvents
+	case SCALE:
+		return event.ScaleEvents
+	case UPGRADE:
+		return event.UpgradeEvents
+	default:
+		return nil
+	}
+}
+
 func ToApplyActionType(a string) (ApplyAction, error) {
 	switch a {
 	case CREATE.String(), "":
@@ -39,6 +54,8 @@ func ToApplyActionType(a string) (ApplyAction, error) {
 	}
 }
 
+// Apply either creates new or modifies an existing cluster, based on the
+// provided action.
 func (c *Cluster) Apply(a string) error {
 	action, err := ToApplyActionType(a)
 
@@ -93,10 +110,59 @@ func (c *Cluster) Apply(a string) error {
 	return c.ApplyNewConfig()
 }
 
+// plan compares new and applied configuration files, and detects
+// events based on the apply action.
+//
+// If applied configuration file does not exist, no events and no
+// error is returned.
+// If blocking changes are detected, an error is returned.
+// If warnings are detected, user is asked for permission to continue.
+func (c *Cluster) plan(action ApplyAction) (event.Events, error) {
+	if c.AppliedConfig == nil {
+		return nil, nil
+	}
+
+	comp := cmp.NewComparator()
+	comp.Tag = "opt"
+	comp.ExtraNameTags = []string{"yaml"}
+	comp.IgnoreEmptyChanges = true
+	comp.PopulateStructNodes = true
+
+	diff, err := comp.Compare(c.AppliedConfig, c.NewConfig)
+
+	if err != nil || len(diff.Changes()) == 0 {
+		return nil, err
+	}
+
+	fmt.Printf("Following changes have been detected:\n\n")
+	fmt.Println(diff.ToYamlDiff())
+
+	events := event.TriggerEvents(diff, action.events())
+	blocking := events.Blocking()
+
+	if len(blocking) > 0 {
+		ui.PrintBlockE(blocking.Errors()...)
+		return nil, fmt.Errorf("Aborted. Configuration file contains errors.")
+	}
+
+	warnings := events.Warns()
+
+	if len(warnings) > 0 {
+		ui.PrintBlockE(warnings.Errors()...)
+		fmt.Println("Above warnings indicate potentially destructive actions.")
+	}
+
+	return events, ui.Ask()
+}
+
 // create creates a new cluster or modifies the current
 // one if the cluster already exists.
 func (c *Cluster) create() error {
 	if err := c.generateMissingSshKeys(); err != nil {
+		return err
+	}
+
+	if err := c.Provisioner().Init(); err != nil {
 		return err
 	}
 
@@ -117,6 +183,10 @@ func (c *Cluster) create() error {
 
 // upgrade upgrades an existing cluster.
 func (c *Cluster) upgrade() error {
+	if err := c.Provisioner().Init(); err != nil {
+		return err
+	}
+
 	if err := c.Provisioner().Apply(); err != nil {
 		return err
 	}
@@ -135,6 +205,10 @@ func (c *Cluster) upgrade() error {
 // scale scales an existing cluster.
 func (c *Cluster) scale(events event.Events) error {
 	if err := c.Executor().ScaleDown(events); err != nil {
+		return err
+	}
+
+	if err := c.Provisioner().Init(); err != nil {
 		return err
 	}
 
@@ -161,39 +235,32 @@ func (c *Cluster) prepare() error {
 	if c.Local {
 		err = copyReqFiles(srcDir, dstDir)
 	} else {
-		srcDir = filepath.Join(dstDir, "tmp")
+		tmpDir := filepath.Join(dstDir, "tmp")
 		proj := git.NewGitProject(c.KubitectURL(), c.KubitectVersion())
 
 		ui.Printf(ui.DEBUG, "kubitect.url: %s\n", proj.Url())
 		ui.Printf(ui.DEBUG, "kubitect.version: %s\n", proj.Version())
 
-		err = cloneAndCopyReqFiles(proj, srcDir, c.Path)
+		err = cloneAndCopyReqFiles(proj, tmpDir, c.Path)
 	}
 
-	if err == nil {
-		return c.StoreNewConfig()
+	if err != nil {
+		e, ok := err.(ui.ErrorBlock)
+		if !ok {
+			return err
+		}
+
+		ui.PrintBlockE(e)
+		return fmt.Errorf("cluster directory (%s) is missing some required files", srcDir)
 	}
 
-	e, ok := err.(ui.ErrorBlock)
-
-	if !ok {
-		return err
-	}
-
-	ui.PrintBlockE(e)
-
-	if srcDir == c.WorkingDir() {
-		return fmt.Errorf("current (working) directory is missing some required files\n\nAre you sure you are in the right directory?")
-	}
-
-	return fmt.Errorf("cluster directory (%s) is missing some required files", srcDir)
+	return c.StoreNewConfig()
 }
 
 // generateMissingSshKeys generates SSH keys if the user has not
-// specified a path to existing keys.
+// specified a path to an existing key pair.
 func (c *Cluster) generateMissingSshKeys() error {
 	sshKeysPath := c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath
-
 	if sshKeysPath != nil {
 		return nil
 	}

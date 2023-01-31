@@ -1,11 +1,15 @@
 package terraform
 
 import (
+	"cli/cluster/provisioner"
+	"cli/config/modelconfig"
+	"cli/env"
 	"cli/ui"
 	"context"
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"syscall"
 
 	"github.com/hashicorp/go-version"
@@ -15,12 +19,6 @@ import (
 )
 
 type (
-	Terraform interface {
-		Plan() (exitCode bool, err error)
-		Apply() error
-		Destroy() error
-	}
-
 	terraform struct {
 		// Required Terraform version
 		version string
@@ -38,26 +36,37 @@ type (
 		// If true, Terraform plan will be shown.
 		showPlan bool
 
+		// Configuration file containing values required for
+		// main.tf template
+		cfg *modelconfig.Config
+
 		// Indicates that terraform project has
 		// been already initialized.
 		initialized bool
 	}
 )
 
-func NewTerraform(
-	version,
-	// clusterPath,
-	binDir,
-	workingDir string,
-	// hosts []modelconfig.Host,
+func NewTerraformProvisioner(
+	clusterPath,
+	sharedPath string,
 	showPlan bool,
-) Terraform {
+	cfg *modelconfig.Config,
+) provisioner.Provisioner {
+	version := env.ConstTerraformVersion
+	binDir := path.Join(sharedPath, "terraform", version)
+	projDir := path.Join(clusterPath, "terraform")
+
 	return &terraform{
 		version:    version,
 		binDir:     binDir,
-		projectDir: workingDir,
+		projectDir: projDir,
 		showPlan:   showPlan,
+		cfg:        cfg,
 	}
+}
+
+func (t *terraform) Init() error {
+	return NewMainTemplate(t.projectDir, t.cfg.Hosts).Write()
 }
 
 // init initializes a Terraform project.

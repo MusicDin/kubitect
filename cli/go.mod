@@ -6,6 +6,7 @@ require (
 	github.com/apenella/go-ansible v1.1.5
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-playground/validator/v10 v10.11.1
+	github.com/golang/mock v1.3.1
 	github.com/hashicorp/hc-install v0.3.2
 	github.com/otiai10/copy v1.7.0
 	github.com/spf13/cobra v1.6.1

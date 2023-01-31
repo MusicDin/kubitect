@@ -2,6 +2,7 @@ package file
 
 import (
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -113,27 +114,20 @@ func Remove(path string) error {
 // ReadYaml reads yaml file on the given path and unmarshals it into the given type.
 func ReadYaml[T interface{}](path string, typ T) (*T, error) {
 	yml, err := Read(path)
-
 	if err != nil {
 		return nil, err
 	}
 
-	return UnmarshalYaml(string(yml), typ)
+	err = yaml.Unmarshal([]byte(yml), &typ)
+	return &typ, err
 }
 
-// UnmarshalYaml unmarshals yaml string to a given type.
-func UnmarshalYaml[T interface{}](yml string, typ T) (*T, error) {
-	err := yaml.Unmarshal([]byte(yml), &typ)
-
+// WriteYaml writes a given object as a yaml file to the given path.
+func WriteYaml(obj interface{}, path string, perm fs.FileMode) error {
+	yml, err := yaml.Marshal(obj)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &typ, nil
-}
-
-// MarshalYaml marshals given object into a string.
-func MarshalYaml(value interface{}) (string, error) {
-	yaml, err := yaml.Marshal(value)
-	return string(yaml), err
+	return ioutil.WriteFile(path, []byte(yml), perm)
 }

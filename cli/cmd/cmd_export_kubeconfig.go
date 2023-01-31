@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cli/app"
 	"cli/utils/file"
 	"fmt"
 	"os"
@@ -24,7 +25,7 @@ var (
 type ExportKcOptions struct {
 	ClusterName string
 
-	AppOptions
+	app.AppContextOptions
 }
 
 func NewExportKcCmd() *cobra.Command {

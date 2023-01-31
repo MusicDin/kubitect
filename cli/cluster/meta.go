@@ -43,6 +43,26 @@ type ClusterMeta struct {
 	prov provisioner.Provisioner
 }
 
+// func NewClusterMeta(ctx ClusterContext, clusterPath string) (*ClusterMeta, error) {
+// 	cpStat, err := os.Stat(clusterPath)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("cluster meta: %v", err)
+// 	}
+
+// 	meta := &ClusterMeta{
+// 		ClusterContext: ctx,
+// 		Name:           cpStat.Name(),
+// 		Path:           filepath.Join(clusterPath, cpStat.Name()),
+// 		Local:          ctx.Local(),
+// 	}
+
+// 	// if !cpStat.IsDir() || !meta.ContainsArchiveFile() {
+// 	// 	return nil, fmt.Errorf("cluster meta: %s is not a cluster directory", err)
+// 	// }
+
+// 	return meta, nil
+// }
+
 func (c ClusterMeta) AppliedConfigPath() string {
 	return filepath.Join(c.Path, DefaultConfigDir, DefaultAppliedConfigFilename)
 }
@@ -76,12 +96,11 @@ func (c *ClusterMeta) Provisioner() provisioner.Provisioner {
 		return c.prov
 	}
 
-	c.prov, _ = terraform.NewTerraformProvisioner(
+	c.prov = terraform.NewTerraformProvisioner(
 		c.Path,
 		c.ShareDir(),
-		true,
+		c.ShowTerraformPlan(),
 		nil,
-		// c.Ui(),
 	)
 
 	return c.prov

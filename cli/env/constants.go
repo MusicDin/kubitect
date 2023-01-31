@@ -20,7 +20,7 @@ var ProjectRequiredApps = []string{
 }
 
 // Defines required files/directories that are copied from tmp git project.
-var ProjectRequiredFiles = [...]string{
+var ProjectRequiredFiles = []string{
 	"ansible/",
 	"resources/",
 	"terraform/modules/",

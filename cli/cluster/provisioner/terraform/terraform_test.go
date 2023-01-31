@@ -1,6 +1,7 @@
 package terraform
 
 import (
+	"cli/config/modelconfig"
 	"cli/env"
 	"cli/ui"
 	"io/ioutil"
@@ -49,12 +50,27 @@ func MockInvalidTerraform(t *testing.T) *terraform {
 	return tf
 }
 
-func TestNewTerraform(t *testing.T) {
-	tf := NewTerraform("v1.0.0", "/tmp", "/tmp", true)
-	assert.NotNil(t, tf)
+func TestNewTerraformProvisioner(t *testing.T) {
+	hosts := []modelconfig.Host{
+		MockLocalHost(t, "test1", false),
+		MockLocalHost(t, "test2", true),
+		MockRemoteHost(t, "test3", false, false),
+	}
+
+	cfg := modelconfig.Config{Hosts: hosts}
+
+	prov := NewTerraformProvisioner(clsPath(t), "shared/path", true, &cfg)
+	assert.NoError(t, prov.Init())
 }
 
-func TestTerraform_Init(t *testing.T) {
+func TestNewTerraformProvisioner_InvalidHosts(t *testing.T) {
+	cfg := modelconfig.Config{}
+
+	prov := NewTerraformProvisioner(clsPath(t), "shared/path", true, &cfg)
+	assert.ErrorContains(t, prov.Init(), "hosts list is empty")
+}
+
+func TestTerraform_init(t *testing.T) {
 	tf := MockMissingTerraform(t)
 	tfPath := path.Join(tf.binDir, "terraform")
 
@@ -73,7 +89,7 @@ func TestTerraform_Init(t *testing.T) {
 	assert.Equal(t, true, tf.initialized)
 }
 
-func TestTerraform_Init_InvalidBinDir(t *testing.T) {
+func TestTerraform_init_InvalidBinDir(t *testing.T) {
 	tf := MockInvalidTerraform(t)
 	assert.ErrorContains(t, tf.init(), "not a directory")
 }

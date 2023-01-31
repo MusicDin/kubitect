@@ -1,0 +1,18 @@
+package executors
+
+import (
+	"cli/cluster/event"
+	"testing"
+)
+
+type executorMock struct{}
+
+func (m executorMock) Init() error                  { return nil }
+func (m executorMock) Create() error                { return nil }
+func (m executorMock) Upgrade() error               { return nil }
+func (m executorMock) ScaleDown(event.Events) error { return nil }
+func (m executorMock) ScaleUp(event.Events) error   { return nil }
+
+func MockExecutor(t *testing.T) Executor {
+	return executorMock{}
+}

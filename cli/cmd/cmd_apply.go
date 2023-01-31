@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cli/app"
 	"cli/cluster"
 	"cli/env"
 
@@ -29,7 +30,7 @@ type ApplyOptions struct {
 	Config string
 	Action string
 
-	AppOptions
+	app.AppContextOptions
 }
 
 func NewApplyCmd() *cobra.Command {

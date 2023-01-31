@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cli/app"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -19,7 +20,7 @@ var (
 type DestroyOptions struct {
 	ClusterName string
 
-	AppOptions
+	app.AppContextOptions
 }
 
 func NewDestroyCmd() *cobra.Command {

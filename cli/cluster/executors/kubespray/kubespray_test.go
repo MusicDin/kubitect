@@ -4,10 +4,11 @@ import (
 	"cli/cluster/event"
 	"cli/cluster/executors"
 	"cli/config/modelconfig"
+	"cli/config/modelinfra"
 	"cli/tools/ansible"
-	"cli/tools/virtualenv"
 	"cli/utils/cmp"
 	"fmt"
+	"path"
 	"reflect"
 	"testing"
 
@@ -15,67 +16,47 @@ import (
 )
 
 type virtualEnvMock struct{}
+type invalidVirtualEnvMock struct{ virtualEnvMock }
 
-func (e *virtualEnvMock) Init() error {
-	return nil
-}
-
-func (e *virtualEnvMock) Path() string {
-	return ""
-}
-
-func MockVenv(t *testing.T) virtualenv.VirtualEnv {
-	return &virtualEnvMock{}
-}
-
-type invalidVirtualEnvMock struct {
-	virtualEnvMock
-}
-
-func (e *invalidVirtualEnvMock) Init() error {
-	return fmt.Errorf("error")
-}
-
-func MockInvalidVenv(t *testing.T) virtualenv.VirtualEnv {
-	return &invalidVirtualEnvMock{}
-}
+func (e *virtualEnvMock) Init() error        { return nil }
+func (e *virtualEnvMock) Path() string       { return "" }
+func (e *invalidVirtualEnvMock) Init() error { return fmt.Errorf("error") }
 
 type ansibleMock struct{}
-
-func (a *ansibleMock) Exec(ansible.Playbook) error {
-	return nil
-}
-
 type invalidAnsibleMock struct{}
 
-func (a *invalidAnsibleMock) Exec(ansible.Playbook) error {
-	return fmt.Errorf("error")
-}
+func (a *ansibleMock) Exec(ansible.Playbook) error        { return nil }
+func (a *invalidAnsibleMock) Exec(ansible.Playbook) error { return fmt.Errorf("error") }
 
-func MockExecutor(t *testing.T) executors.Executor {
+func MockExecutor(t *testing.T) *kubespray {
 	tmpDir := t.TempDir()
+
+	k8sVersion := modelconfig.Version("v1.2.3")
+	sshUser := modelconfig.User("test")
+	sshPKey := modelconfig.File(path.Join(tmpDir, ".ssh", "id_rsa"))
+
+	cfg := &modelconfig.Config{}
+	cfg.Kubernetes.Version = &k8sVersion
+
+	iCfg := &modelinfra.Config{}
+	iCfg.Cluster.NodeTemplate.User = &sshUser
+	iCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath = &(sshPKey)
 
 	return &kubespray{
 		ClusterName: "mock",
 		ClusterPath: tmpDir,
-		K8sVersion:  "v1.23.0",
-		SshUser:     "test",
-		SshPKey:     tmpDir,
+		Config:      cfg,
+		InfraConfig: iCfg,
+		VirtualEnv:  &virtualEnvMock{},
 		Ansible:     &ansibleMock{},
 	}
 }
 
 func MockInvalidExecutor(t *testing.T) executors.Executor {
-	tmpDir := t.TempDir()
-
-	return &kubespray{
-		ClusterName: "mock",
-		ClusterPath: tmpDir,
-		K8sVersion:  "v1.23.0",
-		SshUser:     "test",
-		SshPKey:     tmpDir,
-		Ansible:     &invalidAnsibleMock{},
-	}
+	ks := MockExecutor(t)
+	ks.VirtualEnv = &invalidVirtualEnvMock{}
+	ks.Ansible = &invalidAnsibleMock{}
+	return ks
 }
 
 func MockEvents(t *testing.T, obj interface{}, eType event.EventType) []event.Event {
@@ -93,25 +74,34 @@ func MockEvents(t *testing.T, obj interface{}, eType event.EventType) []event.Ev
 }
 
 func TestNewExecutor(t *testing.T) {
-	_, err := NewKubesprayExecutor("clsName", "clsPath", "vX.Y.Z", "user", "pk", MockVenv(t))
-	assert.NoError(t, err)
+	e := NewKubesprayExecutor(
+		"clsName",
+		"clsPath",
+		&modelconfig.Config{},
+		&modelinfra.Config{},
+		&virtualEnvMock{},
+	)
+	assert.NotNil(t, e)
 }
 
-func TestNewExecutor_InvalidVenv(t *testing.T) {
-	_, err := NewKubesprayExecutor("clsName", "clsPath", "vX.Y.Z", "user", "pk", MockInvalidVenv(t))
-	assert.EqualError(t, err, "kubespray exec: initialize virtual environment: error")
-}
-
-func TestActions(t *testing.T) {
+func TestInit(t *testing.T) {
 	e := MockExecutor(t)
 	assert.NoError(t, e.Init())
+}
+
+func TestInit_InvalidVenv(t *testing.T) {
+	e := MockInvalidExecutor(t)
+	assert.EqualError(t, e.Init(), "kubespray exec: initialize virtual environment: error")
+}
+
+func TestCreateAndUpgrade(t *testing.T) {
+	e := MockExecutor(t)
 	assert.NoError(t, e.Create())
 	assert.NoError(t, e.Upgrade())
 }
 
-func TestActions_Invalid(t *testing.T) {
+func TestCreateAndUpgrade_Invalid(t *testing.T) {
 	e := MockInvalidExecutor(t)
-	assert.EqualError(t, e.Init(), "error")
 	assert.EqualError(t, e.Create(), "error")
 	assert.EqualError(t, e.Upgrade(), "error")
 }

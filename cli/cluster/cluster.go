@@ -12,6 +12,8 @@ import (
 	"cli/ui"
 	"cli/utils/file"
 	"fmt"
+	"os"
+	"path"
 	"path/filepath"
 )
 
@@ -47,7 +49,7 @@ func NewCluster(ctx ClusterContext, configPath string) (*Cluster, error) {
 
 	if err := validateConfig(c.NewConfig); err != nil {
 		ui.PrintBlockE(err...)
-		return c, fmt.Errorf("Provided configuration file is not valid.")
+		return c, fmt.Errorf("invalid configuration file")
 	}
 
 	c.Name = string(*c.NewConfig.Cluster.Name)
@@ -73,9 +75,9 @@ func (c *Cluster) Sync() error {
 	}
 
 	if c.InfraConfig != nil {
-		if err := validateConfig(c.NewConfig); err != nil {
+		if err := validateConfig(c.InfraConfig); err != nil {
 			ui.PrintBlockE(err...)
-			return fmt.Errorf("Infrastructure file (produced by Terraform) is invalid.")
+			return fmt.Errorf("infrastructure file (produced by Terraform) is invalid")
 		}
 	}
 
@@ -83,24 +85,19 @@ func (c *Cluster) Sync() error {
 }
 
 func (c *Cluster) Executor() executors.Executor {
-
 	if c.exec != nil {
 		return c.exec
 	}
 
-	veName := "venv"
-	vePath := filepath.Join(c.ShareDir(), "venv", "kubespray", c.KubesprayVersion())
 	veReqPath := "ansible/kubespray/requirements.txt"
-	veWorkingDir := c.Path
+	vePath := path.Join(c.ShareDir(), "venv", "kubespray", c.KubesprayVersion())
+	ve := virtualenv.NewVirtualEnv(vePath, c.Path, veReqPath)
 
-	ve := virtualenv.NewVirtualEnv(veName, vePath, veWorkingDir, veReqPath)
-
-	c.exec, _ = kubespray.NewKubesprayExecutor(
+	c.exec = kubespray.NewKubesprayExecutor(
 		c.Name,
 		c.Path,
-		string(*c.NewConfig.Kubernetes.Version),
-		string(*c.InfraConfig.Cluster.NodeTemplate.User),
-		string(*c.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath),
+		c.NewConfig,
+		c.InfraConfig,
 		ve,
 	)
 
@@ -112,11 +109,11 @@ func (c *Cluster) Provisioner() provisioner.Provisioner {
 		return c.prov
 	}
 
-	c.prov, _ = terraform.NewTerraformProvisioner(
+	c.prov = terraform.NewTerraformProvisioner(
 		c.Path,
 		c.ShareDir(),
-		true,
-		c.NewConfig.Hosts,
+		c.ShowTerraformPlan(),
+		c.NewConfig,
 	)
 
 	return c.prov
@@ -124,7 +121,12 @@ func (c *Cluster) Provisioner() provisioner.Provisioner {
 
 // ApplyNewConfig replaces currently applied config with new one.
 func (c *Cluster) ApplyNewConfig() error {
-	return file.ForceCopy(c.NewConfigPath, c.AppliedConfigPath())
+	err := os.MkdirAll(path.Dir(c.AppliedConfigPath()), 0744)
+	if err != nil {
+		return err
+	}
+	// return file.ForceCopy(c.NewConfigPath, c.AppliedConfigPath())
+	return file.WriteYaml(c.NewConfig, c.AppliedConfigPath(), 0644)
 }
 
 // StoreNewConfig makes a copy of the provided (new) configuration file in

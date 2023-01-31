@@ -6,6 +6,9 @@ import (
 	"os"
 )
 
+// Destroy destroys an active cluster. If cluster does not exist
+// or does not contain a terraform state file (is inactive), an
+// error is returned.
 func (c *ClusterMeta) Destroy() error {
 	if !c.ContainsTfStateConfig() {
 		return fmt.Errorf("cluster '%s' is already destroyed (or not yet initialized).", c.Name)

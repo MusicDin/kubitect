@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cli/app"
 	"cli/ui"
 	"strings"
 
@@ -15,7 +16,7 @@ var (
 )
 
 type ListOptions struct {
-	AppOptions
+	app.AppContextOptions
 }
 
 func NewListCmd() *cobra.Command {

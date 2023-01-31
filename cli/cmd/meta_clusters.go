@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cli/app"
 	"cli/cluster"
 	"fmt"
 	"io/ioutil"
@@ -41,14 +42,14 @@ func (cs MetaClusters) CountByName(name string) int {
 
 // AllClusters returns list of clusters meta from both global (project)
 // and local clusters directory (if working directory is a Kubitect project).
-func AllClusters(c *AppContext) (MetaClusters, error) {
-	cs, err := clusters(c, false)
+func AllClusters(ctx app.AppContext) (MetaClusters, error) {
+	cs, err := clusters(ctx, false)
 
 	if err != nil {
 		return nil, err
 	}
 
-	lcs, err := clusters(c, true)
+	lcs, err := clusters(ctx, true)
 
 	if err == nil {
 		cs = append(cs, lcs...)
@@ -59,13 +60,13 @@ func AllClusters(c *AppContext) (MetaClusters, error) {
 
 // clusters returns list of clusters meta located in either global (project)
 // or local clusters directory.
-func clusters(c *AppContext, local bool) (MetaClusters, error) {
+func clusters(ctx app.AppContext, local bool) (MetaClusters, error) {
 	var path string
 
 	if local {
-		path = c.LocalClustersDir()
+		path = ctx.LocalClustersDir()
 	} else {
-		path = c.ClustersDir()
+		path = ctx.ClustersDir()
 	}
 
 	files, err := ioutil.ReadDir(path)
@@ -81,7 +82,7 @@ func clusters(c *AppContext, local bool) (MetaClusters, error) {
 			name := f.Name()
 
 			cs = append(cs, cluster.ClusterMeta{
-				ClusterContext: c,
+				ClusterContext: ctx,
 				Name:           name,
 				Path:           filepath.Join(path, name),
 				Local:          local,
