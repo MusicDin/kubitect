@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"fmt"
+	"cli/app"
+	"cli/ui"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -15,7 +16,7 @@ var (
 )
 
 type ListOptions struct {
-	GenericOptions
+	app.AppContextOptions
 }
 
 func NewListCmd() *cobra.Command {
@@ -35,20 +36,20 @@ func NewListCmd() *cobra.Command {
 }
 
 func (o *ListOptions) Run() error {
-	gc := o.GlobalContext()
+	ac := o.AppContext()
 
-	clusters, err := AllClusters(gc)
+	clusters, err := AllClusters(ac)
 
 	if err != nil {
 		return err
 	}
 
 	if len(clusters) == 0 {
-		fmt.Println("No clusters initialized yet. Run 'kubitect apply' to create the cluster.")
+		ui.Println(ui.INFO, "No clusters initialized yet. Run 'kubitect apply' to create the cluster.")
 		return nil
 	}
 
-	fmt.Println("Clusters:")
+	ui.Println(ui.INFO, "Clusters:")
 
 	for _, c := range clusters {
 		var opt []string
@@ -62,9 +63,9 @@ func (o *ListOptions) Run() error {
 		}
 
 		if len(opt) > 0 {
-			fmt.Printf("  - %s (%s)\n", c.Name, strings.Join(opt, ", "))
+			ui.Printf(ui.INFO, "  - %s (%s)\n", c.Name, strings.Join(opt, ", "))
 		} else {
-			fmt.Printf("  - %s\n", c.Name)
+			ui.Printf(ui.INFO, "  - %s\n", c.Name)
 		}
 	}
 

@@ -14,7 +14,6 @@ func tmpFile(t *testing.T, content string) *os.File {
 	fName := "file"
 
 	f, err := os.CreateTemp(t.TempDir(), fName)
-
 	if err != nil {
 		t.Errorf("failed creating tmp file (%s): %v", fName, err)
 	}
@@ -28,12 +27,12 @@ func tmpPath(t *testing.T) string {
 	return path.Join(t.TempDir(), "tmp")
 }
 
-func TestFile_Exists(t *testing.T) {
+func TestExists(t *testing.T) {
 	assert.False(t, Exists(tmpPath(t)))
 	assert.True(t, Exists(tmpFile(t, "test").Name()))
 }
 
-func TestFile_MakeDir(t *testing.T) {
+func TestMakeDir(t *testing.T) {
 	dir := t.TempDir() + "a/b/c/d/e/f"
 	err := MakeDir(dir)
 
@@ -41,16 +40,15 @@ func TestFile_MakeDir(t *testing.T) {
 	assert.True(t, Exists(dir))
 }
 
-func TestFile_MakeDirFail(t *testing.T) {
+func TestMakeDir_Fail(t *testing.T) {
 	err := MakeDir("")
 	assert.ErrorContains(t, err, ": no such file or directory")
 }
 
-func TestFile_Read(t *testing.T) {
+func TestRead(t *testing.T) {
 	f := tmpFile(t, "test")
 
 	out, err := Read(f.Name())
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -58,14 +56,14 @@ func TestFile_Read(t *testing.T) {
 	assert.Equal(t, "test", out)
 }
 
-func TestFile_ReadFail(t *testing.T) {
+func TestRead_Fail(t *testing.T) {
 	tmp := tmpPath(t)
 
 	_, err := Read(tmp)
 	assert.ErrorContains(t, err, ": no such file or directory")
 }
 
-func TestFile_Copy(t *testing.T) {
+func TestCopy(t *testing.T) {
 	tmp := tmpPath(t)
 	f := tmpFile(t, "test")
 
@@ -74,7 +72,6 @@ func TestFile_Copy(t *testing.T) {
 	}
 
 	out, err := Read(tmp)
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -84,18 +81,18 @@ func TestFile_Copy(t *testing.T) {
 	assert.True(t, Exists(tmp))
 }
 
-func TestFile_CopyFileExists(t *testing.T) {
+func TestCopy_FileExists(t *testing.T) {
 	tmp := tmpFile(t, "wrong")
 	f := tmpFile(t, "test")
 
 	assert.ErrorContains(t, Copy(f.Name(), tmp.Name()), ": destination already exists")
 }
 
-func TestFile_CopyFail(t *testing.T) {
+func TestCopy_Fail(t *testing.T) {
 	assert.ErrorContains(t, Copy("", ""), ": no such file or directory")
 }
 
-func TestFile_ForceCopy(t *testing.T) {
+func TestForceCopy(t *testing.T) {
 	tmp := tmpFile(t, "wrong")
 	f := tmpFile(t, "test")
 
@@ -104,7 +101,6 @@ func TestFile_ForceCopy(t *testing.T) {
 	}
 
 	out, err := Read(tmp.Name())
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -114,11 +110,11 @@ func TestFile_ForceCopy(t *testing.T) {
 	assert.True(t, Exists(tmp.Name()))
 }
 
-func TestFile_ForceCopyFail(t *testing.T) {
+func TestForceCopy_Fail(t *testing.T) {
 	assert.ErrorContains(t, ForceCopy("", ""), ": no such file or directory")
 }
 
-func TestFile_Move(t *testing.T) {
+func TestMove(t *testing.T) {
 	tmp := tmpFile(t, "wrong")
 	f := tmpFile(t, "test")
 
@@ -127,7 +123,6 @@ func TestFile_Move(t *testing.T) {
 	}
 
 	out, err := Read(tmp.Name())
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -137,14 +132,14 @@ func TestFile_Move(t *testing.T) {
 	assert.True(t, Exists(tmp.Name()))
 }
 
-func TestFile_MoveFail(t *testing.T) {
+func TestMove_Fail(t *testing.T) {
 	assert.ErrorContains(t, Move("", ""), ": no such file or directory")
 
 	tmp := t.TempDir() + string(os.PathSeparator) + "."
 	assert.ErrorContains(t, Move("", tmp), ": invalid argument")
 }
 
-func TestFile_Remove(t *testing.T) {
+func TestRemove(t *testing.T) {
 	f := tmpFile(t, "test")
 
 	assert.True(t, Exists(f.Name()))
@@ -156,12 +151,26 @@ func TestFile_Remove(t *testing.T) {
 	assert.False(t, Exists(f.Name()))
 }
 
-func TestFile_RemoveFail(t *testing.T) {
+func TestRemove_Fail(t *testing.T) {
 	tmp := t.TempDir() + string(os.PathSeparator) + "."
 	assert.ErrorContains(t, Remove(tmp), ": invalid argument")
 }
 
-func TestFile_Yaml(t *testing.T) {
+func TestWriteYaml(t *testing.T) {
+	type T struct {
+		Value int `yaml:"value"`
+	}
+
+	fPath := path.Join(t.TempDir(), "file.yaml")
+
+	err := WriteYaml(T{7}, fPath, os.ModePerm)
+	assert.NoError(t, err)
+
+	f, err := Read(fPath)
+	assert.Equal(t, "value: 7\n", f)
+}
+
+func TestReadYaml(t *testing.T) {
 	type T struct {
 		Value int `yaml:"value"`
 	}
@@ -170,28 +179,30 @@ func TestFile_Yaml(t *testing.T) {
 		Test T `yaml:"test"`
 	}
 
-	yaml, err := MarshalYaml(S{T{7}})
+	fPath := path.Join(t.TempDir(), "file.yaml")
 
+	err := WriteYaml(S{T{7}}, fPath, os.ModePerm)
 	assert.NoError(t, err)
-	assert.Equal(t, "test:\n    value: 7\n", yaml)
 
-	f := tmpFile(t, yaml)
-
-	s, err := ReadYaml(f.Name(), S{})
-
-	if err != nil {
-		t.Errorf("failed reading YAML file: %v", err)
-	}
-
+	s, err := ReadYaml(fPath, S{})
+	assert.NoError(t, err, "failed reading YAML file")
 	assert.Equal(t, 7, s.Test.Value)
 }
 
-func TestFile_YamlFail(t *testing.T) {
+func TestReadYaml_InvalidContent(t *testing.T) {
 	type S struct {
 		Value int
 	}
 
 	_, err := ReadYaml(tmpFile(t, "\t").Name(), S{})
-
 	assert.ErrorContains(t, err, "yaml: found character that cannot start any token")
+}
+
+func TestReadYaml_FileNotExist(t *testing.T) {
+	type S struct {
+		Value int
+	}
+
+	_, err := ReadYaml(path.Join(t.TempDir(), "invalid"), S{})
+	assert.ErrorContains(t, err, "no such file or directory")
 }

@@ -1,96 +1,138 @@
 package ui
 
 import (
-	"io/ioutil"
+	"cli/ui/streams"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func MockUi(t *testing.T) *Ui {
+type (
+	UiMock interface {
+		Ui
+
+		WriteStdin(t *testing.T, content string)
+		ReadStdout(t *testing.T) string
+		ReadStderr(t *testing.T) string
+	}
+
+	uiMock struct {
+		*ui
+
+		outOffset int64
+		errOffset int64
+	}
+)
+
+func setUiOptions(ui *uiMock, uiOptions ...UiOptions) *uiMock {
+	var o UiOptions
+
+	if len(uiOptions) > 0 {
+		o = uiOptions[0]
+	}
+
+	ui.autoApprove = o.AutoApprove
+	ui.debug = o.Debug
+	ui.noColor = o.NoColor
+
+	return ui
+}
+
+func MockUi(t *testing.T, uiOptions ...UiOptions) UiMock {
 	t.Helper()
 
-	return &Ui{
-		Streams: &Streams{
-			Out: mockTerminalStream(t, "stdout"),
-			Err: mockTerminalStream(t, "stderr"),
-			In:  mockInputStream(t),
+	mock := uiMock{
+		ui: &ui{
+			streams: streams.MockStreams(t),
 		},
 	}
+
+	return setUiOptions(&mock, uiOptions...)
 }
 
-func mockTerminalStream(t *testing.T, fName string) *OutputStream {
+func MockTerminalUi(t *testing.T, uiOptions ...UiOptions) UiMock {
 	t.Helper()
 
-	isTerm := func(*os.File) bool {
-		return true
+	mock := uiMock{
+		ui: &ui{
+			streams: streams.MockTerminalStreams(t),
+		},
 	}
 
-	cols := func(*os.File) int {
-		return 10
-	}
-
-	return &OutputStream{
-		File:       tmpFile(t, fName),
-		isTerminal: isTerm,
-		columns:    cols,
-	}
+	return setUiOptions(&mock, uiOptions...)
 }
 
-func mockNonTerminalStream(t *testing.T, fName string) *OutputStream {
+func MockGlobalUi(t *testing.T, uiOptions ...UiOptions) UiMock {
 	t.Helper()
 
-	isTerm := func(*os.File) bool {
-		return false
+	mock := uiMock{
+		ui: &ui{
+			streams: streams.MockStreams(t),
+		},
 	}
 
-	cols := func(*os.File) int {
-		return 10
-	}
+	instance = mock.ui
 
-	return &OutputStream{
-		File:       tmpFile(t, fName),
-		isTerminal: isTerm,
-		columns:    cols,
-	}
+	return setUiOptions(&mock, uiOptions...)
 }
 
-func mockInputStream(t *testing.T) *InputStream {
+func MockGlobalTerminalUi(t *testing.T, uiOptions ...UiOptions) UiMock {
 	t.Helper()
 
-	isTerm := func(*os.File) bool {
-		return false
+	instance = &ui{
+		streams: streams.MockTerminalStreams(t),
 	}
 
-	return &InputStream{
-		File:       tmpFile(t, "stdin"),
-		isTerminal: isTerm,
+	mock := uiMock{
+		ui: instance,
 	}
+
+	return setUiOptions(&mock, uiOptions...)
 }
 
-func tmpFile(t *testing.T, name string) *os.File {
+// ReadStderr reads output stream file content since last read.
+func (ui *uiMock) ReadStdout(t *testing.T) string {
 	t.Helper()
 
-	f, err := os.CreateTemp(t.TempDir(), name)
+	f := ui.Streams().Out().File()
+	f.Seek(ui.errOffset, 0)
 
-	if err != nil {
-		t.Errorf("failed creating tmp file (%s): %v", name, err)
-	}
+	bytes, err := os.ReadFile(f.Name())
+	assert.NoError(t, err)
+	f.Seek(0, 1)
 
-	return f
+	ui.errOffset += int64(len(bytes))
+
+	return string(bytes)
 }
 
-func readFile(t *testing.T, f *os.File) string {
+// ReadStderr reads error stream file content since last read.
+func (ui *uiMock) ReadStderr(t *testing.T) string {
 	t.Helper()
 
-	if f == nil {
-		t.Errorf("failed to read nil stream: %v", f.Name())
-	}
+	f := ui.Streams().Err().File()
+	f.Seek(ui.outOffset, 0)
 
-	file, err := ioutil.ReadFile(f.Name())
+	bytes, err := os.ReadFile(f.Name())
+	assert.NoError(t, err)
+	f.Seek(0, 1)
 
-	if err != nil {
-		t.Errorf("failed reading tmp file (%s): %v", f.Name(), err)
-	}
+	ui.outOffset += int64(len(bytes))
 
-	return string(file)
+	return string(bytes)
+}
+
+// WriteStdin write given content to the input stream.
+func (ui *uiMock) WriteStdin(t *testing.T, content string) {
+	t.Helper()
+
+	err := os.Truncate(ui.Streams().In().File().Name(), 0)
+	assert.NoError(t, err)
+
+	_, err = ui.Streams().In().File().WriteString(content)
+	assert.NoError(t, err)
+
+	_, err = ui.Streams().In().File().Seek(0, 0)
+	assert.NoError(t, err)
 }

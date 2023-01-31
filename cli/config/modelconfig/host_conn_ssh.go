@@ -1,6 +1,6 @@
 package modelconfig
 
-import v "cli/lib/validation"
+import v "cli/utils/validation"
 
 type ConnectionSSH struct {
 	Keyfile *File `yaml:"keyfile"`

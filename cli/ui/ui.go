@@ -1,21 +1,33 @@
 package ui
 
 import (
+	"cli/ui/streams"
 	"fmt"
 	"strings"
+	"sync"
 )
 
 // Global Ui singleton
-var globalUi *Ui
+var (
+	instance *ui
+	once     sync.Once
+)
 
-func GlobalUi() *Ui {
-	if globalUi == nil {
-		globalUi = &Ui{
-			Streams: StandardStreams(),
+func GlobalUi(opts ...UiOptions) Ui {
+	once.Do(func() {
+		instance = &ui{
+			streams: streams.StandardStreams(),
 		}
-	}
 
-	return globalUi
+		if len(opts) > 0 {
+			o := opts[0]
+			instance.autoApprove = o.AutoApprove
+			instance.debug = o.Debug
+			instance.noColor = o.NoColor
+		}
+	})
+
+	return instance
 }
 
 type Level uint8
@@ -33,34 +45,73 @@ type UiOptions struct {
 	AutoApprove bool
 }
 
-type Ui struct {
-	Streams *Streams
+type (
+	Ui interface {
+		Ask(msg ...string) error
+		Print(level Level, msg ...any)
+		Printf(level Level, format string, args ...any)
+		Println(level Level, msg ...any)
+		PrintBlockE(err ...error)
 
-	NoColor     bool
-	Debug       bool
-	autoApprove bool
-}
+		Streams() streams.Streams
 
-func NewUi(o UiOptions) *Ui {
-	return &Ui{
-		Streams:     StandardStreams(),
-		NoColor:     o.NoColor,
-		Debug:       o.Debug,
-		autoApprove: o.AutoApprove,
+		HasColor() bool
+		Debug() bool
+		AutoApprove() bool
 	}
+
+	ui struct {
+		streams streams.Streams
+
+		noColor     bool
+		debug       bool
+		autoApprove bool
+	}
+)
+
+func HasColor() bool {
+	return GlobalUi().HasColor()
 }
 
-func (u *Ui) Stream(level Level) *OutputStream {
+func (u *ui) HasColor() bool {
+	return !u.noColor
+}
+
+func Debug() bool {
+	return GlobalUi().Debug()
+}
+
+func (u *ui) Debug() bool {
+	return u.debug
+}
+
+func AutoApprove() bool {
+	return GlobalUi().AutoApprove()
+}
+
+func (u *ui) AutoApprove() bool {
+	return u.debug
+}
+
+func Streams() streams.Streams {
+	return GlobalUi().Streams()
+}
+
+func (u *ui) Streams() streams.Streams {
+	return u.streams
+}
+
+func (u *ui) outputStream(level Level) streams.OutputStream {
 	switch level {
 	case ERROR, WARN:
-		return u.Streams.Err
+		return u.streams.Err()
 	default:
-		return u.Streams.Out
+		return u.streams.Out()
 	}
 }
 
-func (ui *Ui) Color(l Level) Color {
-	if ui.NoColor {
+func (u *ui) outputColor(l Level) Color {
+	if u.noColor {
 		return Colors.NONE
 	}
 
@@ -74,9 +125,13 @@ func (ui *Ui) Color(l Level) Color {
 	}
 }
 
+func Ask(msg ...string) error {
+	return GlobalUi().Ask(msg...)
+}
+
 // Ask asks user for confirmation. If user confirms with either "y" or "yes"
 // nil is returned. Otherwise, if user enters "n" or "no" an error is returned.
-func (u *Ui) Ask(msg ...string) error {
+func (u *ui) Ask(msg ...string) error {
 	var question string
 	var response string
 
@@ -85,7 +140,7 @@ func (u *Ui) Ask(msg ...string) error {
 		return nil
 	}
 
-	si := u.Streams.In
+	si := u.streams.In()
 
 	// Auto approve if stdin is not a terminal
 	if si == nil || !si.IsTerminal() {
@@ -100,7 +155,7 @@ func (u *Ui) Ask(msg ...string) error {
 
 	u.Printf(INFO, "\n%s (yes/no) ", question)
 
-	if _, err := fmt.Fscan(si.File, &response); err != nil {
+	if _, err := fmt.Fscan(si.File(), &response); err != nil {
 		return fmt.Errorf("ask: %v", err)
 	}
 
@@ -114,42 +169,60 @@ func (u *Ui) Ask(msg ...string) error {
 	}
 }
 
-func (u *Ui) Print(level Level, msg ...any) {
-	if level == DEBUG && !u.Debug {
+func Print(level Level, msg ...any) {
+	GlobalUi().Print(level, msg...)
+}
+
+func (u *ui) Print(level Level, msg ...any) {
+	if level == DEBUG && !u.debug {
 		return
 	}
 
-	w := u.Stream(level).File
+	w := u.outputStream(level).File()
 
 	fmt.Fprint(w, msg...)
 }
 
-func (u *Ui) Println(level Level, msg ...any) {
+func Println(level Level, msg ...any) {
+	GlobalUi().Println(level, msg...)
+}
+
+func (u *ui) Println(level Level, msg ...any) {
 	u.Print(level, msg...)
 	u.Print(level, "\n")
 }
 
-func (u *Ui) Printf(level Level, format string, args ...interface{}) {
+func Printf(level Level, format string, args ...any) {
+	GlobalUi().Printf(level, format, args...)
+}
+
+func (u *ui) Printf(level Level, format string, args ...any) {
 	u.Print(level, fmt.Sprintf(format, args...))
 }
 
-func (u *Ui) PrintBlockE(err ...error) {
+func PrintBlockE(errs ...error) {
+	GlobalUi().PrintBlockE(errs...)
+}
+
+func (u *ui) PrintBlockE(errs ...error) {
 	var eb ErrorBlock
 
-	for _, e := range err {
+	for _, e := range errs {
 		switch e.(type) {
 		case ErrorBlock:
 			eb = e.(ErrorBlock)
 		default:
-			eb = NewErrorBlock(ERROR,
-				[]Content{
-					NewErrorLine("Error:", fmt.Sprint(e)),
-				},
-			)
+			fmt.Println("heii", fmt.Sprint(e))
+			content := []Content{
+				NewErrorLine("Error:", fmt.Sprint(e)),
+			}
+
+			eb = NewErrorBlock(ERROR, content)
 		}
 
-		s := u.Stream(eb.Severity)
+		s := u.outputStream(eb.Severity())
+		c := u.outputColor(eb.Severity())
 
-		fmt.Fprintln(s.File, eb.Format(s, u.Color(eb.Severity)))
+		fmt.Fprintln(s.File(), eb.Format(s, c))
 	}
 }

@@ -6,6 +6,7 @@ require (
 	github.com/apenella/go-ansible v1.1.5
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-playground/validator/v10 v10.11.1
+	github.com/golang/mock v1.3.1
 	github.com/hashicorp/hc-install v0.3.2
 	github.com/otiai10/copy v1.7.0
 	github.com/spf13/cobra v1.6.1
@@ -47,7 +48,7 @@ require (
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
-	golang.org/x/crypto v0.3.0 // indirect
+	golang.org/x/crypto v0.3.0
 	golang.org/x/net v0.2.0 // indirect
 	golang.org/x/sys v0.2.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect

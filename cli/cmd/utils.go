@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"strings"
 )
 
@@ -34,14 +33,4 @@ func Example(s string) string {
 	}
 
 	return strings.Join(trimmed, "\n")
-}
-
-// EnvVar returns value of the environment variable with a given name.
-// If environment variable is not found, provided default value is returned.
-func EnvVar(key, def string) string {
-	if v, ok := os.LookupEnv(key); ok {
-		return v
-	}
-
-	return def
 }

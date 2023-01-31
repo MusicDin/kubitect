@@ -2,7 +2,7 @@ package terraform
 
 import (
 	"cli/config/modelconfig"
-	"cli/lib/template"
+	"cli/utils/template"
 	"fmt"
 	"os"
 	"path"
@@ -10,12 +10,14 @@ import (
 )
 
 type MainTemplate struct {
-	Hosts []modelconfig.Host
+	Hosts   []modelconfig.Host
+	projDir string
 }
 
-func NewMainTemplate(hosts []modelconfig.Host) MainTemplate {
+func NewMainTemplate(projectDir string, hosts []modelconfig.Host) MainTemplate {
 	return MainTemplate{
-		Hosts: hosts,
+		Hosts:   hosts,
+		projDir: projectDir,
 	}
 }
 
@@ -32,9 +34,9 @@ func (t MainTemplate) Functions() map[string]interface{} {
 }
 
 // Write creates main.tf file from template.
-func (t MainTemplate) Write(clusterPath string) error {
-	srcPath := path.Join(clusterPath, "terraform", "main.tf.tpl")
-	dstPath := path.Join(clusterPath, "terraform", "main.tf")
+func (t MainTemplate) Write() error {
+	srcPath := path.Join(t.projDir, "main.tf.tpl")
+	dstPath := path.Join(t.projDir, "main.tf")
 
 	return template.WriteFrom(t, srcPath, dstPath)
 }

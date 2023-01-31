@@ -1,6 +1,6 @@
 package event
 
-import "cli/lib/cmp"
+import "cli/utils/cmp"
 
 var UpgradeEvents = Events{
 	{

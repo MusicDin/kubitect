@@ -2,10 +2,6 @@ package cluster
 
 import "cli/ui"
 
-// type InvalidClusterDirError struct {
-// 	ui.ErrorBlock
-// }
-
 func NewInvalidClusterDirError(missingFiles []string) error {
 	return ui.NewErrorBlock(ui.ERROR,
 		[]ui.Content{

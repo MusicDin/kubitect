@@ -4,6 +4,7 @@ import (
 	"cli/ui"
 	"context"
 	"fmt"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -13,36 +14,45 @@ import (
 )
 
 type Playbook struct {
-	PlaybookFile string
-	Inventory    string
-	Tags         []string
-	User         string
-	PrivateKey   string
-	Become       bool
-	Local        bool
-	Timeout      int
-	ExtraVars    []string
+	Path       string
+	Inventory  string
+	Tags       []string
+	User       string
+	PrivateKey string
+	Become     bool
+	Local      bool
+	Timeout    int
+	ExtraVars  []string
 }
 
-type Ansible struct {
-	BinPath    string
-	WorkingDir string
+type (
+	Ansible interface {
+		Exec(Playbook) error
+	}
 
-	Ui *ui.Ui
+	ansible struct {
+		binPath string
+	}
+)
+
+func NewAnsible(binDir string) Ansible {
+	return &ansible{
+		binPath: path.Join(binDir, "ansible-playbook"),
+	}
 }
 
-// Exec executes given ansible playbook.
-func (a *Ansible) Exec(pb Playbook) error {
+// Exec executes the given ansible playbook.
+func (a *ansible) Exec(pb Playbook) error {
 	if pb.Local {
 		pb.Inventory = "localhost,"
 	}
 
-	if len(pb.PlaybookFile) < 1 {
-		return fmt.Errorf("ansible-playbook: file path not set")
+	if len(pb.Path) < 1 {
+		return fmt.Errorf("ansible-playbook: playbook path not set")
 	}
 
 	if pb.Inventory == "" {
-		return fmt.Errorf("ansible-playbook (%s): inventory not set", pb.PlaybookFile)
+		return fmt.Errorf("ansible-playbook (%s): inventory not set", pb.Path)
 	}
 
 	privilegeEscalationOptions := &options.AnsiblePrivilegeEscalationOptions{
@@ -64,7 +74,7 @@ func (a *Ansible) Exec(pb Playbook) error {
 		Tags:      strings.Join(pb.Tags, ","),
 	}
 
-	if a.Ui.Debug {
+	if ui.Debug() {
 		playbookOptions.Verbose = true
 	}
 
@@ -78,25 +88,28 @@ func (a *Ansible) Exec(pb Playbook) error {
 	}
 
 	executor := &execute.DefaultExecute{
-		CmdRunDir:   filepath.Dir(pb.PlaybookFile),
-		Write:       a.Ui.Streams.Out.File,
-		WriterError: a.Ui.Streams.Err.File,
+		CmdRunDir:   filepath.Dir(pb.Path),
+		Write:       ui.Streams().Out().File(),
+		WriterError: ui.Streams().Err().File(),
 	}
 
 	playbook := &playbook.AnsiblePlaybookCmd{
-		Binary:                     a.BinPath,
+		Binary:                     a.binPath,
 		Exec:                       executor,
-		Playbooks:                  []string{pb.PlaybookFile},
+		Playbooks:                  []string{pb.Path},
 		Options:                    playbookOptions,
 		ConnectionOptions:          connectionOptions,
 		PrivilegeEscalationOptions: privilegeEscalationOptions,
 		StdoutCallback:             "yaml",
 	}
 
-	// options.AnsibleSetEnv("ANSIBLE_NO_COLOR", "true")    // disable color
-	// options.AnsibleSetEnv("ANSIBLE_FORCE_COLOR", "true") // force color
+	if !ui.HasColor() {
+		options.AnsibleSetEnv("ANSIBLE_NO_COLOR", "true")
+	} else {
+		// options.AnsibleForceColor()
+		options.AnsibleSetEnv("ANSIBLE_FORCE_COLOR", "true")
+	}
 
-	options.AnsibleForceColor()
 	options.AnsibleSetEnv("ANSIBLE_CALLBACKS_ENABLED", "yaml")
 	options.AnsibleSetEnv("ANSIBLE_HOST_PATTERN_MISMATCH", "ignore")
 	options.AnsibleSetEnv("ANSIBLE_DISPLAY_FAILED_STDERR", "true")
@@ -109,7 +122,7 @@ func (a *Ansible) Exec(pb Playbook) error {
 	err = playbook.Run(context.TODO())
 
 	if err != nil {
-		pb := filepath.Base(pb.PlaybookFile)
+		pb := filepath.Base(pb.Path)
 		return fmt.Errorf("ansible-playbook (%s): %v", pb, err)
 	}
 

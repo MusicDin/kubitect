@@ -4,9 +4,7 @@ import (
 	"cli/cluster/executors"
 	"cli/cluster/provisioner"
 	"cli/cluster/provisioner/terraform"
-	"cli/env"
-	"cli/file"
-	"cli/ui"
+	"cli/utils/file"
 	"path/filepath"
 )
 
@@ -32,8 +30,6 @@ type ClusterContext interface {
 
 	Local() bool
 	ShowTerraformPlan() bool
-
-	Ui() *ui.Ui
 }
 
 type ClusterMeta struct {
@@ -46,6 +42,26 @@ type ClusterMeta struct {
 	exec executors.Executor
 	prov provisioner.Provisioner
 }
+
+// func NewClusterMeta(ctx ClusterContext, clusterPath string) (*ClusterMeta, error) {
+// 	cpStat, err := os.Stat(clusterPath)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("cluster meta: %v", err)
+// 	}
+
+// 	meta := &ClusterMeta{
+// 		ClusterContext: ctx,
+// 		Name:           cpStat.Name(),
+// 		Path:           filepath.Join(clusterPath, cpStat.Name()),
+// 		Local:          ctx.Local(),
+// 	}
+
+// 	// if !cpStat.IsDir() || !meta.ContainsArchiveFile() {
+// 	// 	return nil, fmt.Errorf("cluster meta: %s is not a cluster directory", err)
+// 	// }
+
+// 	return meta, nil
+// }
 
 func (c ClusterMeta) AppliedConfigPath() string {
 	return filepath.Join(c.Path, DefaultConfigDir, DefaultAppliedConfigFilename)
@@ -80,16 +96,11 @@ func (c *ClusterMeta) Provisioner() provisioner.Provisioner {
 		return c.prov
 	}
 
-	tfVer := env.ConstTerraformVersion
-
-	c.prov = terraform.NewTerraform(
-		tfVer,
+	c.prov = terraform.NewTerraformProvisioner(
 		c.Path,
-		filepath.Join(c.ShareDir(), "terraform", tfVer),
-		filepath.Join(c.Path, "terraform"),
+		c.ShareDir(),
+		c.ShowTerraformPlan(),
 		nil,
-		true,
-		c.Ui(),
 	)
 
 	return c.prov

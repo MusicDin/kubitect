@@ -1,7 +1,9 @@
 package cmd
 
 import (
-	"cli/file"
+	"cli/app"
+	"cli/ui"
+	"cli/utils/file"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -21,7 +23,7 @@ var (
 type PurgeOptions struct {
 	ClusterName string
 
-	GenericOptions
+	app.AppContextOptions
 }
 
 func NewPurgeCmd() *cobra.Command {
@@ -44,7 +46,7 @@ func NewPurgeCmd() *cobra.Command {
 	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		var names []string
 
-		clusters, err := AllClusters(opts.GlobalContext())
+		clusters, err := AllClusters(opts.AppContext())
 
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp
@@ -63,7 +65,7 @@ func NewPurgeCmd() *cobra.Command {
 }
 
 func (o *PurgeOptions) Run() error {
-	gc := o.GlobalContext()
+	gc := o.AppContext()
 	cs, err := AllClusters(gc)
 
 	if err != nil {
@@ -86,19 +88,19 @@ func (o *PurgeOptions) Run() error {
 		return fmt.Errorf("cluster '%s' cannot be purged: only destroyed clusters can be purged", o.ClusterName)
 	}
 
-	fmt.Printf("Cluster '%s' will be purged. This will remove cluster's directory including all of its content.\n", o.ClusterName)
+	ui.Printf(ui.INFO, "Cluster '%s' will be purged. This will remove cluster's directory including all of its content.\n", o.ClusterName)
 
-	if err := gc.ui.Ask(); err != nil {
+	if err := ui.Ask(); err != nil {
 		return err
 	}
 
-	fmt.Printf("Purging cluster '%s'...\n", o.ClusterName)
+	ui.Printf(ui.INFO, "Purging cluster '%s'...\n", o.ClusterName)
 
 	if err := file.Remove(c.Path); err != nil {
 		return fmt.Errorf("failed to purge cluster '%s': %v", o.ClusterName, err)
 	}
 
-	fmt.Printf("Cluster '%s' has been successfully purged.\n", o.ClusterName)
+	ui.Printf(ui.INFO, "Cluster '%s' has been successfully purged.\n", o.ClusterName)
 
 	return nil
 }

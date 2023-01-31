@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cli/app"
 	"cli/cluster"
 	"cli/env"
 
@@ -29,7 +30,7 @@ type ApplyOptions struct {
 	Config string
 	Action string
 
-	GenericOptions
+	app.AppContextOptions
 }
 
 func NewApplyCmd() *cobra.Command {
@@ -63,7 +64,7 @@ func NewApplyCmd() *cobra.Command {
 }
 
 func (o *ApplyOptions) Run() error {
-	c, err := cluster.NewCluster(o.GlobalContext(), o.Config)
+	c, err := cluster.NewCluster(o.AppContext(), o.Config)
 
 	if err != nil {
 		return err

@@ -8,9 +8,12 @@ import (
 	"cli/config/modelconfig"
 	"cli/config/modelinfra"
 	"cli/env"
-	"cli/file"
 	"cli/tools/virtualenv"
+	"cli/ui"
+	"cli/utils/file"
 	"fmt"
+	"os"
+	"path"
 	"path/filepath"
 )
 
@@ -45,8 +48,8 @@ func NewCluster(ctx ClusterContext, configPath string) (*Cluster, error) {
 	}
 
 	if err := validateConfig(c.NewConfig); err != nil {
-		c.Ui().PrintBlockE(err...)
-		return c, fmt.Errorf("Provided configuration file is not valid.")
+		ui.PrintBlockE(err...)
+		return c, fmt.Errorf("invalid configuration file")
 	}
 
 	c.Name = string(*c.NewConfig.Cluster.Name)
@@ -72,9 +75,9 @@ func (c *Cluster) Sync() error {
 	}
 
 	if c.InfraConfig != nil {
-		if err := validateConfig(c.NewConfig); err != nil {
-			c.Ui().PrintBlockE(err...)
-			return fmt.Errorf("Infrastructure file (produced by Terraform) is invalid.")
+		if err := validateConfig(c.InfraConfig); err != nil {
+			ui.PrintBlockE(err...)
+			return fmt.Errorf("infrastructure file (produced by Terraform) is invalid")
 		}
 	}
 
@@ -82,37 +85,23 @@ func (c *Cluster) Sync() error {
 }
 
 func (c *Cluster) Executor() executors.Executor {
-
 	if c.exec != nil {
 		return c.exec
 	}
 
-	venvs := kubespray.VirtualEnvironments{
-		MAIN: &virtualenv.VirtualEnv{
-			Name:             "main",
-			Path:             filepath.Join(c.ShareDir(), "venv", "main", c.KubitectVersion()),
-			RequirementsPath: "ansible/kubitect/requirements.txt",
-			WorkingDir:       c.Path,
-			Ui:               c.Ui(),
-		},
-		KUBESPRAY: &virtualenv.VirtualEnv{
-			Name:             "kubespray",
-			Path:             filepath.Join(c.ShareDir(), "venv", "kubespray", c.KubesprayVersion()),
-			RequirementsPath: "ansible/kubespray/requirements.txt",
-			WorkingDir:       c.Path,
-			Ui:               c.Ui(),
-		},
-	}
+	veReqPath := "ansible/kubespray/requirements.txt"
+	vePath := path.Join(c.ShareDir(), "venv", "kubespray", c.KubesprayVersion())
+	ve := virtualenv.NewVirtualEnv(vePath, c.Path, veReqPath)
 
-	return kubespray.NewKubespray(
+	c.exec = kubespray.NewKubesprayExecutor(
 		c.Name,
 		c.Path,
-		string(*c.NewConfig.Kubernetes.Version),
-		string(*c.InfraConfig.Cluster.NodeTemplate.User),
-		string(*c.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath),
-		venvs,
-		c.Ui(),
+		c.NewConfig,
+		c.InfraConfig,
+		ve,
 	)
+
+	return c.exec
 }
 
 func (c *Cluster) Provisioner() provisioner.Provisioner {
@@ -120,16 +109,11 @@ func (c *Cluster) Provisioner() provisioner.Provisioner {
 		return c.prov
 	}
 
-	tfVer := env.ConstTerraformVersion
-
-	c.prov = terraform.NewTerraform(
-		tfVer,
+	c.prov = terraform.NewTerraformProvisioner(
 		c.Path,
-		filepath.Join(c.ShareDir(), "terraform", tfVer),
-		filepath.Join(c.Path, "terraform"),
-		c.NewConfig.Hosts,
-		true,
-		c.Ui(),
+		c.ShareDir(),
+		c.ShowTerraformPlan(),
+		c.NewConfig,
 	)
 
 	return c.prov
@@ -137,7 +121,12 @@ func (c *Cluster) Provisioner() provisioner.Provisioner {
 
 // ApplyNewConfig replaces currently applied config with new one.
 func (c *Cluster) ApplyNewConfig() error {
-	return file.ForceCopy(c.NewConfigPath, c.AppliedConfigPath())
+	err := os.MkdirAll(path.Dir(c.AppliedConfigPath()), 0744)
+	if err != nil {
+		return err
+	}
+	// return file.ForceCopy(c.NewConfigPath, c.AppliedConfigPath())
+	return file.WriteYaml(c.NewConfig, c.AppliedConfigPath(), 0644)
 }
 
 // StoreNewConfig makes a copy of the provided (new) configuration file in

@@ -3,10 +3,14 @@ package terraform
 import (
 	"cli/cluster/provisioner"
 	"cli/config/modelconfig"
+	"cli/env"
 	"cli/ui"
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
+	"path"
+	"syscall"
 
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hc-install/fs"
@@ -14,45 +18,59 @@ import (
 	"github.com/hashicorp/hc-install/releases"
 )
 
-type terraform struct {
-	binPath string
+type (
+	terraform struct {
+		// Required Terraform version
+		version string
 
-	Version    string
-	BinDir     string
-	WorkingDir string
-	ShowPlan   bool
+		// Path where terraform binary will be installed
+		// if it is not found locally.
+		binDir string
 
-	clusterPath string
-	hosts       []modelconfig.Host
+		// Evaluated during findAndInstall.
+		binPath string
 
-	initialized bool
+		// Dir where main.tf is located (root Terraform dir).
+		projectDir string
 
-	Ui *ui.Ui
-}
+		// If true, Terraform plan will be shown.
+		showPlan bool
 
-func NewTerraform(
-	version,
+		// Configuration file containing values required for
+		// main.tf template
+		cfg *modelconfig.Config
+
+		// Indicates that terraform project has
+		// been already initialized.
+		initialized bool
+	}
+)
+
+func NewTerraformProvisioner(
 	clusterPath,
-	binDir,
-	workingDir string,
-	hosts []modelconfig.Host,
+	sharedPath string,
 	showPlan bool,
-	ui *ui.Ui,
+	cfg *modelconfig.Config,
 ) provisioner.Provisioner {
+	version := env.ConstTerraformVersion
+	binDir := path.Join(sharedPath, "terraform", version)
+	projDir := path.Join(clusterPath, "terraform")
+
 	return &terraform{
-		Version:    version,
-		BinDir:     binDir,
-		WorkingDir: workingDir,
-		ShowPlan:   showPlan,
-
-		clusterPath: clusterPath,
-		hosts:       hosts,
-
-		Ui: ui,
+		version:    version,
+		binDir:     binDir,
+		projectDir: projDir,
+		showPlan:   showPlan,
+		cfg:        cfg,
 	}
 }
 
 func (t *terraform) Init() error {
+	return NewMainTemplate(t.projectDir, t.cfg.Hosts).Write()
+}
+
+// init initializes a Terraform project.
+func (t *terraform) init() error {
 	if t.initialized {
 		return nil
 	}
@@ -64,13 +82,13 @@ func (t *terraform) Init() error {
 
 	t.binPath = binPath
 
-	cmd := t.NewCmd("init")
+	args := []string{
+		flag("force-copy"),
+		flag("input", false),
+		flag("get", true),
+	}
 
-	cmd.AddArg("force-copy")
-	cmd.AddArg("input", false)
-	cmd.AddArg("get", true)
-
-	_, err = cmd.Run()
+	_, err = t.runCmd("init", args, true)
 
 	if err == nil {
 		t.initialized = true
@@ -79,55 +97,26 @@ func (t *terraform) Init() error {
 	return err
 }
 
-// init initializes a Terraform project.
-func (t *terraform) init() error {
-	if t.binPath != "" {
-		return nil
-	}
-
-	binPath, err := t.findOrInstall()
-	if err != nil {
-		return err
-	}
-
-	t.binPath = binPath
-
-	cmd := t.NewCmd("init")
-
-	cmd.AddArg("force-copy")
-	cmd.AddArg("input", false)
-	cmd.AddArg("get", true)
-
-	_, err = cmd.Run()
-
-	return err
-}
-
 // Plan shows Terraform project changes (plan).
 // It returns a potential error and whether there
 // are changes or not.
 func (t *terraform) Plan() (bool, error) {
-	if err := NewMainTemplate(t.hosts).Write(t.clusterPath); err != nil {
-		return false, err
-	}
-
 	if err := t.init(); err != nil {
 		return false, err
 	}
 
-	cmd := t.NewCmd("plan")
+	args := []string{
+		flag("detailed-exitcode"),
+		flag("input", false),
+		flag("lock", true),
+		flag("lock-timeout", "0s"),
+		flag("parallelism", 10),
+		flag("refresh", true),
+	}
 
-	cmd.ShowOutput(t.Ui.Debug || t.ShowPlan)
+	exitCode, err := t.runCmd("plan", args, t.showPlan)
 
-	cmd.AddArg("detailed-exitcode")
-	cmd.AddArg("input", false)
-	cmd.AddArg("lock", true)
-	cmd.AddArg("lock-timeout", "0s")
-	cmd.AddArg("parallelism", 10)
-	cmd.AddArg("refresh", true)
-
-	exitCode, err := cmd.Run()
-
+	// "exitCode 2" indicates terraform plan changes
 	if err != nil && exitCode == 2 {
 		return true, nil
 	}
@@ -135,7 +124,8 @@ func (t *terraform) Plan() (bool, error) {
 	return false, err
 }
 
-// Apply applies new Terraform configurations.
+// Apply applies new Terraform configurations. In case any
+// changes are detected, user confirmation is required.
 func (t *terraform) Apply() error {
 	changes, err := t.Plan()
 
@@ -144,24 +134,24 @@ func (t *terraform) Apply() error {
 	}
 
 	// Ask user for permission if there are any changes
-	if changes && t.ShowPlan {
-		err := t.Ui.Ask("Proceed with terraform apply?")
+	if changes && t.showPlan {
+		err := ui.Ask("Proceed with terraform apply?")
 
 		if err != nil {
 			return err
 		}
 	}
 
-	cmd := t.NewCmd("apply")
+	args := []string{
+		flag("auto-approve"),
+		flag("input", false),
+		flag("lock", true),
+		flag("lock-timeout", "0s"),
+		flag("parallelism", 10),
+		flag("refresh", true),
+	}
 
-	cmd.AddArg("auto-approve")
-	cmd.AddArg("input", false)
-	cmd.AddArg("lock", true)
-	cmd.AddArg("lock-timeout", "0s")
-	cmd.AddArg("parallelism", 10)
-	cmd.AddArg("refresh", true)
-
-	_, err = cmd.Run()
+	_, err = t.runCmd("apply", args, true)
 	return err
 }
 
@@ -172,38 +162,39 @@ func (t *terraform) Destroy() error {
 		return err
 	}
 
-	cmd := t.NewCmd("destroy")
+	args := []string{
+		flag("auto-approve"),
+		flag("input", false),
+		flag("lock", true),
+		flag("lock-timeout", "0s"),
+		flag("parallelism", 10),
+		flag("refresh", true),
+	}
 
-	cmd.AddArg("auto-approve")
-	cmd.AddArg("input", false)
-	cmd.AddArg("lock", true)
-	cmd.AddArg("lock-timeout", "0s")
-	cmd.AddArg("parallelism", 10)
-	cmd.AddArg("refresh", true)
+	_, err = t.runCmd("destroy", args, true)
 
-	_, err = cmd.Run()
 	return err
 }
 
-// findOrInstall first searches for Terraform binary locally and if
-// binary is not found, it is installed in given binDir.
+// findOrInstall first searches for Terraform binary locally and
+// if binary is not found, it is installed in given binDir.
 func (t *terraform) findOrInstall() (string, error) {
 	var binPath string
 	var err error
 
-	t.Ui.Printf(ui.INFO, "Ensuring Terraform %s is installed...\n", t.Version)
+	ui.Printf(ui.INFO, "Ensuring Terraform %s is installed...\n", t.version)
 
-	binPath, err = findTerraform(t.Version, t.BinDir)
+	binPath, err = findTerraform(t.version, t.binDir)
 
 	if err == nil {
-		t.Ui.Printf(ui.INFO, "Terraform %s found locally (%s).\n", t.Version, binPath)
+		ui.Printf(ui.INFO, "Terraform %s found locally (%s).\n", t.version, binPath)
 		return binPath, nil
 	}
 
-	t.Ui.Printf(ui.INFO, "Terraform %s could not be found locally.\n", t.Version)
-	t.Ui.Printf(ui.INFO, "Installing Terraform %s in '%s'...\n", t.Version, t.BinDir)
+	ui.Printf(ui.INFO, "Terraform %s could not be found locally.\n", t.version)
+	ui.Printf(ui.INFO, "Installing Terraform %s in '%s'...\n", t.version, t.binDir)
 
-	binPath, err = installTerraform(t.Version, t.BinDir)
+	binPath, err = installTerraform(t.version, t.binDir)
 
 	if err != nil {
 		return "", fmt.Errorf("failed to install Terraform: %v", err)
@@ -224,7 +215,8 @@ func findTerraform(ver, binDir string) (string, error) {
 	return fs.Find(context.Background())
 }
 
-// installTerraform installs Terraform in a given directory.
+// installTerraform installs Terraform binary of the provided
+// version in a given directory.
 func installTerraform(ver, binDir string) (string, error) {
 	if err := os.MkdirAll(binDir, os.ModePerm); err != nil {
 		return "", err
@@ -237,4 +229,44 @@ func installTerraform(ver, binDir string) (string, error) {
 	}
 
 	return installer.Install(context.Background())
+}
+
+// runCmd runs terraform command and returns exit code with
+// a potential error.
+func (t *terraform) runCmd(action string, args []string, showOutput bool) (int, error) {
+	args = append([]string{action}, args...)
+
+	if !ui.HasColor() {
+		args = append(args, flag("no-color"))
+	}
+
+	cmd := exec.Command(t.binPath, args...)
+	cmd.Dir = t.projectDir
+
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Pdeathsig: syscall.SIGTERM,
+	}
+
+	if showOutput || ui.Debug() {
+		cmd.Stdout = ui.Streams().Out().File()
+		cmd.Stderr = ui.Streams().Err().File()
+	}
+
+	err := cmd.Run()
+	exitCode := cmd.ProcessState.ExitCode()
+
+	if err != nil {
+		err = fmt.Errorf("terraform %s failed: %v", action, err)
+	}
+
+	return exitCode, err
+}
+
+// Flag concatenates key and value with "=" if value is provided.
+func flag(key string, value ...interface{}) string {
+	if len(value) > 0 && value[0] != nil {
+		return fmt.Sprintf("-%s=%v", key, value[0])
+	}
+
+	return fmt.Sprintf("-%s", key)
 }

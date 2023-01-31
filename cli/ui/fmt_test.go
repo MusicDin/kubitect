@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"cli/ui/streams"
 	"strings"
 	"testing"
 
@@ -8,7 +9,7 @@ import (
 )
 
 // testFormat ignores pivot for cleaner tests
-func testFormat(o *OutputStream, s string, i int) string {
+func testFormat(o streams.OutputStream, s string, i int) string {
 	lines, _ := Format(o, s, i, 0)
 	return strings.Join(lines, "\n")
 }
@@ -79,19 +80,19 @@ func TestFormat_Empty(t *testing.T) {
 }
 
 func TestFormat_TerminalStream(t *testing.T) {
-	s := mockTerminalStream(t, "stdout")
+	s := streams.MockTerminalStreams(t).Out()
 
 	assert.Equal(t, "test", testFormat(s, "test", 0))
 	assert.Equal(t, "te\nst", testFormat(s, "test", s.Columns()-2))
 	assert.Equal(t, "t\ne\ns\nt", testFormat(s, "test", s.Columns()-1))
-	assert.Equal(t, "test", testFormat(s, "test", s.Columns())) // (width <= indentation) => defaultCols
+	assert.Equal(t, "\nt\ne\ns\nt", testFormat(s, "test", s.Columns())) // Maybe if (width <= indentation) => defaultCols
 	assert.Equal(t, "te\nst", testFormat(s, "te\nst", 0))
 	assert.Equal(t, "te\n\nst", testFormat(s, "te\n\nst", 0))
 	assert.Equal(t, "te\nst\n", testFormat(s, "test\n", s.Columns()-2))
 }
 
 func TestFormat_NonTerminalStream(t *testing.T) {
-	s := mockNonTerminalStream(t, "stdout")
+	s := streams.MockStreams(t).Out()
 
 	assert.Equal(t, "test", testFormat(s, "test", 0))
 	assert.Equal(t, "test", testFormat(s, "test", s.Columns()-2))

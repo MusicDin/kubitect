@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cli/app"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -19,7 +20,7 @@ var (
 type DestroyOptions struct {
 	ClusterName string
 
-	GenericOptions
+	app.AppContextOptions
 }
 
 func NewDestroyCmd() *cobra.Command {
@@ -44,7 +45,7 @@ func NewDestroyCmd() *cobra.Command {
 	cmd.MarkPersistentFlagRequired("cluster")
 
 	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		clusters, err := AllClusters(opts.GlobalContext())
+		clusters, err := AllClusters(opts.AppContext())
 
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp
@@ -61,7 +62,7 @@ func (o *DestroyOptions) Run() error {
 		return fmt.Errorf("a valid (non-empty) cluster name must be provided")
 	}
 
-	clusters, err := AllClusters(o.GlobalContext())
+	clusters, err := AllClusters(o.AppContext())
 
 	if err != nil {
 		return err

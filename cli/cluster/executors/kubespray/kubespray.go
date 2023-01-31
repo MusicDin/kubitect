@@ -4,51 +4,67 @@ import (
 	"cli/cluster/event"
 	"cli/cluster/executors"
 	"cli/config/modelconfig"
+	"cli/config/modelinfra"
+	"cli/tools/ansible"
 	"cli/tools/virtualenv"
-	"cli/ui"
 	"fmt"
+	"path"
 )
-
-type VirtualEnvironments struct {
-	MAIN      *virtualenv.VirtualEnv
-	KUBESPRAY *virtualenv.VirtualEnv
-}
 
 type kubespray struct {
 	ClusterName string
 	ClusterPath string
-	K8sVersion  string
-	SshUser     string
-	SshPKey     string
-
-	Venvs VirtualEnvironments
-
-	Ui *ui.Ui
+	Config      *modelconfig.Config
+	InfraConfig *modelinfra.Config
+	VirtualEnv  virtualenv.VirtualEnv
+	Ansible     ansible.Ansible
+	// K8sVersion  string
+	// SshUser     string
+	// SshPKey     string
 }
 
-func NewKubespray(
+func (e *kubespray) K8sVersion() string {
+	return string(*e.Config.Kubernetes.Version)
+}
+
+func (e *kubespray) SshUser() string {
+	return string(*e.InfraConfig.Cluster.NodeTemplate.User)
+}
+
+func (e *kubespray) SshPKey() string {
+	return string(*e.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath)
+}
+
+func NewKubesprayExecutor(
 	clusterName string,
 	clusterPath string,
-	k8sVersion string,
-	sshUser string,
-	sshPKey string,
-
-	venvs VirtualEnvironments,
-
-	Ui *ui.Ui,
+	cfg *modelconfig.Config,
+	infraCfg *modelinfra.Config,
+	virtualEnv virtualenv.VirtualEnv,
 ) executors.Executor {
 	return &kubespray{
 		ClusterName: clusterName,
 		ClusterPath: clusterPath,
-		K8sVersion:  k8sVersion,
-		SshUser:     sshUser,
-		SshPKey:     sshPKey,
-		Venvs:       venvs,
-		Ui:          Ui,
+		Config:      cfg,
+		InfraConfig: infraCfg,
+		VirtualEnv:  virtualEnv,
+		// K8sVersion:  string(*cfg.Kubernetes.Version),
+		// SshUser:     string(*infraCfg.Cluster.NodeTemplate.User),
+		// SshPKey:     string(*infraCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath),
 	}
 }
 
 func (e *kubespray) Init() error {
+	err := e.VirtualEnv.Init()
+	if err != nil {
+		return fmt.Errorf("kubespray exec: initialize virtual environment: %v", err)
+	}
+
+	if e.Ansible == nil {
+		ansibleBinDir := path.Join(e.VirtualEnv.Path(), "bin")
+		e.Ansible = ansible.NewAnsible(ansibleBinDir)
+	}
+
 	if err := e.KubitectInit(TAG_INIT); err != nil {
 		return err
 	}
@@ -120,13 +136,8 @@ func (e *kubespray) ScaleDown(events event.Events) error {
 	}
 
 	rmNodes, err := extractRemovedNodes(events)
-
-	if err != nil {
+	if err != nil || len(rmNodes) == 0 {
 		return err
-	}
-
-	if len(rmNodes) == 0 {
-		return nil
 	}
 
 	var names []string
