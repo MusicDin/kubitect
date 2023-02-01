@@ -40,13 +40,27 @@ func (c Config) Validate() error {
 	)
 }
 
+func (c *Config) SetDefaults() {
+	// If no host is set as the default host,
+	// then set the first one as the default host.
+	if len(c.Hosts) > 0 {
+		for _, h := range c.Hosts {
+			if h.Default {
+				return
+			}
+		}
+
+		c.Hosts[0].Default = true
+	}
+}
+
 // singleDefaultHostValidator returns a validator that triggers an error
 // if multiple hosts are configured as default.
 func (c Config) singleDefaultHostValidator() v.Validator {
 	var defs int
 
 	for _, h := range c.Hosts {
-		if h.Default != nil && *h.Default {
+		if h.Default {
 			defs++
 		}
 	}
@@ -61,11 +75,7 @@ func (c Config) singleDefaultHostValidator() v.Validator {
 // ipInCidrValidator registers a custom validator that checks whether
 // an IP address is within the configured network CIDR.
 func (c Config) ipInCidrValidator() v.Validator {
-	if c.Cluster.Network.CIDR == nil {
-		return v.None
-	}
-
-	return v.IPInRange(string(*c.Cluster.Network.CIDR))
+	return v.IPInRange(string(c.Cluster.Network.CIDR))
 }
 
 // hostNameValidator returns a custom cross-validator that checks whether
@@ -74,9 +84,7 @@ func (c Config) hostNameValidator() v.Validator {
 	var names []string
 
 	for _, h := range c.Hosts {
-		if h.Name != nil {
-			names = append(names, *h.Name)
-		}
+		names = append(names, h.Name)
 	}
 
 	return v.OneOf(names...).Errorf("Field '{.Field}' must point to one of the configured hosts: [%v] (actual: {.Value})", strings.Join(names, "|"))
@@ -84,7 +92,7 @@ func (c Config) hostNameValidator() v.Validator {
 
 // poolNameValidator returns a custom cross-validator that checks whether
 // a given pool name is valid for a matching host.
-func poolNameValidator(hostName *string) v.Validator {
+func poolNameValidator(hostName string) v.Validator {
 	c, ok := v.TopParent().(*Config)
 
 	if !ok || c == nil || len(c.Hosts) == 0 {
@@ -95,36 +103,29 @@ func poolNameValidator(hostName *string) v.Validator {
 	host := (c.Hosts)[0]
 
 	for _, h := range c.Hosts {
-		if h.Default != nil && *h.Default {
+		if h.Default {
 			host = h
 		}
 
-		if hostName == nil || h.Name == nil {
+		if hostName == "" || h.Name == "" {
 			continue
 		}
 
-		if *h.Name == *hostName {
+		if hostName == h.Name {
 			host = h
 			break
 		}
 	}
 
-	if host.Name == nil {
-		// Ignore, because in such case an error is already triggered for a host.
-		return v.None
-	}
-
 	if len(host.DataResourcePools) == 0 {
-		return v.Fail().Errorf("Field '{.Field}' points to a data resource pool, but matching host '%v' has none configured.", *host.Name)
+		return v.Fail().Errorf("Field '{.Field}' points to a data resource pool, but matching host '%v' has none configured.", host.Name)
 	}
 
 	var pools []string
 
 	for _, p := range host.DataResourcePools {
-		if p.Name != nil {
-			pools = append(pools, *p.Name)
-		}
+		pools = append(pools, p.Name)
 	}
 
-	return v.OneOf(pools...).Errorf("Field '{.Field}' must point to one of the pools configured on a matching host '%s': [%s] (actual: {.Value})", *host.Name, strings.Join(pools, "|"))
+	return v.OneOf(pools...).Errorf("Field '{.Field}' must point to one of the pools configured on a matching host '%s': [%s] (actual: {.Value})", host.Name, strings.Join(pools, "|"))
 }

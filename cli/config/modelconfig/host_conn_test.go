@@ -1,6 +1,7 @@
 package modelconfig
 
 import (
+	"cli/utils/defaults"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,38 +16,27 @@ func TestConnType(t *testing.T) {
 }
 
 func TestConn(t *testing.T) {
-	local := LOCAL
-	remote := REMOTE
-	ip := IPv4("192.168.113.13")
-	user := User("user")
-	pk := File("host_conn_test.go")
-
 	c1 := Connection{
-		Type: &local,
+		Type: LOCAL,
 	}
 
 	c2 := Connection{
-		Type: &remote,
-		IP:   &ip,
-		User: &user,
+		Type: REMOTE,
+		IP:   IPv4("192.168.113.13"),
+		User: User("user"),
 		SSH: ConnectionSSH{
-			Keyfile: &pk,
+			Keyfile: File("./host_conn_test.go"),
 		},
 	}
 
-	c3 := Connection{
-		Type: &local,
-	}
-
 	c4 := Connection{
-		Type: &remote,
+		Type: REMOTE,
 	}
 
 	assert.NoError(t, c1.Validate())
-	assert.NoError(t, c2.Validate())
-	assert.NoError(t, c3.Validate())
+	assert.NoError(t, defaults.Assign(&c2).Validate())
 	assert.ErrorContains(t, c4.Validate(), "Field 'ip' is required when connection type is set to 'remote'.")
 	assert.ErrorContains(t, c4.Validate(), "Field 'user' is required when connection type is set to 'remote'.")
 	assert.ErrorContains(t, c4.Validate(), "Field 'ssh' is required when connection type is set to 'remote'.")
-	assert.EqualError(t, Connection{}.Validate(), "Field 'type' is required.")
+	assert.EqualError(t, Connection{}.Validate(), "Field 'type' is required and cannot be empty.")
 }

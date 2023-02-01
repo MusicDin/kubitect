@@ -1,13 +1,16 @@
 package modelconfig
 
-import v "cli/utils/validation"
+import (
+	"cli/utils/defaults"
+	v "cli/utils/validation"
+)
 
 type NodeTemplate struct {
-	User         *User           `yaml:"user"`
+	User         User            `yaml:"user"`
 	OS           OS              `yaml:"os"`
 	SSH          NodeTemplateSSH `yaml:"ssh"`
 	DNS          []IP            `yaml:"dns"`
-	UpdateOnBoot *bool           `yaml:"updateOnBoot"`
+	UpdateOnBoot bool            `yaml:"updateOnBoot"`
 }
 
 func (n NodeTemplate) Validate() error {
@@ -19,10 +22,16 @@ func (n NodeTemplate) Validate() error {
 	)
 }
 
+func (n *NodeTemplate) SetDefaults() {
+	// TODO: Save these default values in env
+	n.User = defaults.Default(n.User, "k8s")
+	n.UpdateOnBoot = defaults.Default(n.UpdateOnBoot, true)
+}
+
 type OS struct {
-	Distro           *OSDistro           `yaml:"distro"`
-	NetworkInterface *OSNetworkInterface `yaml:"networkInterface"`
-	Source           *OSSource           `yaml:"source"`
+	Distro           OSDistro           `yaml:"distro"`
+	NetworkInterface OSNetworkInterface `yaml:"networkInterface"`
+	Source           OSSource           `yaml:"source"`
 }
 
 func (s OS) Validate() error {
@@ -31,6 +40,14 @@ func (s OS) Validate() error {
 		v.Field(&s.NetworkInterface),
 		v.Field(&s.Source),
 	)
+}
+
+func (s *OS) SetDefaults() {
+	s.Distro = defaults.Default(s.Distro, UBUNTU)
+
+	// TODO: Evaluate as in Terraform base module
+	s.NetworkInterface = defaults.Default(s.NetworkInterface, OSNetworkInterface("ens3"))
+	// s.Source = defaults.Default(s.NetworkInterface, OSNetworkInterface("ens3"))
 }
 
 type OSDistro string
@@ -60,12 +77,16 @@ func (os OSSource) Validate() error {
 }
 
 type NodeTemplateSSH struct {
-	AddToKnownHosts *bool `yaml:"addToKnownHosts"`
-	PrivateKeyPath  *File `yaml:"privateKeyPath"`
+	AddToKnownHosts bool `yaml:"addToKnownHosts"`
+	PrivateKeyPath  File `yaml:"privateKeyPath"`
 }
 
 func (ssh NodeTemplateSSH) Validate() error {
 	return v.Struct(&ssh,
-		v.Field(&ssh.PrivateKeyPath),
+		v.Field(&ssh.PrivateKeyPath, v.OmitEmpty()),
 	)
+}
+
+func (ssh *NodeTemplateSSH) SetDefaults() {
+	ssh.AddToKnownHosts = defaults.Default(ssh.AddToKnownHosts, true)
 }

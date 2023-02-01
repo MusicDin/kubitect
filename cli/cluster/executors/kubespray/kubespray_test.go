@@ -31,16 +31,12 @@ func (a *invalidAnsibleMock) Exec(ansible.Playbook) error { return fmt.Errorf("e
 func MockExecutor(t *testing.T) *kubespray {
 	tmpDir := t.TempDir()
 
-	k8sVersion := modelconfig.Version("v1.2.3")
-	sshUser := modelconfig.User("test")
-	sshPKey := modelconfig.File(path.Join(tmpDir, ".ssh", "id_rsa"))
-
 	cfg := &modelconfig.Config{}
-	cfg.Kubernetes.Version = &k8sVersion
+	cfg.Kubernetes.Version = modelconfig.Version("v1.2.3")
 
 	iCfg := &modelinfra.Config{}
-	iCfg.Cluster.NodeTemplate.User = &sshUser
-	iCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath = &(sshPKey)
+	iCfg.Cluster.NodeTemplate.User = modelconfig.User("test")
+	iCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath = modelconfig.File(path.Join(tmpDir, ".ssh", "id_rsa"))
 
 	return &kubespray{
 		ClusterName: "mock",
@@ -107,9 +103,8 @@ func TestCreateAndUpgrade_Invalid(t *testing.T) {
 }
 
 func TestExtractRemovedNodes(t *testing.T) {
-	wName := "worker"
 	w := modelconfig.WorkerInstance{
-		Id: &wName,
+		Id: "worker",
 	}
 
 	events := MockEvents(t, w, event.SCALE_DOWN)
@@ -120,9 +115,8 @@ func TestExtractRemovedNodes(t *testing.T) {
 }
 
 func TestScaleDown(t *testing.T) {
-	wName := "worker"
 	w := modelconfig.WorkerInstance{
-		Id: &wName,
+		Id: "worker",
 	}
 
 	events := MockEvents(t, w, event.SCALE_DOWN)
@@ -144,9 +138,8 @@ func TestScaleDown_InvalidEvent(t *testing.T) {
 }
 
 func TestScaleUp(t *testing.T) {
-	wName := "worker"
 	w := modelconfig.WorkerInstance{
-		Id: &wName,
+		Id: "worker",
 	}
 
 	events := MockEvents(t, w, event.SCALE_UP)

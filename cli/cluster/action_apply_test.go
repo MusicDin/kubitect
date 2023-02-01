@@ -67,7 +67,7 @@ func TestGenerateMissingKeys(t *testing.T) {
 	c := MockCluster(t)
 
 	// Unset PrivateKeyPath to force generating SSH keys.
-	c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath = nil
+	c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath = ""
 
 	assert.NoError(t, c.generateMissingSshKeys())
 }
@@ -102,8 +102,7 @@ func TestPlan(t *testing.T) {
 	assert.NoError(t, c.Sync())
 
 	// Make "blocking" change
-	ver := modelconfig.Version("v1.2.3")
-	c.NewConfig.Kubernetes.Version = &ver
+	c.NewConfig.Kubernetes.Version = modelconfig.Version("v1.2.3")
 
 	_, err := c.plan(SCALE)
 	assert.EqualError(t, err, "Aborted. Configuration file contains errors.")
@@ -154,8 +153,7 @@ func TestApply_Upgrade(t *testing.T) {
 	assert.NoError(t, c.Sync())
 
 	// Make some changes to the new config
-	ver := modelconfig.Version("v1.2.3")
-	c.NewConfig.Kubernetes.Version = &ver
+	c.NewConfig.Kubernetes.Version = modelconfig.Version("v1.2.3")
 
 	// Skip required files check
 	tmp := env.ProjectRequiredFiles
@@ -172,10 +170,9 @@ func TestApply_Scale(t *testing.T) {
 	assert.NoError(t, c.Sync())
 
 	// Append worker node
-	workerId := "1"
 	c.NewConfig.Cluster.Nodes.Worker.Instances = append(
 		c.NewConfig.Cluster.Nodes.Worker.Instances,
-		modelconfig.WorkerInstance{Id: &workerId},
+		modelconfig.WorkerInstance{Id: "worker"},
 	)
 
 	// Skip required files check

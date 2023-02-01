@@ -7,12 +7,12 @@ import (
 )
 
 func TestDataResPool(t *testing.T) {
-	name := "test"
-
 	drp1 := DataResourcePool{
-		Name: &name,
+		Name: "test",
+		Path: "/path",
 	}
 
 	assert.NoError(t, drp1.Validate())
-	assert.EqualError(t, DataResourcePool{}.Validate(), "Field 'name' is required.")
+	assert.ErrorContains(t, DataResourcePool{}.Validate(), "Field 'name' is required and cannot be empty.")
+	assert.ErrorContains(t, DataResourcePool{}.Validate(), "Field 'path' is required and cannot be empty.")
 }

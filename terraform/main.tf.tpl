@@ -58,7 +58,7 @@ module "host_{{ .Name }}" {
   action = var.action
 
   # Resource pools
-  hosts_mainResourcePoolPath = "{{ hostMainResPoolPath . }}"
+  hosts_mainResourcePoolPath = "{{ .MainResourcePoolPath }}"
   hosts_dataResourcePools    = try(local.config.hosts[index(local.config.hosts.*.name, "{{ .Name }}")].dataResourcePools, null)
 
   # Cluster name and node template

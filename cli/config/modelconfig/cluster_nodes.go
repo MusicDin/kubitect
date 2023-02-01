@@ -2,11 +2,17 @@ package modelconfig
 
 import v "cli/utils/validation"
 
+const (
+	defaultVCpu         = VCpu(2)
+	defaultRAM          = GB(4)
+	defaultMainDiskSize = GB(32)
+)
+
 type Instance interface {
 	GetTypeName() string
-	GetID() *string
-	GetIP() *IPv4
-	GetMAC() *MAC
+	GetID() string
+	GetIP() IPv4
+	GetMAC() MAC
 }
 
 type Nodes struct {
@@ -64,9 +70,8 @@ func (n Nodes) IPs() []string {
 
 	for _, i := range n.Instances() {
 		ip := i.GetIP()
-
-		if ip != nil {
-			ips = append(ips, string(*ip))
+		if ip != "" {
+			ips = append(ips, string(ip))
 		}
 	}
 
@@ -79,8 +84,8 @@ func (n Nodes) MACs() []string {
 	for _, i := range n.Instances() {
 		mac := i.GetMAC()
 
-		if mac != nil {
-			macs = append(macs, string(*mac))
+		if mac != "" {
+			macs = append(macs, string(mac))
 		}
 	}
 

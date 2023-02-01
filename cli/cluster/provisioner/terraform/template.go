@@ -27,9 +27,8 @@ func (t MainTemplate) Name() string {
 
 func (t MainTemplate) Functions() map[string]interface{} {
 	return map[string]interface{}{
-		"hostUri":             hostUri,
-		"defaultHost":         defaultHost,
-		"hostMainResPoolPath": hostMainResPoolPath,
+		"hostUri":     hostUri,
+		"defaultHost": defaultHost,
 	}
 }
 
@@ -48,7 +47,7 @@ func defaultHost(hosts []modelconfig.Host) (modelconfig.Host, error) {
 	}
 
 	for _, h := range hosts {
-		if h.Default != nil && *h.Default {
+		if h.Default {
 			return h, nil
 		}
 	}
@@ -56,37 +55,19 @@ func defaultHost(hosts []modelconfig.Host) (modelconfig.Host, error) {
 	return hosts[0], nil
 }
 
-// hostMainResPoolPath returns main resource pool path (MRPP) of the host.
-// If MRPP is nil, a default MRRP is returned.
-func hostMainResPoolPath(host modelconfig.Host) string {
-	if host.MainResourcePoolPath != nil {
-		return *host.MainResourcePoolPath
-	}
-
-	return "/var/lib/libvirt/images/"
-}
-
 // hostUri returns URI of a given host.
 func hostUri(host modelconfig.Host) (string, error) {
 	typ := host.Connection.Type
 
-	if typ == nil || *typ == modelconfig.LOCALHOST || *typ == modelconfig.LOCAL {
+	if typ == "" || typ == modelconfig.LOCALHOST || typ == modelconfig.LOCAL {
 		return "qemu:///system", nil
 	}
 
-	ip := *host.Connection.IP
-	user := *host.Connection.User
-	pkey := "~/.ssh/id_rsa"
-	port := 22
+	ip := string(host.Connection.IP)
+	user := string(host.Connection.User)
+	pkey := string(host.Connection.SSH.Keyfile)
+	port := int(host.Connection.SSH.Port)
 	verify := "&no_verify=1"
-
-	if host.Connection.SSH.Port != nil {
-		port = int(*host.Connection.SSH.Port)
-	}
-
-	if host.Connection.SSH.Keyfile != nil {
-		pkey = fmt.Sprintf("%v", *host.Connection.SSH.Keyfile)
-	}
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -95,7 +76,7 @@ func hostUri(host modelconfig.Host) (string, error) {
 
 	pkey = strings.Replace(pkey, "~", homeDir, 1)
 
-	if host.Connection.SSH.Verify != nil && *host.Connection.SSH.Verify {
+	if host.Connection.SSH.Verify {
 		verify = ""
 	}
 

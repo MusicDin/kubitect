@@ -261,7 +261,7 @@ func (c *Cluster) prepare() error {
 // specified a path to an existing key pair.
 func (c *Cluster) generateMissingSshKeys() error {
 	sshKeysPath := c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath
-	if sshKeysPath != nil {
+	if sshKeysPath != "" {
 		return nil
 	}
 

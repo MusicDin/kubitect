@@ -24,15 +24,15 @@ type kubespray struct {
 }
 
 func (e *kubespray) K8sVersion() string {
-	return string(*e.Config.Kubernetes.Version)
+	return string(e.Config.Kubernetes.Version)
 }
 
 func (e *kubespray) SshUser() string {
-	return string(*e.InfraConfig.Cluster.NodeTemplate.User)
+	return string(e.InfraConfig.Cluster.NodeTemplate.User)
 }
 
 func (e *kubespray) SshPKey() string {
-	return string(*e.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath)
+	return string(e.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath)
 }
 
 func NewKubesprayExecutor(
@@ -143,7 +143,7 @@ func (e *kubespray) ScaleDown(events event.Events) error {
 	var names []string
 
 	for _, n := range rmNodes {
-		name := fmt.Sprintf("%s-%s-%s", e.ClusterName, n.GetTypeName(), *n.GetID())
+		name := fmt.Sprintf("%s-%s-%s", e.ClusterName, n.GetTypeName(), n.GetID())
 		names = append(names, name)
 	}
 

@@ -10,6 +10,7 @@ import (
 	"cli/env"
 	"cli/tools/virtualenv"
 	"cli/ui"
+	"cli/utils/defaults"
 	"cli/utils/file"
 	"fmt"
 	"os"
@@ -47,12 +48,16 @@ func NewCluster(ctx ClusterContext, configPath string) (*Cluster, error) {
 		NewConfigPath: configPath,
 	}
 
+	if err := defaults.Set(c.NewConfig); err != nil {
+		return c, fmt.Errorf("failed to set config defaults: %v", err)
+	}
+
 	if err := validateConfig(c.NewConfig); err != nil {
 		ui.PrintBlockE(err...)
 		return c, fmt.Errorf("invalid configuration file")
 	}
 
-	c.Name = string(*c.NewConfig.Cluster.Name)
+	c.Name = c.NewConfig.Cluster.Name
 	c.Path = filepath.Join(c.ClustersDir(), c.Name)
 
 	return c, c.Sync()

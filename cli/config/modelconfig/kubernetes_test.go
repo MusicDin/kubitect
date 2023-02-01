@@ -3,6 +3,8 @@ package modelconfig
 import (
 	"testing"
 
+	"cli/utils/defaults"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,29 +43,43 @@ func TestKubespray(t *testing.T) {
 }
 
 func TestKubernetes_Empty(t *testing.T) {
-	assert.ErrorContains(t, Kubernetes{}.Validate(), "Field 'version' is required.")
-	assert.ErrorContains(t, Kubernetes{}.Validate(), "Field 'kubespray' is required and cannot be empty.")
+	k8s := Kubernetes{}
+	assert.ErrorContains(t, k8s.Validate(), "Field 'version' is required and cannot be empty.")
+	assert.ErrorContains(t, k8s.Validate(), "Field 'dnsMode' is required and cannot be empty.")
+	assert.ErrorContains(t, k8s.Validate(), "Field 'networkPlugin' is required and cannot be empty.")
+	assert.ErrorContains(t, defaults.Assign(&k8s).Validate(), "Field 'kubespray' is required and cannot be empty.")
 }
 
 func TestKubernetes_Valid(t *testing.T) {
-	ver := Version("v1.2.3")
 	mver := MasterVersion("v1.2.3")
-	boolean := true
-	dnsMode := COREDNS
-	netPlugin := CALICO
 
 	k := Kubernetes{
-		Version:       &ver,
-		DnsMode:       &dnsMode,
-		NetworkPlugin: &netPlugin,
+		Version:       Version("v1.2.3"),
+		DnsMode:       COREDNS,
+		NetworkPlugin: CALICO,
 		Kubespray: Kubespray{
 			Version: &mver,
 		},
 		Other: Other{
-			AutoRenewCertificates: &boolean,
-			CopyKubeconfig:        &boolean,
+			AutoRenewCertificates: true,
+			CopyKubeconfig:        true,
 		},
 	}
 
 	assert.NoError(t, k.Validate())
+}
+
+func TestDefault(t *testing.T) {
+	k := Kubernetes{}
+	assert.NoError(t, defaults.Set(&k))
+	assert.Equal(t, COREDNS, k.DnsMode)
+}
+
+func TestDefault_Fail(t *testing.T) {
+	dns := KUBEDNS
+	k := Kubernetes{
+		DnsMode: dns,
+	}
+	assert.NoError(t, defaults.Set(&k))
+	assert.Equal(t, KUBEDNS, k.DnsMode)
 }

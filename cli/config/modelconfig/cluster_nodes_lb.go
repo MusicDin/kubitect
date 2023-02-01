@@ -1,11 +1,14 @@
 package modelconfig
 
-import v "cli/utils/validation"
+import (
+	"cli/utils/defaults"
+	v "cli/utils/validation"
+)
 
 type LBDefault struct {
-	CPU          *VCpu `yaml:"cpu"`
-	RAM          *GB   `yaml:"ram"`
-	MainDiskSize *GB   `yaml:"mainDiskSize"`
+	CPU          VCpu `yaml:"cpu"`
+	RAM          GB   `yaml:"ram"`
+	MainDiskSize GB   `yaml:"mainDiskSize"`
 }
 
 func (def LBDefault) Validate() error {
@@ -14,6 +17,12 @@ func (def LBDefault) Validate() error {
 		v.Field(&def.RAM),
 		v.Field(&def.MainDiskSize),
 	)
+}
+
+func (def *LBDefault) SetDefaults() {
+	def.CPU = defaults.Default(def.CPU, defaultVCpu)
+	def.RAM = defaults.Default(def.RAM, defaultRAM)
+	def.MainDiskSize = defaults.Default(def.MainDiskSize, defaultMainDiskSize)
 }
 
 type LB struct {
@@ -38,20 +47,33 @@ func (lb LB) Validate() error {
 	)
 }
 
+func (lb *LB) SetDefaults() {
+	for i := range lb.Instances {
+		lb.Instances[i].CPU = defaults.Default(lb.Instances[i].CPU, lb.Default.CPU)
+		lb.Instances[i].RAM = defaults.Default(lb.Instances[i].RAM, lb.Default.RAM)
+		lb.Instances[i].MainDiskSize = defaults.Default(lb.Instances[i].MainDiskSize, lb.Default.MainDiskSize)
+	}
+}
+
 type LBPortForward struct {
-	Name       *string              `yaml:"name"`
-	Port       *Port                `yaml:"port"`
-	TargetPort *Port                `yaml:"targetPort"`
-	Target     *LBPortForwardTarget `yaml:"target"`
+	Name       string              `yaml:"name"`
+	Port       Port                `yaml:"port"`
+	TargetPort Port                `yaml:"targetPort"`
+	Target     LBPortForwardTarget `yaml:"target"`
 }
 
 func (pf LBPortForward) Validate() error {
 	return v.Struct(&pf,
-		v.Field(&pf.Name, v.Required(), v.AlphaNumericHypUS()),
-		v.Field(&pf.Port, v.Required()),
+		v.Field(&pf.Name, v.NotEmpty(), v.AlphaNumericHypUS()),
+		v.Field(&pf.Port, v.NotEmpty()),
 		v.Field(&pf.TargetPort),
 		v.Field(&pf.Target),
 	)
+}
+
+func (pf *LBPortForward) SetDefaults() {
+	pf.TargetPort = defaults.Default(pf.TargetPort, pf.Port)
+	pf.Target = defaults.Default(pf.Target, WORKERS)
 }
 
 type LBPortForwardTarget string
@@ -67,38 +89,38 @@ func (pft LBPortForwardTarget) Validate() error {
 }
 
 type LBInstance struct {
-	Id           *string `yaml:"id" opt:",id"`
-	Host         *string `yaml:"host"`
-	IP           *IPv4   `yaml:"ip"`
-	MAC          *MAC    `yaml:"mac"`
-	CPU          *VCpu   `yaml:"cpu"`
-	RAM          *GB     `yaml:"ram"`
-	MainDiskSize *GB     `yaml:"mainDiskSize"`
-	Priority     *Uint8  `yaml:"priority"`
+	Id           string `yaml:"id" opt:",id"`
+	Host         string `yaml:"host"`
+	IP           IPv4   `yaml:"ip"`
+	MAC          MAC    `yaml:"mac"`
+	CPU          VCpu   `yaml:"cpu"`
+	RAM          GB     `yaml:"ram"`
+	MainDiskSize GB     `yaml:"mainDiskSize"`
+	Priority     *Uint8 `yaml:"priority"`
 }
 
 func (i LBInstance) GetTypeName() string {
 	return "lb"
 }
 
-func (i LBInstance) GetID() *string {
+func (i LBInstance) GetID() string {
 	return i.Id
 }
 
-func (i LBInstance) GetIP() *IPv4 {
+func (i LBInstance) GetIP() IPv4 {
 	return i.IP
 }
 
-func (i LBInstance) GetMAC() *MAC {
+func (i LBInstance) GetMAC() MAC {
 	return i.MAC
 }
 
 func (i LBInstance) Validate() error {
 	return v.Struct(&i,
-		v.Field(&i.Id, v.Required(), v.AlphaNumericHypUS()),
+		v.Field(&i.Id, v.NotEmpty(), v.AlphaNumericHypUS()),
 		v.Field(&i.Host, v.OmitEmpty(), v.Custom(VALID_HOST)),
 		v.Field(&i.IP, v.OmitEmpty(), v.Custom(IP_IN_CIDR)),
-		v.Field(&i.MAC),
+		v.Field(&i.MAC, v.OmitEmpty()),
 		v.Field(&i.CPU),
 		v.Field(&i.RAM),
 		v.Field(&i.MainDiskSize),

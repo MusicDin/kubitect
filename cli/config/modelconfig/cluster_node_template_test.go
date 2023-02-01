@@ -1,6 +1,7 @@
 package modelconfig
 
 import (
+	"cli/utils/defaults"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,28 +25,26 @@ func TestOS(t *testing.T) {
 	source := OSSource("./cluster_node_template_test.go")
 
 	os1 := OS{
-		Distro: &distro,
+		Distro: distro,
 	}
 
 	os2 := OS{
-		Source: &source,
+		Source: source,
 	}
 
-	assert.NoError(t, OS{}.Validate())
-	assert.NoError(t, os1.Validate())
-	assert.NoError(t, os2.Validate())
+	assert.ErrorContains(t, OS{}.Validate(), "Field 'distro' must be one of the following values: [ubuntu|ubuntu20|ubuntu22|debian|debian11]")
+	assert.ErrorContains(t, OS{}.Validate(), "Field 'networkInterface' can contain only alphanumeric characters.")
+	assert.NoError(t, defaults.Assign(&os1).Validate())
+	assert.NoError(t, defaults.Assign(&os2).Validate())
 }
 
 func TestNodeTemplateSSH(t *testing.T) {
-	file1 := File("./cluster_node_template_test.go")
-	file2 := File("./non-existing")
-
 	nts1 := NodeTemplateSSH{
-		PrivateKeyPath: &file1,
+		PrivateKeyPath: File("./cluster_node_template_test.go"),
 	}
 
 	nts2 := NodeTemplateSSH{
-		PrivateKeyPath: &file2,
+		PrivateKeyPath: File("./non-existing"),
 	}
 
 	assert.NoError(t, NodeTemplateSSH{}.Validate())

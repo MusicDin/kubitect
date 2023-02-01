@@ -1,43 +1,48 @@
 package modelconfig
 
 import (
+	"cli/utils/defaults"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
+func TestHost_Empty(t *testing.T) {
+	assert.ErrorContains(t, Host{}.Validate(), "Field 'name' is required and cannot be empty.")
+	assert.ErrorContains(t, Host{}.Validate(), "Field 'type' is required and cannot be empty.")
+}
+
+func TestHost_Default(t *testing.T) {
+	assert.ErrorContains(t, Host{}.Validate(), "Field 'name' is required and cannot be empty.")
+	assert.ErrorContains(t, defaults.Assign(&Host{}).Validate(), "Field 'type' is required and cannot be empty.")
+}
+
 func TestHost(t *testing.T) {
-
-	connType := LOCAL
-	name := "test"
-
 	h1 := Host{
-		Name: &name,
+		Name: "host",
 		Connection: Connection{
-			Type: &connType,
+			Type: LOCAL,
 		},
 	}
 
 	h2 := Host{
-		Name: &name,
+		Name: "host",
 	}
 
 	h3 := Host{
-		Name: &name,
+		Name: "host",
 		DataResourcePools: []DataResourcePool{
 			{
-				Name: &name,
+				Name: "drp1",
 			},
 			{
-				Name: &name,
+				Name: "drp1",
 			},
 		},
 	}
 
 	assert.NoError(t, h1.Validate())
-	assert.EqualError(t, h2.Validate(), "Field 'type' is required.")
-	assert.ErrorContains(t, h3.Validate(), "Field 'type' is required.")
+	assert.EqualError(t, defaults.Assign(&h2).Validate(), "Field 'type' is required and cannot be empty.")
+	assert.ErrorContains(t, h3.Validate(), "Field 'type' is required and cannot be empty.")
 	assert.ErrorContains(t, h3.Validate(), "Field 'Name' must be unique for each element in 'dataResourcePools'.")
-	assert.ErrorContains(t, Host{}.Validate(), "Field 'name' is required.")
-	assert.ErrorContains(t, Host{}.Validate(), "Field 'type' is required.")
 }

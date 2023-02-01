@@ -1,23 +1,23 @@
 package modelconfig
 
 import (
+	"cli/utils/defaults"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMasterDefault(t *testing.T) {
-	size := GB(5)
-	cpu := VCpu(5)
-
 	def := MasterDefault{
-		CPU:          &cpu,
-		RAM:          &size,
-		MainDiskSize: &size,
+		CPU:          VCpu(5),
+		RAM:          GB(5),
+		MainDiskSize: GB(5),
 	}
 
 	assert.NoError(t, def.Validate())
-	assert.NoError(t, MasterDefault{}.Validate())
+	assert.ErrorContains(t, MasterDefault{}.Validate(), "Minimum value for field 'cpu' is 1 (actual: 0).")
+	assert.ErrorContains(t, MasterDefault{}.Validate(), "Minimum value for field 'ram' is 1 (actual: 0).")
+	assert.ErrorContains(t, MasterDefault{}.Validate(), "Minimum value for field 'mainDiskSize' is 1 (actual: 0).")
 }
 
 func TestMaster_Type(t *testing.T) {
@@ -25,18 +25,14 @@ func TestMaster_Type(t *testing.T) {
 }
 
 func TestMaster_Minimal(t *testing.T) {
-	id := "id"
-
 	m := Master{
 		Instances: []MasterInstance{
-			{
-				Id: &id,
-			},
+			{Id: "id"},
 		},
 	}
 
-	assert.NoError(t, m.Validate())
-	assert.EqualError(t, Master{}.Validate(), "At least one master instance must be configured.")
+	assert.NoError(t, defaults.Assign(&m).Validate())
+	assert.EqualError(t, defaults.Assign(&Master{}).Validate(), "At least one master instance must be configured.")
 }
 
 func TestMaster_MissingID(t *testing.T) {
@@ -44,90 +40,63 @@ func TestMaster_MissingID(t *testing.T) {
 		Instances: []MasterInstance{{}},
 	}
 
-	assert.Nil(t, m.Instances[0].GetID())
-	assert.EqualError(t, m.Validate(), "Field 'id' is required.")
+	assert.Empty(t, m.Instances[0].GetID())
+	assert.EqualError(t, defaults.Assign(&m).Validate(), "Field 'id' is required and cannot be empty.")
 }
 
 func TestMaster_UniqueID(t *testing.T) {
-	id := "id"
-
 	m := Master{
 		Instances: []MasterInstance{
-			{
-				Id: &id,
-			},
-			{
-				Id: &id,
-			},
-			{
-				Id: &id,
-			},
+			{Id: "id"},
+			{Id: "id"},
+			{Id: "id"},
 		},
 	}
 
-	assert.EqualError(t, m.Validate(), "Field 'Id' must be unique for each element in 'instances'.")
+	assert.EqualError(t, defaults.Assign(&m).Validate(), "Field 'Id' must be unique for each element in 'instances'.")
 }
 
 func TestMaster_OddNumberOfInstances(t *testing.T) {
-	id1 := "id"
-	id2 := "id2"
-
 	m := Master{
 		Instances: []MasterInstance{
-			{
-				Id: &id1,
-			},
-			{
-				Id: &id2,
-			},
+			{Id: "id1"},
+			{Id: "id2"},
 		},
 	}
 
-	assert.EqualError(t, m.Validate(), "Number of master instances must be odd (1, 3, 5 etc.).")
+	assert.EqualError(t, defaults.Assign(&m).Validate(), "Number of master instances must be odd (1, 3, 5 etc.).")
 }
 
 func TestMaster_DataDisk(t *testing.T) {
-	name := "id"
-	size := GB(42)
-
 	m := Master{
 		Instances: []MasterInstance{
 			{
-				Id: &name,
+				Id: "id",
 				DataDisks: []DataDisk{
 					{
-						Name: &name,
-						Size: &size,
+						Name: "disk",
+						Size: GB(42),
 					},
 				},
 			},
 		},
 	}
 
-	assert.NoError(t, m.Validate())
+	assert.NoError(t, defaults.Assign(&m).Validate())
 }
 
 func TestMaster_DataDiskUniqueName(t *testing.T) {
-	name := "id"
-	size := GB(42)
-
 	m := Master{
 		Instances: []MasterInstance{
 			{
-				Id: &name,
+				Id: "id",
 				DataDisks: []DataDisk{
-					{
-						Name: &name,
-						Size: &size,
-					},
-					{
-						Name: &name,
-						Size: &size,
-					},
+					{Name: "disk1", Size: GB(42)},
+					{Name: "disk1", Size: GB(42)},
 				},
 			},
 		},
 	}
 
-	assert.EqualError(t, m.Validate(), "Field 'Name' must be unique for each element in 'dataDisks'.")
+	assert.EqualError(t, defaults.Assign(&m).Validate(), "Field 'Name' must be unique for each element in 'dataDisks'.")
 }

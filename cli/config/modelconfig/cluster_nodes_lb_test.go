@@ -1,6 +1,7 @@
 package modelconfig
 
 import (
+	"cli/utils/defaults"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,33 +16,39 @@ func TestLBPortForwardTarget(t *testing.T) {
 }
 
 func TestLBPortForward(t *testing.T) {
-	name := "http"
-	port := Port(80)
+	fp := LBPortForward{}
+	fp1 := LBPortForward{Port: 80}
+	fp2 := LBPortForward{Name: "http"}
+	fp3 := LBPortForward{Name: "http", Port: 80}
 
-	fp := &LBPortForward{}
-	fp1 := &LBPortForward{Port: &port}
-	fp2 := &LBPortForward{Name: &name}
-	fp3 := &LBPortForward{Name: &name, Port: &port}
+	assert.ErrorContains(t, fp.Validate(), "Field 'name' is required and cannot be empty.")
+	assert.ErrorContains(t, fp.Validate(), "Field 'port' is required and cannot be empty.")
+	assert.ErrorContains(t, fp1.Validate(), "Field 'name' is required and cannot be empty.")
+	assert.ErrorContains(t, fp2.Validate(), "Field 'port' is required and cannot be empty.")
+	assert.EqualError(t, fp3.Validate(), "Minimum value for field 'targetPort' is 1 (actual: 0).")
+}
 
-	assert.ErrorContains(t, fp.Validate(), "Field 'name' is required.")
-	assert.ErrorContains(t, fp.Validate(), "Field 'port' is required.")
-	assert.ErrorContains(t, fp1.Validate(), "Field 'name' is required.")
-	assert.ErrorContains(t, fp2.Validate(), "Field 'port' is required.")
-	assert.NoError(t, fp3.Validate())
+func TestLBPortForward_Default(t *testing.T) {
+	fp := defaults.Assign(&LBPortForward{Name: "http", Port: 80})
+
+	assert.NoError(t, fp.Validate())
+	assert.Equal(t, Port(80), fp.TargetPort)
+	assert.Equal(t, WORKERS, fp.Target)
 }
 
 func TestLBDefault(t *testing.T) {
-	size := GB(5)
-	cpu := VCpu(5)
-
 	def := LBDefault{
-		CPU:          &cpu,
-		RAM:          &size,
-		MainDiskSize: &size,
+		CPU:          VCpu(5),
+		RAM:          GB(5),
+		MainDiskSize: GB(5),
 	}
 
 	assert.NoError(t, def.Validate())
-	assert.NoError(t, LBDefault{}.Validate())
+	assert.NoError(t, def.Validate())
+	assert.NoError(t, defaults.Assign(&LBDefault{}).Validate())
+	assert.ErrorContains(t, LBDefault{}.Validate(), "Minimum value for field 'cpu' is 1 (actual: 0).")
+	assert.ErrorContains(t, LBDefault{}.Validate(), "Minimum value for field 'ram' is 1 (actual: 0).")
+	assert.ErrorContains(t, LBDefault{}.Validate(), "Minimum value for field 'mainDiskSize' is 1 (actual: 0).")
 }
 
 func TestLB_Type(t *testing.T) {
@@ -49,18 +56,14 @@ func TestLB_Type(t *testing.T) {
 }
 
 func TestLB_Minimal(t *testing.T) {
-	id := "id1"
-
 	lb := LB{
 		Instances: []LBInstance{
-			{
-				Id: &id,
-			},
+			{Id: "id"},
 		},
 	}
 
-	assert.NoError(t, lb.Validate())
-	assert.NoError(t, LB{}.Validate())
+	assert.NoError(t, defaults.Assign(&lb).Validate())
+	assert.NoError(t, defaults.Assign(&LBDefault{}).Validate())
 }
 
 func TestLB_MissingID(t *testing.T) {
@@ -68,63 +71,45 @@ func TestLB_MissingID(t *testing.T) {
 		Instances: []LBInstance{{}},
 	}
 
-	assert.Nil(t, lb.Instances[0].GetID())
-	assert.EqualError(t, lb.Validate(), "Field 'id' is required.")
+	assert.Empty(t, lb.Instances[0].GetID())
+	assert.EqualError(t, defaults.Assign(&lb).Validate(), "Field 'id' is required and cannot be empty.")
 }
 
 func TestLB_UniqueID(t *testing.T) {
-	id := "id1"
 	ip := IPv4("192.168.113.13")
 
 	lb := LB{
 		VIP: &ip,
 		Instances: []LBInstance{
-			{
-				Id: &id,
-			},
-			{
-				Id: &id,
-			},
+			{Id: "id"},
+			{Id: "id"},
 		},
 	}
 
-	assert.EqualError(t, lb.Validate(), "Field 'Id' must be unique for each element in 'instances'.")
+	assert.EqualError(t, defaults.Assign(&lb).Validate(), "Field 'Id' must be unique for each element in 'instances'.")
 }
 
 func TestLB_VIP(t *testing.T) {
-	id1 := "id1"
-	id2 := "id2"
 	ip := IPv4("192.168.113.13")
 
 	lb := LB{
 		VIP: &ip,
 		Instances: []LBInstance{
-			{
-				Id: &id1,
-			},
-			{
-				Id: &id2,
-			},
+			{Id: "id1"},
+			{Id: "id2"},
 		},
 	}
 
-	assert.NoError(t, lb.Validate())
+	assert.NoError(t, defaults.Assign(&lb).Validate())
 }
 
 func TestLB_MissingVIP(t *testing.T) {
-	id1 := "id1"
-	id2 := "id2"
-
 	lb := LB{
 		Instances: []LBInstance{
-			{
-				Id: &id1,
-			},
-			{
-				Id: &id2,
-			},
+			{Id: "id1"},
+			{Id: "id2"},
 		},
 	}
 
-	assert.EqualError(t, lb.Validate(), "Virtual IP (VIP) is required when multiple load balancer instances are configured.")
+	assert.EqualError(t, defaults.Assign(&lb).Validate(), "Virtual IP (VIP) is required when multiple load balancer instances are configured.")
 }
