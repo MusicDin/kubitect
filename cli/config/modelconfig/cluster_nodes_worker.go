@@ -6,11 +6,12 @@ import (
 )
 
 type WorkerDefault struct {
-	CPU          VCpu    `yaml:"cpu"`
-	RAM          GB      `yaml:"ram"`
-	MainDiskSize GB      `yaml:"mainDiskSize"`
-	Labels       Labels  `yaml:"labels"`
-	Taints       []Taint `yaml:"taints"`
+	CPU          VCpu       `yaml:"cpu"`
+	RAM          GB         `yaml:"ram"`
+	MainDiskSize GB         `yaml:"mainDiskSize"`
+	Labels       Labels     `yaml:"labels,omitempty"`
+	Taints       []Taint    `yaml:"taints,omitempty"`
+	DataDisks    []DataDisk `yaml:"dataDisks,omitempty"`
 }
 
 func (d WorkerDefault) Validate() error {
@@ -20,6 +21,7 @@ func (d WorkerDefault) Validate() error {
 		v.Field(&d.MainDiskSize),
 		v.Field(&d.Labels),
 		v.Field(&d.Taints),
+		v.Field(&d.DataDisks, v.OmitEmpty(), v.UniqueField("Name")),
 	)
 }
 
@@ -31,7 +33,7 @@ func (def *WorkerDefault) SetDefaults() {
 
 type Worker struct {
 	Default   WorkerDefault    `yaml:"default"`
-	Instances []WorkerInstance `yaml:"instances"`
+	Instances []WorkerInstance `yaml:"instances,omitempty"`
 }
 
 func (w Worker) Validate() error {
@@ -46,20 +48,21 @@ func (w *Worker) SetDefaults() {
 		w.Instances[i].CPU = defaults.Default(w.Instances[i].CPU, w.Default.CPU)
 		w.Instances[i].RAM = defaults.Default(w.Instances[i].RAM, w.Default.RAM)
 		w.Instances[i].MainDiskSize = defaults.Default(w.Instances[i].MainDiskSize, w.Default.MainDiskSize)
+		w.Instances[i].DataDisks = append(w.Default.DataDisks, w.Instances[i].DataDisks...)
 	}
 }
 
 type WorkerInstance struct {
 	Id           string     `yaml:"id" opt:",id"`
-	Host         string     `yaml:"host"`
-	IP           IPv4       `yaml:"ip"`
-	MAC          MAC        `yaml:"mac"`
+	Host         string     `yaml:"host,omitempty"`
+	IP           IPv4       `yaml:"ip,omitempty"`
+	MAC          MAC        `yaml:"mac,omitempty"`
 	CPU          VCpu       `yaml:"cpu"`
 	RAM          GB         `yaml:"ram"`
 	MainDiskSize GB         `yaml:"mainDiskSize"`
-	DataDisks    []DataDisk `yaml:"dataDisks"`
-	Labels       Labels     `yaml:"labels"`
-	Taints       []Taint    `yaml:"taints"`
+	DataDisks    []DataDisk `yaml:"dataDisks,omitempty"`
+	Labels       Labels     `yaml:"labels,omitempty"`
+	Taints       []Taint    `yaml:"taints,omitempty"`
 }
 
 func (i WorkerInstance) GetTypeName() string {

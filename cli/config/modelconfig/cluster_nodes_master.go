@@ -6,11 +6,12 @@ import (
 )
 
 type MasterDefault struct {
-	CPU          VCpu    `yaml:"cpu"`
-	RAM          GB      `yaml:"ram"`
-	MainDiskSize GB      `yaml:"mainDiskSize"`
-	Labels       Labels  `yaml:"labels"`
-	Taints       []Taint `yaml:"taints"`
+	CPU          VCpu       `yaml:"cpu"`
+	RAM          GB         `yaml:"ram"`
+	MainDiskSize GB         `yaml:"mainDiskSize"`
+	Labels       Labels     `yaml:"labels,omitempty"`
+	Taints       []Taint    `yaml:"taints,omitempty"`
+	DataDisks    []DataDisk `yaml:"dataDisks,omitempty"`
 }
 
 func (d MasterDefault) Validate() error {
@@ -20,6 +21,7 @@ func (d MasterDefault) Validate() error {
 		v.Field(&d.MainDiskSize),
 		v.Field(&d.Labels),
 		v.Field(&d.Taints),
+		v.Field(&d.DataDisks, v.OmitEmpty(), v.UniqueField("Name")),
 	)
 }
 
@@ -51,20 +53,21 @@ func (m *Master) SetDefaults() {
 		m.Instances[i].CPU = defaults.Default(m.Instances[i].CPU, m.Default.CPU)
 		m.Instances[i].RAM = defaults.Default(m.Instances[i].RAM, m.Default.RAM)
 		m.Instances[i].MainDiskSize = defaults.Default(m.Instances[i].MainDiskSize, m.Default.MainDiskSize)
+		m.Instances[i].DataDisks = append(m.Default.DataDisks, m.Instances[i].DataDisks...)
 	}
 }
 
 type MasterInstance struct {
 	Id           string     `yaml:"id" opt:",id"`
-	Host         string     `yaml:"host"`
-	IP           IPv4       `yaml:"ip"`
-	MAC          MAC        `yaml:"mac"`
+	Host         string     `yaml:"host,omitempty"`
+	IP           IPv4       `yaml:"ip,omitempty"`
+	MAC          MAC        `yaml:"mac,omitempty"`
 	CPU          VCpu       `yaml:"cpu"`
 	RAM          GB         `yaml:"ram"`
 	MainDiskSize GB         `yaml:"mainDiskSize"`
-	DataDisks    []DataDisk `yaml:"dataDisks"`
-	Labels       Labels     `yaml:"labels"`
-	Taints       []Taint    `yaml:"taints"`
+	DataDisks    []DataDisk `yaml:"dataDisks,omitempty"`
+	Labels       Labels     `yaml:"labels,omitempty"`
+	Taints       []Taint    `yaml:"taints,omitempty"`
 }
 
 func (i MasterInstance) GetTypeName() string {
@@ -96,7 +99,7 @@ func (i MasterInstance) Validate() error {
 		v.Field(&i.CPU),
 		v.Field(&i.RAM),
 		v.Field(&i.MainDiskSize),
-		v.Field(&i.DataDisks, v.UniqueField("Name")),
+		v.Field(&i.DataDisks, v.OmitEmpty(), v.UniqueField("Name")),
 		v.Field(&i.Labels),
 		v.Field(&i.Taints),
 	)

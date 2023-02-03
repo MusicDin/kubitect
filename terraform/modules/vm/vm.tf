@@ -58,7 +58,6 @@ resource "libvirt_volume" "vm_main_disk" {
 
 # Creates volume for new virtual machine #
 resource "libvirt_volume" "vm_data_disks" {
-
   for_each = { for disk in var.vm_data_disks : disk.name => disk }
 
   name = "${var.vm_name}-${each.key}-data-disk"

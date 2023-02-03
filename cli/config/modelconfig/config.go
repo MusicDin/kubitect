@@ -17,8 +17,8 @@ type Config struct {
 	Hosts      []Host     `yaml:"hosts"`
 	Cluster    Cluster    `yaml:"cluster"`
 	Kubernetes Kubernetes `yaml:"kubernetes"`
-	Addons     Addons     `yaml:"addons"`
-	Kubitect   Kubitect   `yaml:"kubitect"`
+	Addons     Addons     `yaml:"addons,omitempty"`
+	Kubitect   Kubitect   `yaml:"kubitect,omitempty"`
 }
 
 func (c Config) Validate() error {

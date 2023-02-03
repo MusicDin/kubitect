@@ -55,19 +55,18 @@ variable "cluster_name" {
 variable "cluster_nodeTemplate_user" {
   type        = string
   description = "Username used to SSH to the virtual machines."
-  nullable    = false
 }
 
 variable "cluster_nodeTemplate_ssh_privateKeyPath" {
   type        = string
   description = "Location of private SSH key that will be used for virtual machines."
+  default     = "../config/.ssh/id_rsa"
+  nullable    = false
 }
 
 variable "cluster_nodeTemplate_ssh_addToKnownHosts" {
   type        = bool
   description = "Add virtual machines to SSH known hosts."
-  default     = true
-  nullable    = false
 }
 
 variable "cluster_nodeTemplate_os_source" {
@@ -90,8 +89,6 @@ variable "cluster_nodeTemplate_dns" {
 variable "cluster_nodeTemplate_updateOnBoot" {
   type        = bool
   description = "Update system on boot."
-  default     = true
-  nullable    = false
 }
 
 variable "cluster_nodeTemplate_cpuMode" {
@@ -113,12 +110,13 @@ variable "cluster_network_mode" {
 variable "cluster_network_bridge" {
   type        = string
   description = "Network (virtual) bridge."
+  nullable    = true
 }
 
 variable "cluster_network_gateway" {
   type        = string
   description = "Network gateway."
-  default     = null
+  nullable    = true
 }
 
 variable "cluster_network_cidr" {
@@ -133,21 +131,6 @@ variable "cluster_network_cidr" {
 variable "cluster_nodes_loadBalancer_vip" {
   type        = string
   description = "HAProxy load balancer virtual IP address (VIP)."
-}
-
-variable "cluster_nodes_loadBalancer_default_cpu" {
-  type        = number
-  description = "The default number of vCPU allocated to the HAProxy load balancer."
-}
-
-variable "cluster_nodes_loadBalancer_default_ram" {
-  type        = number
-  description = "The default amount of RAM (in GiB) allocated to the HAProxy load balancer."
-}
-
-variable "cluster_nodes_loadBalancer_default_mainDiskSize" {
-  type        = number
-  description = "Size of the main disk (in GiB) that is attached to the HAProxy load balancer."
 }
 
 variable "cluster_nodes_loadBalancer_instances" {
@@ -167,41 +150,15 @@ variable "cluster_nodes_loadBalancer_instances" {
 # Master node VMs parameters
 #======================================================================================
 
-variable "cluster_nodes_master_default_cpu" {
-  type        = number
-  description = "The default number of vCPU allocated to the master node."
-}
-
-variable "cluster_nodes_master_default_ram" {
-  type        = number
-  description = "The default amount of RAM (in GiB) allocated to the master node."
-}
-
-variable "cluster_nodes_master_default_mainDiskSize" {
-  type        = number
-  description = "Size of the main disk (in GiB) that is attached to the master node."
-}
-
-variable "cluster_nodes_master_default_dataDisks" {
-  type = list(object({
-    name : string
-    pool : optional(string)
-    size : number
-  }))
-  description = "List of additional data disks that are attached to the master node."
-  default     = []
-  nullable    = false
-}
-
 variable "cluster_nodes_master_instances" {
   type = list(object({
     id           = string
     host         = optional(string)
     mac          = optional(string)
     ip           = optional(string)
-    cpu          = optional(number)
-    ram          = optional(number)
-    mainDiskSize = optional(number)
+    cpu          = number
+    ram          = number
+    mainDiskSize = number
     dataDisks = optional(list(object({
       name : string
       pool : optional(string)
@@ -215,41 +172,15 @@ variable "cluster_nodes_master_instances" {
 # Worker node VMs parameters
 #======================================================================================
 
-variable "cluster_nodes_worker_default_cpu" {
-  type        = number
-  description = "The default number of vCPU allocated to the worker node."
-}
-
-variable "cluster_nodes_worker_default_ram" {
-  type        = number
-  description = "The default amount of RAM (in GiB) allocated to the worker node."
-}
-
-variable "cluster_nodes_worker_default_mainDiskSize" {
-  type        = number
-  description = "Size of the main disk (in GiB) that is attached to the worker node."
-}
-
-variable "cluster_nodes_worker_default_dataDisks" {
-  type = list(object({
-    name : string
-    pool : optional(string)
-    size : number
-  }))
-  description = "List of additional data disks that are attached to the worker node."
-  default     = []
-  nullable    = false
-}
-
 variable "cluster_nodes_worker_instances" {
   type = list(object({
     id           = string
     host         = optional(string)
     mac          = optional(string)
     ip           = optional(string)
-    cpu          = optional(number)
-    ram          = optional(number)
-    mainDiskSize = optional(number)
+    cpu          = number
+    ram          = number
+    mainDiskSize = number
     dataDisks = optional(list(object({
       name : string
       pool : optional(string)

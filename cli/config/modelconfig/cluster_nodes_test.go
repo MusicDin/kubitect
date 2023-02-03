@@ -87,11 +87,9 @@ func TestNodes_SingleLB(t *testing.T) {
 }
 
 func TestNodes_MultiLB(t *testing.T) {
-	ip := IPv4("192.168.113.13")
-
 	n := Nodes{
 		LoadBalancer: LB{
-			VIP: &ip,
+			VIP: IPv4("192.168.113.13"),
 			Instances: []LBInstance{
 				{Id: "lb1"},
 				{Id: "lb2"},

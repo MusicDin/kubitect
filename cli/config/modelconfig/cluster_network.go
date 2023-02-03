@@ -19,9 +19,9 @@ func (mode NetworkMode) Validate() error {
 
 type Network struct {
 	CIDR    CIDRv4        `yaml:"cidr"`
-	Gateway *IPv4         `yaml:"gateway"`
+	Gateway *IPv4         `yaml:"gateway,omitempty"`
 	Mode    NetworkMode   `yaml:"mode"`
-	Bridge  NetworkBridge `yaml:"bridge"`
+	Bridge  NetworkBridge `yaml:"bridge,omitempty"`
 }
 
 func (n Network) Validate() error {

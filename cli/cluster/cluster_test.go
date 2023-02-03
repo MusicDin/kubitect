@@ -65,8 +65,12 @@ func MockCluster(t *testing.T) *clusterMock {
 	c, err := NewCluster(ctx, mockConfigFile(t))
 	assert.NoError(t, err)
 
-	// Prevents generation of SSH keys (in prepare phase)
-	c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath = modelconfig.File("test")
+	// Create empty SSH keys
+	keyDir := t.TempDir()
+	keyPath := path.Join(keyDir, "key")
+	os.Create(keyPath)
+	os.Create(keyPath + ".pub")
+	c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath = modelconfig.File(keyPath)
 
 	c.exec = executors.MockExecutor(t)
 	c.prov = provisioner.MockProvisioner(t)

@@ -1,6 +1,7 @@
 package modelconfig
 
 import (
+	"cli/env"
 	"cli/utils/defaults"
 	v "cli/utils/validation"
 )
@@ -8,8 +9,9 @@ import (
 type NodeTemplate struct {
 	User         User            `yaml:"user"`
 	OS           OS              `yaml:"os"`
-	SSH          NodeTemplateSSH `yaml:"ssh"`
-	DNS          []IP            `yaml:"dns"`
+	SSH          NodeTemplateSSH `yaml:"ssh,omitempty"`
+	CpuMode      CpuMode         `yaml:"cpuMode,omitempty"`
+	DNS          []IP            `yaml:"dns,omitempty"`
 	UpdateOnBoot bool            `yaml:"updateOnBoot"`
 }
 
@@ -23,8 +25,8 @@ func (n NodeTemplate) Validate() error {
 }
 
 func (n *NodeTemplate) SetDefaults() {
-	// TODO: Save these default values in env
 	n.User = defaults.Default(n.User, "k8s")
+	n.CpuMode = defaults.Default(n.CpuMode, CUSTOM)
 	n.UpdateOnBoot = defaults.Default(n.UpdateOnBoot, true)
 }
 
@@ -43,11 +45,9 @@ func (s OS) Validate() error {
 }
 
 func (s *OS) SetDefaults() {
-	s.Distro = defaults.Default(s.Distro, UBUNTU)
-
-	// TODO: Evaluate as in Terraform base module
 	s.NetworkInterface = defaults.Default(s.NetworkInterface, OSNetworkInterface("ens3"))
-	// s.Source = defaults.Default(s.NetworkInterface, OSNetworkInterface("ens3"))
+	s.Distro = defaults.Default(s.Distro, UBUNTU)
+	s.Source = defaults.Default(s.Source, OSSource(env.ProjectOsPresets[string(s.Distro)]))
 }
 
 type OSDistro string
@@ -82,11 +82,21 @@ type NodeTemplateSSH struct {
 }
 
 func (ssh NodeTemplateSSH) Validate() error {
-	return v.Struct(&ssh,
-		v.Field(&ssh.PrivateKeyPath, v.OmitEmpty()),
-	)
+	return v.Struct(&ssh)
+	// v.Field(&ssh.PrivateKeyPath, v.Skip()),
 }
 
 func (ssh *NodeTemplateSSH) SetDefaults() {
 	ssh.AddToKnownHosts = defaults.Default(ssh.AddToKnownHosts, true)
+}
+
+type CpuMode string
+
+const (
+	CUSTOM      CpuMode = "custom"
+	PASSTHROUGH CpuMode = "host-passthrough"
+)
+
+func (m CpuMode) Validate() error {
+	return v.Var(m, v.OneOf(PASSTHROUGH, CUSTOM))
 }

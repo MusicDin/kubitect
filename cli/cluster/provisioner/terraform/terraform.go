@@ -5,6 +5,7 @@ import (
 	"cli/config/modelconfig"
 	"cli/env"
 	"cli/ui"
+	"cli/utils/file"
 	"context"
 	"fmt"
 	"os"
@@ -66,6 +67,12 @@ func NewTerraformProvisioner(
 }
 
 func (t *terraform) Init() error {
+	cfgPath := path.Join(t.projectDir, "variables.yaml")
+	err := file.WriteYaml(t.cfg, cfgPath, 0644)
+	if err != nil {
+		return fmt.Errorf("terraform: failed to create input variables file: %v", err)
+	}
+
 	return NewMainTemplate(t.projectDir, t.cfg.Hosts).Write()
 }
 

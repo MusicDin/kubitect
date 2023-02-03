@@ -36,6 +36,32 @@ func TestWorker_Minimal(t *testing.T) {
 	assert.NoError(t, defaults.Assign(&Worker{}).Validate())
 }
 
+func TestWorker_Defaults(t *testing.T) {
+	w := Worker{
+		Default: WorkerDefault{
+			CPU:          VCpu(2),
+			RAM:          GB(4),
+			MainDiskSize: GB(256),
+		},
+		Instances: []WorkerInstance{
+			{Id: "id1", CPU: VCpu(4)},
+			{Id: "id2", RAM: GB(8)},
+			{Id: "id3", MainDiskSize: (512)},
+		},
+	}
+
+	defaults.Assign(&w)
+	assert.Equal(t, VCpu(4), w.Instances[0].CPU)
+	assert.Equal(t, VCpu(2), w.Instances[1].CPU)
+	assert.Equal(t, VCpu(2), w.Instances[2].CPU)
+	assert.Equal(t, GB(4), w.Instances[0].RAM)
+	assert.Equal(t, GB(8), w.Instances[1].RAM)
+	assert.Equal(t, GB(4), w.Instances[2].RAM)
+	assert.Equal(t, GB(256), w.Instances[0].MainDiskSize)
+	assert.Equal(t, GB(256), w.Instances[1].MainDiskSize)
+	assert.Equal(t, GB(512), w.Instances[2].MainDiskSize)
+}
+
 func TestWorker_MissingID(t *testing.T) {
 	w := Worker{
 		Instances: []WorkerInstance{{}},
@@ -88,4 +114,32 @@ func TestWorker_DataDiskUniqueName(t *testing.T) {
 	}
 
 	assert.EqualError(t, defaults.Assign(&w).Validate(), "Field 'Name' must be unique for each element in 'dataDisks'.")
+}
+
+func TestWorker_DefaultDataDisks(t *testing.T) {
+	defDisks := []DataDisk{
+		{Name: "def-disk1", Size: GB(42)},
+		{Name: "def-disk2", Size: GB(42)},
+	}
+
+	addDisks := []DataDisk{
+		{Name: "disk1", Size: GB(42)},
+		{Name: "disk2", Size: GB(42)},
+	}
+
+	w := Worker{
+		Default: WorkerDefault{
+			DataDisks: defDisks,
+		},
+		Instances: []WorkerInstance{
+			{Id: "id1", DataDisks: addDisks},
+			{Id: "id2"},
+			{Id: "id3"},
+		},
+	}
+
+	assert.NoError(t, defaults.Assign(&w).Validate())
+	assert.Equal(t, append(defDisks, addDisks...), w.Instances[0].DataDisks)
+	assert.Equal(t, w.Default.DataDisks, w.Instances[1].DataDisks)
+	assert.Equal(t, w.Default.DataDisks, w.Instances[2].DataDisks)
 }

@@ -7,6 +7,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestDataResPool_Empty(t *testing.T) {
+	assert.ErrorContains(t, DataResourcePool{}.Validate(), "Field 'name' is required and cannot be empty.")
+	assert.ErrorContains(t, DataResourcePool{}.Validate(), "Field 'path' is required and cannot be empty.")
+}
+
+func TestDataResPool_Default(t *testing.T) {
+	assert.EqualError(t, defaults.Assign(&DataResourcePool{}).Validate(), "Field 'name' is required and cannot be empty.")
+}
+
+func TestDataResPool(t *testing.T) {
+	drp1 := DataResourcePool{
+		Name: "test",
+		Path: "/path",
+	}
+
+	assert.NoError(t, drp1.Validate())
+}
+
 func TestHost_Empty(t *testing.T) {
 	assert.ErrorContains(t, Host{}.Validate(), "Field 'name' is required and cannot be empty.")
 	assert.ErrorContains(t, Host{}.Validate(), "Field 'type' is required and cannot be empty.")

@@ -5,6 +5,11 @@ import (
 	v "cli/utils/validation"
 )
 
+var (
+	defaultVRID     = Uint8(51)
+	defaultPriority = Uint8(10)
+)
+
 type LBDefault struct {
 	CPU          VCpu `yaml:"cpu"`
 	RAM          GB   `yaml:"ram"`
@@ -26,17 +31,17 @@ func (def *LBDefault) SetDefaults() {
 }
 
 type LB struct {
-	VIP             *IPv4           `yaml:"vip"`
-	VirtualRouterId *Uint8          `yaml:"virtualRouterId"`
+	VIP             IPv4            `yaml:"vip,omitempty"`
+	VirtualRouterId *Uint8          `yaml:"virtualRouterId,omitempty"`
 	Default         LBDefault       `yaml:"default"`
-	Instances       []LBInstance    `yaml:"instances"`
-	ForwardPorts    []LBPortForward `yaml:"forwardPorts"`
+	Instances       []LBInstance    `yaml:"instances,omitempty"`
+	ForwardPorts    []LBPortForward `yaml:"forwardPorts,omitempty"`
 }
 
 func (lb LB) Validate() error {
 	return v.Struct(&lb,
 		v.Field(&lb.VIP,
-			v.Required().When(len(lb.Instances) > 1).Error("Virtual IP (VIP) is required when multiple load balancer instances are configured."),
+			v.NotEmpty().When(len(lb.Instances) > 1).Error("Virtual IP (VIP) is required when multiple load balancer instances are configured."),
 			v.OmitEmpty(),
 			v.Custom(IP_IN_CIDR),
 		),
@@ -48,17 +53,25 @@ func (lb LB) Validate() error {
 }
 
 func (lb *LB) SetDefaults() {
+	if len(lb.Instances) > 1 {
+		lb.VirtualRouterId = defaults.Default(lb.VirtualRouterId, &defaultVRID)
+	}
+
 	for i := range lb.Instances {
 		lb.Instances[i].CPU = defaults.Default(lb.Instances[i].CPU, lb.Default.CPU)
 		lb.Instances[i].RAM = defaults.Default(lb.Instances[i].RAM, lb.Default.RAM)
 		lb.Instances[i].MainDiskSize = defaults.Default(lb.Instances[i].MainDiskSize, lb.Default.MainDiskSize)
+
+		if len(lb.Instances) > 1 {
+			lb.Instances[i].Priority = defaults.Default(lb.Instances[i].Priority, &defaultPriority)
+		}
 	}
 }
 
 type LBPortForward struct {
 	Name       string              `yaml:"name"`
 	Port       Port                `yaml:"port"`
-	TargetPort Port                `yaml:"targetPort"`
+	TargetPort Port                `yaml:"targetPort,omitempty"`
 	Target     LBPortForwardTarget `yaml:"target"`
 }
 
@@ -90,13 +103,13 @@ func (pft LBPortForwardTarget) Validate() error {
 
 type LBInstance struct {
 	Id           string `yaml:"id" opt:",id"`
-	Host         string `yaml:"host"`
-	IP           IPv4   `yaml:"ip"`
-	MAC          MAC    `yaml:"mac"`
+	Host         string `yaml:"host,omitempty"`
+	IP           IPv4   `yaml:"ip,omitempty"`
+	MAC          MAC    `yaml:"mac,omitempty"`
 	CPU          VCpu   `yaml:"cpu"`
 	RAM          GB     `yaml:"ram"`
 	MainDiskSize GB     `yaml:"mainDiskSize"`
-	Priority     *Uint8 `yaml:"priority"`
+	Priority     *Uint8 `yaml:"priority,omitempty"`
 }
 
 func (i LBInstance) GetTypeName() string {

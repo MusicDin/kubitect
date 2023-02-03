@@ -15,6 +15,27 @@ func TestConnType(t *testing.T) {
 	assert.NoError(t, LOCALHOST.Validate())
 }
 
+func TestConnSSH_Empty(t *testing.T) {
+	assert.ErrorContains(t, ConnectionSSH{}.Validate(), "Path to password-less private key of the remote host is required.")
+	assert.ErrorContains(t, ConnectionSSH{}.Validate(), "Minimum value for field 'port' is 1 (actual: 0).")
+}
+
+func TestConnSSH_Default(t *testing.T) {
+	assert.EqualError(t, defaults.Assign(&ConnectionSSH{}).Validate(), "Path to password-less private key of the remote host is required.")
+}
+
+func TestConnSSH(t *testing.T) {
+	ssh := ConnectionSSH{
+		Keyfile: File("host_conn_test.go"),
+	}
+
+	assert.NoError(t, defaults.Assign(&ssh).Validate())
+}
+
+func TestConn_Empty(t *testing.T) {
+	assert.EqualError(t, Connection{}.Validate(), "Field 'type' is required and cannot be empty.")
+}
+
 func TestConn(t *testing.T) {
 	c1 := Connection{
 		Type: LOCAL,

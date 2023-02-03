@@ -62,8 +62,31 @@ func TestLB_Minimal(t *testing.T) {
 		},
 	}
 
-	assert.NoError(t, defaults.Assign(&lb).Validate())
 	assert.NoError(t, defaults.Assign(&LBDefault{}).Validate())
+	assert.NoError(t, defaults.Assign(&lb).Validate())
+}
+
+func TestLB_Defaults(t *testing.T) {
+	lb1 := LB{
+		Instances: []LBInstance{
+			{Id: "id"},
+		},
+	}
+
+	lb2 := LB{
+		Instances: []LBInstance{
+			{Id: "id1"},
+			{Id: "id2"},
+		},
+	}
+
+	defaults.Assign(&lb1)
+	defaults.Assign(&lb2)
+
+	assert.Nil(t, lb1.VirtualRouterId, "LB VRID is set even if only one instance is configured!")
+	assert.Nil(t, lb1.Instances[0].Priority, "LB instance priority is set even if only one instance is configured!")
+	assert.Equal(t, &defaultVRID, lb2.VirtualRouterId, "Default LB VRID is not set when multiple instances are configured!")
+	assert.Equal(t, &defaultPriority, lb2.Instances[0].Priority, "Default LB instance priority is not set when multiple instances are configured!")
 }
 
 func TestLB_MissingID(t *testing.T) {
@@ -76,10 +99,8 @@ func TestLB_MissingID(t *testing.T) {
 }
 
 func TestLB_UniqueID(t *testing.T) {
-	ip := IPv4("192.168.113.13")
-
 	lb := LB{
-		VIP: &ip,
+		VIP: IPv4("192.168.113.13"),
 		Instances: []LBInstance{
 			{Id: "id"},
 			{Id: "id"},
@@ -90,10 +111,8 @@ func TestLB_UniqueID(t *testing.T) {
 }
 
 func TestLB_VIP(t *testing.T) {
-	ip := IPv4("192.168.113.13")
-
 	lb := LB{
-		VIP: &ip,
+		VIP: IPv4("192.168.113.13"),
 		Instances: []LBInstance{
 			{Id: "id1"},
 			{Id: "id2"},

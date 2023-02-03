@@ -16,9 +16,9 @@ type Instance interface {
 }
 
 type Nodes struct {
-	LoadBalancer LB     `yaml:"loadBalancer"`
 	Master       Master `yaml:"master"`
-	Worker       Worker `yaml:"worker"`
+	Worker       Worker `yaml:"worker,omitempty"`
+	LoadBalancer LB     `yaml:"loadBalancer,omitempty"`
 }
 
 func (n Nodes) Validate() error {
@@ -50,16 +50,16 @@ func (n Nodes) isLBRequiredValidator() v.Validator {
 func (n Nodes) Instances() []Instance {
 	var ins []Instance
 
-	for _, i := range n.LoadBalancer.Instances {
-		ins = append(ins, Instance(i))
-	}
-
 	for _, i := range n.Master.Instances {
-		ins = append(ins, Instance(i))
+		ins = append(ins, i)
 	}
 
 	for _, i := range n.Worker.Instances {
-		ins = append(ins, Instance(i))
+		ins = append(ins, i)
+	}
+
+	for _, i := range n.LoadBalancer.Instances {
+		ins = append(ins, i)
 	}
 
 	return ins

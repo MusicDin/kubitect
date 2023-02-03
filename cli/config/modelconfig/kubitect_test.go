@@ -1,18 +1,16 @@
 package modelconfig
 
 import (
+	"cli/env"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestKubitect_Empty(t *testing.T) {
-	url := URL("https://github.com/musicdin/kubitect")
-	version := MasterVersion("master")
-
 	k := Kubitect{
-		Url:     &url,
-		Version: &version,
+		Url:     URL(env.ConstProjectUrl),
+		Version: MasterVersion("master"),
 	}
 
 	assert.NoError(t, k.Validate())

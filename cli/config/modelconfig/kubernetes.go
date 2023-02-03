@@ -10,7 +10,7 @@ type Kubernetes struct {
 	Version       Version       `yaml:"version"`
 	DnsMode       DnsMode       `yaml:"dnsMode"`
 	NetworkPlugin NetworkPlugin `yaml:"networkPlugin"`
-	Kubespray     Kubespray     `yaml:"kubespray"`
+	Kubespray     Kubespray     `yaml:"kubespray,omitempty"`
 	Other         Other         `yaml:"other"`
 }
 
@@ -63,13 +63,13 @@ type Other struct {
 }
 
 type Kubespray struct {
-	URL     *URL           `yaml:"url"`
-	Version *MasterVersion `yaml:"version"`
+	URL     URL           `yaml:"url,omitempty"`
+	Version MasterVersion `yaml:"version,omitempty"`
 }
 
 func (k Kubespray) Validate() error {
 	return v.Struct(&k,
-		v.Field(&k.URL),
-		v.Field(&k.Version, v.Required()),
+		v.Field(&k.URL, v.OmitEmpty()),
+		v.Field(&k.Version),
 	)
 }

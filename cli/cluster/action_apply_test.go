@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -68,8 +69,21 @@ func TestGenerateMissingKeys(t *testing.T) {
 
 	// Unset PrivateKeyPath to force generating SSH keys.
 	c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath = ""
-
 	assert.NoError(t, c.generateMissingSshKeys())
+
+	// Keys should not be regenerated since files exist
+	timeout := time.After(10 * time.Second)
+	done := make(chan bool)
+	go func() {
+		assert.NoError(t, c.generateMissingSshKeys())
+		done <- true
+	}()
+
+	select {
+	case <-timeout:
+		assert.Fail(t, "Keys should not be recreated after being generated")
+	case <-done:
+	}
 }
 
 func TestGenerateMissingKeys_PKPathProvided(t *testing.T) {

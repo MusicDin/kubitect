@@ -1,18 +1,5 @@
 output "cluster" {
   value = {
-
-    nodeTemplate = {
-      user = var.vm_user
-      ssh = {
-        privateKeyPath = abspath(var.vm_ssh.privateKeyPath)
-      }
-      os = {
-        distro           = var.vm_os.distro
-        source           = var.vm_os.source
-        networkInterface = var.vm_os.networkInterface
-      }
-    }
-
     nodes = {
       loadBalancer = {
         vip = (length(var.lb_nodes) == 0
@@ -34,7 +21,6 @@ output "cluster" {
         instances = var.worker_nodes
       }
     }
-
   }
   description = "Evaluated cluster section of the config."
 }

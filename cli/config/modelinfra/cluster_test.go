@@ -65,12 +65,10 @@ func TestCluster_DuplicateMAC(t *testing.T) {
 }
 
 func TestCluster_Complete(t *testing.T) {
-	ip := c.IPv4("192.168.113.13")
-
 	cls := Cluster{}
 	cls.Nodes = c.Nodes{
 		LoadBalancer: c.LB{
-			VIP: &ip,
+			VIP: c.IPv4("192.168.113.13"),
 			Instances: []c.LBInstance{
 				{Id: "id1"},
 				{Id: "id2"},

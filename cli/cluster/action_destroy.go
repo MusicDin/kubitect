@@ -28,6 +28,7 @@ func (c *ClusterMeta) Destroy() error {
 
 	os.Remove(c.TfStatePath())
 	os.Remove(c.KubeconfigPath())
+	os.Remove(c.AppliedConfigPath())
 
 	return nil
 }

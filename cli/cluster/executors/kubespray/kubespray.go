@@ -28,11 +28,11 @@ func (e *kubespray) K8sVersion() string {
 }
 
 func (e *kubespray) SshUser() string {
-	return string(e.InfraConfig.Cluster.NodeTemplate.User)
+	return string(e.Config.Cluster.NodeTemplate.User)
 }
 
 func (e *kubespray) SshPKey() string {
-	return string(e.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath)
+	return string(e.Config.Cluster.NodeTemplate.SSH.PrivateKeyPath)
 }
 
 func NewKubesprayExecutor(

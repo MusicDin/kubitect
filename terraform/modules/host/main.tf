@@ -55,10 +55,9 @@ resource "libvirt_volume" "base_volume" {
 
 # Creates network #
 module "network_module" {
+  source = "../network/"
 
   count = local.is_bridge ? 0 : 1
-
-  source = "../network/"
 
   network_name   = local.network_name
   network_mode   = var.cluster_network_mode
@@ -72,7 +71,6 @@ module "network_module" {
 
 # Create HAProxy load balancer #
 module "lb_module" {
-
   source = "../vm"
 
   for_each = { for node in var.cluster_nodes_loadBalancer_instances : node.id => node }
@@ -100,9 +98,9 @@ module "lb_module" {
   vm_network_interface = var.cluster_nodeTemplate_os_networkInterface
   vm_dns               = var.cluster_nodeTemplate_dns
   vm_cpuMode           = var.cluster_nodeTemplate_cpuMode
-  vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_loadBalancer_default_cpu
-  vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_loadBalancer_default_ram
-  vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_loadBalancer_default_mainDiskSize
+  vm_cpu               = each.value.cpu
+  vm_ram               = each.value.ram
+  vm_main_disk_size    = each.value.mainDiskSize
   vm_data_disks        = []
   vm_id                = each.value.id
   vm_mac               = each.value.mac
@@ -120,7 +118,6 @@ module "lb_module" {
 
 # Creates master nodes #
 module "master_module" {
-
   source = "../vm"
 
   for_each = { for node in var.cluster_nodes_master_instances : node.id => node }
@@ -148,10 +145,10 @@ module "master_module" {
   vm_network_interface = var.cluster_nodeTemplate_os_networkInterface
   vm_dns               = var.cluster_nodeTemplate_dns
   vm_cpuMode           = var.cluster_nodeTemplate_cpuMode
-  vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_master_default_cpu
-  vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_master_default_ram
-  vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_master_default_mainDiskSize
-  vm_data_disks        = [for disk in (each.value.dataDisks != null ? each.value.dataDisks : []) : disk if disk.pool == null || disk.pool == "main" || length(setintersection(keys(libvirt_pool.data_resource_pools), [disk.pool])) == 1]
+  vm_cpu               = each.value.cpu
+  vm_ram               = each.value.ram
+  vm_main_disk_size    = each.value.mainDiskSize
+  vm_data_disks        = each.value.dataDisks
   vm_id                = each.value.id
   vm_mac               = each.value.mac
   vm_ip                = each.value.ip
@@ -168,7 +165,6 @@ module "master_module" {
 
 # Creates worker nodes #
 module "worker_module" {
-
   source = "../vm"
 
   for_each = { for node in var.cluster_nodes_worker_instances : node.id => node }
@@ -196,10 +192,10 @@ module "worker_module" {
   vm_network_interface = var.cluster_nodeTemplate_os_networkInterface
   vm_dns               = var.cluster_nodeTemplate_dns
   vm_cpuMode           = var.cluster_nodeTemplate_cpuMode
-  vm_cpu               = each.value.cpu != null ? each.value.cpu : var.cluster_nodes_worker_default_cpu
-  vm_ram               = each.value.ram != null ? each.value.ram : var.cluster_nodes_worker_default_ram
-  vm_main_disk_size    = each.value.mainDiskSize != null ? each.value.mainDiskSize : var.cluster_nodes_worker_default_mainDiskSize
-  vm_data_disks        = [for disk in (each.value.dataDisks != null ? each.value.dataDisks : []) : disk if disk.pool == null || disk.pool == "main" || length(setintersection(keys(libvirt_pool.data_resource_pools), [disk.pool])) == 1]
+  vm_cpu               = each.value.cpu
+  vm_ram               = each.value.ram
+  vm_main_disk_size    = each.value.mainDiskSize
+  vm_data_disks        = each.value.dataDisks
   vm_id                = each.value.id
   vm_mac               = each.value.mac
   vm_ip                = each.value.ip

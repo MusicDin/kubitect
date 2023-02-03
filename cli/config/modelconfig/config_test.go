@@ -48,12 +48,10 @@ var (
 		},
 	}
 
-	k8s_version    = Version("v1.2.3")
-	k8s_ks_version = MasterVersion(k8s_version)
-	k8s            = Kubernetes{
-		Version: k8s_version,
+	k8s = Kubernetes{
+		Version: Version("v1.2.3"),
 		Kubespray: Kubespray{
-			Version: &k8s_ks_version,
+			Version: MasterVersion("master"),
 		},
 	}
 

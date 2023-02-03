@@ -3,6 +3,7 @@ package modelconfig
 import (
 	"testing"
 
+	"cli/env"
 	"cli/utils/defaults"
 
 	"github.com/stretchr/testify/assert"
@@ -25,19 +26,16 @@ func TestNetworkPlugin(t *testing.T) {
 }
 
 func TestKubespray(t *testing.T) {
-	ver := MasterVersion("master")
-	url := URL("https://github.com/kubernetes-sigs/kubespray")
-
 	ks1 := Kubespray{
-		Version: &ver,
+		Version: MasterVersion("master"),
 	}
 
 	ks2 := Kubespray{
-		Version: &ver,
-		URL:     &url,
+		Version: MasterVersion("master"),
+		URL:     URL(env.ConstKubesprayUrl),
 	}
 
-	assert.EqualError(t, Kubespray{}.Validate(), "Field 'version' is required.")
+	assert.ErrorContains(t, Kubespray{}.Validate(), "Field 'version' must be a valid semantic version prefixed with 'v'")
 	assert.NoError(t, ks1.Validate())
 	assert.NoError(t, ks2.Validate())
 }
@@ -51,14 +49,12 @@ func TestKubernetes_Empty(t *testing.T) {
 }
 
 func TestKubernetes_Valid(t *testing.T) {
-	mver := MasterVersion("v1.2.3")
-
 	k := Kubernetes{
 		Version:       Version("v1.2.3"),
 		DnsMode:       COREDNS,
 		NetworkPlugin: CALICO,
 		Kubespray: Kubespray{
-			Version: &mver,
+			Version: MasterVersion("v1.2.3"),
 		},
 		Other: Other{
 			AutoRenewCertificates: true,
