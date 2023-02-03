@@ -130,10 +130,20 @@ func TestSync_FailReadingInfraConfig(t *testing.T) {
 func TestSync_InvalidInfraConfig(t *testing.T) {
 	c := MockCluster(t)
 
-	// Make invalid infrastructure config
+	// Invalid infrastructure config
+	cfg := template.TrimTemplate(`
+		nodes:
+			master:
+				instances:
+					- id: "1"
+						ip: "192.168.113.10"
+					- id: "2"
+						ip: "192.168.113.10"
+	`)
+
 	err := os.MkdirAll(path.Dir(c.InfrastructureConfigPath()), 0777)
 	assert.NoError(t, err)
-	err = ioutil.WriteFile(c.InfrastructureConfigPath(), []byte("cluster:"), 0777)
+	err = ioutil.WriteFile(c.InfrastructureConfigPath(), []byte(cfg), 0777)
 	assert.NoError(t, err)
 
 	assert.ErrorContains(t, c.Sync(), "infrastructure file (produced by Terraform) is invalid")

@@ -33,10 +33,10 @@ func MockExecutor(t *testing.T) *kubespray {
 
 	cfg := &modelconfig.Config{}
 	cfg.Kubernetes.Version = modelconfig.Version("v1.2.3")
+	cfg.Cluster.NodeTemplate.User = modelconfig.User("test")
+	cfg.Cluster.NodeTemplate.SSH.PrivateKeyPath = modelconfig.File(path.Join(tmpDir, ".ssh", "id_rsa"))
 
 	iCfg := &modelinfra.Config{}
-	iCfg.Cluster.NodeTemplate.User = modelconfig.User("test")
-	iCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath = modelconfig.File(path.Join(tmpDir, ".ssh", "id_rsa"))
 
 	return &kubespray{
 		ClusterName: "mock",
