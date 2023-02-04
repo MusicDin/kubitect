@@ -105,6 +105,7 @@ func (c *Cluster) Executor() executors.Executor {
 	c.exec = kubespray.NewKubesprayExecutor(
 		c.Name,
 		c.Path,
+		c.PrivateSshKeyPath(),
 		c.NewConfig,
 		c.InfraConfig,
 		ve,

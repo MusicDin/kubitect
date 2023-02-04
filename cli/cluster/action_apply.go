@@ -157,7 +157,7 @@ func (c *Cluster) plan(action ApplyAction) (event.Events, error) {
 // create creates a new cluster or modifies the current
 // one if the cluster already exists.
 func (c *Cluster) create() error {
-	if err := c.generateMissingSshKeys(); err != nil {
+	if err := c.generateSshKeys(); err != nil {
 		return err
 	}
 
@@ -256,13 +256,18 @@ func (c *Cluster) prepare() error {
 	return c.StoreNewConfig()
 }
 
-// generateMissingSshKeys ensures that SSH keys for a cluster a
-// present in the cluster directory.
-func (c *Cluster) generateMissingSshKeys() error {
+// generateSshKeys ensures that SSH keys for a cluster a exist in the
+// cluster directory.
+//
+// If the key pair is missing, the keys are either generated or retrieved
+// from the location specified by the user in a node template section of
+// the configuration file. However, if SSH keys already exist in the
+// cluster directory, no action is taken.
+func (c *Cluster) generateSshKeys() error {
 	ui.Println(ui.INFO, "Ensuring SSH keys are present...")
 
-	kpName := "id_rsa"
-	kpDir := path.Join(c.Path, "config", ".ssh")
+	kpName := path.Base(c.PrivateSshKeyPath())
+	kpDir := path.Dir(c.PrivateSshKeyPath())
 
 	// Stop if key pair already exists
 	if keygen.KeyPairExists(kpDir, kpName) {

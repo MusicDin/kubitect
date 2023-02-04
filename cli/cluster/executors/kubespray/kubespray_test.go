@@ -73,6 +73,7 @@ func TestNewExecutor(t *testing.T) {
 	e := NewKubesprayExecutor(
 		"clsName",
 		"clsPath",
+		path.Join(t.TempDir(), "id_rsa"),
 		&modelconfig.Config{},
 		&modelinfra.Config{},
 		&virtualEnvMock{},

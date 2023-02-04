@@ -69,13 +69,13 @@ func TestGenerateMissingKeys(t *testing.T) {
 
 	// Unset PrivateKeyPath to force generating SSH keys.
 	c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath = ""
-	assert.NoError(t, c.generateMissingSshKeys())
+	assert.NoError(t, c.generateSshKeys())
 
 	// Keys should not be regenerated since files exist
 	timeout := time.After(10 * time.Second)
 	done := make(chan bool)
 	go func() {
-		assert.NoError(t, c.generateMissingSshKeys())
+		assert.NoError(t, c.generateSshKeys())
 		done <- true
 	}()
 
@@ -88,7 +88,7 @@ func TestGenerateMissingKeys(t *testing.T) {
 
 func TestGenerateMissingKeys_PKPathProvided(t *testing.T) {
 	c := MockCluster(t)
-	assert.NoError(t, c.generateMissingSshKeys())
+	assert.NoError(t, c.generateSshKeys())
 }
 
 func TestPrepare_MissingFiles(t *testing.T) {

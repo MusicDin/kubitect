@@ -53,7 +53,3 @@ func (s ConnectionSSH) Validate() error {
 func (s *ConnectionSSH) SetDefaults() {
 	s.Port = defaults.Default(s.Port, Port(22))
 }
-
-// func (c *Connection) SetDefaults() {
-// 	c.Type = defaults.Default(c.Type, LOCAL)
-// }

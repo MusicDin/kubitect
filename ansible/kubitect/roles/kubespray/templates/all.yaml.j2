@@ -22,9 +22,9 @@ bin_dir: /usr/local/bin
 
 
 ## External LB example config
-apiserver_loadbalancer_domain_name: "<< infra.cluster.nodes.loadBalancer.vip >>"
+apiserver_loadbalancer_domain_name: "<< infra.nodes.loadBalancer.vip >>"
 loadbalancer_apiserver:
-  address: "<< infra.cluster.nodes.loadBalancer.vip >>"
+  address: "<< infra.nodes.loadBalancer.vip >>"
   port: 6443
 
 ## Internal loadbalancers for apiservers
