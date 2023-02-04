@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"cli/app"
 	"cli/cluster/executors"
 	"cli/cluster/executors/kubespray"
 	"cli/cluster/provisioner"
@@ -16,6 +17,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 type Cluster struct {
@@ -32,33 +34,36 @@ type Cluster struct {
 // NewCluster returns new Cluster instance with populated general fields.
 // Cluster name and path are extracted from the provided configuration file.
 // Previously applied configuration is also read, if cluster already exists.
-func NewCluster(ctx ClusterContext, configPath string) (*Cluster, error) {
+func NewCluster(ctx app.AppContext, configPath string) (*Cluster, error) {
 	newCfg, err := readConfig(configPath, modelconfig.Config{})
-
 	if err != nil {
 		return nil, err
 	}
 
 	c := &Cluster{
 		ClusterMeta: ClusterMeta{
-			ClusterContext: ctx,
-			Local:          ctx.Local(),
+			AppContext: ctx,
+			Local:      ctx.Local(),
 		},
 		NewConfig:     newCfg,
 		NewConfigPath: configPath,
 	}
 
 	if err := defaults.Set(c.NewConfig); err != nil {
-		return c, fmt.Errorf("failed to set config defaults: %v", err)
+		return nil, fmt.Errorf("failed to set config defaults: %v", err)
 	}
-
-	// TODO: Cluster name should be prefixed and validated here
-	// (if cluster is local, prefix cluster name with "local")
-	// (ensure that non local cluster cannot contain "local" prefix)
 
 	if err := validateConfig(c.NewConfig); err != nil {
 		ui.PrintBlockE(err...)
-		return c, fmt.Errorf("invalid configuration file")
+		return nil, fmt.Errorf("invalid configuration file")
+	}
+
+	// Add prefix "local" to the cluster name, if cluster is local.
+	// Throw an error if cluster is not local, but has a prefix "local".
+	if ctx.Local() {
+		c.NewConfig.Cluster.Name = "local-" + c.NewConfig.Cluster.Name
+	} else if strings.HasPrefix(c.NewConfig.Cluster.Name, "local") {
+		return nil, fmt.Errorf("Cluster name cannot have a prefix 'local'. This prefix is reserved for clusters created with --local flag.")
 	}
 
 	c.Name = c.NewConfig.Cluster.Name
@@ -72,13 +77,11 @@ func (c *Cluster) Sync() error {
 	var err error
 
 	c.AppliedConfig, err = readConfigIfExists(c.AppliedConfigPath(), modelconfig.Config{})
-
 	if err != nil {
 		return fmt.Errorf("failed to read previously applied configuration file: %v", err)
 	}
 
 	c.InfraConfig, err = readConfigIfExists(c.InfrastructureConfigPath(), modelinfra.Config{})
-
 	if err != nil {
 		return fmt.Errorf("failed to read infrastructure file: %v", err)
 	}
@@ -135,7 +138,7 @@ func (c *Cluster) ApplyNewConfig() error {
 	if err != nil {
 		return err
 	}
-	// return file.ForceCopy(c.NewConfigPath, c.AppliedConfigPath())
+
 	return file.WriteYaml(c.NewConfig, c.AppliedConfigPath(), 0644)
 }
 
@@ -149,27 +152,3 @@ func (c *Cluster) StoreNewConfig() error {
 
 	return file.ForceCopy(src, dst)
 }
-
-// func (c *Cluster) KubitectURL() string {
-// 	if c.NewConfig.Kubitect.Url != nil {
-// 		return string(*c.NewConfig.Kubitect.Url)
-// 	}
-
-// 	return env.ConstProjectUrl
-// }
-
-// func (c *Cluster) KubitectVersion() string {
-// 	if c.NewConfig.Kubitect.Version != "" {
-// 		return string(c.NewConfig.Kubitect.Version)
-// 	}
-
-// 	return env.ConstProjectVersion
-// }
-
-// func (c *Cluster) KubesprayVersion() string {
-// 	if c.NewConfig.Kubernetes.Kubespray.Version != nil {
-// 		return string(*c.NewConfig.Kubernetes.Kubespray.Version)
-// 	}
-
-// 	return env.ConstKubesprayVersion
-// }

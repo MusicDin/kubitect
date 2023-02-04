@@ -2,10 +2,6 @@ package cluster
 
 import (
 	"cli/app"
-	"cli/cluster/executors"
-	"cli/cluster/provisioner"
-	"cli/config/modelconfig"
-	"cli/ui"
 	"cli/utils/template"
 	"io/ioutil"
 	"os"
@@ -15,25 +11,31 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type (
-	clusterMock struct {
-		Cluster
-		ui ui.UiMock
-	}
-)
+func TestNewCluster(t *testing.T) {
+	ctx := app.MockAppContext(t)
 
-// mockConfigFile writes a sample test configuration file and
-// returns its path.
-func mockConfigFile(t *testing.T) string {
-	cfgPath := path.Join(t.TempDir(), "config.yaml")
-	cfg := template.TrimTemplate(`
+	c, err := NewCluster(ctx, mockConfigFile(t))
+	assert.NoError(t, err)
+	assert.Equal(t, "cluster-mock", c.Name)
+}
+
+func TestNewCluster_Local(t *testing.T) {
+	ctx := app.MockAppContext(t, app.AppContextOptions{Local: true})
+
+	c, err := NewCluster(ctx, mockConfigFile(t))
+	assert.NoError(t, err)
+	assert.Equal(t, "local-cluster-mock", c.Name)
+}
+
+func TestNewCluster_InvalidClusterName(t *testing.T) {
+	cfgPath := writeConfigFile(t, template.TrimTemplate(`
 		hosts:
 			- name: localhost
 				connection:
 					type: local
 
 		cluster:
-			name: cluster-mock
+			name: local-cluster-mock
 			network:
 				cidr: 192.168.113.0/24
 			nodes:
@@ -42,54 +44,13 @@ func mockConfigFile(t *testing.T) string {
 						- id: 1
 
 		kubernetes:
-			version: v1.24.7
+			version: v1.0.0
 			kubespray:
-				version: v2.21.0
-	`)
+				version: v1.0.0
+	`))
 
-	err := ioutil.WriteFile(cfgPath, []byte(cfg), 0777)
-	assert.NoError(t, err, "Failed to write test configuration file!")
-
-	return cfgPath
-}
-
-func MockCluster(t *testing.T) *clusterMock {
-	t.Helper()
-
-	ctxOptions := app.AppContextOptions{
-		Local:       false,
-		AutoApprove: true,
-	}
-	ctx := app.MockAppContext(t, ctxOptions)
-
-	c, err := NewCluster(ctx, mockConfigFile(t))
-	assert.NoError(t, err)
-
-	// Create empty SSH keys
-	keyDir := t.TempDir()
-	keyPath := path.Join(keyDir, "key")
-	os.Create(keyPath)
-	os.Create(keyPath + ".pub")
-	c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath = modelconfig.File(keyPath)
-
-	c.exec = executors.MockExecutor(t)
-	c.prov = provisioner.MockProvisioner(t)
-
-	return &clusterMock{*c, ctx.Ui()}
-}
-
-func MockLocalCluster(t *testing.T) *clusterMock {
-	t.Helper()
-
-	c := MockCluster(t)
-	c.Local = true
-
-	return c
-}
-
-func TestNewCluster(t *testing.T) {
-	_, err := NewCluster(app.MockAppContext(t), mockConfigFile(t))
-	assert.NoError(t, err)
+	_, err := NewCluster(app.MockAppContext(t), cfgPath)
+	assert.ErrorContains(t, err, "Cluster name cannot have a prefix 'local'.")
 }
 
 func TestNewCluster_ConfigNotExists(t *testing.T) {

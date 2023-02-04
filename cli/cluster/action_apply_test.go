@@ -142,7 +142,7 @@ func TestApply_Upgrade_AskToCreate(t *testing.T) {
 	defer func() { env.ProjectRequiredFiles = tmp }()
 
 	assert.NoError(t, c.Apply(UPGRADE.String()))
-	assert.Contains(t, c.ui.ReadStdout(t), "Cannot upgrade cluster 'cluster-mock'. It has not been created yet.")
+	assert.Contains(t, c.Ui().ReadStdout(t), "Cannot upgrade cluster 'cluster-mock'. It has not been created yet.")
 }
 
 func TestApply_Upgrade_NoChanges(t *testing.T) {
@@ -157,7 +157,7 @@ func TestApply_Upgrade_NoChanges(t *testing.T) {
 	defer func() { env.ProjectRequiredFiles = tmp }()
 
 	assert.NoError(t, c.Apply(UPGRADE.String()))
-	assert.Contains(t, c.ui.ReadStdout(t), "No changes detected.")
+	assert.Contains(t, c.Ui().ReadStdout(t), "No changes detected.")
 }
 
 func TestApply_Upgrade(t *testing.T) {

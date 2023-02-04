@@ -10,16 +10,22 @@ type (
 	AppContextMock interface {
 		AppContext
 		Ui() ui.UiMock
+		Options() AppContextOptions
 	}
 
 	appContextMock struct {
 		appContext
-		ui ui.UiMock
+		appContextOptions AppContextOptions
+		ui                ui.UiMock
 	}
 )
 
 func (m *appContextMock) Ui() ui.UiMock {
 	return m.ui
+}
+
+func (m *appContextMock) Options() AppContextOptions {
+	return m.appContextOptions
 }
 
 func MockAppContext(t *testing.T, opts ...AppContextOptions) AppContextMock {
@@ -39,6 +45,8 @@ func MockAppContext(t *testing.T, opts ...AppContextOptions) AppContextMock {
 		showTfPlan: o.ShowTerraformPlan,
 	}
 
+	o.appContext = &ctx
+
 	if !o.Local {
 		ctx.homeDir = path.Join(tmpDir, "home")
 	}
@@ -51,5 +59,9 @@ func MockAppContext(t *testing.T, opts ...AppContextOptions) AppContextMock {
 
 	u := ui.MockGlobalTerminalUi(t, uOpts)
 
-	return &appContextMock{ctx, u}
+	return &appContextMock{
+		appContext:        ctx,
+		appContextOptions: o,
+		ui:                u,
+	}
 }

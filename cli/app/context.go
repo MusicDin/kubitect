@@ -31,6 +31,9 @@ type AppContextOptions struct {
 
 	// Show terraform plan
 	ShowTerraformPlan bool
+
+	// AppContext instance.
+	appContext AppContext
 }
 
 type (
@@ -84,6 +87,10 @@ type (
 // NewAppContext creates new application context and initializes
 // a global UI.
 func (o AppContextOptions) AppContext() AppContext {
+	if o.appContext != nil {
+		return o.appContext
+	}
+
 	wd, err := os.Getwd()
 
 	if err != nil {
@@ -111,12 +118,14 @@ func (o AppContextOptions) AppContext() AppContext {
 	// Initialize global ui
 	ui.GlobalUi(uiOpts)
 
-	return &appContext{
+	o.appContext = &appContext{
 		homeDir:    home,
 		workingDir: wd,
 		local:      o.Local,
 		showTfPlan: o.ShowTerraformPlan,
 	}
+
+	return o.appContext
 }
 
 func (c *appContext) Local() bool {
@@ -163,7 +172,8 @@ func (c appContext) VerifyRequirements() error {
 	return nil
 }
 
-// appExists returns true if command with a given name is found in PATH.
+// appExists returns true if command with
+// a given name is found in PATH.
 func appExists(cmd string) bool {
 	_, err := exec.LookPath(cmd)
 	return err == nil

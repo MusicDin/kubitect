@@ -34,7 +34,7 @@ type ApplyOptions struct {
 }
 
 func NewApplyCmd() *cobra.Command {
-	var opts ApplyOptions
+	var o ApplyOptions
 
 	cmd := &cobra.Command{
 		SuggestFor: []string{"create", "scale", "upgrade"},
@@ -44,15 +44,15 @@ func NewApplyCmd() *cobra.Command {
 		Long:       applyLong,
 		Example:    applyExample,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return opts.Run()
+			return o.Run()
 		},
 	}
 
-	cmd.PersistentFlags().StringVarP(&opts.Config, "config", "c", "", "specify path to the cluster config file")
-	cmd.PersistentFlags().StringVarP(&opts.Action, "action", "a", DefaultAction, "specify cluster action [create, upgrade, scale]")
-	cmd.PersistentFlags().BoolVarP(&opts.Local, "local", "l", false, "use a current directory as the cluster path")
-	cmd.PersistentFlags().BoolVar(&opts.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
-	cmd.PersistentFlags().BoolVar(&opts.Debug, "debug", false, "enable debug messages")
+	cmd.PersistentFlags().StringVarP(&o.Config, "config", "c", "", "specify path to the cluster config file")
+	cmd.PersistentFlags().StringVarP(&o.Action, "action", "a", DefaultAction, "specify cluster action [create, upgrade, scale]")
+	cmd.PersistentFlags().BoolVarP(&o.Local, "local", "l", false, "use a current directory as the cluster path")
+	cmd.PersistentFlags().BoolVar(&o.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
+	cmd.PersistentFlags().BoolVar(&o.Debug, "debug", false, "enable debug messages")
 
 	cmd.MarkPersistentFlagRequired("config")
 

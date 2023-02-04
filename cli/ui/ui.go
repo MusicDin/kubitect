@@ -14,18 +14,20 @@ var (
 )
 
 func GlobalUi(opts ...UiOptions) Ui {
-	once.Do(func() {
-		instance = &ui{
-			streams: streams.StandardStreams(),
-		}
+	if instance == nil {
+		once.Do(func() {
+			instance = &ui{
+				streams: streams.StandardStreams(),
+			}
 
-		if len(opts) > 0 {
-			o := opts[0]
-			instance.autoApprove = o.AutoApprove
-			instance.debug = o.Debug
-			instance.noColor = o.NoColor
-		}
-	})
+			if len(opts) > 0 {
+				o := opts[0]
+				instance.autoApprove = o.AutoApprove
+				instance.debug = o.Debug
+				instance.noColor = o.NoColor
+			}
+		})
+	}
 
 	return instance
 }

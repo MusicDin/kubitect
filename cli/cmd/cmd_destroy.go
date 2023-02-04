@@ -24,7 +24,7 @@ type DestroyOptions struct {
 }
 
 func NewDestroyCmd() *cobra.Command {
-	var opts DestroyOptions
+	var o DestroyOptions
 
 	cmd := &cobra.Command{
 		SuggestFor: []string{"remove", "delete", "del"},
@@ -34,18 +34,18 @@ func NewDestroyCmd() *cobra.Command {
 		Long:       destroyLong,
 		Example:    destroyExample,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return opts.Run()
+			return o.Run()
 		},
 	}
 
-	cmd.PersistentFlags().StringVar(&opts.ClusterName, "cluster", "", "specify the cluster to be used")
-	cmd.PersistentFlags().BoolVar(&opts.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
-	cmd.PersistentFlags().BoolVar(&opts.Debug, "debug", false, "enable debug messages")
+	cmd.PersistentFlags().StringVar(&o.ClusterName, "cluster", "", "specify the cluster to be used")
+	cmd.PersistentFlags().BoolVar(&o.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
+	cmd.PersistentFlags().BoolVar(&o.Debug, "debug", false, "enable debug messages")
 
 	cmd.MarkPersistentFlagRequired("cluster")
 
 	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		clusters, err := AllClusters(opts.AppContext())
+		clusters, err := AllClusters(o.AppContext())
 
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp
