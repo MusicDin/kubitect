@@ -79,7 +79,6 @@ func (c *Cluster) Apply(a string) error {
 
 	if c.AppliedConfig != nil {
 		events, err = c.plan(action)
-
 		if err != nil {
 			return err
 		}
@@ -158,7 +157,7 @@ func (c *Cluster) plan(action ApplyAction) (event.Events, error) {
 // create creates a new cluster or modifies the current
 // one if the cluster already exists.
 func (c *Cluster) create() error {
-	if err := c.generateMissingSshKeys(); err != nil {
+	if err := c.generateSshKeys(); err != nil {
 		return err
 	}
 
@@ -236,7 +235,7 @@ func (c *Cluster) prepare() error {
 		err = copyReqFiles(srcDir, dstDir)
 	} else {
 		tmpDir := filepath.Join(dstDir, "tmp")
-		proj := git.NewGitProject(c.KubitectURL(), c.KubitectVersion())
+		proj := git.NewGitProject(env.ConstProjectUrl, env.ConstProjectVersion)
 
 		ui.Printf(ui.DEBUG, "kubitect.url: %s\n", proj.Url())
 		ui.Printf(ui.DEBUG, "kubitect.version: %s\n", proj.Version())
@@ -257,24 +256,45 @@ func (c *Cluster) prepare() error {
 	return c.StoreNewConfig()
 }
 
-// generateMissingSshKeys generates SSH keys if the user has not
-// specified a path to an existing key pair.
-func (c *Cluster) generateMissingSshKeys() error {
-	sshKeysPath := c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath
-	if sshKeysPath != nil {
+// generateSshKeys ensures that SSH keys for a cluster a exist in the
+// cluster directory.
+//
+// If the key pair is missing, the keys are either generated or retrieved
+// from the location specified by the user in a node template section of
+// the configuration file. However, if SSH keys already exist in the
+// cluster directory, no action is taken.
+func (c *Cluster) generateSshKeys() error {
+	ui.Println(ui.INFO, "Ensuring SSH keys are present...")
+
+	kpName := path.Base(c.PrivateSshKeyPath())
+	kpDir := path.Dir(c.PrivateSshKeyPath())
+
+	// Stop if key pair already exists
+	if keygen.KeyPairExists(kpDir, kpName) {
 		return nil
 	}
 
-	ui.Print(ui.INFO, "Generating new SSH keys...")
+	// Keypair does not exist.
+	// - Check if user provided path to the custom key pair
+	pkPath := string(c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath)
+	if pkPath != "" {
+		kp, err := keygen.ReadKeyPair(path.Dir(pkPath), path.Base(pkPath))
+		if err != nil {
+			return err
+		}
 
+		return kp.Write(kpDir, kpName)
+	}
+
+	// Keypair does not exist and user has not provided a custom path.
+	// - Generate new key pair
 	kp, err := keygen.NewKeyPair(4096)
 	if err != nil {
 		return err
 	}
 
-	defSshKeyPath := path.Join(c.Path, "config", ".ssh")
+	return kp.Write(kpDir, kpName)
 
-	return kp.WriteKeys(defSshKeyPath, "id_rsa")
 }
 
 // cloneAndCopyReqFiles first clones a project using git and then

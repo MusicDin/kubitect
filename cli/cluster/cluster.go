@@ -10,6 +10,7 @@ import (
 	"cli/env"
 	"cli/tools/virtualenv"
 	"cli/ui"
+	"cli/utils/defaults"
 	"cli/utils/file"
 	"fmt"
 	"os"
@@ -47,12 +48,20 @@ func NewCluster(ctx ClusterContext, configPath string) (*Cluster, error) {
 		NewConfigPath: configPath,
 	}
 
+	if err := defaults.Set(c.NewConfig); err != nil {
+		return c, fmt.Errorf("failed to set config defaults: %v", err)
+	}
+
+	// TODO: Cluster name should be prefixed and validated here
+	// (if cluster is local, prefix cluster name with "local")
+	// (ensure that non local cluster cannot contain "local" prefix)
+
 	if err := validateConfig(c.NewConfig); err != nil {
 		ui.PrintBlockE(err...)
 		return c, fmt.Errorf("invalid configuration file")
 	}
 
-	c.Name = string(*c.NewConfig.Cluster.Name)
+	c.Name = c.NewConfig.Cluster.Name
 	c.Path = filepath.Join(c.ClustersDir(), c.Name)
 
 	return c, c.Sync()
@@ -90,12 +99,13 @@ func (c *Cluster) Executor() executors.Executor {
 	}
 
 	veReqPath := "ansible/kubespray/requirements.txt"
-	vePath := path.Join(c.ShareDir(), "venv", "kubespray", c.KubesprayVersion())
+	vePath := path.Join(c.ShareDir(), "venv", "kubespray", env.ConstKubesprayVersion)
 	ve := virtualenv.NewVirtualEnv(vePath, c.Path, veReqPath)
 
 	c.exec = kubespray.NewKubesprayExecutor(
 		c.Name,
 		c.Path,
+		c.PrivateSshKeyPath(),
 		c.NewConfig,
 		c.InfraConfig,
 		ve,
@@ -140,26 +150,26 @@ func (c *Cluster) StoreNewConfig() error {
 	return file.ForceCopy(src, dst)
 }
 
-func (c *Cluster) KubitectURL() string {
-	if c.NewConfig.Kubitect.Url != nil {
-		return string(*c.NewConfig.Kubitect.Url)
-	}
+// func (c *Cluster) KubitectURL() string {
+// 	if c.NewConfig.Kubitect.Url != nil {
+// 		return string(*c.NewConfig.Kubitect.Url)
+// 	}
 
-	return env.ConstProjectUrl
-}
+// 	return env.ConstProjectUrl
+// }
 
-func (c *Cluster) KubitectVersion() string {
-	if c.NewConfig.Kubitect.Version != nil {
-		return string(*c.NewConfig.Kubitect.Version)
-	}
+// func (c *Cluster) KubitectVersion() string {
+// 	if c.NewConfig.Kubitect.Version != "" {
+// 		return string(c.NewConfig.Kubitect.Version)
+// 	}
 
-	return env.ConstProjectVersion
-}
+// 	return env.ConstProjectVersion
+// }
 
-func (c *Cluster) KubesprayVersion() string {
-	if c.NewConfig.Kubernetes.Kubespray.Version != nil {
-		return string(*c.NewConfig.Kubernetes.Kubespray.Version)
-	}
+// func (c *Cluster) KubesprayVersion() string {
+// 	if c.NewConfig.Kubernetes.Kubespray.Version != nil {
+// 		return string(*c.NewConfig.Kubernetes.Kubespray.Version)
+// 	}
 
-	return env.ConstKubesprayVersion
-}
+// 	return env.ConstKubesprayVersion
+// }

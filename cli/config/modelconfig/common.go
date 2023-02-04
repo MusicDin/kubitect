@@ -86,16 +86,16 @@ func (l Labels) Validate() error {
 }
 
 type DataDisk struct {
-	Name *string `yaml:"name" opt:",id"`
-	Pool *string `yaml:"pool"`
-	Size *GB     `yaml:"size"`
+	Name string `yaml:"name" opt:",id"`
+	Pool string `yaml:"pool"`
+	Size GB     `yaml:"size"`
 }
 
 func (d DataDisk) Validate() error {
 	return v.Struct(&d,
-		v.Field(&d.Name, v.Required(), v.AlphaNumericHyp()),
-		v.Field(&d.Pool, v.OmitEmpty(), v.Skip().When(d.Pool != nil && *d.Pool == "main"), v.Custom(VALID_POOL)),
-		v.Field(&d.Size, v.Required()),
+		v.Field(&d.Name, v.NotEmpty(), v.AlphaNumericHyp()),
+		v.Field(&d.Pool, v.OmitEmpty(), v.Skip().When(d.Pool == "main"), v.Custom(VALID_POOL)),
+		v.Field(&d.Size, v.NotEmpty()),
 	)
 }
 

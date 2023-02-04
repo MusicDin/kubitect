@@ -2,17 +2,23 @@ package modelconfig
 
 import v "cli/utils/validation"
 
+const (
+	defaultVCpu         = VCpu(2)
+	defaultRAM          = GB(4)
+	defaultMainDiskSize = GB(32)
+)
+
 type Instance interface {
 	GetTypeName() string
-	GetID() *string
-	GetIP() *IPv4
-	GetMAC() *MAC
+	GetID() string
+	GetIP() IPv4
+	GetMAC() MAC
 }
 
 type Nodes struct {
-	LoadBalancer LB     `yaml:"loadBalancer"`
 	Master       Master `yaml:"master"`
-	Worker       Worker `yaml:"worker"`
+	Worker       Worker `yaml:"worker,omitempty"`
+	LoadBalancer LB     `yaml:"loadBalancer,omitempty"`
 }
 
 func (n Nodes) Validate() error {
@@ -44,16 +50,16 @@ func (n Nodes) isLBRequiredValidator() v.Validator {
 func (n Nodes) Instances() []Instance {
 	var ins []Instance
 
-	for _, i := range n.LoadBalancer.Instances {
-		ins = append(ins, Instance(i))
-	}
-
 	for _, i := range n.Master.Instances {
-		ins = append(ins, Instance(i))
+		ins = append(ins, i)
 	}
 
 	for _, i := range n.Worker.Instances {
-		ins = append(ins, Instance(i))
+		ins = append(ins, i)
+	}
+
+	for _, i := range n.LoadBalancer.Instances {
+		ins = append(ins, i)
 	}
 
 	return ins
@@ -64,9 +70,8 @@ func (n Nodes) IPs() []string {
 
 	for _, i := range n.Instances() {
 		ip := i.GetIP()
-
-		if ip != nil {
-			ips = append(ips, string(*ip))
+		if ip != "" {
+			ips = append(ips, string(ip))
 		}
 	}
 
@@ -79,8 +84,8 @@ func (n Nodes) MACs() []string {
 	for _, i := range n.Instances() {
 		mac := i.GetMAC()
 
-		if mac != nil {
-			macs = append(macs, string(*mac))
+		if mac != "" {
+			macs = append(macs, string(mac))
 		}
 	}
 

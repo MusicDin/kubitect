@@ -86,18 +86,15 @@ func TestLabels(t *testing.T) {
 }
 
 func TestDataDisk(t *testing.T) {
-	str := "test"
-	size := GB(5)
-
 	dd := DataDisk{
-		Name: &str,
-		Pool: &str,
-		Size: &size,
+		Name: "disk",
+		Pool: "disk",
+		Size: GB(5),
 	}
 
 	assert.NoError(t, dd.Validate())
-	assert.ErrorContains(t, DataDisk{}.Validate(), "Field 'size' is required.")
-	assert.ErrorContains(t, DataDisk{}.Validate(), "Field 'name' is required.")
+	assert.ErrorContains(t, DataDisk{}.Validate(), "Field 'size' is required and cannot be empty.")
+	assert.ErrorContains(t, DataDisk{}.Validate(), "Field 'name' is required and cannot be empty.")
 }
 
 func TestVersion(t *testing.T) {

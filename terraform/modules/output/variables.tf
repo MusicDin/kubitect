@@ -7,26 +7,26 @@ variable "lb_vip" {
   description = "Load balancer virtual IP address (VIP)"
 }
 
-variable "vm_user" {
-  type        = string
-  description = "SSH user for VMs"
-}
+# variable "vm_user" {
+#   type        = string
+#   description = "SSH user for VMs"
+# }
 
-variable "vm_ssh" {
-  type = object({
-    privateKeyPath = string
-  })
-  description = "Location of private ssh key for VMs"
-}
+# variable "vm_ssh" {
+#   type = object({
+#     privateKeyPath = string
+#   })
+#   description = "Location of private ssh key for VMs"
+# }
 
-variable "vm_os" {
-  type = object({
-    distro           = string
-    source           = string
-    networkInterface = string
-  })
-  description = "Operating system (os) information."
-}
+# variable "vm_os" {
+#   type = object({
+#     distro           = string
+#     source           = string
+#     networkInterface = string
+#   })
+#   description = "Operating system (os) information."
+# }
 
 #======================================================================================
 # Virtual machine instances

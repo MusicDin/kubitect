@@ -12,45 +12,42 @@ import (
 )
 
 type kubespray struct {
-	ClusterName string
-	ClusterPath string
-	Config      *modelconfig.Config
-	InfraConfig *modelinfra.Config
-	VirtualEnv  virtualenv.VirtualEnv
-	Ansible     ansible.Ansible
-	// K8sVersion  string
-	// SshUser     string
-	// SshPKey     string
+	ClusterName       string
+	ClusterPath       string
+	SshPrivateKeyPath string
+	Config            *modelconfig.Config
+	InfraConfig       *modelinfra.Config
+	VirtualEnv        virtualenv.VirtualEnv
+	Ansible           ansible.Ansible
 }
 
 func (e *kubespray) K8sVersion() string {
-	return string(*e.Config.Kubernetes.Version)
+	return string(e.Config.Kubernetes.Version)
 }
 
 func (e *kubespray) SshUser() string {
-	return string(*e.InfraConfig.Cluster.NodeTemplate.User)
+	return string(e.Config.Cluster.NodeTemplate.User)
 }
 
 func (e *kubespray) SshPKey() string {
-	return string(*e.InfraConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath)
+	return e.SshPrivateKeyPath
 }
 
 func NewKubesprayExecutor(
 	clusterName string,
 	clusterPath string,
+	sshPrivateKeyPath string,
 	cfg *modelconfig.Config,
 	infraCfg *modelinfra.Config,
 	virtualEnv virtualenv.VirtualEnv,
 ) executors.Executor {
 	return &kubespray{
-		ClusterName: clusterName,
-		ClusterPath: clusterPath,
-		Config:      cfg,
-		InfraConfig: infraCfg,
-		VirtualEnv:  virtualEnv,
-		// K8sVersion:  string(*cfg.Kubernetes.Version),
-		// SshUser:     string(*infraCfg.Cluster.NodeTemplate.User),
-		// SshPKey:     string(*infraCfg.Cluster.NodeTemplate.SSH.PrivateKeyPath),
+		ClusterName:       clusterName,
+		ClusterPath:       clusterPath,
+		SshPrivateKeyPath: sshPrivateKeyPath,
+		Config:            cfg,
+		InfraConfig:       infraCfg,
+		VirtualEnv:        virtualEnv,
 	}
 }
 
@@ -143,7 +140,7 @@ func (e *kubespray) ScaleDown(events event.Events) error {
 	var names []string
 
 	for _, n := range rmNodes {
-		name := fmt.Sprintf("%s-%s-%s", e.ClusterName, n.GetTypeName(), *n.GetID())
+		name := fmt.Sprintf("%s-%s-%s", e.ClusterName, n.GetTypeName(), n.GetID())
 		names = append(names, name)
 	}
 

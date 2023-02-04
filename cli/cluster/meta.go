@@ -79,6 +79,10 @@ func (c ClusterMeta) KubeconfigPath() string {
 	return filepath.Join(c.Path, DefaultConfigDir, DefaultKubeconfigFilename)
 }
 
+func (c ClusterMeta) PrivateSshKeyPath() string {
+	return filepath.Join(c.Path, DefaultConfigDir, ".ssh", "id_rsa")
+}
+
 func (c ClusterMeta) ContainsAppliedConfig() bool {
 	return file.Exists(c.AppliedConfigPath())
 }

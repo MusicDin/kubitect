@@ -1,13 +1,18 @@
 package modelconfig
 
-import v "cli/utils/validation"
+import (
+	"cli/env"
+	"cli/utils/defaults"
+	v "cli/utils/validation"
+)
 
 type NodeTemplate struct {
-	User         *User           `yaml:"user"`
+	User         User            `yaml:"user"`
 	OS           OS              `yaml:"os"`
-	SSH          NodeTemplateSSH `yaml:"ssh"`
-	DNS          []IP            `yaml:"dns"`
-	UpdateOnBoot *bool           `yaml:"updateOnBoot"`
+	SSH          NodeTemplateSSH `yaml:"ssh,omitempty"`
+	CpuMode      CpuMode         `yaml:"cpuMode,omitempty"`
+	DNS          []IP            `yaml:"dns,omitempty"`
+	UpdateOnBoot bool            `yaml:"updateOnBoot"`
 }
 
 func (n NodeTemplate) Validate() error {
@@ -19,10 +24,16 @@ func (n NodeTemplate) Validate() error {
 	)
 }
 
+func (n *NodeTemplate) SetDefaults() {
+	n.User = defaults.Default(n.User, "k8s")
+	n.CpuMode = defaults.Default(n.CpuMode, CUSTOM)
+	n.UpdateOnBoot = defaults.Default(n.UpdateOnBoot, true)
+}
+
 type OS struct {
-	Distro           *OSDistro           `yaml:"distro"`
-	NetworkInterface *OSNetworkInterface `yaml:"networkInterface"`
-	Source           *OSSource           `yaml:"source"`
+	Distro           OSDistro           `yaml:"distro"`
+	NetworkInterface OSNetworkInterface `yaml:"networkInterface"`
+	Source           OSSource           `yaml:"source"`
 }
 
 func (s OS) Validate() error {
@@ -31,6 +42,12 @@ func (s OS) Validate() error {
 		v.Field(&s.NetworkInterface),
 		v.Field(&s.Source),
 	)
+}
+
+func (s *OS) SetDefaults() {
+	s.NetworkInterface = defaults.Default(s.NetworkInterface, OSNetworkInterface("ens3"))
+	s.Distro = defaults.Default(s.Distro, UBUNTU)
+	s.Source = defaults.Default(s.Source, OSSource(env.ProjectOsPresets[string(s.Distro)]))
 }
 
 type OSDistro string
@@ -60,12 +77,26 @@ func (os OSSource) Validate() error {
 }
 
 type NodeTemplateSSH struct {
-	AddToKnownHosts *bool `yaml:"addToKnownHosts"`
-	PrivateKeyPath  *File `yaml:"privateKeyPath"`
+	AddToKnownHosts bool `yaml:"addToKnownHosts"`
+	PrivateKeyPath  File `yaml:"privateKeyPath"`
 }
 
 func (ssh NodeTemplateSSH) Validate() error {
-	return v.Struct(&ssh,
-		v.Field(&ssh.PrivateKeyPath),
-	)
+	return v.Struct(&ssh)
+	// v.Field(&ssh.PrivateKeyPath, v.Skip()),
+}
+
+func (ssh *NodeTemplateSSH) SetDefaults() {
+	ssh.AddToKnownHosts = defaults.Default(ssh.AddToKnownHosts, true)
+}
+
+type CpuMode string
+
+const (
+	CUSTOM      CpuMode = "custom"
+	PASSTHROUGH CpuMode = "host-passthrough"
+)
+
+func (m CpuMode) Validate() error {
+	return v.Var(m, v.OneOf(PASSTHROUGH, CUSTOM))
 }

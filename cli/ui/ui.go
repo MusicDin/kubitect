@@ -212,7 +212,6 @@ func (u *ui) PrintBlockE(errs ...error) {
 		case ErrorBlock:
 			eb = e.(ErrorBlock)
 		default:
-			fmt.Println("heii", fmt.Sprint(e))
 			content := []Content{
 				NewErrorLine("Error:", fmt.Sprint(e)),
 			}

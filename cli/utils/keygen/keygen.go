@@ -13,8 +13,6 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-const keyPerm = 0600
-
 type (
 	Key interface {
 		Write(path string) error
@@ -34,14 +32,14 @@ func (k key) Write(path string) error {
 
 type (
 	KeyPair interface {
-		WriteKeys(dir, keyName string) error
 		PublicKey() Key
 		PrivateKey() Key
+		Write(dir, keyName string) error
 	}
 
 	keyPair struct {
-		private Key
-		public  Key
+		private key
+		public  key
 	}
 )
 
@@ -53,29 +51,68 @@ func (p keyPair) PublicKey() Key {
 	return p.public
 }
 
-// NewKeyPair creates a private and public key pair.
+// Write keys creates the keys directory and writes the keys to it.
+func (p keyPair) Write(dir, keyName string) error {
+	err := os.MkdirAll(dir, 0700)
+	if err != nil {
+		return err
+	}
+
+	privKeyPath := path.Join(dir, keyName)
+	pubKeyPath := path.Join(dir, keyName+".pub")
+
+	err = p.PrivateKey().Write(privKeyPath)
+	if err != nil {
+		return err
+	}
+
+	return p.PublicKey().Write(pubKeyPath)
+}
+
+// NewKeyPair generates new private and public key pair.
 func NewKeyPair(bitSize int) (KeyPair, error) {
 	privateKey, err := generatePrivateKey(bitSize)
 	if err != nil {
 		return nil, err
 	}
 
-	privateKeyBytes := encodePrivateKey(privateKey)
-	publicKeyBytes, err := generatePublicKey(privateKey)
+	pair := keyPair{}
+	pair.private.value = encodePrivateKey(privateKey)
+	pair.public.value, err = generatePublicKey(privateKey)
 	if err != nil {
 		return nil, err
 	}
 
-	pair := keyPair{
-		private: key{
-			value: privateKeyBytes,
-		},
-		public: key{
-			value: publicKeyBytes,
-		},
+	return pair, nil
+}
+
+// ReadKeyPair reads public and private keys with a given name
+// from the specified directory.
+func ReadKeyPair(dir, keyName string) (KeyPair, error) {
+	var err error
+	var pair keyPair
+
+	privKeyPath := path.Join(dir, keyName)
+	pair.private.value, err = ioutil.ReadFile(privKeyPath)
+	if err != nil {
+		return nil, NewKeyFileError("private", keyName, err)
+	}
+
+	pubKeyName := keyName + ".pub"
+	pubKeyPath := path.Join(dir, pubKeyName)
+	pair.public.value, err = ioutil.ReadFile(pubKeyPath)
+	if err != nil {
+		return nil, NewKeyFileError("public", keyName+".pub", err)
 	}
 
 	return pair, nil
+}
+
+// Returns true if key pair with a given name exists in a
+// specified directory.
+func KeyPairExists(dir, keyName string) bool {
+	kp, err := ReadKeyPair(dir, keyName)
+	return err == nil && kp != nil
 }
 
 // generatePrivateKey creates a RSA private key of specified bit size.
@@ -113,19 +150,4 @@ func generatePublicKey(privateKey *rsa.PrivateKey) ([]byte, error) {
 	}
 
 	return ssh.MarshalAuthorizedKey(publicRsaKey), nil
-}
-
-// Write keys creates the specified directory and writes the keys to it.
-func (p keyPair) WriteKeys(dir, keyName string) error {
-	err := os.MkdirAll(dir, 0700)
-	if err != nil {
-		return err
-	}
-
-	err = p.PrivateKey().Write(path.Join(dir, keyName))
-	if err != nil {
-		return err
-	}
-
-	return p.PublicKey().Write(path.Join(dir, keyName+".pub"))
 }

@@ -2,6 +2,7 @@ package terraform
 
 import (
 	"cli/config/modelconfig"
+	"cli/utils/defaults"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -30,43 +31,34 @@ func MockPKey(t *testing.T) modelconfig.File {
 }
 
 func MockLocalHost(t *testing.T, name string, def bool) modelconfig.Host {
-	typ := modelconfig.LOCAL
-
 	host := modelconfig.Host{
-		Name:    &name,
-		Default: &def,
+		Name:    name,
+		Default: def,
 		Connection: modelconfig.Connection{
-			Type: &typ,
+			Type: modelconfig.LOCAL,
 		},
 	}
 
-	assert.NoError(t, host.Validate())
+	assert.NoError(t, defaults.Assign(&host).Validate())
 	return host
 }
 
 func MockRemoteHost(t *testing.T, name string, def bool, verify bool) modelconfig.Host {
-	typ := modelconfig.REMOTE
-	ip := modelconfig.IPv4("192.168.113.42")
-	user := modelconfig.User("mocked-user")
-	sshPKey := MockPKey(t)
-	sshPort := modelconfig.Port(42)
-
 	host := modelconfig.Host{
-		Name:    &name,
-		Default: &def,
+		Name:    name,
+		Default: def,
 		Connection: modelconfig.Connection{
-			Type: &typ,
-			IP:   &ip,
-			User: &user,
+			Type: modelconfig.REMOTE,
+			IP:   modelconfig.IPv4("192.168.113.42"),
+			User: modelconfig.User("mocked-user"),
 			SSH: modelconfig.ConnectionSSH{
-				Keyfile: &sshPKey,
-				Port:    &sshPort,
-				Verify:  &verify,
+				Keyfile: MockPKey(t),
+				Verify:  verify,
 			},
 		},
 	}
 
-	assert.NoError(t, host.Validate())
+	assert.NoError(t, defaults.Assign(&host).Validate())
 	return host
 }
 
@@ -87,7 +79,7 @@ func TestHostUri_Local(t *testing.T) {
 func TestHostUri_Remote(t *testing.T) {
 	h := MockRemoteHost(t, "remote", false, false)
 	pkey := h.Connection.SSH.Keyfile
-	expected := fmt.Sprintf("qemu+ssh://mocked-user@192.168.113.42:42/system?keyfile=%s&no_verify=1", *pkey)
+	expected := fmt.Sprintf("qemu+ssh://mocked-user@192.168.113.42:22/system?keyfile=%s&no_verify=1", pkey)
 
 	uri, err := hostUri(h)
 	assert.NoError(t, err)
@@ -97,7 +89,7 @@ func TestHostUri_Remote(t *testing.T) {
 func TestHostUri_Remote_Verify(t *testing.T) {
 	h := MockRemoteHost(t, "remote", false, true)
 	pkey := h.Connection.SSH.Keyfile
-	expected := fmt.Sprintf("qemu+ssh://mocked-user@192.168.113.42:42/system?keyfile=%s", *pkey)
+	expected := fmt.Sprintf("qemu+ssh://mocked-user@192.168.113.42:22/system?keyfile=%s", pkey)
 
 	uri, err := hostUri(h)
 	assert.NoError(t, err)
@@ -112,18 +104,6 @@ func TestHostUri_NoHomeVar(t *testing.T) {
 	h := MockRemoteHost(t, "remote", false, false)
 	_, err := hostUri(h)
 	assert.EqualError(t, err, "$HOME is not defined")
-}
-
-func TestHostMainResPoolPath(t *testing.T) {
-	path := "test"
-
-	h := modelconfig.Host{}
-	h.MainResourcePoolPath = &path
-	assert.Equal(t, "test", hostMainResPoolPath(h))
-}
-
-func TestHostMainResPoolPath_Default(t *testing.T) {
-	assert.Equal(t, "/var/lib/libvirt/images/", hostMainResPoolPath(modelconfig.Host{}))
 }
 
 func TestIsDefault(t *testing.T) {

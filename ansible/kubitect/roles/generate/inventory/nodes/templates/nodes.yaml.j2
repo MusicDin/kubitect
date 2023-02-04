@@ -8,8 +8,8 @@
 all:
   hosts:
   {# Load balancers #}
-  {% if infra.cluster.nodes.loadBalancer.instances is defined %}
-    {% for lb in infra.cluster.nodes.loadBalancer.instances %}
+  {% if infra.nodes.loadBalancer.instances is defined %}
+    {% for lb in infra.nodes.loadBalancer.instances %}
     {% set cfg_lb = cfg_lbs | selectattr("id", "in", [lb.id|string, lb.id|int(none)]) | first %}
     {{ lb.name }}:
       ansible_host: {{ lb.ip }}
@@ -19,7 +19,7 @@ all:
     {% endfor %}
   {% endif %}
   {# Master nodes #}
-  {% for master in infra.cluster.nodes.master.instances %}
+  {% for master in infra.nodes.master.instances %}
   {% set cfg_master = cfg_masters | selectattr("id", "in", [master.id|string, master.id|int(none)]) | first %}
     {{ master.name }}:
       ansible_host: {{ master.ip }}
@@ -39,8 +39,8 @@ all:
       {% endif %}
   {% endfor %}
   {# Worker nodes #}
-  {% if infra.cluster.nodes.worker.instances is defined %}
-    {% for worker in infra.cluster.nodes.worker.instances %}
+  {% if infra.nodes.worker.instances is defined %}
+    {% for worker in infra.nodes.worker.instances %}
     {% set cfg_worker = cfg_workers | selectattr("id", "in", [worker.id|string, worker.id|int(none)]) | first %}
     {{ worker.name }}:
       ansible_host: {{ worker.ip }}
@@ -63,32 +63,32 @@ all:
   children:
     haproxy:
       hosts:
-      {% if infra.cluster.nodes.loadBalancer.instances is defined %}
-        {% for lb in infra.cluster.nodes.loadBalancer.instances %}
+      {% if infra.nodes.loadBalancer.instances is defined %}
+        {% for lb in infra.nodes.loadBalancer.instances %}
         {{ lb.name }}:
         {% endfor %}
       {% endif %}
     etcd:
       hosts:
-      {% for master in infra.cluster.nodes.master.instances %}
+      {% for master in infra.nodes.master.instances %}
         {{ master.name }}:
       {% endfor %}
     k8s_cluster:
       children:
         kube_control_plane:
           hosts:
-          {% for master in infra.cluster.nodes.master.instances %}
+          {% for master in infra.nodes.master.instances %}
             {{ master.name }}:
           {% endfor %}
         kube_node:
           hosts:
-          {% if infra.cluster.nodes.worker.instances | default([]) | length > 0 %}
-            {% for worker in infra.cluster.nodes.worker.instances %}
+          {% if infra.nodes.worker.instances | default([]) | length > 0 %}
+            {% for worker in infra.nodes.worker.instances %}
             {{ worker.name }}:
             {% endfor %}
           {% else %}
             {# No worker nodes -> masters also become workers #}
-            {% for master in infra.cluster.nodes.master.instances %}
+            {% for master in infra.nodes.master.instances %}
             {{ master.name }}:
             {% endfor %}
           {% endif %}

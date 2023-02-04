@@ -1,6 +1,7 @@
 package modelconfig
 
 import (
+	"cli/utils/defaults"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,54 +14,49 @@ var (
 	sample_dd_size = GB(5)
 	sample_ip      = IPv4("192.168.114.13")
 
-	net_cidr = CIDRv4("192.168.113.0/24")
-	net      = Network{
-		CIDR: &net_cidr,
+	net = Network{
+		CIDR: CIDRv4("192.168.113.0/24"),
 	}
 
-	localhost_type = LOCAL
-	localhost      = Host{
-		Name:    &sample_name1,
-		Default: &sample_default,
+	localhost = Host{
+		Name:    "localhost",
+		Default: true,
 		Connection: Connection{
-			Type: &localhost_type,
+			Type: LOCAL,
 		},
 		DataResourcePools: []DataResourcePool{
 			{
-				Name: &sample_name1,
+				Name: "pool1",
+				Path: "/path1",
 			},
 			{
-				Name: &sample_name2,
+				Name: "pool2",
+				Path: "/path2",
 			},
 		},
 	}
 
-	remotehost_keyfile = File("./config_test.go")
-	remotehost_user    = User("user")
-	remotehost_type    = REMOTE
-	remotehost         = Host{
-		Name: &sample_name2,
+	remotehost = Host{
+		Name: "remotehost",
 		Connection: Connection{
-			Type: &remotehost_type,
-			IP:   &sample_ip,
-			User: &remotehost_user,
+			Type: REMOTE,
+			IP:   sample_ip,
+			User: User("user"),
 			SSH: ConnectionSSH{
-				Keyfile: &remotehost_keyfile,
+				Keyfile: File("./config_test.go"),
 			},
 		},
 	}
 
-	k8s_version    = Version("v1.2.3")
-	k8s_ks_version = MasterVersion(k8s_version)
-	k8s            = Kubernetes{
-		Version: &k8s_version,
+	k8s = Kubernetes{
+		Version: Version("v1.2.3"),
 		Kubespray: Kubespray{
-			Version: &k8s_ks_version,
+			Version: MasterVersion("master"),
 		},
 	}
 
 	cluster = Cluster{
-		Name:    &sample_name1,
+		Name:    sample_name1,
 		Network: net,
 	}
 
@@ -84,19 +80,19 @@ func TestConfig_Valid(t *testing.T) {
 		Master: Master{
 			Instances: []MasterInstance{
 				{
-					Id:   &sample_name1,
-					Host: &sample_name1,
+					Id:   "id",
+					Host: "localhost",
 					DataDisks: []DataDisk{
 						// Correct pool reference
 						{
-							Name: &sample_name1,
-							Pool: &sample_name1,
-							Size: &sample_dd_size,
+							Name: "disk1",
+							Pool: "pool1",
+							Size: GB(5),
 						},
 						// Main pool reference (no direct pool ref)
 						{
-							Name: &sample_name2,
-							Size: &sample_dd_size,
+							Name: "disk2",
+							Size: GB(5),
 						},
 					},
 				},
@@ -107,7 +103,7 @@ func TestConfig_Valid(t *testing.T) {
 	cfg := config
 	cfg.Cluster = cls
 
-	assert.NoError(t, cfg.Validate())
+	assert.NoError(t, defaults.Assign(&cfg).Validate())
 }
 
 func TestConfig_InvalidIP(t *testing.T) {
@@ -116,9 +112,9 @@ func TestConfig_InvalidIP(t *testing.T) {
 		Master: Master{
 			Instances: []MasterInstance{
 				{
-					Id:   &sample_name1,
-					Host: &sample_name1,
-					IP:   &sample_ip,
+					Id:   "id",
+					Host: "localhost",
+					IP:   sample_ip,
 				},
 			},
 		},
@@ -127,7 +123,7 @@ func TestConfig_InvalidIP(t *testing.T) {
 	cfg := config
 	cfg.Cluster = cls
 
-	assert.EqualError(t, cfg.Validate(), "Field 'ip' must be a valid IP address within '192.168.113.0/24' subnet. (actual: 192.168.114.13)")
+	assert.EqualError(t, defaults.Assign(&cfg).Validate(), "Field 'ip' must be a valid IP address within '192.168.113.0/24' subnet. (actual: 192.168.114.13)")
 }
 
 func TestConfig_MultipleDefaultHosts(t *testing.T) {
@@ -136,15 +132,15 @@ func TestConfig_MultipleDefaultHosts(t *testing.T) {
 		Master: Master{
 			Instances: []MasterInstance{
 				{
-					Id:   &sample_name1,
-					Host: &sample_name1,
+					Id:   "id",
+					Host: "localhost",
 				},
 			},
 		},
 	}
 
 	rhDef := remotehost
-	rhDef.Default = &sample_default
+	rhDef.Default = true
 
 	cfg := config
 	cfg.Cluster = cls
@@ -153,19 +149,17 @@ func TestConfig_MultipleDefaultHosts(t *testing.T) {
 		rhDef,
 	}
 
-	assert.EqualError(t, cfg.Validate(), "Only one host can be configured as default.")
+	assert.EqualError(t, defaults.Assign(&cfg).Validate(), "Only one host can be configured as default.")
 }
 
 func TestConfig_InvalidHostRef(t *testing.T) {
-	host := "wrong"
-
 	cls := cluster
 	cls.Nodes = Nodes{
 		Master: Master{
 			Instances: []MasterInstance{
 				{
-					Id:   &sample_name1,
-					Host: &host,
+					Id:   "id",
+					Host: "wrong",
 				},
 			},
 		},
@@ -174,7 +168,7 @@ func TestConfig_InvalidHostRef(t *testing.T) {
 	cfg := config
 	cfg.Cluster = cls
 
-	assert.EqualError(t, cfg.Validate(), "Field 'host' must point to one of the configured hosts: [test] (actual: wrong)")
+	assert.EqualError(t, defaults.Assign(&cfg).Validate(), "Field 'host' must point to one of the configured hosts: [localhost] (actual: wrong)")
 }
 
 func TestConfig_InvalidPoolHostRef(t *testing.T) {
@@ -183,13 +177,13 @@ func TestConfig_InvalidPoolHostRef(t *testing.T) {
 		Master: Master{
 			Instances: []MasterInstance{
 				{
-					Id:   &sample_name1,
-					Host: &sample_name2,
+					Id:   "id",
+					Host: "remotehost",
 					DataDisks: []DataDisk{
 						{
-							Name: &sample_name1,
-							Pool: &sample_name1,
-							Size: &sample_dd_size,
+							Name: "disk",
+							Pool: "pool1",
+							Size: GB(5),
 						},
 					},
 				},
@@ -204,23 +198,21 @@ func TestConfig_InvalidPoolHostRef(t *testing.T) {
 		remotehost,
 	}
 
-	assert.EqualError(t, cfg.Validate(), "Field 'pool' points to a data resource pool, but matching host 'test2' has none configured.")
+	assert.EqualError(t, defaults.Assign(&cfg).Validate(), "Field 'pool' points to a data resource pool, but matching host 'remotehost' has none configured.")
 }
 
 func TestConfig_InvalidPoolRef(t *testing.T) {
-	pool := "wrong"
-
 	cls := cluster
 	cls.Nodes = Nodes{
 		Master: Master{
 			Instances: []MasterInstance{
 				{
-					Id: &sample_name1,
+					Id: sample_name1,
 					DataDisks: []DataDisk{
 						{
-							Name: &sample_name1,
-							Pool: &pool,
-							Size: &sample_dd_size,
+							Name: "disk",
+							Pool: "wrong",
+							Size: GB(5),
 						},
 					},
 				},
@@ -231,23 +223,21 @@ func TestConfig_InvalidPoolRef(t *testing.T) {
 	cfg := config
 	cfg.Cluster = cls
 
-	assert.EqualError(t, cfg.Validate(), "Field 'pool' must point to one of the pools configured on a matching host 'test': [test|test2] (actual: wrong)")
+	assert.EqualError(t, defaults.Assign(&cfg).Validate(), "Field 'pool' must point to one of the pools configured on a matching host 'localhost': [pool1|pool2] (actual: wrong)")
 }
 
 func TestConfig_MainPoolRef(t *testing.T) {
-	pool := "main"
-
 	cls := cluster
 	cls.Nodes = Nodes{
 		Master: Master{
 			Instances: []MasterInstance{
 				{
-					Id: &sample_name1,
+					Id: sample_name1,
 					DataDisks: []DataDisk{
 						{
-							Name: &sample_name1,
-							Pool: &pool,
-							Size: &sample_dd_size,
+							Name: "disk1",
+							Pool: "main",
+							Size: GB(5),
 						},
 					},
 				},
@@ -258,7 +248,7 @@ func TestConfig_MainPoolRef(t *testing.T) {
 	cfg := config
 	cfg.Cluster = cls
 
-	assert.NoError(t, cfg.Validate())
+	assert.NoError(t, defaults.Assign(&cfg).Validate())
 }
 
 // When disk pool matches a host with no hostname, no extra error should
@@ -269,11 +259,11 @@ func TestConfig_MissingHostName(t *testing.T) {
 		Master: Master{
 			Instances: []MasterInstance{
 				{
-					Id: &sample_name1,
+					Id: sample_name1,
 					DataDisks: []DataDisk{
 						{
-							Name: &sample_name1,
-							Size: &sample_dd_size,
+							Name: "disk",
+							Size: GB(5),
 						},
 					},
 				},
@@ -286,10 +276,10 @@ func TestConfig_MissingHostName(t *testing.T) {
 	cfg.Hosts = []Host{
 		{
 			Connection: Connection{
-				Type: &localhost_type,
+				Type: LOCAL,
 			},
 		},
 	}
 
-	assert.EqualError(t, cfg.Validate(), "Field 'name' is required.")
+	assert.EqualError(t, defaults.Assign(&cfg).Validate(), "Field 'name' is required and cannot be empty.")
 }

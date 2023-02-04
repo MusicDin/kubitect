@@ -7,13 +7,9 @@ import (
 )
 
 func TestAddonRook(t *testing.T) {
-	ver := Version("v1.9.9")
-
 	rook := Rook{
-		Version: &ver,
-		NodeSelector: &Labels{
-			"rook": "true",
-		},
+		Version:      Version("v1.9.9"),
+		NodeSelector: Labels{"rook": "true"},
 	}
 
 	assert.NoError(t, rook.Validate())
