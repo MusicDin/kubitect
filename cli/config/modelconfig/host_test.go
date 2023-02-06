@@ -64,3 +64,8 @@ func TestHost(t *testing.T) {
 	assert.ErrorContains(t, h3.Validate(), "Field 'type' is required and cannot be empty.")
 	assert.ErrorContains(t, h3.Validate(), "Field 'Name' must be unique for each element in 'dataResourcePools'.")
 }
+
+func TestHost_Mock(t *testing.T) {
+	assert.NoError(t, MockLocalHost(t, "test", true).Validate())
+	assert.NoError(t, MockRemoteHost(t, "test", true, false).Validate())
+}

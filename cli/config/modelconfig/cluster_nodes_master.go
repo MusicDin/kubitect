@@ -58,6 +58,7 @@ func (m *Master) SetDefaults() {
 }
 
 type MasterInstance struct {
+	Name         string     `yaml:"name,omitempty" opt:"-"`
 	Id           string     `yaml:"id" opt:",id"`
 	Host         string     `yaml:"host,omitempty"`
 	IP           IPv4       `yaml:"ip,omitempty"`
