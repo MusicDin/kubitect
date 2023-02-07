@@ -8,6 +8,56 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestKubesprayAllTemplate(t *testing.T) {
+	tmpDir := t.TempDir()
+	nodes := modelconfig.MockNodes(t)
+
+	tpl := NewKubesprayAllTemplate(tmpDir, nodes)
+	pop, err := template.Populate(tpl)
+
+	assert.NoError(t, err)
+	assert.NoError(t, tpl.Write())
+	assert.Contains(t, pop, "apiserver_loadbalancer_domain_name: \"192.168.113.200\"")
+	assert.Contains(t, pop, "loadbalancer_apiserver:\n  address: \"192.168.113.200\"\n  port: 6443")
+}
+
+func TestKubesprayK8sClusterTemplate(t *testing.T) {
+	tmpDir := t.TempDir()
+	cfg := modelconfig.MockConfig(t)
+
+	tpl := NewKubesprayK8sClusterTemplate(tmpDir, cfg)
+	pop, err := template.Populate(tpl)
+
+	assert.NoError(t, err)
+	assert.NoError(t, tpl.Write())
+	assert.Contains(t, pop, "kube_version: v1.24.7")
+	assert.Contains(t, pop, "kube_network_plugin: calico")
+	assert.Contains(t, pop, "dns_mode: coredns")
+	assert.Contains(t, pop, "auto_renew_certificates: false")
+}
+
+func TestKubesprayAddonsTemplate(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	tpl := NewKubesprayAddonsTemplate(tmpDir, "test: test")
+	pop, err := template.Populate(tpl)
+
+	assert.NoError(t, err)
+	assert.NoError(t, tpl.Write())
+	assert.Equal(t, pop, "test: test")
+}
+
+func TestKubesprayEtcdTemplate(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	tpl := NewKubesprayEtcdTemplate(tmpDir)
+	pop, err := template.Populate(tpl)
+
+	assert.NoError(t, err)
+	assert.NoError(t, tpl.Write())
+	assert.Contains(t, pop, "etcd_deployment_type: host")
+}
+
 func TestHostsTemplate(t *testing.T) {
 	tmpDir := t.TempDir()
 
@@ -45,6 +95,7 @@ func TestHostsTemplate(t *testing.T) {
 	`)
 
 	assert.NoError(t, err)
+	assert.NoError(t, tpl.Write())
 	assert.Equal(t, expect, pop)
 }
 
@@ -110,6 +161,7 @@ func TestNodesTemplate(t *testing.T) {
 	`)
 
 	assert.NoError(t, err)
+	assert.NoError(t, tpl.Write())
 	assert.Equal(t, expect, pop)
 }
 

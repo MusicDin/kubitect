@@ -19,59 +19,60 @@ func MockTemplateFile(t *testing.T, content string) string {
 	return path
 }
 
-type TestTemplate struct {
-	Value string
-}
+type TemplateMock struct{ Value string }
+type InvalidTemplateMock struct{ TemplateMock }
+type InvalidFieldTemplateMock struct{ TemplateMock }
+type CustomDelimsTemplateMock struct{ TemplateMock }
+type CustomFuncsTemplateMock struct{ TemplateMock }
 
-func (t TestTemplate) Template() string {
-	return "Test {{ .Value }}"
-}
-
-func (t TestTemplate) Name() string {
-	return "test.tpl"
-}
-
-func (t TestTemplate) Functions() map[string]any {
-	return nil
-}
-
-type TestInvalidTemplate struct {
-	TestTemplate
-}
-
-func (t TestInvalidTemplate) Template() string {
-	return "{{ \\ }}"
-}
-
-type TestInvalidFieldTemplate struct {
-	TestTemplate
-}
-
-func (t TestInvalidFieldTemplate) Template() string {
-	return "Test {{ .Invalid }}"
+func (t TemplateMock) Name() string                             { return "test.tpl" }
+func (t TemplateMock) Template() string                         { return "Test {{ .Value }}" }
+func (t InvalidTemplateMock) Template() string                  { return "{{ \\ }}" }
+func (t InvalidFieldTemplateMock) Template() string             { return "Test {{ .Invalid }}" }
+func (t CustomDelimsTemplateMock) Template() string             { return "<< if true >>success<< end >>" }
+func (t CustomDelimsTemplateMock) Delimiters() (string, string) { return "<<", ">>" }
+func (t CustomFuncsTemplateMock) Template() string              { return "{{ alwaysTrue }}" }
+func (t CustomFuncsTemplateMock) Functions() map[string]any {
+	return map[string]any{
+		"alwaysTrue": func() bool { return true },
+	}
 }
 
 func TestPopulate(t *testing.T) {
-	tpl := TestTemplate{Value: "test"}
+	tpl := TemplateMock{Value: "test"}
 	str, err := Populate(tpl)
 	assert.NoError(t, err)
 	assert.Equal(t, "Test test", str)
 }
 
 func TestPopulate_Invalid(t *testing.T) {
-	_, err := Populate(TestInvalidTemplate{})
+	_, err := Populate(InvalidTemplateMock{})
 	assert.ErrorContains(t, err, "unexpected")
 }
 
 func TestPopulate_InvalidField(t *testing.T) {
-	_, err := Populate(TestInvalidFieldTemplate{})
+	_, err := Populate(InvalidFieldTemplateMock{})
 	assert.ErrorContains(t, err, "can't evaluate field Invalid")
+}
+
+func TestPopulate_CustomDelims(t *testing.T) {
+	tpl := CustomDelimsTemplateMock{}
+	str, err := Populate(tpl)
+	assert.NoError(t, err)
+	assert.Equal(t, "success", str)
+}
+
+func TestPopulate_CustomFunctions(t *testing.T) {
+	tpl := CustomFuncsTemplateMock{}
+	str, err := Populate(tpl)
+	assert.NoError(t, err)
+	assert.Equal(t, "true", str)
 }
 
 func TestPopulateFrom(t *testing.T) {
 	path := MockTemplateFile(t, "{{ .Value }}")
 
-	tpl := TestTemplate{Value: "test"}
+	tpl := TemplateMock{Value: "test"}
 	str, err := PopulateFrom(tpl, path)
 	assert.NoError(t, err)
 	assert.Equal(t, "test", str)
@@ -80,19 +81,29 @@ func TestPopulateFrom(t *testing.T) {
 func TestPopulateFrom_Invalid(t *testing.T) {
 	path := MockTemplateFile(t, "{{ \\ }}")
 
-	_, err := PopulateFrom(TestTemplate{}, path)
+	_, err := PopulateFrom(TemplateMock{}, path)
 	assert.ErrorContains(t, err, "unexpected")
 }
 
 func TestPopulateFrom_InvalidPath(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "invalid.tpl")
 
-	_, err := PopulateFrom(TestTemplate{}, path)
+	_, err := PopulateFrom(TemplateMock{}, path)
 	assert.ErrorContains(t, err, "no such file or directory")
 }
 
+func TestWrite_InvalidDir(t *testing.T) {
+	dir := path.Join(t.TempDir(), "dir")
+
+	// Create file on dir location
+	_, err := os.Create(dir)
+	assert.NoError(t, err)
+
+	assert.ErrorContains(t, write(path.Join(dir, "tpl"), nil), "not a directory")
+}
+
 func TestWrite(t *testing.T) {
-	tpl := TestTemplate{Value: "test"}
+	tpl := TemplateMock{Value: "test"}
 	tplPath := path.Join(t.TempDir(), "test")
 
 	err := Write(tpl, tplPath)
@@ -104,7 +115,7 @@ func TestWrite(t *testing.T) {
 }
 
 func TestWrite_Invalid(t *testing.T) {
-	tpl := TestInvalidTemplate{}
+	tpl := InvalidTemplateMock{}
 	tplPath := path.Join(t.TempDir(), "test")
 
 	err := Write(tpl, tplPath)
@@ -112,7 +123,7 @@ func TestWrite_Invalid(t *testing.T) {
 }
 
 func TestWriteFrom(t *testing.T) {
-	tpl := TestTemplate{Value: "test"}
+	tpl := TemplateMock{Value: "test"}
 	srcPath := MockTemplateFile(t, "{{ .Value }}")
 	dstPath := path.Join(t.TempDir(), "test")
 
@@ -128,7 +139,7 @@ func TestWriteFrom_Invalid(t *testing.T) {
 	srcPath := MockTemplateFile(t, "{{ \\ }}")
 	dstPath := path.Join(t.TempDir(), "test")
 
-	err := WriteFrom(TestTemplate{}, srcPath, dstPath)
+	err := WriteFrom(TemplateMock{}, srcPath, dstPath)
 	assert.ErrorContains(t, err, "unexpected")
 }
 

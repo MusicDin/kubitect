@@ -83,3 +83,38 @@ func MockNodes(t *testing.T) Nodes {
 	assert.NoError(t, defaults.Set(&nodes))
 	return nodes
 }
+
+func MockConfig(t *testing.T) Config {
+	cfg := Config{
+		Hosts: []Host{
+			MockLocalHost(t, "local", true),
+			MockRemoteHost(t, "remote", false, false),
+		},
+		Cluster: Cluster{
+			Name: "cluster-mock",
+			Network: Network{
+				CIDR: "192.168.113.0/24",
+			},
+			Nodes: Nodes{
+				Master: Master{
+					Instances: []MasterInstance{
+						{
+							Name: "cluster-mock-master-1",
+							Id:   "1",
+							IP:   "192.168.113.10",
+						},
+					},
+				},
+			},
+		},
+		Kubernetes: Kubernetes{
+			Version: "v1.24.7",
+			Kubespray: Kubespray{
+				Version: "v2.21.0",
+			},
+		},
+	}
+
+	assert.NoError(t, defaults.Set(&cfg))
+	return cfg
+}

@@ -3,17 +3,157 @@ package kubespray
 import (
 	"cli/config/modelconfig"
 	"cli/utils/template"
+	"path"
 )
 
+const groupVarsDir = "group_vars"
+
+type KubesprayAllTemplate struct {
+	InfraNodes modelconfig.Nodes
+	configDir  string
+}
+
+func NewKubesprayAllTemplate(configDir string, infraNodes modelconfig.Nodes) KubesprayAllTemplate {
+	return KubesprayAllTemplate{
+		configDir:  configDir,
+		InfraNodes: infraNodes,
+	}
+}
+
+func (t KubesprayAllTemplate) Name() string {
+	return "all.yaml"
+}
+
+func (t KubesprayAllTemplate) Write() error {
+	dstPath := path.Join(t.configDir, groupVarsDir, "all", t.Name())
+	return template.Write(t, dstPath)
+}
+
+func (t KubesprayAllTemplate) Template() string {
+	return template.TrimTemplate(`
+		##
+		# Kubesprays's source file (v2.17.1):
+		# https://github.com/kubernetes-sigs/kubespray/blob/v2.17.1/inventory/sample/group_vars/all/all.yml
+		##
+		---
+		apiserver_loadbalancer_domain_name: "{{ .InfraNodes.LoadBalancer.VIP }}"
+		deploy_container_engine: true
+		etcd_kubeadm_enabled: false
+		loadbalancer_apiserver:
+			address: "{{ .InfraNodes.LoadBalancer.VIP }}"
+			port: 6443
+		## Upstream dns servers
+		# upstream_dns_servers:
+		#   - 8.8.8.8
+		#   - 8.8.4.4
+	`)
+}
+
+type KubesprayK8sClusterTemplate struct {
+	Config    modelconfig.Config
+	configDir string
+}
+
+func NewKubesprayK8sClusterTemplate(configDir string, config modelconfig.Config) KubesprayK8sClusterTemplate {
+	return KubesprayK8sClusterTemplate{
+		configDir: configDir,
+		Config:    config,
+	}
+}
+
+func (t KubesprayK8sClusterTemplate) Name() string {
+	return "k8s_cluster.yaml"
+}
+
+func (t KubesprayK8sClusterTemplate) Write() error {
+	dstPath := path.Join(t.configDir, groupVarsDir, "k8s_cluster", t.Name())
+	return template.Write(t, dstPath)
+}
+
+func (t KubesprayK8sClusterTemplate) Delimiters() (string, string) {
+	return "<<", ">>"
+}
+
+func (t KubesprayK8sClusterTemplate) Template() string {
+	return template.TrimTemplate(`
+		##
+		# Kubesprays's source file (v2.17.1):
+		# https://github.com/kubernetes-sigs/kubespray/blob/v2.17.1/inventory/sample/group_vars/k8s_cluster/k8s-cluster.yml
+		##
+		---
+		auto_renew_certificates: << .Config.Kubernetes.Other.AutoRenewCertificates >>
+		# TODO: Support custom DNS domain
+		cluster_name: cluster.local
+		dns_mode: << .Config.Kubernetes.DnsMode >>
+		kube_version: << .Config.Kubernetes.Version >>
+		kube_network_plugin: << .Config.Kubernetes.NetworkPlugin >>
+		kube_proxy_strict_arp: true
+		resolvconf_mode: host_resolvconf
+	`)
+}
+
+type KubesprayAddonsTemplate struct {
+	configDir string
+	Addons    string
+}
+
+func NewKubesprayAddonsTemplate(configDir string, addons string) KubesprayAddonsTemplate {
+	return KubesprayAddonsTemplate{
+		configDir: configDir,
+		Addons:    addons,
+	}
+}
+
+func (t KubesprayAddonsTemplate) Name() string {
+	return "addons.yaml"
+}
+
+func (t KubesprayAddonsTemplate) Write() error {
+	dstPath := path.Join(t.configDir, groupVarsDir, "k8s_cluster", t.Name())
+	return template.Write(t, dstPath)
+}
+
+func (t KubesprayAddonsTemplate) Template() string {
+	return "{{ .Addons }}"
+}
+
+type KubesprayEtcdTemplate struct {
+	configDir string
+}
+
+func NewKubesprayEtcdTemplate(configDir string) KubesprayEtcdTemplate {
+	return KubesprayEtcdTemplate{configDir}
+}
+
+func (t KubesprayEtcdTemplate) Name() string {
+	return "etcd.yaml"
+}
+
+func (t KubesprayEtcdTemplate) Write() error {
+	dstPath := path.Join(t.configDir, groupVarsDir, t.Name())
+	return template.Write(t, dstPath)
+}
+
+func (t KubesprayEtcdTemplate) Template() string {
+	return template.TrimTemplate(`
+		##
+		# Kubesprays's source file (v2.17.1):
+		# https://github.com/kubernetes-sigs/kubespray/blob/v2.17.1/inventory/sample/group_vars/etcd.yml
+		##
+		---
+		etcd_deployment_type: host
+	`)
+}
+
 type HostsTemplate struct {
-	projDir    string
+	configDir  string
 	SshKeyFile string
 	Hosts      []modelconfig.Host
 }
 
-func NewHostsTemplate(projectDir, sshPrivateKeyPath string, hosts []modelconfig.Host) HostsTemplate {
+func NewHostsTemplate(configDir, sshPrivateKeyPath string, hosts []modelconfig.Host) HostsTemplate {
 	return HostsTemplate{
-		projDir:    projectDir,
+		configDir:  configDir,
 		SshKeyFile: sshPrivateKeyPath,
 		Hosts:      hosts,
 	}
@@ -23,49 +163,59 @@ func (t HostsTemplate) Name() string {
 	return "hosts.yaml"
 }
 
+func (t HostsTemplate) Write() error {
+	dstPath := path.Join(t.configDir, t.Name())
+	return template.Write(t, dstPath)
+}
+
 func (t HostsTemplate) Functions() map[string]interface{} {
 	return map[string]interface{}{
 		"isRemoteHost": isRemoteHost,
 	}
 }
 
+// isRemoteHost returns true id host's connection type equals REMOTE.
+func isRemoteHost(host modelconfig.Host) bool {
+	return host.Connection.Type == modelconfig.REMOTE
+}
+
 func (t HostsTemplate) Template() string {
 	return template.TrimTemplate(`
-	{{- $pkPath := .SshKeyFile -}}
-	all:
-		hosts:
-		{{- range .Hosts }}
-			{{ .Name }}:
-			{{- if isRemoteHost . }}
-				ansible_connection: ssh
-				ansible_user: {{ .Connection.User }}
-				ansible_host: {{ .Connection.IP }}
-				ansible_port: {{ .Connection.SSH.Port }}
-				ansible_private_key_file: {{ $pkPath }}
-			{{- else }}
-				ansible_connection: local
-				ansible_host: localhost
+		{{- $pkPath := .SshKeyFile -}}
+		all:
+			hosts:
+			{{- range .Hosts }}
+				{{ .Name }}:
+				{{- if isRemoteHost . }}
+					ansible_connection: ssh
+					ansible_user: {{ .Connection.User }}
+					ansible_host: {{ .Connection.IP }}
+					ansible_port: {{ .Connection.SSH.Port }}
+					ansible_private_key_file: {{ $pkPath }}
+				{{- else }}
+					ansible_connection: local
+					ansible_host: localhost
+				{{- end }}
 			{{- end }}
-		{{- end }}
 
-  children:
-    kubitect_hosts:
-      hosts:
-      {{- range .Hosts }}
-        {{ .Name }}:
-      {{- end }}
+		children:
+			kubitect_hosts:
+				hosts:
+				{{- range .Hosts }}
+					{{ .Name }}:
+				{{- end }}
 	`)
 }
 
 type NodesTemplate struct {
 	ConfigNodes modelconfig.Nodes
 	InfraNodes  modelconfig.Nodes
-	projDir     string
+	configDir   string
 }
 
-func NewNodesTemplate(projectDir string, configNodes, infraNodes modelconfig.Nodes) NodesTemplate {
+func NewNodesTemplate(configDir string, configNodes, infraNodes modelconfig.Nodes) NodesTemplate {
 	return NodesTemplate{
-		projDir:     projectDir,
+		configDir:   configDir,
 		ConfigNodes: configNodes,
 		InfraNodes:  infraNodes,
 	}
@@ -75,10 +225,9 @@ func (t NodesTemplate) Name() string {
 	return "nodes.yaml"
 }
 
-func (t NodesTemplate) Functions() map[string]interface{} {
-	return map[string]interface{}{
-		"isRemoteHost": isRemoteHost,
-	}
+func (t NodesTemplate) Write() error {
+	dstPath := path.Join(t.configDir, t.Name())
+	return template.Write(t, dstPath)
 }
 
 func (t NodesTemplate) Template() string {
@@ -160,9 +309,4 @@ func (t NodesTemplate) Template() string {
 							{{- end }}
 						{{- end }}
 	`)
-}
-
-// isRemoteHost returns true id host's connection type equals REMOTE.
-func isRemoteHost(host modelconfig.Host) bool {
-	return host.Connection.Type == modelconfig.REMOTE
 }
