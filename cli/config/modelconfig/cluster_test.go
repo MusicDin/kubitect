@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	cls_sample_cluster = Cluster{
+	sampleCluster = Cluster{
 		Name: "test",
 		Network: Network{
 			CIDR: CIDRv4("192.168.113.13/24"),
@@ -24,7 +24,7 @@ func TestCluster_Empty(t *testing.T) {
 }
 
 func TestCluster_Minimal(t *testing.T) {
-	cls := cls_sample_cluster
+	cls := sampleCluster
 	cls.Nodes = Nodes{
 		Master: Master{
 			Instances: []MasterInstance{
@@ -39,7 +39,7 @@ func TestCluster_Minimal(t *testing.T) {
 func TestCluster_DuplicateIP(t *testing.T) {
 	ip := IPv4("192.168.113.13")
 
-	cls := cls_sample_cluster
+	cls := sampleCluster
 	cls.Nodes = Nodes{
 		Master: Master{
 			Instances: []MasterInstance{
@@ -65,7 +65,7 @@ func TestCluster_DuplicateIP(t *testing.T) {
 func TestCluster_DuplicateMAC(t *testing.T) {
 	mac := MAC("AA:BB:CC:DD:EE:FF")
 
-	cls := cls_sample_cluster
+	cls := sampleCluster
 	cls.Nodes = Nodes{
 		Master: Master{
 			Instances: []MasterInstance{
@@ -89,7 +89,7 @@ func TestCluster_DuplicateMAC(t *testing.T) {
 }
 
 func TestCluster_Complete(t *testing.T) {
-	cls := cls_sample_cluster
+	cls := sampleCluster
 	cls.Nodes = Nodes{
 		LoadBalancer: LB{
 			VIP: IPv4("192.168.113.13"),

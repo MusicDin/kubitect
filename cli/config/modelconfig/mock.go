@@ -28,6 +28,16 @@ func MockLocalHost(t *testing.T, name string, def bool) Host {
 		Connection: Connection{
 			Type: LOCAL,
 		},
+		DataResourcePools: []DataResourcePool{
+			{
+				Name: "pool1",
+				Path: "/path1",
+			},
+			{
+				Name: "pool2",
+				Path: "/path2",
+			},
+		},
 	}
 
 	assert.NoError(t, defaults.Assign(&host).Validate())
