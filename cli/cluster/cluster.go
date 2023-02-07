@@ -17,7 +17,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 )
 
 type Cluster struct {
@@ -60,11 +59,11 @@ func NewCluster(ctx app.AppContext, configPath string) (*Cluster, error) {
 
 	// Add prefix "local" to the cluster name, if cluster is local.
 	// Throw an error if cluster is not local, but has a prefix "local".
-	if ctx.Local() {
-		c.NewConfig.Cluster.Name = "local-" + c.NewConfig.Cluster.Name
-	} else if strings.HasPrefix(c.NewConfig.Cluster.Name, "local") {
-		return nil, fmt.Errorf("Cluster name cannot have a prefix 'local'. This prefix is reserved for clusters created with --local flag.")
-	}
+	// if ctx.Local() {
+	// 	c.NewConfig.Cluster.Name = "local-" + c.NewConfig.Cluster.Name
+	// } else if strings.HasPrefix(c.NewConfig.Cluster.Name, "local") {
+	// 	return nil, fmt.Errorf("Cluster name cannot have a prefix 'local'. This prefix is reserved for clusters created with --local flag.")
+	// }
 
 	c.Name = c.NewConfig.Cluster.Name
 	c.Path = filepath.Join(c.ClustersDir(), c.Name)
