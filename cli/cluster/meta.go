@@ -53,12 +53,16 @@ type ClusterMeta struct {
 // 	return &meta, nil
 // }
 
+func (c ClusterMeta) ConfigDir() string {
+	return filepath.Join(c.Path, DefaultConfigDir)
+}
+
 func (c ClusterMeta) AppliedConfigPath() string {
-	return filepath.Join(c.Path, DefaultConfigDir, DefaultAppliedConfigFilename)
+	return filepath.Join(c.ConfigDir(), DefaultAppliedConfigFilename)
 }
 
 func (c ClusterMeta) InfrastructureConfigPath() string {
-	return filepath.Join(c.Path, DefaultConfigDir, DefaultInfraConfigFilename)
+	return filepath.Join(c.ConfigDir(), DefaultInfraConfigFilename)
 }
 
 func (c ClusterMeta) TfStatePath() string {
@@ -66,11 +70,11 @@ func (c ClusterMeta) TfStatePath() string {
 }
 
 func (c ClusterMeta) KubeconfigPath() string {
-	return filepath.Join(c.Path, DefaultConfigDir, DefaultKubeconfigFilename)
+	return filepath.Join(c.ConfigDir(), DefaultKubeconfigFilename)
 }
 
 func (c ClusterMeta) PrivateSshKeyPath() string {
-	return filepath.Join(c.Path, DefaultConfigDir, ".ssh", "id_rsa")
+	return filepath.Join(c.ConfigDir(), ".ssh", "id_rsa")
 }
 
 func (c ClusterMeta) ContainsAppliedConfig() bool {

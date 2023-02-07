@@ -9,10 +9,9 @@ import (
 )
 
 func TestKubesprayAllTemplate(t *testing.T) {
-	tmpDir := t.TempDir()
 	nodes := modelconfig.MockNodes(t)
 
-	tpl := NewKubesprayAllTemplate(tmpDir, nodes)
+	tpl := NewKubesprayAllTemplate(t.TempDir(), nodes)
 	pop, err := template.Populate(tpl)
 
 	assert.NoError(t, err)
@@ -22,10 +21,9 @@ func TestKubesprayAllTemplate(t *testing.T) {
 }
 
 func TestKubesprayK8sClusterTemplate(t *testing.T) {
-	tmpDir := t.TempDir()
 	cfg := modelconfig.MockConfig(t)
 
-	tpl := NewKubesprayK8sClusterTemplate(tmpDir, cfg)
+	tpl := NewKubesprayK8sClusterTemplate(t.TempDir(), cfg)
 	pop, err := template.Populate(tpl)
 
 	assert.NoError(t, err)
@@ -37,9 +35,7 @@ func TestKubesprayK8sClusterTemplate(t *testing.T) {
 }
 
 func TestKubesprayAddonsTemplate(t *testing.T) {
-	tmpDir := t.TempDir()
-
-	tpl := NewKubesprayAddonsTemplate(tmpDir, "test: test")
+	tpl := NewKubesprayAddonsTemplate(t.TempDir(), "test: test")
 	pop, err := template.Populate(tpl)
 
 	assert.NoError(t, err)
@@ -59,15 +55,13 @@ func TestKubesprayEtcdTemplate(t *testing.T) {
 }
 
 func TestHostsTemplate(t *testing.T) {
-	tmpDir := t.TempDir()
-
 	hosts := []modelconfig.Host{
 		modelconfig.MockLocalHost(t, "local", true),
 		modelconfig.MockLocalHost(t, "localhost", false),
 		modelconfig.MockRemoteHost(t, "remote", false, false),
 	}
 
-	tpl := NewHostsTemplate(tmpDir, "~/.ssh/id_rsa", hosts)
+	tpl := NewHostsTemplate(t.TempDir(), "~/.ssh/id_rsa", hosts)
 	pop, err := template.Populate(tpl)
 
 	expect := template.TrimTemplate(`
@@ -100,11 +94,9 @@ func TestHostsTemplate(t *testing.T) {
 }
 
 func TestNodesTemplate(t *testing.T) {
-	tmpDir := t.TempDir()
-
 	nodes := modelconfig.MockNodes(t)
 
-	tpl := NewNodesTemplate(tmpDir, nodes, nodes)
+	tpl := NewNodesTemplate(t.TempDir(), nodes, nodes)
 	pop, err := template.Populate(tpl)
 
 	expect := template.TrimTemplate(`
@@ -166,12 +158,10 @@ func TestNodesTemplate(t *testing.T) {
 }
 
 func TestNodesTemplate_NoWorkers(t *testing.T) {
-	tmpDir := t.TempDir()
-
 	nodes := modelconfig.MockNodes(t)
 	nodes.Worker = modelconfig.Worker{}
 
-	tpl := NewNodesTemplate(tmpDir, nodes, nodes)
+	tpl := NewNodesTemplate(t.TempDir(), nodes, nodes)
 	pop, err := template.Populate(tpl)
 
 	expect := template.TrimTemplate(`

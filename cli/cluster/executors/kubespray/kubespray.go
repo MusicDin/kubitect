@@ -5,9 +5,13 @@ import (
 	"cli/cluster/executors"
 	"cli/config/modelconfig"
 	"cli/config/modelinfra"
+	"cli/env"
 	"cli/tools/ansible"
+	"cli/tools/git"
 	"cli/tools/virtualenv"
+	"cli/ui"
 	"fmt"
+	"os"
 	"path"
 )
 
@@ -15,6 +19,7 @@ type kubespray struct {
 	ClusterName       string
 	ClusterPath       string
 	SshPrivateKeyPath string
+	ConfigDir         string
 	Config            *modelconfig.Config
 	InfraConfig       *modelinfra.Config
 	VirtualEnv        virtualenv.VirtualEnv
@@ -37,6 +42,7 @@ func NewKubesprayExecutor(
 	clusterName string,
 	clusterPath string,
 	sshPrivateKeyPath string,
+	configDir string,
 	cfg *modelconfig.Config,
 	infraCfg *modelinfra.Config,
 	virtualEnv virtualenv.VirtualEnv,
@@ -45,6 +51,7 @@ func NewKubesprayExecutor(
 		ClusterName:       clusterName,
 		ClusterPath:       clusterPath,
 		SshPrivateKeyPath: sshPrivateKeyPath,
+		ConfigDir:         configDir,
 		Config:            cfg,
 		InfraConfig:       infraCfg,
 		VirtualEnv:        virtualEnv,
@@ -52,8 +59,20 @@ func NewKubesprayExecutor(
 }
 
 func (e *kubespray) Init() error {
-	err := e.VirtualEnv.Init()
-	if err != nil {
+	url := env.ConstKubesprayUrl
+	ver := env.ConstKubesprayVersion
+	dst := path.Join(e.ClusterPath, "ansible", "kubespray")
+
+	if err := os.RemoveAll(dst); err != nil {
+		return err
+	}
+
+	ui.Println(ui.INFO, "Cloning Kubespray (%s)...", ver)
+	if err := git.NewGitProject(url, ver).Clone(dst); err != nil {
+		return err
+	}
+
+	if err := e.VirtualEnv.Init(); err != nil {
 		return fmt.Errorf("kubespray exec: initialize virtual environment: %v", err)
 	}
 
@@ -62,17 +81,26 @@ func (e *kubespray) Init() error {
 		e.Ansible = ansible.NewAnsible(ansibleBinDir)
 	}
 
-	if err := e.KubitectInit(TAG_INIT); err != nil {
-		return err
-	}
-
 	return e.KubitectHostsSetup()
 }
 
 func (e *kubespray) Create() error {
-	if err := e.KubitectInit(TAG_INIT, TAG_KUBESPRAY, TAG_GEN_NODES); err != nil {
+	if err := e.generateHostsInventory(); err != nil {
 		return err
 	}
+
+	if err := e.generateNodesInventory(); err != nil {
+		return err
+	}
+
+	if err := e.generateGroupVars(); err != nil {
+		return err
+	}
+
+	// generate hosts, nodes, and group vars
+	// if err := e.KubitectInit(TAG_INIT, TAG_KUBESPRAY, TAG_GEN_NODES); err != nil {
+	// 	return err
+	// }
 
 	if err := e.KubitectHostsSetup(); err != nil {
 		return err
@@ -90,9 +118,22 @@ func (e *kubespray) Create() error {
 }
 
 func (e *kubespray) Upgrade() error {
-	if err := e.KubitectInit(TAG_INIT, TAG_KUBESPRAY, TAG_GEN_NODES); err != nil {
+	if err := e.generateHostsInventory(); err != nil {
 		return err
 	}
+
+	if err := e.generateNodesInventory(); err != nil {
+		return err
+	}
+
+	if err := e.generateGroupVars(); err != nil {
+		return err
+	}
+
+	// generate hosts, nodes, and group vars
+	// if err := e.KubitectInit(TAG_INIT, TAG_KUBESPRAY, TAG_GEN_NODES); err != nil {
+	// 	return err
+	// }
 
 	if err := e.KubitectHostsSetup(); err != nil {
 		return err
@@ -113,9 +154,18 @@ func (e *kubespray) ScaleUp(events event.Events) error {
 		return nil
 	}
 
-	if err := e.KubitectInit(TAG_KUBESPRAY, TAG_GEN_NODES); err != nil {
+	if err := e.generateNodesInventory(); err != nil {
 		return err
 	}
+
+	if err := e.generateGroupVars(); err != nil {
+		return err
+	}
+
+	// generate nodes and group variables
+	// if err := e.KubitectInit(TAG_KUBESPRAY, TAG_GEN_NODES); err != nil {
+	// 	return err
+	// }
 
 	if err := e.HAProxy(); err != nil {
 		return err
@@ -144,9 +194,14 @@ func (e *kubespray) ScaleDown(events event.Events) error {
 		names = append(names, name)
 	}
 
-	if err := e.KubitectInit(TAG_KUBESPRAY); err != nil {
+	if err := e.generateGroupVars(); err != nil {
 		return err
 	}
+
+	// generate group variables
+	// if err := e.KubitectInit(TAG_KUBESPRAY); err != nil {
+	// 	return err
+	// }
 
 	return e.KubesprayRemoveNodes(names)
 }
@@ -167,4 +222,34 @@ func extractRemovedNodes(events event.Events) ([]modelconfig.Instance, error) {
 	}
 
 	return nodes, nil
+}
+
+// generateNodesInventory creates an Ansible inventory of target nodes.
+func (e *kubespray) generateNodesInventory() error {
+	return NewNodesTemplate(e.ConfigDir, e.Config.Cluster.Nodes, e.InfraConfig.Nodes).Write()
+}
+
+// generateHostsInventory creates an Ansible inventory of target hosts.
+func (e *kubespray) generateHostsInventory() error {
+	return NewHostsTemplate(e.ConfigDir, e.SshPrivateKeyPath, e.Config.Hosts).Write()
+}
+
+// generateGroupVars creates a directory of Kubespray group variables.
+func (e *kubespray) generateGroupVars() error {
+	err := NewKubesprayAllTemplate(e.ConfigDir, e.InfraConfig.Nodes).Write()
+	if err != nil {
+		return err
+	}
+
+	err = NewKubesprayK8sClusterTemplate(e.ConfigDir, *e.Config).Write()
+	if err != nil {
+		return err
+	}
+
+	err = NewKubesprayAddonsTemplate(e.ConfigDir, e.Config.Addons.Kubespray).Write()
+	if err != nil {
+		return err
+	}
+
+	return NewKubesprayEtcdTemplate(e.ConfigDir).Write()
 }
