@@ -4,12 +4,37 @@ import (
 	"fmt"
 	"net"
 	"reflect"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
 
 var ErrorExportInterface = fmt.Errorf("validators.extra_UniqueField: Cannot export private field!")
 var ErrorFieldNotFound = fmt.Errorf("validators.extra_UniqueField: Field not found!")
+
+// extra_RegexAny returns true if the field value matches any of the provided regex
+// expressions.
+func extra_RegexAny(fl validator.FieldLevel) bool {
+	for _, r := range strings.Split(fl.Param(), " ") {
+		if regex(r, fl.Field().String()) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// extra_RegexAll returns true if the field value matches all of the provided regex
+// expressions.
+func extra_RegexAll(fl validator.FieldLevel) bool {
+	for _, r := range strings.Split(fl.Param(), " ") {
+		if !regex(r, fl.Field().String()) {
+			return false
+		}
+	}
+
+	return true
+}
 
 // extra_AlphaNumericDash checks whether the field contains only alphanumeric characters
 // (a-Z0-9) and hyphen (-).

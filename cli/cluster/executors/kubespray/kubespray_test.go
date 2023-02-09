@@ -5,6 +5,7 @@ import (
 	"cli/cluster/executors"
 	"cli/config/modelconfig"
 	"cli/config/modelinfra"
+	"cli/env"
 	"cli/tools/ansible"
 	"cli/utils/cmp"
 	"fmt"
@@ -32,7 +33,7 @@ func MockExecutor(t *testing.T) *kubespray {
 	tmpDir := t.TempDir()
 
 	cfg := &modelconfig.Config{}
-	cfg.Kubernetes.Version = modelconfig.Version("v1.2.3")
+	cfg.Kubernetes.Version = env.ConstKubernetesVersion
 	cfg.Cluster.NodeTemplate.User = modelconfig.User("test")
 	cfg.Cluster.NodeTemplate.SSH.PrivateKeyPath = modelconfig.File(path.Join(tmpDir, ".ssh", "id_rsa"))
 

@@ -61,6 +61,8 @@ func initialize() {
 	validate.RegisterValidation("extra_vsemver", extra_VSemVer)
 	validate.RegisterValidation("extra_ipinrange", extra_IPInRange)
 	validate.RegisterValidation("extra_uniquefield", extra_UniqueField)
+	validate.RegisterValidation("extra_regexany", extra_RegexAny)
+	validate.RegisterValidation("extra_regexall", extra_RegexAll)
 }
 
 // validate validates the provided value against the validator.
@@ -409,5 +411,21 @@ func VSemVer() Validator {
 	return Validator{
 		Tags: "extra_vsemver",
 		Err:  "Field '{.Field}' must be a valid semantic version prefixed with 'v' (e.g. v1.2.3). (actual: {.Value})",
+	}
+}
+
+// Regex checks whether the field matches any regex expression.
+func RegexAny(regex ...string) Validator {
+	return Validator{
+		Tags: fmt.Sprintf("extra_regexany=%s", strings.Join(regex, " ")),
+		Err:  fmt.Sprintf("Field '{.Field}' does not match any regex expression %s. (actual: {.Value})", regex),
+	}
+}
+
+// Regex checks whether the field matches all regex expressions.
+func RegexAll(regex ...string) Validator {
+	return Validator{
+		Tags: fmt.Sprintf("extra_regexall=%s", strings.Join(regex, " ")),
+		Err:  fmt.Sprintf("Field '{.Field}' does not match all regex expressions %s. (actual: {.Value})", regex),
 	}
 }

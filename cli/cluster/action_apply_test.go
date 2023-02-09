@@ -4,6 +4,7 @@ import (
 	"cli/config/modelconfig"
 	"cli/env"
 	"cli/tools/git"
+	"fmt"
 	"os"
 	"path"
 	"testing"
@@ -116,7 +117,8 @@ func TestPlan(t *testing.T) {
 	assert.NoError(t, c.Sync())
 
 	// Make "blocking" change
-	c.NewConfig.Kubernetes.Version = modelconfig.Version("v1.2.3")
+	ver := fmt.Sprintf("%s.%s", env.ProjectK8sVersions[0], "99")
+	c.NewConfig.Kubernetes.Version = modelconfig.KubernetesVersion(ver)
 
 	_, err := c.plan(SCALE)
 	assert.EqualError(t, err, "Aborted. Configuration file contains errors.")
@@ -167,7 +169,8 @@ func TestApply_Upgrade(t *testing.T) {
 	assert.NoError(t, c.Sync())
 
 	// Make some changes to the new config
-	c.NewConfig.Kubernetes.Version = modelconfig.Version("v1.2.3")
+	ver := fmt.Sprintf("%s.%s", env.ProjectK8sVersions[0], "99")
+	c.NewConfig.Kubernetes.Version = modelconfig.KubernetesVersion(ver)
 
 	// Skip required files check
 	tmp := env.ProjectRequiredFiles

@@ -6,11 +6,12 @@ package env
 
 // Project related constants
 const (
-	ConstProjectUrl       = "https://github.com/MusicDin/kubitect"
-	ConstProjectVersion   = "v2.2.0"
-	ConstKubesprayUrl     = "https://github.com/kubernetes-sigs/kubespray"
-	ConstKubesprayVersion = "v2.20.0"
-	ConstTerraformVersion = "1.3.7"
+	ConstProjectUrl        = "https://github.com/MusicDin/kubitect"
+	ConstProjectVersion    = "v2.2.0"
+	ConstKubesprayUrl      = "https://github.com/kubernetes-sigs/kubespray"
+	ConstKubesprayVersion  = "v2.21.0"
+	ConstKubernetesVersion = "v1.25.6"
+	ConstTerraformVersion  = "1.3.7"
 )
 
 // Defines applications that Kubitect depends on.
@@ -47,4 +48,10 @@ var ProjectOsPresets = map[string]string{
 	"ubuntu20": "https://cloud-images.ubuntu.com/releases/focal/release-20220711/ubuntu-20.04-server-cloudimg-amd64.img",
 	"debian":   "https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-generic-amd64.qcow2",
 	"debian11": "https://cloud.debian.org/images/cloud/bullseye/20220711-1073/debian-11-genericcloud-amd64-20220711-1073.qcow2",
+}
+
+var ProjectK8sVersions = []string{
+	"v1.26",
+	"v1.25",
+	"v1.24",
 }

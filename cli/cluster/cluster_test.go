@@ -44,13 +44,13 @@ func TestNewCluster_InvalidClusterName(t *testing.T) {
 						- id: 1
 
 		kubernetes:
-			version: v1.0.0
+			version: v1.25.6
 			kubespray:
 				version: v1.0.0
 	`))
 
 	_, err := NewCluster(app.MockAppContext(t), cfgPath)
-	assert.ErrorContains(t, err, "Cluster name cannot have a prefix 'local'.")
+	assert.ErrorContains(t, err, "Cluster name cannot contain a prefix 'local'.")
 }
 
 func TestNewCluster_ConfigNotExists(t *testing.T) {
