@@ -58,6 +58,8 @@ func NewKubesprayExecutor(
 	}
 }
 
+// Init clones Kubespray project, initializes virtual environment
+// and generates Ansible hosts inventory.
 func (e *kubespray) Init() error {
 	url := env.ConstKubesprayUrl
 	ver := env.ConstKubesprayVersion
@@ -67,7 +69,7 @@ func (e *kubespray) Init() error {
 		return err
 	}
 
-	ui.Println(ui.INFO, "Cloning Kubespray (%s)...", ver)
+	ui.Printf(ui.INFO, "Cloning Kubespray (%s)...\n", ver)
 	if err := git.NewGitProject(url, ver).Clone(dst); err != nil {
 		return err
 	}
@@ -84,6 +86,8 @@ func (e *kubespray) Init() error {
 	return e.KubitectHostsSetup()
 }
 
+// Create creates a Kubernetes cluster by calling appropriate Kubespray
+// playbooks.
 func (e *kubespray) Create() error {
 	if err := e.generateHostsInventory(); err != nil {
 		return err
@@ -96,11 +100,6 @@ func (e *kubespray) Create() error {
 	if err := e.generateGroupVars(); err != nil {
 		return err
 	}
-
-	// generate hosts, nodes, and group vars
-	// if err := e.KubitectInit(TAG_INIT, TAG_KUBESPRAY, TAG_GEN_NODES); err != nil {
-	// 	return err
-	// }
 
 	if err := e.KubitectHostsSetup(); err != nil {
 		return err
@@ -130,11 +129,6 @@ func (e *kubespray) Upgrade() error {
 		return err
 	}
 
-	// generate hosts, nodes, and group vars
-	// if err := e.KubitectInit(TAG_INIT, TAG_KUBESPRAY, TAG_GEN_NODES); err != nil {
-	// 	return err
-	// }
-
 	if err := e.KubitectHostsSetup(); err != nil {
 		return err
 	}
@@ -162,11 +156,6 @@ func (e *kubespray) ScaleUp(events event.Events) error {
 		return err
 	}
 
-	// generate nodes and group variables
-	// if err := e.KubitectInit(TAG_KUBESPRAY, TAG_GEN_NODES); err != nil {
-	// 	return err
-	// }
-
 	if err := e.HAProxy(); err != nil {
 		return err
 	}
@@ -174,7 +163,7 @@ func (e *kubespray) ScaleUp(events event.Events) error {
 	return e.KubesprayScale()
 }
 
-// scaleDown gracefully removes nodes from the cluster.
+// ScaleDown gracefully removes nodes from the cluster.
 func (e *kubespray) ScaleDown(events event.Events) error {
 	events = events.OfType(event.SCALE_DOWN)
 
@@ -197,11 +186,6 @@ func (e *kubespray) ScaleDown(events event.Events) error {
 	if err := e.generateGroupVars(); err != nil {
 		return err
 	}
-
-	// generate group variables
-	// if err := e.KubitectInit(TAG_KUBESPRAY); err != nil {
-	// 	return err
-	// }
 
 	return e.KubesprayRemoveNodes(names)
 }

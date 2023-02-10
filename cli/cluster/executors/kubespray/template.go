@@ -62,7 +62,7 @@ func NewKubesprayK8sClusterTemplate(configDir string, config modelconfig.Config)
 }
 
 func (t KubesprayK8sClusterTemplate) Name() string {
-	return "k8s_cluster.yaml"
+	return "k8s-cluster.yaml"
 }
 
 func (t KubesprayK8sClusterTemplate) Write() error {
@@ -197,20 +197,19 @@ func (t HostsTemplate) Template() string {
 					ansible_host: localhost
 				{{- end }}
 			{{- end }}
-
-		children:
-			kubitect_hosts:
-				hosts:
-				{{- range .Hosts }}
-					{{ .Name }}:
-				{{- end }}
+			children:
+				kubitect_hosts:
+					hosts:
+					{{- range .Hosts }}
+						{{ .Name }}:
+					{{- end }}
 	`)
 }
 
 type NodesTemplate struct {
+	configDir   string
 	ConfigNodes modelconfig.Nodes
 	InfraNodes  modelconfig.Nodes
-	configDir   string
 }
 
 func NewNodesTemplate(configDir string, configNodes, infraNodes modelconfig.Nodes) NodesTemplate {
@@ -278,35 +277,35 @@ func (t NodesTemplate) Template() string {
 						{{- end }}
 					{{- end }}
 			{{- end }}
-		children:
-			haproxy:
-				hosts:
-				{{- range .InfraNodes.LoadBalancer.Instances }}
-					{{ .Name }}:
-				{{- end }}
-			etcd:
-				hosts:
-				{{- range .InfraNodes.Master.Instances }}
-					{{ .Name }}:
-				{{- end }}
-			k8s_cluster:
-				children:
-					kube_control_plane:
-						hosts:
-						{{- range .InfraNodes.Master.Instances }}
-							{{ .Name }}:
-						{{- end }}
-					kube_node:
-						hosts:
-						{{- if .InfraNodes.Worker.Instances }}
-							{{- range .InfraNodes.Worker.Instances }}
-							{{ .Name }}:
-							{{- end }}
-						{{- else }}
-							{{- /* No worker nodes -> masters also become workers */ -}}
+			children:
+				haproxy:
+					hosts:
+					{{- range .InfraNodes.LoadBalancer.Instances }}
+						{{ .Name }}:
+					{{- end }}
+				etcd:
+					hosts:
+					{{- range .InfraNodes.Master.Instances }}
+						{{ .Name }}:
+					{{- end }}
+				k8s_cluster:
+					children:
+						kube_control_plane:
+							hosts:
 							{{- range .InfraNodes.Master.Instances }}
-							{{ .Name }}:
+								{{ .Name }}:
 							{{- end }}
-						{{- end }}
+						kube_node:
+							hosts:
+							{{- if .InfraNodes.Worker.Instances }}
+								{{- range .InfraNodes.Worker.Instances }}
+								{{ .Name }}:
+								{{- end }}
+							{{- else }}
+								{{- /* No worker nodes -> masters also become workers */ -}}
+								{{- range .InfraNodes.Master.Instances }}
+								{{ .Name }}:
+								{{- end }}
+							{{- end }}
 	`)
 }

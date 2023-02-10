@@ -79,13 +79,12 @@ func TestHostsTemplate(t *testing.T) {
 					ansible_host: 192.168.113.42
 					ansible_port: 22
 					ansible_private_key_file: ~/.ssh/id_rsa
-		
-		children:
-			kubitect_hosts:
-				hosts:
-					local:
-					localhost:
-					remote:
+			children:
+				kubitect_hosts:
+					hosts:
+						local:
+						localhost:
+						remote:
 	`)
 
 	assert.NoError(t, err)
@@ -128,28 +127,28 @@ func TestNodesTemplate(t *testing.T) {
 						- "taint1=value:NoSchedule"
 				cls-worker-3:
 					ansible_host: 192.168.113.23
-		children:
-		  haproxy:
-		    hosts:
-		      cls-lb-1:
-		      cls-lb-2:
-		  etcd:
-		    hosts:
-		      cls-master-1:
-		      cls-master-2:
-		      cls-master-3:
-		  k8s_cluster:
-		    children:
-		      kube_control_plane:
-		        hosts:
-		          cls-master-1:
-		          cls-master-2:
-		          cls-master-3:
-		      kube_node:
-		        hosts:
-		          cls-worker-1:
-		          cls-worker-2:
-		          cls-worker-3:
+			children:
+				haproxy:
+					hosts:
+						cls-lb-1:
+						cls-lb-2:
+				etcd:
+					hosts:
+						cls-master-1:
+						cls-master-2:
+						cls-master-3:
+				k8s_cluster:
+					children:
+						kube_control_plane:
+							hosts:
+								cls-master-1:
+								cls-master-2:
+								cls-master-3:
+						kube_node:
+							hosts:
+								cls-worker-1:
+								cls-worker-2:
+								cls-worker-3:
 	`)
 
 	assert.NoError(t, err)
@@ -183,28 +182,28 @@ func TestNodesTemplate_NoWorkers(t *testing.T) {
 						- "taint1=value:NoSchedule"
 				cls-master-3:
 					ansible_host: 192.168.113.13
-		children:
-		  haproxy:
-		    hosts:
-		      cls-lb-1:
-		      cls-lb-2:
-		  etcd:
-		    hosts:
-		      cls-master-1:
-		      cls-master-2:
-		      cls-master-3:
-		  k8s_cluster:
-		    children:
-		      kube_control_plane:
-		        hosts:
-		          cls-master-1:
-		          cls-master-2:
-		          cls-master-3:
-		      kube_node:
-		        hosts:
-							cls-master-1:
-							cls-master-2:
-							cls-master-3:
+			children:
+				haproxy:
+					hosts:
+						cls-lb-1:
+						cls-lb-2:
+				etcd:
+					hosts:
+						cls-master-1:
+						cls-master-2:
+						cls-master-3:
+				k8s_cluster:
+					children:
+						kube_control_plane:
+							hosts:
+								cls-master-1:
+								cls-master-2:
+								cls-master-3:
+						kube_node:
+							hosts:
+								cls-master-1:
+								cls-master-2:
+								cls-master-3:
 	`)
 
 	assert.NoError(t, err)

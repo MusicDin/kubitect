@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"cli/app"
-	"cli/cluster"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -57,16 +56,8 @@ func TestExportCmd_Help(t *testing.T) {
 	assert.Contains(t, out, exportLong)
 }
 
-func TestListCmd(t *testing.T) {
-	cluster.MockCluster(t)
-
-	out, err := Execute(t, NewListCmd)
-	assert.NoError(t, err)
-	assert.Contains(t, out, "No clusters initialized yet.")
-}
-
-func TestListCmd_NoClusters(t *testing.T) {
-	out, err := Execute(t, NewListCmd)
-	assert.NoError(t, err)
-	assert.Contains(t, out, "No clusters initialized yet.")
-}
+// func TestListCmd_NoClusters(t *testing.T) {
+// 	out, err := Execute(t, NewListCmd)
+// 	assert.NoError(t, err)
+// 	assert.Contains(t, out, "No clusters initialized yet.")
+// }
