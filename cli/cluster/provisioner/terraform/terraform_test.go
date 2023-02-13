@@ -52,9 +52,9 @@ func MockInvalidTerraform(t *testing.T) *terraform {
 
 func TestNewTerraformProvisioner(t *testing.T) {
 	hosts := []modelconfig.Host{
-		MockLocalHost(t, "test1", false),
-		MockLocalHost(t, "test2", true),
-		MockRemoteHost(t, "test3", false, false),
+		modelconfig.MockLocalHost(t, "test1", false),
+		modelconfig.MockLocalHost(t, "test2", true),
+		modelconfig.MockRemoteHost(t, "test3", false, false),
 	}
 
 	cfg := modelconfig.Config{Hosts: hosts}

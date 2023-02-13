@@ -26,7 +26,7 @@ type ExportConfigOptions struct {
 }
 
 func NewExportConfigCmd() *cobra.Command {
-	var opts ExportConfigOptions
+	var o ExportConfigOptions
 
 	cmd := &cobra.Command{
 		SuggestFor: []string{"cfg"},
@@ -36,17 +36,17 @@ func NewExportConfigCmd() *cobra.Command {
 		Long:       exportConfigLong,
 		Example:    exportConfigExample,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return opts.Run()
+			return o.Run()
 		},
 	}
 
-	cmd.PersistentFlags().StringVar(&opts.ClusterName, "cluster", "", "specify the cluster to be used")
+	cmd.PersistentFlags().StringVar(&o.ClusterName, "cluster", "", "specify the cluster to be used")
 	cmd.MarkPersistentFlagRequired("cluster")
 
 	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		var names []string
 
-		clusters, err := AllClusters(opts.AppContext())
+		clusters, err := AllClusters(o.AppContext())
 
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp

@@ -12,6 +12,10 @@ func TestNodes_Empty(t *testing.T) {
 	assert.ErrorContains(t, defaults.Assign(&Nodes{}).Validate(), "At least one master instance must be configured.")
 }
 
+func TestNodes_Mock(t *testing.T) {
+	assert.NoError(t, MockNodes(t).Validate())
+}
+
 func TestCluster_NilInstances(t *testing.T) {
 	n := Nodes{
 		LoadBalancer: LB{

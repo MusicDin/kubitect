@@ -12,7 +12,9 @@ func BuiltInFuncs() template.FuncMap {
 		"list":     fList,
 		"append":   fAppend,
 		"prepend":  fPrepend,
+		"first":    fFirst,
 		"map":      fMap,
+		"select":   fSelect,
 		"join":     fJoin,
 		"contains": fContains,
 		"deref":    fDeref,
@@ -38,13 +40,22 @@ func fPrepend(list []interface{}, element interface{}) []interface{} {
 	return append([]interface{}{element}, list...)
 }
 
+// fFirst returns the first element from the given list.
+// If list is empty, nil is returned.
+func fFirst(list []interface{}) interface{} {
+	if len(list) > 0 {
+		return list[0]
+	}
+	return nil
+}
+
 // fMap maps objects from a list to a new list that contains only object
 // fields that match a given name.
 func fMap(fieldName string, list interface{}) ([]interface{}, error) {
 	v := reflect.ValueOf(list)
 
 	if v.Kind() != reflect.Slice {
-		return nil, fmt.Errorf("extractField: list is not a slice")
+		return nil, fmt.Errorf("map: list must be either of type slice or array (actual: %v)", v.Kind())
 	}
 
 	fields := make([]interface{}, 0)
@@ -53,19 +64,58 @@ func fMap(fieldName string, list interface{}) ([]interface{}, error) {
 		el := v.Index(i)
 
 		if el.Kind() != reflect.Struct {
-			return nil, fmt.Errorf("extractField: list element is not a struct")
+			return nil, fmt.Errorf("map: list elements must be of type struct (actual: %v)", el.Kind())
 		}
 
 		f := el.FieldByName(fieldName)
 
 		if !f.IsValid() {
-			return nil, fmt.Errorf("extractField: field %s not found in struct", fieldName)
+			return nil, fmt.Errorf("map: field %s not found in a struct", fieldName)
 		}
 
 		fields = append(fields, f.Interface())
 	}
 
 	return fields, nil
+}
+
+// fSelect selects list elements which contain a given field that equals
+// the provided value. If value is nil, all elements that contain a given
+// field are returned.
+func fSelect(fieldName string, fieldValue, list interface{}) ([]interface{}, error) {
+	v := reflect.ValueOf(list)
+
+	if v.Kind() != reflect.Array && v.Kind() != reflect.Slice {
+		return nil, fmt.Errorf("select: list must be either of type slice or array (actual: %v)", v.Kind())
+	}
+
+	var newList []interface{}
+
+	for i := 0; i < v.Len(); i++ {
+		el := v.Index(i)
+
+		if el.Kind() == reflect.Interface {
+			el = el.Elem()
+		}
+
+		if el.Kind() != reflect.Struct {
+			return nil, fmt.Errorf("select: list elements must be of type struct (actual: %v)", el.Kind())
+		}
+
+		f := el.FieldByName(fieldName)
+		if !f.IsValid() {
+			continue
+		}
+
+		fv := f.Interface()
+		if fieldValue != nil && fv != fieldValue {
+			continue
+		}
+
+		newList = append(newList, el.Interface())
+	}
+
+	return newList, nil
 }
 
 // fMap joins a list of objects with a given separator.

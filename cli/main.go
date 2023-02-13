@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	err := cmd.Execute()
+	err := cmd.NewRootCmd().Execute()
 
 	if err != nil {
 		ui.PrintBlockE(err)

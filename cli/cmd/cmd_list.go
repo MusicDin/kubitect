@@ -20,7 +20,7 @@ type ListOptions struct {
 }
 
 func NewListCmd() *cobra.Command {
-	var opts ListOptions
+	var o ListOptions
 
 	return &cobra.Command{
 		Aliases:    []string{"ls"},
@@ -30,7 +30,7 @@ func NewListCmd() *cobra.Command {
 		Short:      listShort,
 		Long:       listLong,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return opts.Run()
+			return o.Run()
 		},
 	}
 }

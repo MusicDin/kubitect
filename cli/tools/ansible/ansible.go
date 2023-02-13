@@ -43,12 +43,12 @@ func NewAnsible(binDir string) Ansible {
 
 // Exec executes the given ansible playbook.
 func (a *ansible) Exec(pb Playbook) error {
-	if pb.Local {
-		pb.Inventory = "localhost,"
-	}
-
 	if len(pb.Path) < 1 {
 		return fmt.Errorf("ansible-playbook: playbook path not set")
+	}
+
+	if pb.Local && pb.Inventory == "" {
+		pb.Inventory = "localhost,"
 	}
 
 	if pb.Inventory == "" {

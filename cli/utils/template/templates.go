@@ -2,15 +2,30 @@ package template
 
 import (
 	"bytes"
+	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 	"text/template"
 	"unicode"
 )
 
+// If a type implements the Functions method,
+// it can provide custom functions that will
+// be added to the existing built-in functions.
+type CustomFunctions interface {
+	Functions() map[string]any
+}
+
+// If a type implements the Delimiters method,
+// it can specify custom delimiters that will
+// replace the default ones.
+type CustomDelimiters interface {
+	Delimiters() (left string, right string)
+}
+
 type Template interface {
 	Name() string
-	Functions() map[string]any
 }
 
 type TextTemplate interface {
@@ -22,7 +37,14 @@ type TextTemplate interface {
 func populate(t Template, content string) (string, error) {
 	tpl := template.New(t.Name())
 	tpl = tpl.Funcs(BuiltInFuncs())
-	tpl = tpl.Funcs(template.FuncMap(t.Functions()))
+
+	if f, ok := t.(CustomFunctions); ok {
+		tpl = tpl.Funcs(template.FuncMap(f.Functions()))
+	}
+
+	if f, ok := t.(CustomDelimiters); ok {
+		tpl = tpl.Delims(f.Delimiters())
+	}
 
 	tpl, err := tpl.Parse(content)
 	if err != nil {
@@ -62,7 +84,7 @@ func Write(t TextTemplate, path string) error {
 		return err
 	}
 
-	return os.WriteFile(path, []byte(res), os.ModePerm)
+	return write(path, []byte(res))
 }
 
 // WriteFrom reads a template from source path, populates the template
@@ -73,7 +95,18 @@ func WriteFrom(t Template, srcPath string, dstPath string) error {
 		return err
 	}
 
-	return os.WriteFile(dstPath, []byte(res), os.ModePerm)
+	return write(dstPath, []byte(res))
+}
+
+// write writes given bytes to the file on a destination path.
+// It also ensures that all necessary directories are created.
+func write(dstPath string, bytes []byte) error {
+	err := os.MkdirAll(path.Dir(dstPath), os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(dstPath, bytes, 0644)
 }
 
 // TrimTemplate trims alls leading and trailing spaces from each line

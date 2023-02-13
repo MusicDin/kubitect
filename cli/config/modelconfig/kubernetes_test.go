@@ -9,6 +9,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestKubernetesVersion(t *testing.T) {
+	assert.NoError(t, KubernetesVersion("v1.24.0").Validate())
+	assert.NoError(t, KubernetesVersion("v1.24.10").Validate())
+	assert.NoError(t, KubernetesVersion("v1.25.0").Validate())
+	assert.NoError(t, KubernetesVersion("v1.25.10").Validate())
+	assert.NoError(t, KubernetesVersion("v1.26.0").Validate())
+	assert.NoError(t, KubernetesVersion("v1.26.10").Validate())
+	assert.ErrorContains(t, KubernetesVersion("v1.26.").Validate(), "Unsupported Kubernetes version")
+	assert.ErrorContains(t, KubernetesVersion("v1.26.100").Validate(), "Unsupported Kubernetes version")
+}
+
 func TestDnsMode(t *testing.T) {
 	assert.Error(t, DnsMode("").Validate())
 	assert.Error(t, DnsMode("wrong").Validate())
@@ -50,11 +61,11 @@ func TestKubernetes_Empty(t *testing.T) {
 
 func TestKubernetes_Valid(t *testing.T) {
 	k := Kubernetes{
-		Version:       Version("v1.2.3"),
+		Version:       env.ConstKubernetesVersion,
 		DnsMode:       COREDNS,
 		NetworkPlugin: CALICO,
 		Kubespray: Kubespray{
-			Version: MasterVersion("v1.2.3"),
+			Version: "v1.2.3",
 		},
 		Other: Other{
 			AutoRenewCertificates: true,

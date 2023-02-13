@@ -1,17 +1,19 @@
 package modelconfig
 
 import (
+	"cli/env"
 	v "cli/utils/validation"
+	"fmt"
 
 	"cli/utils/defaults"
 )
 
 type Kubernetes struct {
-	Version       Version       `yaml:"version"`
-	DnsMode       DnsMode       `yaml:"dnsMode"`
-	NetworkPlugin NetworkPlugin `yaml:"networkPlugin"`
-	Kubespray     Kubespray     `yaml:"kubespray,omitempty"`
-	Other         Other         `yaml:"other"`
+	Version       KubernetesVersion `yaml:"version"`
+	DnsMode       DnsMode           `yaml:"dnsMode"`
+	NetworkPlugin NetworkPlugin     `yaml:"networkPlugin"`
+	Kubespray     Kubespray         `yaml:"kubespray,omitempty"`
+	Other         Other             `yaml:"other"`
 }
 
 func (k Kubernetes) Validate() error {
@@ -25,10 +27,25 @@ func (k Kubernetes) Validate() error {
 }
 
 func (k *Kubernetes) SetDefaults() {
-	// TODO: Set default k8s version in env
-	k.Version = defaults.Default(k.Version, "v1.23.0")
+	k.Version = defaults.Default(k.Version, env.ConstKubernetesVersion)
 	k.DnsMode = defaults.Default(k.DnsMode, COREDNS)
 	k.NetworkPlugin = defaults.Default(k.NetworkPlugin, CALICO)
+}
+
+type KubernetesVersion string
+
+func (ver KubernetesVersion) Validate() error {
+	var rs []string
+
+	for _, r := range env.ProjectK8sVersions {
+		regex := fmt.Sprintf("^%s.[0-9][0-9]?$", r)
+		rs = append(rs, regex)
+	}
+
+	msg := fmt.Sprintf("Unsupported Kubernetes version (%s).", ver)
+	msg += fmt.Sprintf("Supported versions are: %v", env.ProjectK8sVersions)
+
+	return v.Var(ver, v.RegexAny(rs...).Error(msg))
 }
 
 type DnsMode string

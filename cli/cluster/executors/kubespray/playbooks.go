@@ -14,24 +14,6 @@ const (
 	TAG_GEN_NODES PlaybookTag = "gen_nodes"
 )
 
-// KubitectInit function calls Ansible playbook that is responsible for initializing
-// the cluster. Different workflow is executed based on the provided tags.
-func (e *kubespray) KubitectInit(tags ...PlaybookTag) error {
-	var sTags []string
-
-	for _, s := range tags {
-		sTags = append(sTags, string(s))
-	}
-
-	pb := ansible.Playbook{
-		Path:  filepath.Join(e.ClusterPath, "ansible/kubitect/init.yaml"),
-		Tags:  sTags,
-		Local: true,
-	}
-
-	return e.Ansible.Exec(pb)
-}
-
 // KubitectHostsSetup function calls an Ansible playbook that ensures Kubitect target
 // hosts meet all the requirements before cluster is created.
 func (e *kubespray) KubitectHostsSetup() error {

@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"cli/app"
 	"cli/cluster/executors"
 	"cli/cluster/provisioner"
 	"cli/cluster/provisioner/terraform"
@@ -21,19 +22,8 @@ const (
 	DefaultKubeconfigFilename     = "admin.conf"
 )
 
-type ClusterContext interface {
-	WorkingDir() string
-	HomeDir() string
-	ShareDir() string
-	ClustersDir() string
-	LocalClustersDir() string
-
-	Local() bool
-	ShowTerraformPlan() bool
-}
-
 type ClusterMeta struct {
-	ClusterContext
+	app.AppContext
 
 	Name  string
 	Path  string
@@ -43,32 +33,36 @@ type ClusterMeta struct {
 	prov provisioner.Provisioner
 }
 
-// func NewClusterMeta(ctx ClusterContext, clusterPath string) (*ClusterMeta, error) {
+// func NewClusterMeta(ctx app.AppContext, clusterPath string) (ClusterMeta, error) {
 // 	cpStat, err := os.Stat(clusterPath)
 // 	if err != nil {
 // 		return nil, fmt.Errorf("cluster meta: %v", err)
 // 	}
 
-// 	meta := &ClusterMeta{
-// 		ClusterContext: ctx,
-// 		Name:           cpStat.Name(),
-// 		Path:           filepath.Join(clusterPath, cpStat.Name()),
-// 		Local:          ctx.Local(),
+// 	meta := clusterMeta{
+// 		AppContext: ctx,
+// 		Name:       cpStat.Name(),
+// 		Path:       filepath.Join(clusterPath, cpStat.Name()),
+// 		Local:      ctx.Local(),
 // 	}
 
-// 	// if !cpStat.IsDir() || !meta.ContainsArchiveFile() {
-// 	// 	return nil, fmt.Errorf("cluster meta: %s is not a cluster directory", err)
-// 	// }
+// 	if !cpStat.IsDir() || !meta.ContainsAppliedConfig() {
+// 		return nil, fmt.Errorf("cluster meta: %s is not a cluster directory", err)
+// 	}
 
-// 	return meta, nil
+// 	return &meta, nil
 // }
 
+func (c ClusterMeta) ConfigDir() string {
+	return filepath.Join(c.Path, DefaultConfigDir)
+}
+
 func (c ClusterMeta) AppliedConfigPath() string {
-	return filepath.Join(c.Path, DefaultConfigDir, DefaultAppliedConfigFilename)
+	return filepath.Join(c.ConfigDir(), DefaultAppliedConfigFilename)
 }
 
 func (c ClusterMeta) InfrastructureConfigPath() string {
-	return filepath.Join(c.Path, DefaultConfigDir, DefaultInfraConfigFilename)
+	return filepath.Join(c.ConfigDir(), DefaultInfraConfigFilename)
 }
 
 func (c ClusterMeta) TfStatePath() string {
@@ -76,11 +70,11 @@ func (c ClusterMeta) TfStatePath() string {
 }
 
 func (c ClusterMeta) KubeconfigPath() string {
-	return filepath.Join(c.Path, DefaultConfigDir, DefaultKubeconfigFilename)
+	return filepath.Join(c.ConfigDir(), DefaultKubeconfigFilename)
 }
 
 func (c ClusterMeta) PrivateSshKeyPath() string {
-	return filepath.Join(c.Path, DefaultConfigDir, ".ssh", "id_rsa")
+	return filepath.Join(c.ConfigDir(), ".ssh", "id_rsa")
 }
 
 func (c ClusterMeta) ContainsAppliedConfig() bool {

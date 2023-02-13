@@ -338,3 +338,17 @@ func TestVSemVer(t *testing.T) {
 	assert.Error(t, Var("a.b.c", VSemVer()))
 	assert.Error(t, Var(nil, VSemVer()))
 }
+
+func TestRegexAny(t *testing.T) {
+	regex := []string{"^[0-9][0-9]?$", "abc"}
+	assert.NoError(t, Var("abc", RegexAny(regex...)))
+	assert.NoError(t, Var("1", RegexAny(regex...)))
+	assert.NoError(t, Var("13", RegexAny(regex...)))
+	assert.EqualError(t, Var("a", RegexAny(regex...)), "Field does not match any regex expression [^[0-9][0-9]?$ abc]. (actual: a)")
+}
+
+func TestRegexAll(t *testing.T) {
+	regex := []string{"^*[0-9]$", "^abc"}
+	assert.NoError(t, Var("abc4", RegexAll(regex...)))
+	assert.EqualError(t, Var("abc", RegexAll(regex...)), "Field does not match all regex expressions [^*[0-9]$ ^abc]. (actual: abc)")
+}

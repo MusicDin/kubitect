@@ -27,7 +27,7 @@ type PurgeOptions struct {
 }
 
 func NewPurgeCmd() *cobra.Command {
-	var opts PurgeOptions
+	var o PurgeOptions
 
 	cmd := &cobra.Command{
 		Use:     "purge",
@@ -36,17 +36,17 @@ func NewPurgeCmd() *cobra.Command {
 		Long:    purgeLong,
 		Example: purgeExample,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return opts.Run()
+			return o.Run()
 		},
 	}
 
-	cmd.PersistentFlags().StringVar(&opts.ClusterName, "cluster", "", "specify the cluster to be used")
-	cmd.PersistentFlags().BoolVar(&opts.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
+	cmd.PersistentFlags().StringVar(&o.ClusterName, "cluster", "", "specify the cluster to be used")
+	cmd.PersistentFlags().BoolVar(&o.AutoApprove, "auto-approve", false, "automatically approve any user permission requests")
 
 	cmd.RegisterFlagCompletionFunc("cluster", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		var names []string
 
-		clusters, err := AllClusters(opts.AppContext())
+		clusters, err := AllClusters(o.AppContext())
 
 		if err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp

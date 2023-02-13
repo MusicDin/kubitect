@@ -11,10 +11,6 @@ var (
 		Kubitect is a CLI tool that helps you manage multiple Kubernetes clusters.`)
 )
 
-func Execute() error {
-	return NewRootCmd().Execute()
-}
-
 func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "kubitect",

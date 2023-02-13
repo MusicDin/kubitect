@@ -16,7 +16,7 @@ func LongDesc(s string) string {
 	return strings.TrimSpace(strings.Join(trimmed, "\n"))
 }
 
-// Example trims alls leading and trailing spaces from each line
+// Example trims all leading and trailing spaces from each line
 // and indents it with some spaces.
 func Example(s string) string {
 	var trimmed []string
@@ -32,5 +32,6 @@ func Example(s string) string {
 		trimmed = append(trimmed, t)
 	}
 
-	return strings.Join(trimmed, "\n")
+	out := strings.Join(trimmed, "\n")
+	return strings.TrimRight(out, " ")
 }

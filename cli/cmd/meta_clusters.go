@@ -72,7 +72,7 @@ func clusters(ctx app.AppContext, local bool) (MetaClusters, error) {
 	files, err := ioutil.ReadDir(path)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed reading cluster directory: %v", err)
+		return nil, fmt.Errorf("failed to read clusters directory: %v", err)
 	}
 
 	var cs MetaClusters
@@ -82,10 +82,10 @@ func clusters(ctx app.AppContext, local bool) (MetaClusters, error) {
 			name := f.Name()
 
 			cs = append(cs, cluster.ClusterMeta{
-				ClusterContext: ctx,
-				Name:           name,
-				Path:           filepath.Join(path, name),
-				Local:          local,
+				AppContext: ctx,
+				Name:       name,
+				Path:       filepath.Join(path, name),
+				Local:      local,
 			})
 		}
 	}

@@ -5,6 +5,7 @@ import (
 	"cli/cluster/executors"
 	"cli/config/modelconfig"
 	"cli/config/modelinfra"
+	"cli/env"
 	"cli/tools/ansible"
 	"cli/utils/cmp"
 	"fmt"
@@ -32,7 +33,7 @@ func MockExecutor(t *testing.T) *kubespray {
 	tmpDir := t.TempDir()
 
 	cfg := &modelconfig.Config{}
-	cfg.Kubernetes.Version = modelconfig.Version("v1.2.3")
+	cfg.Kubernetes.Version = env.ConstKubernetesVersion
 	cfg.Cluster.NodeTemplate.User = modelconfig.User("test")
 	cfg.Cluster.NodeTemplate.SSH.PrivateKeyPath = modelconfig.File(path.Join(tmpDir, ".ssh", "id_rsa"))
 
@@ -42,6 +43,7 @@ func MockExecutor(t *testing.T) *kubespray {
 		ClusterName: "mock",
 		ClusterPath: tmpDir,
 		Config:      cfg,
+		ConfigDir:   path.Join(tmpDir, "config"),
 		InfraConfig: iCfg,
 		VirtualEnv:  &virtualEnvMock{},
 		Ansible:     &ansibleMock{},
@@ -70,10 +72,13 @@ func MockEvents(t *testing.T, obj interface{}, eType event.EventType) []event.Ev
 }
 
 func TestNewExecutor(t *testing.T) {
+	tmpDir := t.TempDir()
+	clsName := "clsName"
 	e := NewKubesprayExecutor(
-		"clsName",
-		"clsPath",
-		path.Join(t.TempDir(), "id_rsa"),
+		clsName,
+		path.Join(tmpDir, clsName),
+		path.Join(tmpDir, "id_rsa"),
+		path.Join(tmpDir, "config"),
 		&modelconfig.Config{},
 		&modelinfra.Config{},
 		&virtualEnvMock{},

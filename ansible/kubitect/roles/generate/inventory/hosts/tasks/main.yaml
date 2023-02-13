@@ -1,7 +1,0 @@
----
-- name: Generate hosts.yaml file containing Kubitect hosts
-  template:
-    src: hosts.yaml.j2
-    dest: "{{ config_dir }}/hosts.yaml"
-    lstrip_blocks: true
-    mode: 0600
