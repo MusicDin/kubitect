@@ -80,7 +80,7 @@ jobs:
             mkdocs-material>=8.2.11 \
             mkdocs-material-extensions>=1.0.3 \
             mkdocs-minify-plugin>=0.5 \
-            mkdocs-redirects>=1.0 \
+            mkdocs-redirects>=1.2 \
             pygments>=2.11 \
             pymdown-extensions>=9.3 \
             mike>=1.1.2
