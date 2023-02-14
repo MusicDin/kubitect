@@ -1,8 +1,6 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 [tag 2.1.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.1.0
 
-<h1 align="center">Cluster node template</h1>
-
 The note template in the cluster section of the configuration **defines the properties of all nodes** in the cluster.
 This includes the properties of the operating system (OS), DNS, and virtual machine user.
 

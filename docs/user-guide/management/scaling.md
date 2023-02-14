@@ -1,5 +1,3 @@
-<h1 align="center">Scaling the cluster</h1>
-
 Any cluster created with Kubitect can be subsequently scaled.
 To do so, simply change the configuration and reapply it using the `scale` action.
 

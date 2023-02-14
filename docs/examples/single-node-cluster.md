@@ -1,5 +1,3 @@
-<h1 align="center">Single node cluster</h1>
-
 This example shows how to setup a single node Kubernetes cluster using Kubitect.
 
 <div align=center>

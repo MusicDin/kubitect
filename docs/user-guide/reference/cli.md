@@ -4,8 +4,6 @@ hide:
   # - toc
 ---
 
-<h1 align="center">CLI reference</h1>
-
 This document contains a reference of the Kubitect CLI tool.
 It documents each command along with its flags.
 

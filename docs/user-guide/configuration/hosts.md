@@ -1,7 +1,5 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 
-<h1 align="center">Hosts configuration</h1>
-
 Defining Kubitect hosts is esential. 
 **Hosts represent the target servers** where the cluster will be deployed.
 Every valid configuration must contain at least one host, but there can be as many hosts as needed.

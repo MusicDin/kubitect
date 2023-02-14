@@ -1,7 +1,5 @@
 [tag 2.1.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.1.0
 
-<h1 align="center">Addons</h1>
-
 ## Configuration
 
 ### Kubespray addons

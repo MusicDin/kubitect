@@ -60,6 +60,11 @@ extra_css:
 extra_javascript:
   - theme/assets/javascripts/extra.js
 
+extra:
+  version:
+    provider: mike
+    default: latest
+
 plugins:
   - search
   - minify:

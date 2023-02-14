@@ -1,7 +1,5 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 
-<h1 align="center">Cluster metadata</h1>
-
 ## Configuration
 
 ### Cluster name

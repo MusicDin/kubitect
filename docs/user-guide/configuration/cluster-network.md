@@ -1,7 +1,5 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 
-<h1 align="center">Cluster network</h1>
-
 This document describes **how to define the cluster network** in the Kubitect configuration.
 It defines either the properties of the network to be created or the network to which the cluster nodes are to be assigned.
 

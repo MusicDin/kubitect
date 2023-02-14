@@ -1,10 +1,7 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 
-<h1 align="center">Project metadata</h1>
-
 To ensure the configuration will reproduce exactly the same cluster when reapplied, it is recommended to set specific Kubitect version.
 Furthermore if the project is forked or cloned, you can also instruct Kubitect to use your repository instead of the original one.
-
 
 ## Configuration
 

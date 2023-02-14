@@ -1,5 +1,3 @@
-<h1 align="center">Highly available cluster</h1>
-
 This example shows how to use Kubitect to set up a highly available cluster that spreads over 5 hosts.
 Such topology provides redundancy in case any node or even host fails.
 

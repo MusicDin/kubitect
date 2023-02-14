@@ -1,8 +1,6 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 [tag 2.1.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.1.0
 
-<h1 align="center">Cluster nodes</h1>
-
 ## Nodes configuration structure
 
 Cluster's nodes configuration consists of three **node types**:

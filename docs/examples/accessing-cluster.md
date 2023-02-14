@@ -1,5 +1,3 @@
-<h1 align="center">Accessing the cluster</h1>
-
 Kubernetes clusters running on cloud providers typically support provision of a load balancer from the cloud infrastructure on demand.
 By simply setting a Service type to `LoadBalancer` provisions an external load balancer that has its own unique IP address and redirects all connections to the Service, as shown in the figure below.
 

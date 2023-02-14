@@ -1,7 +1,5 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 
-<h1 align="center">Kubernetes configuration</h1>
-
 The Kubernetes section of the configuration file contains properties that are closely related to Kubernetes, such as Kubernetes version, network plugin, and DNS mode. 
 In addition, the Kubespray project version and URL can also be specified in this section of the Kubitect configuration.
 

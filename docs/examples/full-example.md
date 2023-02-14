@@ -1,5 +1,3 @@
-<h1 align="center">Full (detailed) example</h1>
-
 This document contains an example of Kubitect configuration.
 Example covers all (*or most*) of the Kubitect properties.
 This example is meant for users that learn the fastest from an example configuration.
