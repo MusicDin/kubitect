@@ -251,8 +251,8 @@
     height: 1.5em;
     width: 1.5em;
     background-color: var(--md-default-fg-color);
-    -webkit-mask-image: url("../assets/images/icon_file-lines.svg");
-    mask-image: url("../assets/images/icon_file-lines.svg");
+    -webkit-mask-image: url("../images/icon_file-lines.svg");
+    mask-image: url("../images/icon_file-lines.svg");
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-size: contain;
