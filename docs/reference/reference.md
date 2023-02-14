@@ -4,8 +4,6 @@ hide:
   - toc
 ---
 
-<h1 align="center">Reference</h1>
-
 The cluster configuration consists of four parts:
 
 + `kubitect` - project metadata.

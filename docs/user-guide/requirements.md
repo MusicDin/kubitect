@@ -1,5 +1,3 @@
-<h1 align="center">Requirements</h1>
-
 ## Local machine
 
 On the machine where the command-line tool is installed, the following requirements must be met:

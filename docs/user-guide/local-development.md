@@ -1,5 +1,3 @@
-<h1 align="center">Local development</h1>
-
 This document shows how to build a CLI tool manually and how to use the project without creating any files outside the project's directory.
 
 ## Clone the project

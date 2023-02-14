@@ -1,5 +1,3 @@
-<h1 align="center">Setting up nodes over bridged network</h1>
-
 This example shows how to configure a simple bridge interface using [netplan](https://netplan.io/).
 
 ## Step 1 - (Pre)configure the bridge on the host

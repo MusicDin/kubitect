@@ -1,5 +1,3 @@
-<h1 align="center">Getting Started</h1>
-
 In this step-by-step guide, you will learn how to prepare a custom cluster configuration file and use it to create a functional Kubernetes cluster consisting of a single master node and three worker nodes.
 
 !!! note "Note"

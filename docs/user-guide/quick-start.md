@@ -1,5 +1,3 @@
-<h1 align="center">Quick start</h1>
-
 ### Step 1 - Create the cluster
 
 Run the following command to create the default cluster.

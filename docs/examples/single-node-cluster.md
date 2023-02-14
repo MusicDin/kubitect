@@ -1,5 +1,3 @@
-<h1 align="center">Single node cluster</h1>
-
 If you want to initialize a cluster with only one node,
 specify single master node in cluster configuration file:
 

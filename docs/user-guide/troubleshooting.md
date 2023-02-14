@@ -1,5 +1,3 @@
-<h1 align="center"> Troubleshooting</h1>
-
 ??? question "Is your problem not listed here?"
 
     If the troubleshooting page is missing an error you encountered, please report it on GitHub by [opening an issue](https://github.com/MusicDin/kubitect/issues/new).

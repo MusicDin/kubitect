@@ -1,5 +1,3 @@
-<h1 align="center">Cluster management</h1>
-
 Project currently supports the following actions that can be executed on the running Kubernetes cluster:
 
 + scaling the cluster

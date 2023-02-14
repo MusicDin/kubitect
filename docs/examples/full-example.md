@@ -1,5 +1,3 @@
-<h1 align="center">Full (detailed) example</h1>
-
 ```yaml
 #
 # In the 'kubitect' section, you can specify the target git project and version.
