@@ -38,7 +38,7 @@ A host can be either a local or a remote machine.
 
         ```yaml title="kubitect.yaml"
         hosts:
-          - name: localhost # (1)
+          - name: localhost # (1)!
             connection:
               type: local
         ```
@@ -57,9 +57,9 @@ A host can be either a local or a remote machine.
             connection:
               type: remote
               user: myuser
-              ip: 10.10.40.143 # (1)
+              ip: 10.10.40.143 # (1)!
               ssh:
-                keyfile: "~/.ssh/id_rsa_server1" # (2)
+                keyfile: "~/.ssh/id_rsa_server1" # (2)!
         ```
 
         1. IP address of the remote host.
@@ -173,13 +173,13 @@ cluster:
   ...
   nodes:
     master:
-      default: # (1)
-        ram: 4 # (2)
-        cpu: 2 # (3)
-        mainDiskSize: 32 # (4)
-      instances: # (5)
-        - id: 1 # (6)
-          ip: 192.168.113.10 # (7)
+      default: # (1)!
+        ram: 4 # (2)!
+        cpu: 2 # (3)!
+        mainDiskSize: 32 # (4)!
+      instances: # (5)!
+        - id: 1 # (6)!
+          ip: 192.168.113.10 # (7)!
     worker:
       default: 
         ram: 8
@@ -188,7 +188,7 @@ cluster:
       instances:
         - id: 1
           ip: 192.168.113.21
-          ram: 4 # (8)
+          ram: 4 # (8)!
 ```
 
 1.  Default properties are applied to all nodes of the same type (in this case `master` nodes).
