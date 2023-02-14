@@ -71,7 +71,7 @@ cluster:
         - name: http
           port: 80
           targetPort: 50080
-          target: workers # (1)
+          target: workers # (1)!
         - name: https
           port: 443
           targetPort: 50443
@@ -82,7 +82,7 @@ addons:
   kubespray:
     ingress_nginx_enabled: true
     ingress_nginx_namespace: "ingress-nginx"
-    ingress_nginx_insecure_port: 50080 # (2)
+    ingress_nginx_insecure_port: 50080 # (2)!
     ingress_nginx_secure_port: 50443
 ```
 

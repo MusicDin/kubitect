@@ -50,7 +50,7 @@ Preset distributions are the following:
 cluster:
   nodeTemplate:
     os:
-      distro: debian # (1)
+      distro: debian # (1)!
 ```
 
 1. The distribution `ubuntu` is used by default.
@@ -77,7 +77,7 @@ By default, a DNS list contains only the network gateway.
 ```yaml
 cluster:
   nodeTemplate:
-    dns: # (1)
+    dns: # (1)!
       - 1.1.1.1
       - 1.0.0.1
 ```

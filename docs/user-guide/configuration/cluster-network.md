@@ -57,7 +57,7 @@ In bridge mode, the network CIDR should specify the network to which the cluster
 ```yaml
 cluster:
   network:
-    cidr: 192.168.113.0/24 # (1)
+    cidr: 192.168.113.0/24 # (1)!
 ```
 
 1.  In `nat` mode - Any unused private network within a local network.
@@ -80,7 +80,7 @@ Also note that the gateway IP address must be within the specified network range
 cluster:
   network:
     cidr: 10.10.0.0/20
-    gateway: 10.10.0.230 # (1)
+    gateway: 10.10.0.230 # (1)!
 ```
 
 1. If this option is omitted, `10.10.0.1` is used as the gateway IP (first client IP in the network range).

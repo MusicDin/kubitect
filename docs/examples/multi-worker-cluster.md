@@ -24,7 +24,7 @@ cluster:
     master:
       instances:
         - id: 1
-          ip: 192.168.113.10 # (1)
+          ip: 192.168.113.10 # (1)!
     worker:
       instances:
         - id: 1
