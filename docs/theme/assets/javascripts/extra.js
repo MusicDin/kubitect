@@ -2,6 +2,34 @@
  * Landing page terminal
  */
 
+// initial url path
+let prevPath = window.location.pathname;
+
+// trigger terminal animation when window loads
+window.addEventListener('DOMContentLoaded', terminalAnimation)
+
+window.onload = function () {
+    let bodyList = document.querySelector("body")
+
+    let observer = new MutationObserver(() => {
+
+        // check if paths differ
+        if (prevPath !== window.location.pathname) {
+
+            // update href to match current location
+            prevPath = window.location.pathname;
+
+            if (window.location.pathname === '/') {
+                terminalAnimation()
+            } 
+        }
+    })
+
+    // start observing body for mutations
+    observer.observe(bodyList, { childList: true, subtree: true });
+}
+
+
 // terminal animation
 function terminalAnimation() {
 
