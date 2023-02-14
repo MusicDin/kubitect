@@ -9,7 +9,7 @@ This example shows how to use Kubitect to set up a Kubernetes cluster with **one
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="/assets/images/topology-1m3w-arch.png" 
+    src="../../assets/images/topology-1m3w-arch.png" 
     alt="Architecture of the cluster with 1 master and 3 worker nodes"
     width="75%">
 </div>

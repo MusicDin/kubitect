@@ -9,7 +9,7 @@ This example shows how to setup a single node Kubernetes cluster using Kubitect.
 <div class="text-center">
   <img
     class="mobile-w-75"
-    src="/assets/images/topology-1m-arch.png" 
+    src="../../assets/images/topology-1m-arch.png" 
     alt="Architecture of a single node cluster"
     width="50%">
 </div>
