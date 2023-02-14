@@ -1,5 +1,3 @@
-<h1 align="center">Multi-master cluster</h1>
-
 This example shows how to use Kubitect to set up a Kubernetes cluster with **3 master and 3 worker nodes**.
 Configuring multiple master nodes provides control plane redundancy, meaning that the control plane can continue to operate normally if a certain number of master nodes fail.
 Since Kubitect deploys clusters with a *stacked control plane* (see [Kubernetes.io - Stacked etcd topology](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/ha-topology/#stacked-etcd-topology) for more information), this means that there is no downtime as long as (n/2)+1 master nodes are available.
@@ -45,7 +43,7 @@ cluster:
         - id: 1
           ip: 192.168.113.100
     master:
-      instances: # (1)
+      instances: # (1)!
         - id: 1
           ip: 192.168.113.10
         - id: 2

@@ -1,5 +1,3 @@
-<h1 align="center">Accessing the cluster</h1>
-
 Kubernetes clusters running on cloud providers typically support provision of a load balancer from the cloud infrastructure on demand.
 By simply setting a Service type to `LoadBalancer` provisions an external load balancer that has its own unique IP address and redirects all connections to the Service, as shown in the figure below.
 
@@ -73,7 +71,7 @@ cluster:
         - name: http
           port: 80
           targetPort: 50080
-          target: workers # (1)
+          target: workers # (1)!
         - name: https
           port: 443
           targetPort: 50443
@@ -84,7 +82,7 @@ addons:
   kubespray:
     ingress_nginx_enabled: true
     ingress_nginx_namespace: "ingress-nginx"
-    ingress_nginx_insecure_port: 50080 # (2)
+    ingress_nginx_insecure_port: 50080 # (2)!
     ingress_nginx_secure_port: 50443
 ```
 

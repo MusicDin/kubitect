@@ -1,5 +1,3 @@
-<h1 align="center">Destroying the cluster</h1>
-
 The destruction of the cluster consists of 2 parts.
 The first part destroys all active cluster components, while the second part deletes all configuration files for a given cluster.
 

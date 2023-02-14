@@ -1,5 +1,3 @@
-<h1 align="center">Quick start</h1>
-
 <div align=center>
   <img
     class="mobile-w-100"

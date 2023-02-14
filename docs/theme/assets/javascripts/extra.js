@@ -1,22 +1,17 @@
 /*
- * Remove code block hashtags before annotations
+ * Landing page terminal
  */
 
 // initial url path
-var oldHref = document.location.href;
-var prevPath = window.location.pathname;
-
-// remove hastags when content is loaded for the first time
-window.addEventListener('DOMContentLoaded', removeHashtags)
+let prevPath = window.location.pathname;
 
 // trigger terminal animation when window loads
 window.addEventListener('DOMContentLoaded', terminalAnimation)
 
 window.onload = function () {
+    let bodyList = document.querySelector("body")
 
-    var bodyList = document.querySelector("body")
-
-    var observer = new MutationObserver((mutations) => {
+    let observer = new MutationObserver(() => {
 
         // check if paths differ
         if (prevPath !== window.location.pathname) {
@@ -25,41 +20,14 @@ window.onload = function () {
             prevPath = window.location.pathname;
 
             if (window.location.pathname === '/') {
-
-                // trigger terminal animation on landing page
                 terminalAnimation()
-
-            } else {
-                mutations.forEach(() => {
-                    if (oldHref != document.location.href) {
-
-                        // update href to match current location
-                        oldHref = document.location.href;
-
-                        // wait for annotations and remove hashtags
-                        removeHashtags()
-                    }
-                });
-            }
+            } 
         }
-    });
+    })
 
     // start observing body for mutations
     observer.observe(bodyList, { childList: true, subtree: true });
-};
-
-// waits until code block annotations are loaded and remove hashtags
-function removeHashtags() {
-
-    document.querySelectorAll("code").forEach((node) => {
-        let str = node.innerHTML
-        node.innerHTML = str.replace(/(# )(\([0-9]*\))/g, "$2")
-    })
-};
-
-/*
- * Landing page terminal
- */
+}
 
 // terminal animation
 function terminalAnimation() {

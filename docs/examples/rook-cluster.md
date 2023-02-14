@@ -1,5 +1,3 @@
-<h1 align="center">Rook cluster</h1>
-
 !!! warning "Important"
 
     Since the Rook addon is still under development, it may not work as expected.
@@ -46,7 +44,7 @@ cluster:
         - id: 1
           dataDisks:
             - name: rook
-              pool: rook-pool # (1)
+              pool: rook-pool # (1)!
               size: 256
         - id: 2
           dataDisks:
@@ -178,7 +176,7 @@ cluster:
       instances:
         - id: 1
           labels:
-            rook: true # (1)
+            rook: true # (1)!
         - id: 2
           labels:
             rook: true

@@ -1,5 +1,3 @@
-<h1 align="center">Internal load balancing (iLB)</h1>
-
 Multiple master nodes ensure that services remain available if one or even more master nodes fail. 
 Cluster has to be set up with an odd number of master nodes so that the quorum (the majority of master nodes) can be maintained if one or more masters fail.
 In the high-availability (HA) scenario, Kubernetes maintains a copy of the `etcd` databases on each master node, but holds elections for the `kube-controller` and `kube-scheduler` managers to avoid conflicts.

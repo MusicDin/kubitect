@@ -1,5 +1,3 @@
-<h1 align="center">Installation</h1>
-
 Before starting with installation, make sure you meet all the [requirements](./requirements.md).
 
 ## Install Kubitect CLI tool

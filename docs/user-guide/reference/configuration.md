@@ -4,8 +4,6 @@ hide:
   - toc
 ---
 
-<h1 align="center">Configuration reference</h1>
-
 This document contains a reference of the Kubitect configuration file and documents all possible configuration properties.
 
 The configuration sections are as follows:

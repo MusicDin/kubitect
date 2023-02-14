@@ -1,5 +1,3 @@
-<h1 align="center">Creating the cluster</h1>
-
 With Kubitect, clusters are created by applying the cluster configuration to the Kubitect CLI tool.
 If no cluster configuration is not specified, the default configuration is applied, as described in the [Quick start](../../../getting-started/quick-start) guide.
 

@@ -1,5 +1,3 @@
-<h1 align="center">Full (detailed) example</h1>
-
 This document contains an example of Kubitect configuration.
 Example covers all (*or most*) of the Kubitect properties.
 This example is meant for users that learn the fastest from an example configuration.
@@ -14,7 +12,7 @@ This example is meant for users that learn the fastest from an example configura
 #     tool actions, as you should already be in the Git repository.
 #
 kubitect:
-  url: "https://github.com/MusicDin/kubitect" # (1)
+  url: "https://github.com/MusicDin/kubitect" # (1)!
   version: "v2.1.0"
 
 #
@@ -33,19 +31,19 @@ kubitect:
 # list is used as the default host.
 #
 hosts:
-  - name: localhost # (3)
-    default: true # (4)
+  - name: localhost # (3)!
+    default: true # (4)!
     connection:
-      type: local # (5)
+      type: local # (5)!
   - name: remote-server-1
     connection:
       type: remote
-      user: myuser # (6)
-      ip: 10.10.40.143 # (7)
+      user: myuser # (6)!
+      ip: 10.10.40.143 # (7)!
       ssh:
-        port: 1234  # (8)
-        verify: true # (9)
-        keyfile: "~/.ssh/id_rsa_server1" # (10)
+        port: 1234  # (8)!
+        verify: true # (9)!
+        keyfile: "~/.ssh/id_rsa_server1" # (10)!
   - name: remote-server-2
     connection:
       type: remote
@@ -53,10 +51,10 @@ hosts:
       ip: 10.10.40.144
       ssh:
         keyfile: "~/.ssh/id_rsa_server2"
-    mainResourcePoolPath: "/var/lib/libvirt/pools/" # (11)
-    dataResourcePools: # (12)
-      - name: data-pool # (13)
-        path: "/mnt/data/pool" # (14)
+    mainResourcePoolPath: "/var/lib/libvirt/pools/" # (11)!
+    dataResourcePools: # (12)!
+      - name: data-pool # (13)!
+        path: "/mnt/data/pool" # (14)!
       - name: backup-pool
         path: "/mnt/backup/pool"
 
@@ -65,12 +63,12 @@ hosts:
 # cluster, the nodes that are part of the cluster, and the cluster's network.
 # 
 cluster:
-  name: my-k8s-cluster # (15)
+  name: my-k8s-cluster # (15)!
   network:
-    mode: bridge # (16)
-    cidr: 10.10.64.0/24 # (17)
-    gateway: 10.10.64.1 # (18)
-    bridge: br0 # (19)
+    mode: bridge # (16)!
+    cidr: 10.10.64.0/24 # (17)!
+    gateway: 10.10.64.1 # (18)!
+    bridge: br0 # (19)!
   nodeTemplate:
     user: k8s
     ssh:
@@ -78,15 +76,15 @@ cluster:
       addToKnownHosts: true
     os:
       distro: ubuntu
-      networkInterface: ens3 # (20)
-    dns: # (21)
+      networkInterface: ens3 # (20)!
+    dns: # (21)!
       - 1.1.1.1
       - 1.0.0.1
     updateOnBoot: true
   nodes:
     loadBalancer:
-      vip: 10.10.64.200 # (22)
-      virtualRouterId: 13 # (23)
+      vip: 10.10.64.200 # (22)!
+      virtualRouterId: 13 # (23)!
       forwardPorts:
         - name: http
           port: 80
@@ -96,17 +94,17 @@ cluster:
         - name: sample
           port: 60000
           targetPort: 35000
-      default: # (24)
+      default: # (24)!
         ram: 4 # GiB
         cpu: 1 # vCPU
         mainDiskSize: 16 # GiB
       instances:
         - id: 1
-          ip: 10.10.64.5 # (25)
-          mac: "52:54:00:00:00:40" # (26)
-          ram: 8 # (27)
-          cpu: 8 # (28)
-          host: remote-server-1 # (29)
+          ip: 10.10.64.5 # (25)!
+          mac: "52:54:00:00:00:40" # (26)!
+          ram: 8 # (27)!
+          cpu: 8 # (28)!
+          host: remote-server-1 # (29)!
         - id: 2
           ip: 10.10.64.6
           mac: "52:54:00:00:00:41"
@@ -134,9 +132,9 @@ cluster:
       default:
         ram: 16
         cpu: 4
-        labels: # (30)
+        labels: # (30)!
          - custom-label: "This is a custom default node label"
-         - node-role.kubernetes.io/node: # (31)
+         - node-role.kubernetes.io/node: # (31)!
       instances:
         - id: 1
           ip: 10.10.64.101
@@ -145,9 +143,9 @@ cluster:
           host: remote-server-1
         - id: 2
           ip: 10.10.64.102
-          dataDisks: # (32)
-            - name: rook-disk # (33)
-              pool: data-pool # (34)
+          dataDisks: # (32)!
+            - name: rook-disk # (33)!
+              pool: data-pool # (34)!
               size: 128 # GiB
             - name: test-disk
               pool: data-pool
@@ -156,7 +154,7 @@ cluster:
           ip: 10.10.64.103
           ram: 64
           labels:
-            - custom-label: "Overwrite default node label" # (35)
+            - custom-label: "Overwrite default node label" # (35)!
             - instance-label: "Node label, only for this instance"
         - id: 4
           host: remote-server-2

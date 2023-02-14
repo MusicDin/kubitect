@@ -1,5 +1,3 @@
-<h1 align="center">Single node cluster</h1>
-
 This example shows how to setup a single node Kubernetes cluster using Kubitect.
 
 <div align=center>
@@ -26,7 +24,7 @@ cluster:
     master:
       instances:
         - id: 1
-          ip: 192.168.113.10 # (1)
+          ip: 192.168.113.10 # (1)!
 ```
 
 1.  Static IP address of the node. 

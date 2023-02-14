@@ -1,5 +1,3 @@
-<h1 align="center">Multi-worker cluster</h1>
-
 This example shows how to use Kubitect to set up a Kubernetes cluster with **one master and three worker nodes**.
 
 <div align=center>
@@ -26,7 +24,7 @@ cluster:
     master:
       instances:
         - id: 1
-          ip: 192.168.113.10 # (1)
+          ip: 192.168.113.10 # (1)!
     worker:
       instances:
         - id: 1

@@ -1,7 +1,5 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 
-<h1 align="center">Hosts configuration</h1>
-
 Defining Kubitect hosts is esential. 
 **Hosts represent the target servers** where the cluster will be deployed.
 Every valid configuration must contain at least one host, but there can be as many hosts as needed.
@@ -19,7 +17,7 @@ Such host is also refered to as localhost.
 
 ```yaml
 hosts:
-  - name: localhost # (1)
+  - name: localhost # (1)!
     connection:
       type: local
 ``` 
@@ -38,9 +36,9 @@ hosts:
     connection:
       type: remote
       user: myuser
-      ip: 10.10.40.143 # (1)
+      ip: 10.10.40.143 # (1)!
       ssh:
-        keyfile: "~/.ssh/id_rsa_server1" # (2)
+        keyfile: "~/.ssh/id_rsa_server1" # (2)!
 ```
 
 1. IP address of the remote host.
@@ -112,9 +110,9 @@ By default, main disk pool path is set to `/var/lib/libvirt/images/`.
 
 ```yaml
 hosts:
-  - name: host1 # (1)
+  - name: host1 # (1)!
   - name: host2 
-    mainResourcePoolPath: /mnt/ssd/kubitect/ # (2)
+    mainResourcePoolPath: /mnt/ssd/kubitect/ # (2)!
 ```
 
 1. Because the main resource pool path for this host is not set, the default path (`/var/lib/libvirt/images/`) is used.
@@ -139,7 +137,7 @@ hosts:
     dataResourcePools:
       - name: rook-pool
         path: /mnt/hdd/kubitect/pools/
-      - name: data-pool # (1)
+      - name: data-pool # (1)!
 ```
 
 1. If the path of the resource pool is not specified, it is created under the path `/var/lib/libvirt/images/`.

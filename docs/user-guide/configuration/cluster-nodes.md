@@ -2,8 +2,6 @@
 [tag 2.1.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.1.0
 [tag 2.2.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.2.0
 
-<h1 align="center">Cluster nodes</h1>
-
 ## Nodes configuration structure
 
 Cluster's nodes configuration consists of three **node types**:
@@ -95,9 +93,9 @@ cluster:
       default:
         cpu: 2
       instances:
-        - id: 1 # (1)
+        - id: 1 # (1)!
         - id: 2
-          cpu: 4 # (2)
+          cpu: 4 # (2)!
 ```
 
 1. Since the `cpu` property is not set for this instance, the default value is used (2).
@@ -111,7 +109,7 @@ cluster:
   nodes:
     <node-type>:
       instances:
-        - id: 1 # (1)
+        - id: 1 # (1)!
 ```
 
 1. Since the 'cpu' property is not set at instance level or as a default value, Kubitect sets the value of the 'cpu' property to **2 vCPU**.
@@ -132,9 +130,9 @@ cluster:
       default:
         ram: 8
       instances:
-        - id: 1 # (1)
+        - id: 1 # (1)!
         - id: 2
-          ram: 16 # (2)
+          ram: 16 # (2)!
 ```
 
 1. Since the `ram` property is not set for this instance, the default value is used (8 GiB).
@@ -148,7 +146,7 @@ cluster:
   nodes:
     <node-type>:
       instances:
-        - id: 1 # (1)
+        - id: 1 # (1)!
 ```
 
 1. Since the `ram` property is not set at instance level or as a default value, Kubitect sets the value of the `ram` property to **4 GiB**.
@@ -169,9 +167,9 @@ cluster:
       default:
         mainDiskSize: 128
       instances:
-        - id: 1 # (1)
+        - id: 1 # (1)!
         - id: 2
-          mainDiskSize: 256 # (2)
+          mainDiskSize: 256 # (2)!
 ```
 
 1. Since the `mainDiskSize` property is not set for this instance, the default value is used (128 GiB).
@@ -185,7 +183,7 @@ cluster:
   nodes:
     <node-type>:
       instances:
-        - id: 1 # (1)
+        - id: 1 # (1)!
 ```
 
 1. Since the `mainDiskSize` property is not set at instance level or as a default value, Kubitect sets the value of the `mainDiskSize` property to **32 GiB**.
@@ -206,8 +204,8 @@ cluster:
     <node-type>:
       instances:
         - id: 1
-          ip: 192.168.113.5 # (1)
-        - id: 2 # (2)
+          ip: 192.168.113.5 # (1)!
+        - id: 2 # (2)!
 ```
 
 1. A static IP (`192.168.113.5`) is set for this instance.
@@ -226,8 +224,8 @@ cluster:
     <node-type>:
       instances:
         - id: 1
-          mac: "52:54:00:00:13:10" # (1)
-        - id: 2 # (2)
+          mac: "52:54:00:00:13:10" # (1)!
+        - id: 2 # (2)!
 ```
 
 1. A custom MAC address (`52:54:00:00:13:10`) is set for this instance.
@@ -255,8 +253,8 @@ cluster:
     <node-type>:
       instances:
         - id: 1
-          host: host1 # (1)
-        - id: 2 # (2)
+          host: host1 # (1)!
+        - id: 2 # (2)!
 ```
 
 1. The instance is deployed on `host1`.
@@ -289,10 +287,10 @@ cluster:
         - id: 1
           dataDisks:
             - name: data-volume
-              pool: main # (1)
+              pool: main # (1)!
               size: 256
             - name: rook-volume
-              pool: rook-pool # (2)
+              pool: rook-pool # (2)!
               size: 512
 ```
 
@@ -319,17 +317,17 @@ However, labels set at the instance level take precedence over default labels.
 ```yaml
 cluster:
   nodes:
-    <node-type>: # (1)
+    <node-type>: # (1)!
       default:
         labels:
           label-key-1: def-label-value-1
           label-key-2: def-label-value-2
       instances:
         - id: 1
-          labels: # (2)
+          labels: # (2)!
             label-key-3: instance-label-value-3
         - id: 2
-          labels: # (3)
+          labels: # (3)!
             label-key-1: new-label-value-1
 ```
 
@@ -361,7 +359,7 @@ Taints set for a particular instance are merged with the default taints and dupl
 ```yaml
 cluster:
   nodes:
-    <node-type>: # (1)
+    <node-type>: # (1)!
       default:
         taints:
           - "key1=value1:NoSchedule"
@@ -420,7 +418,7 @@ cluster:
   nodes:
     loadBalancer:
       vip: 168.192.113.200
-      virtualRouterId: 30 # (1)
+      virtualRouterId: 30 # (1)!
 ```
 
 1. If the virtual IP (VIP) is not set, the virtual router ID is ignored.
@@ -444,9 +442,9 @@ cluster:
   nodes:
     loadBalancer:
       instances:
-        - id: 1 # (1)
+        - id: 1 # (1)!
         - id: 2 
-          priority: 200 # (2)
+          priority: 200 # (2)!
 ```
 
 1. Since the load balancer priority for this instance is not specified, it is set to 10.
@@ -482,9 +480,9 @@ cluster:
     loadBalancer:
       forwardPorts:
         - name: https
-          port: 443 # (1)
-          targetPort: 31200 # (2)
-          target: all # (3)
+          port: 443 # (1)!
+          targetPort: 31200 # (2)!
+          target: all # (3)!
 ```
 
 1.  Incoming port is the port on which a load balancer listens for incoming traffic.
@@ -517,7 +515,7 @@ cluster:
     worker:
       default:
         labels:
-          node-role.kubernetes.io/node: # (1)
+          node-role.kubernetes.io/node: # (1)!
       instances:
         ...
 ```
@@ -547,7 +545,7 @@ cluster:
           port: 80
         - name: https
           port: 443
-          target: all # (1)
+          target: all # (1)!
       instances:
         - id: 1
 ```
