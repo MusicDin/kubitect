@@ -1,0 +1,118 @@
+h3 {
+    margin: 0;
+    padding: 0;
+}
+
+@media (max-width:768px) {
+
+    .card-row {
+        flex-direction: column;
+        margin-right: 10pt;
+    }
+
+    .card-container {
+        padding-right: 10pt;
+    }
+}
+
+.card {
+    width: 100%;
+    margin: 10pt;
+    padding: 0pt 10pt;
+    border: 1px solid #aaaaaa;
+    border-radius: 5pt;
+    display: flex;
+    flex-direction: column;
+    transition-duration: 300ms;
+}
+
+.card:hover {
+    transform: translateY(-2pt);
+    box-shadow: 0 10pt 8pt -5pt #aaaaaa;
+}
+
+.card-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    text-align: left;
+    width: 100%;
+    font-weight: bold;
+    padding: 10pt;
+    border-bottom: 1px solid #aaaaaa;
+    text-align: center;
+}
+
+.card-content-text {
+    height: 100%;
+    padding: 0pt 10pt;
+}
+
+.card-content-text p {
+    text-align: justify;
+    margin: 0;
+    padding: 0
+}
+
+.card-footer-nav {
+    padding: 0pt 10pt 10pt;
+    display: flex;
+    justify-content: center;
+}
+
+.card-footer-nav img {
+    width: 30pt;
+}
+
+.card-row {
+    display: flex;
+}
+
+.roadmap {
+    display: flex;
+    flex-direction: column;
+    margin-top: 16pt;
+}
+
+.roadmap div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.roadmap div.road {
+    margin-left: 10pt;
+    margin-right: 10pt;
+    height: 20pt;
+    width: 2pt;
+    border-left: 3px dotted #00e676;
+}
+
+.roadmap div.road.todo {
+    margin-left: 10pt;
+    margin-right: 10pt;
+    height: 20pt;
+    width: 2pt;
+    border-left: 3px dotted #aaaaaa;
+}
+
+.roadmap .question {
+    color: #999999
+}
+
+.roadmap div img {
+    width: 10pt;
+    height: 10pt;
+    margin: 5pt;
+    fill: green !important;
+}
+
+.roadmap div span {
+    margin-left: 10pt;
+}
+
+.roadmap div svg {
+    fill: green !important;
+}
