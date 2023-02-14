@@ -9,7 +9,7 @@ Such topology provides redundancy in case any node or even host fails.
 
 <div text="text-center">
   <img 
-    src="/assets/images/topology-ha-arch.png" 
+    src="../../assets/images/topology-ha-arch.png" 
     alt="Architecture of the highly available cluster"
     width="100%">
 </div>
@@ -98,7 +98,7 @@ Its main purpose is to serve incoming requests on the same virtual (shared) IP a
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="/assets/images/topology-ha-base.png" 
+    src="../../assets/images/topology-ha-base.png" 
     alt="Scheme of highly available topology"
     width="75%">
 </div>
