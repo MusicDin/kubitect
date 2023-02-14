@@ -78,7 +78,7 @@ For easier interpretation of the components that the final cluster will be made 
 <div align=center>
   <img
     class="mobile-w-100"
-    src="/assets/images/topology-1m1w-arch.png" 
+    src="../../assets/images/topology-1m1w-arch.png" 
     alt="Architecture of the cluster with one master and one worker node"
     width="75%">
 </div>
