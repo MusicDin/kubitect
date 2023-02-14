@@ -10,8 +10,8 @@ cluster:
     master:
       instances:
       - id: 1
-        ip: 10.10.64.5 # (1)
-        mac: "52:54:00:00:00:40" # (2)
+        ip: 10.10.64.5 # (1)!
+        mac: "52:54:00:00:00:40" # (2)!
 ```
 
 1. Static IP address. If omitted, the DHCP lease is requested.

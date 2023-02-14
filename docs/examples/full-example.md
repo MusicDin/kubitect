@@ -11,7 +11,7 @@
 #     Git repository.
 #
 kubitect:
-  url: "https://github.com/MusicDin/kubitect" # (1)
+  url: "https://github.com/MusicDin/kubitect" # (1)!
   version: "v2.0.7"
 
 #
@@ -31,19 +31,19 @@ kubitect:
 # the first one in the list is used as default host.
 #
 hosts:
-  - name: localhost # (3)
-    default: true # (4)
+  - name: localhost # (3)!
+    default: true # (4)!
     connection:
-      type: local # (5)
+      type: local # (5)!
   - name: remote-server-1
     connection:
       type: remote
-      user: myuser # (6)
-      ip: 10.10.40.143 # (7)
+      user: myuser # (6)!
+      ip: 10.10.40.143 # (7)!
       ssh:
-        port: 1234  # (8)
-        verify: false # (9)
-        keyfile: "~/.ssh/id_rsa_server1" # (10)
+        port: 1234  # (8)!
+        verify: false # (9)!
+        keyfile: "~/.ssh/id_rsa_server1" # (10)!
   - name: remote-server-2
     connection:
       type: remote
@@ -51,8 +51,8 @@ hosts:
       ip: 10.10.40.144
       ssh:
         keyfile: "~/.ssh/id_rsa_server2"
-    mainResourcePoolPath: "/var/lib/libvirt/pools/" # (11)
-    dataResourcePools: # (12)
+    mainResourcePoolPath: "/var/lib/libvirt/pools/" # (11)!
+    dataResourcePools: # (12)!
       - name: data-pool
         path: "/mnt/data/pool"
       - name: backup-pool
@@ -63,17 +63,17 @@ hosts:
 # nodes that are part of the cluster and cluster's network.
 # 
 cluster:
-  name: "my-k8s-cluster" # (13)
+  name: "my-k8s-cluster" # (13)!
   network:
-    mode: bridge # (14)
-    cidr: "10.10.64.0/24" # (15)
-    gateway: 10.10.64.1 # (16)
-    bridge: br0 # (17)
-    dns: # (18)
+    mode: bridge # (14)!
+    cidr: "10.10.64.0/24" # (15)!
+    gateway: 10.10.64.1 # (16)!
+    bridge: br0 # (17)!
+    dns: # (18)!
       - 1.1.1.1
       - 1.0.0.1
   nodeTemplate:
-    networkInterface: "ens3" # (19)
+    networkInterface: "ens3" # (19)!
     user: "k8s"
     ssh:
       privateKeyPath: "~/.ssh/id_rsa_test"
@@ -84,18 +84,18 @@ cluster:
     updateOnBoot: true
   nodes:
     loadBalancer:
-      vip: "10.10.64.200" # (20)
-      default: # (21)
+      vip: "10.10.64.200" # (20)!
+      default: # (21)!
         ram: 4 # GiB
         cpu: 1 # vCPU
         mainDiskSize: 16 # GiB
       instances:
         - id: 1
-          ip: 10.10.64.5 # (22)
-          mac: "52:54:00:00:00:40" # (23)
-          ram: 8 # (24)
-          cpu: 8 # (25)
-          host: remote-server-1 # (26)
+          ip: 10.10.64.5 # (22)!
+          mac: "52:54:00:00:00:40" # (23)!
+          ram: 8 # (24)!
+          cpu: 8 # (25)!
+          host: remote-server-1 # (26)!
         - id: 2
           ip: 10.10.64.6
           mac: "52:54:00:00:00:41"
@@ -123,15 +123,7 @@ cluster:
       default:
         ram: 16
         cpu: 4
-        label: node # (27)
-        # Default dataDisks are NOT YET supported
-        # dataDisks: # (29)
-        #  - name: rook-disk # (30)
-        #    pool: data-pool # (31)
-        #    size: 128       # (32)
-        #  - name: backup-disk
-        #    pool: data-pool
-        #    size: 512
+        label: node # (27)!
       instances:
         - id: 1
           ip: 10.10.64.101
@@ -140,7 +132,7 @@ cluster:
           host: remote-server-1
         - id: 2
           ip: 10.10.64.102
-          dataDisks: # (33)
+          dataDisks: # (33)!
             - name: rook-disk
               pool: data-pool
               size: 128

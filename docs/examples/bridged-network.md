@@ -12,14 +12,14 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    eth0: {} # (1)
+    eth0: {} # (1)!
   bridges:
-    br0: # (2)
+    br0: # (2)!
       interfaces:
         - eth0
       dhcp4: true
       dhcp6: false
-      addresses: # (3)
+      addresses: # (3)!
         - 10.10.0.17
 ```
 
