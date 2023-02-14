@@ -1,157 +1,157 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://kubitect.io/master/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/examples/accessing-cluster/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/examples/full-example/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/examples/ha-cluster/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/examples/multi-master-cluster/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/examples/multi-worker-cluster/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/examples/network-bridge/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/examples/rook-cluster/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/examples/single-node-cluster/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/getting-started/getting-started/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/getting-started/installation/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/getting-started/introduction/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/getting-started/quick-start/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/getting-started/requirements/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/getting-started/other/local-development/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/getting-started/other/troubleshooting/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/before-you-begin/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/configuration/addons/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/configuration/cluster-name/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/configuration/cluster-network/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/configuration/cluster-node-template/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/configuration/cluster-nodes/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/configuration/hosts/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/configuration/kubernetes/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/configuration/project-metadata/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/management/creating/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/management/destroying/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/management/scaling/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/management/upgrading/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/reference/cli/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://kubitect.io/master/user-guide/reference/configuration/</loc>
+         <loc>None</loc>
          <lastmod>2023-02-14</lastmod>
          <changefreq>daily</changefreq>
     </url>
