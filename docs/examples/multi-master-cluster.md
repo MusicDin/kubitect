@@ -5,7 +5,7 @@ Since Kubitect deploys clusters with a *stacked control plane* (see [Kubernetes.
 <div align=center>
   <img
     class="mobile-w-100"
-    src="/assets/images/topology-3m3w1lb-arch.png" 
+    src="../../assets/images/topology-3m3w1lb-arch.png" 
     alt="Architecture of the cluster with 3 master and 3 worker nodes"
     width="75%">
 </div>
@@ -23,7 +23,7 @@ This problem can be solved by placing a load balancer in front of the control pl
 <div align=center>
   <img
     class="mobile-w-100"
-    src="/assets/images/topology-3m3w1lb-base.png" 
+    src="../../assets/images/topology-3m3w1lb-base.png" 
     alt="Scheme of load balancing between control plane nodes"
     width="75%">
 </div>
