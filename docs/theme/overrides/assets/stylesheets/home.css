@@ -19,6 +19,17 @@ a.md-top.md-icon {
   border: none !important;
 }
 
+/* version list */
+.md-version__list {
+  color: rgba(200, 200, 200, 0.8);
+  background-color: rgb(14, 42, 75);
+  box-shadow: 3px;
+}
+
+.md-version__link:hover {
+  color: white
+}
+
 /* remove search bar */
 .md-search {
   display: none;
