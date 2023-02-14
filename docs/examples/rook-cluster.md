@@ -9,7 +9,7 @@ For distributed storage, we add an additional data disk to each virtual machine 
 <div align=center>
   <img
     class="mobile-w-100"
-    src="/assets/images/rook-cluster-arch.png" 
+    src="../../assets/images/rook-cluster-arch.png" 
     alt="Basic Rook cluster scheme"
     width="75%">
 </div>
@@ -159,7 +159,7 @@ Only the nodes where Rook should be deployed are labeled `#!yaml rook: true`, as
 <div align=center>
   <img
     class="mobile-w-100"
-    src="/assets/images/rook-cluster-labels.png" 
+    src="../../assets/images/rook-cluster-labels.png" 
     alt="Cluster scheme with labels to restrict Rook deployment"
     width="85%">
 </div>
@@ -199,7 +199,7 @@ We want to deploy Rook on the nodes labeled with the label `#!yaml rook: true`, 
 <div align=center>
   <img
     class="mobile-w-100"
-    src="/assets/images/rook-cluster-node-selector.png" 
+    src="../../assets/images/rook-cluster-node-selector.png" 
     alt="Cluster scheme of Rook deployment with applied node selector"
     width="85%">
 </div>

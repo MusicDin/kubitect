@@ -5,7 +5,7 @@ This example shows how to configure a simple bridge interface using [Netplan](ht
 <div align=center>
   <img
     class="mobile-w-100"
-    src="/assets/images/network-bridge.png" 
+    src="../../assets/images/network-bridge.png" 
     alt="NAT vs bridge network scheme"
     width="75%">
 </div>
