@@ -1,9 +1,11 @@
 package modelconfig
 
 import (
-	"cli/utils/defaults"
-	v "cli/utils/validation"
 	"fmt"
+
+	v "github.com/MusicDin/kubitect/cli/utils/validation"
+
+	"github.com/MusicDin/kubitect/cli/utils/defaults"
 )
 
 type Connection struct {

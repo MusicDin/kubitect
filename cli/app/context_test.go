@@ -1,10 +1,11 @@
 package app
 
 import (
-	"cli/env"
 	"os"
 	"path"
 	"testing"
+
+	"github.com/MusicDin/kubitect/cli/env"
 
 	"github.com/stretchr/testify/assert"
 )

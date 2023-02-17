@@ -1,9 +1,10 @@
 package modelconfig
 
 import (
-	"cli/env"
-	"cli/utils/defaults"
 	"testing"
+
+	"github.com/MusicDin/kubitect/cli/env"
+	"github.com/MusicDin/kubitect/cli/utils/defaults"
 
 	"github.com/stretchr/testify/assert"
 )

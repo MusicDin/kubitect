@@ -1,9 +1,10 @@
 package cluster
 
 import (
-	"cli/utils/file"
-	"cli/utils/validation"
 	"fmt"
+
+	"github.com/MusicDin/kubitect/cli/utils/file"
+	"github.com/MusicDin/kubitect/cli/utils/validation"
 )
 
 // readConfig reads configuration file on the given path and converts it into

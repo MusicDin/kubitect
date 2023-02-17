@@ -1,14 +1,15 @@
 package cluster
 
 import (
-	"cli/config/modelconfig"
-	"cli/env"
-	"cli/tools/git"
 	"fmt"
 	"os"
 	"path"
 	"testing"
 	"time"
+
+	"github.com/MusicDin/kubitect/cli/config/modelconfig"
+	"github.com/MusicDin/kubitect/cli/env"
+	"github.com/MusicDin/kubitect/cli/tools/git"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -1,7 +1,7 @@
 package event
 
 import (
-	"cli/utils/cmp"
+	"github.com/MusicDin/kubitect/cli/utils/cmp"
 )
 
 type EventType string

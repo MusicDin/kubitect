@@ -1,10 +1,11 @@
 package virtualenv
 
 import (
-	"cli/ui"
 	"fmt"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/MusicDin/kubitect/cli/ui"
 )
 
 type (

@@ -1,8 +1,8 @@
 package modelconfig
 
 import (
-	"cli/utils/defaults"
-	v "cli/utils/validation"
+	"github.com/MusicDin/kubitect/cli/utils/defaults"
+	v "github.com/MusicDin/kubitect/cli/utils/validation"
 )
 
 type WorkerDefault struct {

@@ -1,12 +1,13 @@
 package cluster
 
 import (
-	"cli/app"
-	"cli/utils/template"
 	"io/ioutil"
 	"os"
 	"path"
 	"testing"
+
+	"github.com/MusicDin/kubitect/cli/app"
+	"github.com/MusicDin/kubitect/cli/utils/template"
 
 	"github.com/stretchr/testify/assert"
 )

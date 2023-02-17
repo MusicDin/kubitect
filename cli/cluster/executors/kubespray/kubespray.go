@@ -1,18 +1,19 @@
 package kubespray
 
 import (
-	"cli/cluster/event"
-	"cli/cluster/executors"
-	"cli/config/modelconfig"
-	"cli/config/modelinfra"
-	"cli/env"
-	"cli/tools/ansible"
-	"cli/tools/git"
-	"cli/tools/virtualenv"
-	"cli/ui"
 	"fmt"
 	"os"
 	"path"
+
+	"github.com/MusicDin/kubitect/cli/cluster/event"
+	"github.com/MusicDin/kubitect/cli/cluster/executors"
+	"github.com/MusicDin/kubitect/cli/config/modelconfig"
+	"github.com/MusicDin/kubitect/cli/config/modelinfra"
+	"github.com/MusicDin/kubitect/cli/env"
+	"github.com/MusicDin/kubitect/cli/tools/ansible"
+	"github.com/MusicDin/kubitect/cli/tools/git"
+	"github.com/MusicDin/kubitect/cli/tools/virtualenv"
+	"github.com/MusicDin/kubitect/cli/ui"
 )
 
 type kubespray struct {

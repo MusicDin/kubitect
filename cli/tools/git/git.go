@@ -1,11 +1,11 @@
 package git
 
 import (
-	"cli/ui"
 	"fmt"
 	"os"
 	"regexp"
 
+	"github.com/MusicDin/kubitect/cli/ui"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 )

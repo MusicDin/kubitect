@@ -1,13 +1,14 @@
 package app
 
 import (
-	"cli/env"
-	"cli/ui"
 	"fmt"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
+
+	"github.com/MusicDin/kubitect/cli/env"
+	"github.com/MusicDin/kubitect/cli/ui"
 )
 
 const (

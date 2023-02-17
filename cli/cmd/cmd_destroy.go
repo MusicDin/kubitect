@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"cli/app"
 	"fmt"
+
+	"github.com/MusicDin/kubitect/cli/app"
 
 	"github.com/spf13/cobra"
 )

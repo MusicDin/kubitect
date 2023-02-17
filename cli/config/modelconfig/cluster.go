@@ -1,6 +1,6 @@
 package modelconfig
 
-import v "cli/utils/validation"
+import v "github.com/MusicDin/kubitect/cli/utils/validation"
 
 type Cluster struct {
 	Name         string       `yaml:"name"`

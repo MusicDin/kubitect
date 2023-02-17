@@ -1,9 +1,10 @@
 package ui
 
 import (
-	"cli/ui/streams"
 	"fmt"
 	"strings"
+
+	"github.com/MusicDin/kubitect/cli/ui/streams"
 )
 
 // Block symbols

@@ -1,4 +1,4 @@
-module cli
+module github.com/MusicDin/kubitect/cli
 
 go 1.18
 

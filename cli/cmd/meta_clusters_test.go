@@ -1,12 +1,13 @@
 package cmd
 
 import (
-	"cli/app"
-	"cli/cluster"
 	"os"
 	"path"
 	"strings"
 	"testing"
+
+	"github.com/MusicDin/kubitect/cli/app"
+	"github.com/MusicDin/kubitect/cli/cluster"
 
 	"github.com/stretchr/testify/assert"
 )

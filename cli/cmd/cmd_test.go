@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"cli/app"
 	"testing"
+
+	"github.com/MusicDin/kubitect/cli/app"
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"

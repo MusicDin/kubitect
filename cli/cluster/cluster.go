@@ -1,23 +1,25 @@
 package cluster
 
 import (
-	"cli/app"
-	"cli/cluster/executors"
-	"cli/cluster/executors/kubespray"
-	"cli/cluster/provisioner"
-	"cli/cluster/provisioner/terraform"
-	"cli/config/modelconfig"
-	"cli/config/modelinfra"
-	"cli/env"
-	"cli/tools/virtualenv"
-	"cli/ui"
-	"cli/utils/defaults"
-	"cli/utils/file"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/MusicDin/kubitect/cli/utils/file"
+
+	"github.com/MusicDin/kubitect/cli/app"
+	"github.com/MusicDin/kubitect/cli/cluster/executors"
+	"github.com/MusicDin/kubitect/cli/cluster/executors/kubespray"
+	"github.com/MusicDin/kubitect/cli/cluster/provisioner"
+	"github.com/MusicDin/kubitect/cli/cluster/provisioner/terraform"
+	"github.com/MusicDin/kubitect/cli/config/modelconfig"
+	"github.com/MusicDin/kubitect/cli/config/modelinfra"
+	"github.com/MusicDin/kubitect/cli/env"
+	"github.com/MusicDin/kubitect/cli/tools/virtualenv"
+	"github.com/MusicDin/kubitect/cli/ui"
+	"github.com/MusicDin/kubitect/cli/utils/defaults"
 )
 
 type Cluster struct {

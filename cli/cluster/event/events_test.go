@@ -1,12 +1,13 @@
 package event
 
 import (
-	"cli/config/modelconfig"
-	"cli/utils/cmp"
 	"fmt"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/MusicDin/kubitect/cli/config/modelconfig"
+	"github.com/MusicDin/kubitect/cli/utils/cmp"
 
 	"github.com/stretchr/testify/assert"
 )

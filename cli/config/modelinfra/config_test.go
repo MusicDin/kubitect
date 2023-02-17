@@ -1,8 +1,9 @@
 package modelinfra
 
 import (
-	c "cli/config/modelconfig"
 	"testing"
+
+	c "github.com/MusicDin/kubitect/cli/config/modelconfig"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -1,6 +1,6 @@
 package executors
 
-import "cli/cluster/event"
+import "github.com/MusicDin/kubitect/cli/cluster/event"
 
 type Executor interface {
 	Init() error

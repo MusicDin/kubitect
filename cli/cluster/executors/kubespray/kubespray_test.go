@@ -1,17 +1,18 @@
 package kubespray
 
 import (
-	"cli/cluster/event"
-	"cli/cluster/executors"
-	"cli/config/modelconfig"
-	"cli/config/modelinfra"
-	"cli/env"
-	"cli/tools/ansible"
-	"cli/utils/cmp"
 	"fmt"
 	"path"
 	"reflect"
 	"testing"
+
+	"github.com/MusicDin/kubitect/cli/cluster/event"
+	"github.com/MusicDin/kubitect/cli/cluster/executors"
+	"github.com/MusicDin/kubitect/cli/config/modelconfig"
+	"github.com/MusicDin/kubitect/cli/config/modelinfra"
+	"github.com/MusicDin/kubitect/cli/env"
+	"github.com/MusicDin/kubitect/cli/tools/ansible"
+	"github.com/MusicDin/kubitect/cli/utils/cmp"
 
 	"github.com/stretchr/testify/assert"
 )

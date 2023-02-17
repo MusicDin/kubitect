@@ -1,10 +1,10 @@
 package git
 
 import (
-	"cli/env"
-	"cli/ui"
 	"testing"
 
+	"github.com/MusicDin/kubitect/cli/env"
+	"github.com/MusicDin/kubitect/cli/ui"
 	"github.com/stretchr/testify/assert"
 )
 

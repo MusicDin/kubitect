@@ -1,11 +1,12 @@
 package cmd
 
 import (
-	"cli/app"
-	"cli/cluster"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+
+	"github.com/MusicDin/kubitect/cli/app"
+	"github.com/MusicDin/kubitect/cli/cluster"
 )
 
 type MetaClusters []cluster.ClusterMeta

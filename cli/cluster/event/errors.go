@@ -1,7 +1,7 @@
 package event
 
 import (
-	"cli/ui"
+	"github.com/MusicDin/kubitect/cli/ui"
 )
 
 func NewConfigChangeError(msg string, paths ...string) error {

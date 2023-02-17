@@ -1,10 +1,11 @@
 package cmd
 
 import (
-	"cli/app"
-	"cli/ui"
-	"cli/utils/file"
 	"fmt"
+
+	"github.com/MusicDin/kubitect/cli/app"
+	"github.com/MusicDin/kubitect/cli/ui"
+	"github.com/MusicDin/kubitect/cli/utils/file"
 
 	"github.com/spf13/cobra"
 )
