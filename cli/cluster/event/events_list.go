@@ -1,6 +1,6 @@
 package event
 
-import "cli/utils/cmp"
+import "github.com/MusicDin/kubitect/cli/utils/cmp"
 
 var UpgradeEvents = Events{
 	{

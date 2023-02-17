@@ -1,11 +1,12 @@
 package terraform
 
 import (
-	"cli/config/modelconfig"
 	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/MusicDin/kubitect/cli/config/modelconfig"
 
 	"github.com/stretchr/testify/assert"
 )

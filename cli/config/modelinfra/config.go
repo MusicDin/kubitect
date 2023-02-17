@@ -1,8 +1,8 @@
 package modelinfra
 
 import (
-	"cli/config/modelconfig"
-	v "cli/utils/validation"
+	"github.com/MusicDin/kubitect/cli/config/modelconfig"
+	v "github.com/MusicDin/kubitect/cli/utils/validation"
 )
 
 type Config struct {

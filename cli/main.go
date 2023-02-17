@@ -1,9 +1,10 @@
 package main
 
 import (
-	"cli/cmd"
-	"cli/ui"
 	"os"
+
+	"github.com/MusicDin/kubitect/cli/cmd"
+	"github.com/MusicDin/kubitect/cli/ui"
 )
 
 func main() {

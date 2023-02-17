@@ -6,7 +6,7 @@ import (
 	"path"
 	"testing"
 
-	v "cli/utils/validation"
+	v "github.com/MusicDin/kubitect/cli/utils/validation"
 
 	"github.com/stretchr/testify/assert"
 )

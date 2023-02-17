@@ -1,8 +1,9 @@
 package event
 
 import (
-	"cli/utils/cmp"
 	"testing"
+
+	"github.com/MusicDin/kubitect/cli/utils/cmp"
 )
 
 func MockEvent(t *testing.T, eventType EventType, changes []cmp.Change) Event {

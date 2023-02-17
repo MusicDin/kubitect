@@ -1,8 +1,9 @@
 package modelconfig
 
 import (
-	v "cli/utils/validation"
 	"strings"
+
+	v "github.com/MusicDin/kubitect/cli/utils/validation"
 )
 
 // Keys of custom validators

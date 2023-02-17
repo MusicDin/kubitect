@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"cli/app"
-	"cli/cluster"
-	"cli/env"
+	"github.com/MusicDin/kubitect/cli/app"
+	"github.com/MusicDin/kubitect/cli/cluster"
+	"github.com/MusicDin/kubitect/cli/env"
 
 	"github.com/spf13/cobra"
 )

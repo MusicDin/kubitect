@@ -1,9 +1,10 @@
 package cluster
 
 import (
-	"cli/ui"
 	"fmt"
 	"os"
+
+	"github.com/MusicDin/kubitect/cli/ui"
 )
 
 // Destroy destroys an active cluster. If cluster does not exist

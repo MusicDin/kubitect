@@ -1,6 +1,6 @@
 package modelconfig
 
-import v "cli/utils/validation"
+import v "github.com/MusicDin/kubitect/cli/utils/validation"
 
 // Uint8 is intentionally set to int to avoid panic if value is set
 // outside the uint8 size.

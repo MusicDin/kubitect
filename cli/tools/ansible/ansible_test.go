@@ -1,9 +1,9 @@
 package ansible
 
 import (
-	"cli/ui"
 	"testing"
 
+	"github.com/MusicDin/kubitect/cli/ui"
 	"github.com/stretchr/testify/assert"
 )
 

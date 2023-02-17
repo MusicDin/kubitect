@@ -1,17 +1,18 @@
 package cluster
 
 import (
-	"cli/cluster/event"
-	"cli/env"
-	"cli/tools/git"
-	"cli/ui"
-	"cli/utils/cmp"
-	"cli/utils/file"
-	"cli/utils/keygen"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/MusicDin/kubitect/cli/cluster/event"
+	"github.com/MusicDin/kubitect/cli/env"
+	"github.com/MusicDin/kubitect/cli/tools/git"
+	"github.com/MusicDin/kubitect/cli/ui"
+	"github.com/MusicDin/kubitect/cli/utils/cmp"
+	"github.com/MusicDin/kubitect/cli/utils/file"
+	"github.com/MusicDin/kubitect/cli/utils/keygen"
 )
 
 type ApplyAction string

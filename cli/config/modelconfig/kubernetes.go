@@ -1,11 +1,12 @@
 package modelconfig
 
 import (
-	"cli/env"
-	v "cli/utils/validation"
 	"fmt"
 
-	"cli/utils/defaults"
+	"github.com/MusicDin/kubitect/cli/env"
+	v "github.com/MusicDin/kubitect/cli/utils/validation"
+
+	"github.com/MusicDin/kubitect/cli/utils/defaults"
 )
 
 type Kubernetes struct {

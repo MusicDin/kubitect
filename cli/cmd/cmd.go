@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"cli/env"
+	"github.com/MusicDin/kubitect/cli/env"
 
 	"github.com/spf13/cobra"
 )

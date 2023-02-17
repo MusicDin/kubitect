@@ -1,6 +1,6 @@
 package cluster
 
-import "cli/ui"
+import "github.com/MusicDin/kubitect/cli/ui"
 
 func NewInvalidClusterDirError(missingFiles []string) error {
 	return ui.NewErrorBlock(ui.ERROR,

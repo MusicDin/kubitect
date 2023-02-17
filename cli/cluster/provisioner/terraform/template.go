@@ -1,12 +1,13 @@
 package terraform
 
 import (
-	"cli/config/modelconfig"
-	"cli/utils/template"
 	"fmt"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/MusicDin/kubitect/cli/config/modelconfig"
+	"github.com/MusicDin/kubitect/cli/utils/template"
 )
 
 type MainTemplate struct {

@@ -1,13 +1,13 @@
 package ansible
 
 import (
-	"cli/ui"
 	"context"
 	"fmt"
 	"path"
 	"path/filepath"
 	"strings"
 
+	"github.com/MusicDin/kubitect/cli/ui"
 	"github.com/apenella/go-ansible/pkg/execute"
 	"github.com/apenella/go-ansible/pkg/options"
 	"github.com/apenella/go-ansible/pkg/playbook"
