@@ -2,34 +2,34 @@ package cluster
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/MusicDin/kubitect/cli/ui"
+	"github.com/MusicDin/kubitect/cli/utils/file"
 )
 
-// Destroy destroys an active cluster. If cluster does not exist
-// or does not contain a terraform state file (is inactive), an
-// error is returned.
+// Destroy destroys an active cluster and removes cluster's
+// directory. If cluster does not exist or does not contain
+// a terraform state file (is inactive), an error is returned.
 func (c *ClusterMeta) Destroy() error {
 	if !c.ContainsTfStateConfig() {
 		return fmt.Errorf("cluster '%s' is already destroyed (or not yet initialized).", c.Name)
 	}
 
 	ui.Printf(ui.INFO, "Cluster '%s' will be destroyed.\n", c.Name)
-
 	if err := ui.Ask(); err != nil {
 		return err
 	}
 
-	ui.Printf(ui.INFO, "Destroying cluster '%s'...\n", c.Name)
-
+	ui.Println(ui.INFO, "Destroying cluster...")
 	if err := c.Provisioner().Destroy(); err != nil {
 		return err
 	}
 
-	os.Remove(c.TfStatePath())
-	os.Remove(c.KubeconfigPath())
-	os.Remove(c.AppliedConfigPath())
+	ui.Println(ui.INFO, "Cleaning up cluster directory...", c.Name)
+	if err := file.Remove(c.Path); err != nil {
+		return fmt.Errorf("failed to remove directory of the cluster '%s': %v", c.Name, err)
+	}
 
+	ui.Printf(ui.INFO, "Cluster '%s' has been successfully destroyed.\n", c.Name)
 	return nil
 }

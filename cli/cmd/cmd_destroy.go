@@ -64,21 +64,18 @@ func (o *DestroyOptions) Run() error {
 	}
 
 	clusters, err := AllClusters(o.AppContext())
-
 	if err != nil {
 		return err
 	}
 
 	c := clusters.FindByName(o.ClusterName)
-
 	if c == nil {
-		return fmt.Errorf("cluster '%s' does not exist", o.ClusterName)
+		return fmt.Errorf("cluster '%s' does not exist", c.Name)
 	}
 
-	count := clusters.CountByName(o.ClusterName)
-
+	count := clusters.CountByName(c.Name)
 	if count > 1 {
-		return fmt.Errorf("multiple clusters (%d) have been found with the name '%s'", count, o.ClusterName)
+		return fmt.Errorf("multiple clusters (%d) have been found with the same name (%s)", count, c.Name)
 	}
 
 	return c.Destroy()
