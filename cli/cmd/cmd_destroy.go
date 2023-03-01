@@ -70,7 +70,7 @@ func (o *DestroyOptions) Run() error {
 
 	c := clusters.FindByName(o.ClusterName)
 	if c == nil {
-		return fmt.Errorf("cluster '%s' does not exist", c.Name)
+		return fmt.Errorf("cluster '%s' does not exist", o.ClusterName)
 	}
 
 	count := clusters.CountByName(c.Name)
