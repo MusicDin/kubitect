@@ -7,10 +7,6 @@ var UpgradeEvents = Events{
 		eType: OK,
 		path:  "Kubernetes.Version",
 	},
-	{
-		eType: OK,
-		path:  "Kubernetes.Kubespray.Version",
-	},
 }
 
 var ScaleEvents = Events{
@@ -187,11 +183,8 @@ var ModifyEvents = Events{
 	// Prevent k8s properties changes
 	{
 		eType: BLOCK,
-		paths: []string{
-			"Kubernetes.Version",
-			"Kubernetes.Kubespray.Version",
-		},
-		msg: "Changing Kubernetes or Kubespray version is allowed only when upgrading the cluster.\nTo upgrade the cluster run apply command with '--action upgrade' flag.",
+		path:  "Kubernetes.Version",
+		msg:   "Changing Kubernetes is allowed only when upgrading the cluster.\nTo upgrade the cluster run apply command with '--action upgrade' flag.",
 	},
 	// Allow addons changes
 	{

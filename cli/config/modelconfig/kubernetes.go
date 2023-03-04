@@ -13,7 +13,6 @@ type Kubernetes struct {
 	Version       KubernetesVersion `yaml:"version"`
 	DnsMode       DnsMode           `yaml:"dnsMode"`
 	NetworkPlugin NetworkPlugin     `yaml:"networkPlugin"`
-	Kubespray     Kubespray         `yaml:"kubespray,omitempty"`
 	Other         Other             `yaml:"other"`
 }
 
@@ -22,7 +21,6 @@ func (k Kubernetes) Validate() error {
 		v.Field(&k.Version, v.NotEmpty()),
 		v.Field(&k.DnsMode, v.NotEmpty()),
 		v.Field(&k.NetworkPlugin, v.NotEmpty()),
-		v.Field(&k.Kubespray, v.NotEmpty()),
 		v.Field(&k.Other),
 	)
 }
@@ -78,16 +76,4 @@ func (p NetworkPlugin) Validate() error {
 type Other struct {
 	AutoRenewCertificates bool `yaml:"autoRenewCertificates"`
 	CopyKubeconfig        bool `yaml:"copyKubeconfig"`
-}
-
-type Kubespray struct {
-	URL     URL           `yaml:"url,omitempty"`
-	Version MasterVersion `yaml:"version,omitempty"`
-}
-
-func (k Kubespray) Validate() error {
-	return v.Struct(&k,
-		v.Field(&k.URL, v.OmitEmpty()),
-		v.Field(&k.Version),
-	)
 }

@@ -18,23 +18,15 @@ kubitect export config --cluster my-cluster > my-cluster.yaml
 ## Upgrade the cluster
 
 !!! warning "Important"
+    Do not skip Kubitect's minor releases when upgrading the cluster.
 
-    Do not skip releases when upgrading--upgrade by one tag at a time.
-
-    > For more information read [Kubespray upgrades](https://github.com/kubernetes-sigs/kubespray/blob/master/docs/upgrades.md).
-
-Before upgrading the cluster, ensure that [Kubespray](https://github.com/kubernetes-sigs/kubespray#supported-components) supports a specific Kubernetes version.
-
-In the cluster configuration file, set the desired Kubernetes version and adjust the Kubespray version if necessary.
+In the cluster configuration file, change the Kubernetes version.
 
 Example:
 ```yaml title="cluster.yaml"
 kubernetes:
   version: v1.22.5 # Old value: v1.21.6
   ...
-  kubespray:
-    version: v2.18.0 # Old value: v2.17.1
-    ...
 ```
 
 Apply the modified configuration using `upgrade` action.

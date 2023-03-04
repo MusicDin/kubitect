@@ -132,9 +132,7 @@ This behavior can be restricted with node selectors.
                   size: 32
 
     kubernetes:
-      version: v1.23.7
-      kubespray:
-        version: v2.20.0
+      version: v1.24.7
 
     addons:
       rook:
@@ -278,9 +276,7 @@ addons:
                   size: 32
 
     kubernetes:
-      version: v1.23.7
-      kubespray:
-        version: v2.20.0
+      version: v1.24.7
 
     addons:
       rook:
