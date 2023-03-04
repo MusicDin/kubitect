@@ -217,19 +217,15 @@ cluster:
 
 ### Step 4.4 - Kubernetes properties
 
-The last part of the cluster configuration consists of the Kubernetes properties.
-In this section we define the Kubernetes version, the DNS plugin and so on.
-It is also important to check if Kubespray supports a specific Kubernetes version.
+The last section of the cluster configuration is contains the Kubernetes properties, 
+such as the version, network plugin, and DNS mode.
 
-If you are using a custom Kubespray, you can also specify the URL to a custom Git repository.
 
 ```yaml title="kubitect.yaml"
 kubernetes:
-  version: v1.23.7
+  version: v1.24.7
   networkPlugin: calico
   dnsMode: coredns
-  kubespray:
-    version: v2.20.0
 ```
 
 ## Step 5 - Create the cluster
@@ -278,11 +274,9 @@ cluster:
           ram: 4
 
 kubernetes:
-  version: v1.23.7
+  version: v1.24.7
   networkPlugin: calico
   dnsMode: coredns
-  kubespray:
-    version: v2.20.0
 ```
 
 Now create the cluster by applying your custom configuration using the Kubitect command line tool. 

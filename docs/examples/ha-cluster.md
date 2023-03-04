@@ -305,9 +305,7 @@ cluster:
                   size: 512
 
     kubernetes:
-      version: v1.23.7
-      kubespray:
-        version: v2.20.0
+      version: v1.24.7
     ```
 
 ## Step 5: Applying the configuration

@@ -171,12 +171,9 @@ cluster:
 # Kubespray to use and which network plugin and DNS server to install.
 #
 kubernetes:
-  version: v1.23.7
+  version: v1.24.7
   networkPlugin: calico
   dnsMode: coredns
-  kubespray:
-    url: "https://github.com/kubernetes-sigs/kubespray.git"
-    version: v2.20.0
   other:
     copyKubeconfig: false
 

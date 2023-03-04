@@ -17,7 +17,7 @@ The configuration sections are as follows:
 + `kubitect` - Project metadata.
 + `hosts` - A list of physical hosts (local or remote).
 + `cluster` - Configuration of the cluster infrastructure. Virtual machine properties, node types to install, and the host on which to install the nodes.
-+ `kubernetes` - Kubernetes and Kubespray configuration.
++ `kubernetes` - Kubernetes configuration.
 + `addons` - Configurable addons and applications.
 
 Each configuration property is documented with 5 columns: Property name, description, type, default value and is the property required.
@@ -769,23 +769,6 @@ Each configuration property is documented with 5 columns: Property name, descrip
       </td>
     </tr>
     <tr>
-      <td><code>kubernetes.kubespray.url</code></td>
-      <td>string</td>
-      <td><a href="https://github.com/kubernetes-sigs/kubespray.git">https://github.com/kubernetes-sigs/kubespray.git</a></td>
-      <td></td>
-      <td>
-        URL to the Kubespray project.
-        For example, it can be changed so that it targets your fork of a project.
-      </td>
-    </tr>
-    <tr>
-      <td><code>kubernetes.kubespray.version</code></td>
-      <td>string</td>
-      <td></td>
-      <td>Yes</td>
-      <td>Kubespray version. Version is used to checkout into appropriate branch.</td>
-    </tr>
-    <tr>
       <td><code>kubernetes.networkPlugin</code></td>
       <td>string</td>
       <td>calico</td>
@@ -824,8 +807,8 @@ Each configuration property is documented with 5 columns: Property name, descrip
     <tr>
       <td><code>kubernetes.version</code></td>
       <td>string</td>
+      <td>v1.25.6</td>
       <td></td>
-      <td>Yes</td>
       <td>Kubernetes version that will be installed.</td>
     </tr>
   </tbody>

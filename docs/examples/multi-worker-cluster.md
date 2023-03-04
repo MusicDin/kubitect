@@ -77,11 +77,9 @@ cluster:
             - id: 99
 
     kubernetes:
-      version: v1.23.7
+      version: v1.24.7
       networkPlugin: calico
       dnsMode: coredns
-      kubespray:
-        version: v2.20.0
     ```
 
 ## Step 2: Applying the configuration

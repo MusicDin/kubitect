@@ -7,55 +7,21 @@
 
 <div markdown="1" class="text-justify">
 
-The Kubernetes section of the configuration file contains properties that are closely related to Kubernetes, such as Kubernetes version, network plugin, and DNS mode. 
-In addition, the Kubespray project version and URL can also be specified in this section of the Kubitect configuration.
+The Kubernetes section of the configuration file contains properties that are closely related to Kubernetes, such as Kubernetes version, network plugin, and DNS mode.
 
 ## Configuration
-
-### Kubespray version
-
-:material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
-&ensp;
-:material-alert-circle-outline: Required
-
-As Kubitect relays on the Kubespray for deploying a Kubernetes cluster, a Kubespray project is cloned during a cluster creation.
-This property defines the version of the Kubespray to be cloned.
-All Kubespray versions can be found on on their GitHub [release page](https://github.com/kubernetes-sigs/kubespray/releases).
-
-```yaml
-kubernetes:
-  kubespray:
-    version: v2.20.0
-```
-
-### Kubespray URL
-
-:material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
-&ensp;
-:octicons-file-symlink-file-24: Default: `https://github.com/kubernetes-sigs/kubespray`
-
-By default, Kubespray is cloned from the official GitHub repository.
-If there is a need to use a custom forked version of the project, the url to the repository can be specified with this property.
-
-```yaml
-kubernetes:
-  kubespray:
-    url: https://github.com/kubernetes-sigs/kubespray
-```
 
 ### Kubernetes version
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 &ensp;
-:material-alert-circle-outline: Required
+:octicons-file-symlink-file-24: Default: `v1.25.6`
 
-The Kubernetes version must be defined in the Kubitect configuration.
-It must be ensured that Kubespray supports the provided Kubernetes version, otherwise the cluster setup will fail.
-In addition, Kubernetes version must be prefixed with the `v`.
+Kubernetes version to be deployed.
 
 ```yaml
 kubernetes:
-  version: v1.23.6
+  version: v1.24.7
 ```
 
 ### Kubernetes network plugin
@@ -125,19 +91,6 @@ Therefore, the control plane certificates can be renewed automatically on the fi
 kubernetes:
   other:
     autoRenewCertificates: true
-```
-
-## Example usage
-
-### Minimal configuration
-
-The minimalistic Kubernetes configuration encompasses setting Kubernetes and Kubesrpay versions.
-
-```yaml
-kuberentes:
-  version: v1.23.7
-  kubespray:
-    version: v2.20.0
 ```
 
 </div>
