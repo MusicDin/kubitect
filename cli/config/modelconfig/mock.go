@@ -120,9 +120,6 @@ func MockConfig(t *testing.T) Config {
 		},
 		Kubernetes: Kubernetes{
 			Version: "v1.24.7",
-			Kubespray: Kubespray{
-				Version: "v2.21.0",
-			},
 		},
 	}
 

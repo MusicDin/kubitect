@@ -36,27 +36,12 @@ func TestNetworkPlugin(t *testing.T) {
 	assert.NoError(t, CILIUM.Validate())
 }
 
-func TestKubespray(t *testing.T) {
-	ks1 := Kubespray{
-		Version: MasterVersion("master"),
-	}
-
-	ks2 := Kubespray{
-		Version: MasterVersion("master"),
-		URL:     URL(env.ConstKubesprayUrl),
-	}
-
-	assert.ErrorContains(t, Kubespray{}.Validate(), "Field 'version' must be a valid semantic version prefixed with 'v'")
-	assert.NoError(t, ks1.Validate())
-	assert.NoError(t, ks2.Validate())
-}
-
 func TestKubernetes_Empty(t *testing.T) {
 	k8s := Kubernetes{}
 	assert.ErrorContains(t, k8s.Validate(), "Field 'version' is required and cannot be empty.")
 	assert.ErrorContains(t, k8s.Validate(), "Field 'dnsMode' is required and cannot be empty.")
 	assert.ErrorContains(t, k8s.Validate(), "Field 'networkPlugin' is required and cannot be empty.")
-	assert.ErrorContains(t, defaults.Assign(&k8s).Validate(), "Field 'kubespray' is required and cannot be empty.")
+	assert.NoError(t, defaults.Assign(&k8s).Validate())
 }
 
 func TestKubernetes_Valid(t *testing.T) {
@@ -64,9 +49,6 @@ func TestKubernetes_Valid(t *testing.T) {
 		Version:       env.ConstKubernetesVersion,
 		DnsMode:       COREDNS,
 		NetworkPlugin: CALICO,
-		Kubespray: Kubespray{
-			Version: "v1.2.3",
-		},
 		Other: Other{
 			AutoRenewCertificates: true,
 			CopyKubeconfig:        true,
