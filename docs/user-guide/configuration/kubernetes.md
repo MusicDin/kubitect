@@ -53,9 +53,8 @@ kubernetes:
 &ensp;
 :octicons-file-symlink-file-24: Default: `coredns`
 
-Two DNS servers are supproted, `coredns` and `kubedns`.
-It is highly recommended to use CoreDNS, which has replaced the kube-dns.
-If this property is omitted, CoreDNS is used.
+Currently, the only DNS mode supported by Kubitect is `coredns`.
+Therefore, it is safe to omit this property.
 
 ```yaml
 kubernetes:

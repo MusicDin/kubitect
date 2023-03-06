@@ -173,7 +173,7 @@ cluster:
 kubernetes:
   version: v1.24.7
   networkPlugin: calico
-  dnsMode: coredns
+  dnsMode: coredns # (36)!
   other:
     copyKubeconfig: false
 
@@ -294,3 +294,5 @@ addons:
 34. Resource pool name that must be defined on the host on which the instance will be deployed.
 
 35. Node labels defined for specific instances take precedence over default labels with the same key, so this label overrides the default label.
+
+36. Currently, the only DNS mode supported is CoreDNS.

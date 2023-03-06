@@ -764,7 +764,6 @@ Each configuration property is documented with 5 columns: Property name, descrip
         DNS server used within a Kubernetes cluster. Possible values are: 
         <ul>
           <li><code>coredns</code></li>
-          <li><code>kubedns</code></li>
         </ul>
       </td>
     </tr>
