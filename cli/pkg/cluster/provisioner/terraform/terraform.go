@@ -252,7 +252,7 @@ func (t *terraform) runCmd(action string, args []string, showOutput bool) (int, 
 
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		// TODO: find a better way to handle Ctrl+C 😂?!?
-		// Pdeathsig: syscall.SIGTERM,
+		Pdeathsig: syscall.SIGTERM,
 	}
 
 	if showOutput || ui.Debug() {
