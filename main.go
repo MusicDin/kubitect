@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/MusicDin/kubitect/pkg/kubitect/cmd"
+	"github.com/MusicDin/kubitect/pkg/cmd"
 	"github.com/MusicDin/kubitect/pkg/ui"
 	"os"
 )
