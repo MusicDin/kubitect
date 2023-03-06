@@ -1,7 +1,7 @@
 package event
 
 import (
-	cmp2 "github.com/MusicDin/kubitect/cli/pkg/utils/cmp"
+	"github.com/MusicDin/kubitect/cli/pkg/utils/cmp"
 )
 
 type EventType string
@@ -23,11 +23,11 @@ type Event struct {
 	msg     string
 	path    string
 	paths   []string
-	changes []cmp2.Change
-	action  cmp2.ActionType
+	changes []cmp.Change
+	action  cmp.ActionType
 }
 
-func (e Event) Action() cmp2.ActionType {
+func (e Event) Action() cmp.ActionType {
 	return e.action
 }
 
@@ -39,7 +39,7 @@ func (e Event) Paths() []string {
 	return e.paths
 }
 
-func (e Event) Changes() []cmp2.Change {
+func (e Event) Changes() []cmp.Change {
 	return e.changes
 }
 
@@ -99,7 +99,7 @@ func (es Events) Errors() []error {
 // add adds the event with the corresponding change to the list.
 // If an event with a matching action and path already exists in
 // the list then the change is appended to the existing event.
-func (es *Events) add(event Event, c cmp2.Change) {
+func (es *Events) add(event Event, c cmp.Change) {
 	for i, e := range *es {
 		if e.action == event.action && e.path == event.path {
 			(*es)[i].changes = append((*es)[i].changes, c)
@@ -107,16 +107,16 @@ func (es *Events) add(event Event, c cmp2.Change) {
 		}
 	}
 
-	event.changes = []cmp2.Change{c}
+	event.changes = []cmp.Change{c}
 	*es = append(*es, event)
 }
 
 // triggerEvents returns triggered events of the corresponding action.
-func TriggerEvents(diff *cmp2.DiffNode, events Events) Events {
+func TriggerEvents(diff *cmp.DiffNode, events Events) Events {
 	var trig Events
 
-	cmp2.TriggerEventsF(diff, events, trig.add)
-	cc := cmp2.ConflictingChanges(diff, events)
+	cmp.TriggerEventsF(diff, events, trig.add)
+	cc := cmp.ConflictingChanges(diff, events)
 
 	if len(cc) > 0 {
 		trig = append(trig, Event{

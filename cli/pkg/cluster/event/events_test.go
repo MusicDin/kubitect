@@ -3,7 +3,7 @@ package event
 import (
 	"fmt"
 	"github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
-	cmp2 "github.com/MusicDin/kubitect/cli/pkg/utils/cmp"
+	"github.com/MusicDin/kubitect/cli/pkg/utils/cmp"
 	"reflect"
 	"strings"
 	"testing"
@@ -27,9 +27,9 @@ func TestEvent_Path(t *testing.T) {
 }
 
 func TestEvent(t *testing.T) {
-	changes := []cmp2.Change{
+	changes := []cmp.Change{
 		{
-			Action: cmp2.CREATE,
+			Action: cmp.CREATE,
 			Path:   "test",
 		},
 	}
@@ -38,10 +38,10 @@ func TestEvent(t *testing.T) {
 		eType:   OK,
 		changes: changes,
 		msg:     "Event msg",
-		action:  cmp2.CREATE,
+		action:  cmp.CREATE,
 	}
 
-	assert.Equal(t, cmp2.CREATE, event.Action())
+	assert.Equal(t, cmp.CREATE, event.Action())
 	assert.Equal(t, changes, event.Changes())
 	assert.Equal(t, nil, event.Error())
 }
@@ -50,7 +50,7 @@ func TestEvent_ConfigWarning(t *testing.T) {
 	event := Event{
 		eType: WARN,
 		msg:   "event msg",
-		changes: []cmp2.Change{
+		changes: []cmp.Change{
 			{Path: "test"},
 		},
 	}
@@ -61,7 +61,7 @@ func TestEvent_ConfigWarning(t *testing.T) {
 func TestEvent_ConfigError(t *testing.T) {
 	event := Event{
 		eType: BLOCK,
-		changes: []cmp2.Change{
+		changes: []cmp.Change{
 			{Path: "test"},
 		},
 	}
@@ -102,10 +102,10 @@ func TestEvents_Errors(t *testing.T) {
 func TestEvents_Add(t *testing.T) {
 	var events Events
 
-	e1 := Event{path: "path.test", msg: "event1", action: cmp2.CREATE}
-	e2 := Event{path: "path.test", msg: "event2", action: cmp2.DELETE}
+	e1 := Event{path: "path.test", msg: "event1", action: cmp.CREATE}
+	e2 := Event{path: "path.test", msg: "event2", action: cmp.DELETE}
 
-	change := cmp2.Change{}
+	change := cmp.Change{}
 
 	events.add(e1, change)
 	assert.Len(t, events, 1)
@@ -133,7 +133,7 @@ func TestTriggerEvents(t *testing.T) {
 
 	events := Events{Event{path: "Value", eType: BLOCK}}
 
-	diff, err := cmp2.Compare(s1, s2)
+	diff, err := cmp.Compare(s1, s2)
 	assert.NoError(t, err)
 
 	actual := TriggerEvents(diff, events).Errors()
@@ -153,7 +153,7 @@ func TestTriggerEvents_Conflicting(t *testing.T) {
 
 	events := Events{Event{path: "Value", eType: BLOCK}}
 
-	diff, err := cmp2.Compare(s1, s2)
+	diff, err := cmp.Compare(s1, s2)
 	assert.NoError(t, err)
 
 	trig := TriggerEvents(diff, events)

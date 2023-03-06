@@ -1,7 +1,7 @@
 package app
 
 import (
-	ui2 "github.com/MusicDin/kubitect/cli/pkg/ui"
+	"github.com/MusicDin/kubitect/cli/pkg/ui"
 	"path"
 	"testing"
 )
@@ -9,18 +9,18 @@ import (
 type (
 	AppContextMock interface {
 		AppContext
-		Ui() ui2.UiMock
+		Ui() ui.UiMock
 		Options() AppContextOptions
 	}
 
 	appContextMock struct {
 		appContext
 		appContextOptions AppContextOptions
-		ui                ui2.UiMock
+		ui                ui.UiMock
 	}
 )
 
-func (m *appContextMock) Ui() ui2.UiMock {
+func (m *appContextMock) Ui() ui.UiMock {
 	return m.ui
 }
 
@@ -51,13 +51,13 @@ func MockAppContext(t *testing.T, opts ...AppContextOptions) AppContextMock {
 		ctx.homeDir = path.Join(tmpDir, "home")
 	}
 
-	uOpts := ui2.UiOptions{
+	uOpts := ui.UiOptions{
 		AutoApprove: o.AutoApprove,
 		Debug:       o.Debug,
 		NoColor:     o.NoColor,
 	}
 
-	u := ui2.MockGlobalTerminalUi(t, uOpts)
+	u := ui.MockGlobalTerminalUi(t, uOpts)
 
 	return &appContextMock{
 		appContext:        ctx,

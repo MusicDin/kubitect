@@ -1,7 +1,7 @@
 package kubespray
 
 import (
-	modelconfig2 "github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/cli/pkg/utils/template"
 	"testing"
 
@@ -9,7 +9,7 @@ import (
 )
 
 func TestKubesprayAllTemplate(t *testing.T) {
-	nodes := modelconfig2.MockNodes(t)
+	nodes := modelconfig.MockNodes(t)
 
 	tpl := NewKubesprayAllTemplate(t.TempDir(), nodes)
 	pop, err := template.Populate(tpl)
@@ -21,7 +21,7 @@ func TestKubesprayAllTemplate(t *testing.T) {
 }
 
 func TestKubesprayK8sClusterTemplate(t *testing.T) {
-	cfg := modelconfig2.MockConfig(t)
+	cfg := modelconfig.MockConfig(t)
 
 	tpl := NewKubesprayK8sClusterTemplate(t.TempDir(), cfg)
 	pop, err := template.Populate(tpl)
@@ -55,10 +55,10 @@ func TestKubesprayEtcdTemplate(t *testing.T) {
 }
 
 func TestHostsTemplate(t *testing.T) {
-	hosts := []modelconfig2.Host{
-		modelconfig2.MockLocalHost(t, "local", true),
-		modelconfig2.MockLocalHost(t, "localhost", false),
-		modelconfig2.MockRemoteHost(t, "remote", false, false),
+	hosts := []modelconfig.Host{
+		modelconfig.MockLocalHost(t, "local", true),
+		modelconfig.MockLocalHost(t, "localhost", false),
+		modelconfig.MockRemoteHost(t, "remote", false, false),
 	}
 
 	tpl := NewHostsTemplate(t.TempDir(), "~/.ssh/id_rsa", hosts)
@@ -93,7 +93,7 @@ func TestHostsTemplate(t *testing.T) {
 }
 
 func TestNodesTemplate(t *testing.T) {
-	nodes := modelconfig2.MockNodes(t)
+	nodes := modelconfig.MockNodes(t)
 
 	tpl := NewNodesTemplate(t.TempDir(), nodes, nodes)
 	pop, err := template.Populate(tpl)
@@ -157,8 +157,8 @@ func TestNodesTemplate(t *testing.T) {
 }
 
 func TestNodesTemplate_NoWorkers(t *testing.T) {
-	nodes := modelconfig2.MockNodes(t)
-	nodes.Worker = modelconfig2.Worker{}
+	nodes := modelconfig.MockNodes(t)
+	nodes.Worker = modelconfig.Worker{}
 
 	tpl := NewNodesTemplate(t.TempDir(), nodes, nodes)
 	pop, err := template.Populate(tpl)

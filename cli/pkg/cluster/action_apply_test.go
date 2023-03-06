@@ -2,7 +2,7 @@ package cluster
 
 import (
 	"fmt"
-	modelconfig2 "github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/cli/pkg/env"
 	"github.com/MusicDin/kubitect/cli/pkg/tools/git"
 	"os"
@@ -118,7 +118,7 @@ func TestPlan(t *testing.T) {
 
 	// Make "blocking" change
 	ver := fmt.Sprintf("%s.%s", env.ProjectK8sVersions[0], "99")
-	c.NewConfig.Kubernetes.Version = modelconfig2.KubernetesVersion(ver)
+	c.NewConfig.Kubernetes.Version = modelconfig.KubernetesVersion(ver)
 
 	_, err := c.plan(SCALE)
 	assert.EqualError(t, err, "Aborted. Configuration file contains errors.")
@@ -170,7 +170,7 @@ func TestApply_Upgrade(t *testing.T) {
 
 	// Make some changes to the new config
 	ver := fmt.Sprintf("%s.%s", env.ProjectK8sVersions[0], "99")
-	c.NewConfig.Kubernetes.Version = modelconfig2.KubernetesVersion(ver)
+	c.NewConfig.Kubernetes.Version = modelconfig.KubernetesVersion(ver)
 
 	// Skip required files check
 	tmp := env.ProjectRequiredFiles
@@ -189,7 +189,7 @@ func TestApply_Scale(t *testing.T) {
 	// Append worker node
 	c.NewConfig.Cluster.Nodes.Worker.Instances = append(
 		c.NewConfig.Cluster.Nodes.Worker.Instances,
-		modelconfig2.WorkerInstance{Id: "worker"},
+		modelconfig.WorkerInstance{Id: "worker"},
 	)
 
 	// Skip required files check

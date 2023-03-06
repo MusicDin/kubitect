@@ -2,7 +2,7 @@ package terraform
 
 import (
 	"fmt"
-	modelconfig2 "github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/cli/pkg/utils/template"
 	"os"
 	"path"
@@ -10,11 +10,11 @@ import (
 )
 
 type MainTemplate struct {
-	Hosts   []modelconfig2.Host
+	Hosts   []modelconfig.Host
 	projDir string
 }
 
-func NewMainTemplate(projectDir string, hosts []modelconfig2.Host) MainTemplate {
+func NewMainTemplate(projectDir string, hosts []modelconfig.Host) MainTemplate {
 	return MainTemplate{
 		Hosts:   hosts,
 		projDir: projectDir,
@@ -41,9 +41,9 @@ func (t MainTemplate) Write() error {
 }
 
 // defaultHost returns default host from a given list of hosts.
-func defaultHost(hosts []modelconfig2.Host) (modelconfig2.Host, error) {
+func defaultHost(hosts []modelconfig.Host) (modelconfig.Host, error) {
 	if hosts == nil || len(hosts) == 0 {
-		return modelconfig2.Host{}, fmt.Errorf("defaultHost: hosts list is empty")
+		return modelconfig.Host{}, fmt.Errorf("defaultHost: hosts list is empty")
 	}
 
 	for _, h := range hosts {
@@ -56,10 +56,10 @@ func defaultHost(hosts []modelconfig2.Host) (modelconfig2.Host, error) {
 }
 
 // hostUri returns URI of a given host.
-func hostUri(host modelconfig2.Host) (string, error) {
+func hostUri(host modelconfig.Host) (string, error) {
 	typ := host.Connection.Type
 
-	if typ == "" || typ == modelconfig2.LOCALHOST || typ == modelconfig2.LOCAL {
+	if typ == "" || typ == modelconfig.LOCALHOST || typ == modelconfig.LOCAL {
 		return "qemu:///system", nil
 	}
 

@@ -1,25 +1,25 @@
 package event
 
 import (
-	ui2 "github.com/MusicDin/kubitect/cli/pkg/ui"
+	"github.com/MusicDin/kubitect/cli/pkg/ui"
 )
 
 func NewConfigChangeError(msg string, paths ...string) error {
-	return ui2.NewErrorBlock(ui2.ERROR,
-		[]ui2.Content{
-			ui2.NewErrorLine("Error type:", "Config Change"),
-			ui2.NewErrorSection("Config path:", paths...),
-			ui2.NewErrorSection("Error:", msg),
+	return ui.NewErrorBlock(ui.ERROR,
+		[]ui.Content{
+			ui.NewErrorLine("Error type:", "Config Change"),
+			ui.NewErrorSection("Config path:", paths...),
+			ui.NewErrorSection("Error:", msg),
 		},
 	)
 }
 
 func NewConfigChangeWarning(msg string, paths ...string) error {
-	return ui2.NewErrorBlock(ui2.WARN,
-		[]ui2.Content{
-			ui2.NewErrorLine("Warning type:", "Config Change"),
-			ui2.NewErrorSection("Config path:", paths...),
-			ui2.NewErrorSection("Warning:", msg),
+	return ui.NewErrorBlock(ui.WARN,
+		[]ui.Content{
+			ui.NewErrorLine("Warning type:", "Config Change"),
+			ui.NewErrorSection("Config path:", paths...),
+			ui.NewErrorSection("Warning:", msg),
 		},
 	)
 }

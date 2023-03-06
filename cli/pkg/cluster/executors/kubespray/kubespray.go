@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/MusicDin/kubitect/cli/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/cli/pkg/cluster/executors"
-	modelconfig2 "github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/cli/pkg/config/modelinfra"
 	"github.com/MusicDin/kubitect/cli/pkg/env"
 	"github.com/MusicDin/kubitect/cli/pkg/tools/ansible"
@@ -20,7 +20,7 @@ type kubespray struct {
 	ClusterPath       string
 	SshPrivateKeyPath string
 	ConfigDir         string
-	Config            *modelconfig2.Config
+	Config            *modelconfig.Config
 	InfraConfig       *modelinfra.Config
 	VirtualEnv        virtualenv.VirtualEnv
 	Ansible           ansible.Ansible
@@ -43,7 +43,7 @@ func NewKubesprayExecutor(
 	clusterPath string,
 	sshPrivateKeyPath string,
 	configDir string,
-	cfg *modelconfig2.Config,
+	cfg *modelconfig.Config,
 	infraCfg *modelinfra.Config,
 	virtualEnv virtualenv.VirtualEnv,
 ) executors.Executor {
@@ -191,12 +191,12 @@ func (e *kubespray) ScaleDown(events event.Events) error {
 }
 
 // extractRemovedNodes returns node instances from the event changes.
-func extractRemovedNodes(events event.Events) ([]modelconfig2.Instance, error) {
-	var nodes []modelconfig2.Instance
+func extractRemovedNodes(events event.Events) ([]modelconfig.Instance, error) {
+	var nodes []modelconfig.Instance
 
 	for _, e := range events {
 		for _, ch := range e.Changes() {
-			if i, ok := ch.Before.(modelconfig2.Instance); ok {
+			if i, ok := ch.Before.(modelconfig.Instance); ok {
 				nodes = append(nodes, i)
 				continue
 			}

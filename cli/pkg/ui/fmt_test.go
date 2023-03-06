@@ -1,7 +1,7 @@
 package ui
 
 import (
-	streams2 "github.com/MusicDin/kubitect/cli/pkg/ui/streams"
+	"github.com/MusicDin/kubitect/cli/pkg/ui/streams"
 	"strings"
 	"testing"
 
@@ -9,7 +9,7 @@ import (
 )
 
 // testFormat ignores pivot for cleaner tests
-func testFormat(o streams2.OutputStream, s string, i int) string {
+func testFormat(o streams.OutputStream, s string, i int) string {
 	lines, _ := Format(o, s, i, 0)
 	return strings.Join(lines, "\n")
 }
@@ -80,7 +80,7 @@ func TestFormat_Empty(t *testing.T) {
 }
 
 func TestFormat_TerminalStream(t *testing.T) {
-	s := streams2.MockTerminalStreams(t).Out()
+	s := streams.MockTerminalStreams(t).Out()
 
 	assert.Equal(t, "test", testFormat(s, "test", 0))
 	assert.Equal(t, "te\nst", testFormat(s, "test", s.Columns()-2))
@@ -92,7 +92,7 @@ func TestFormat_TerminalStream(t *testing.T) {
 }
 
 func TestFormat_NonTerminalStream(t *testing.T) {
-	s := streams2.MockStreams(t).Out()
+	s := streams.MockStreams(t).Out()
 
 	assert.Equal(t, "test", testFormat(s, "test", 0))
 	assert.Equal(t, "test", testFormat(s, "test", s.Columns()-2))

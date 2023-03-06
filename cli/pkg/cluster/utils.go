@@ -3,12 +3,12 @@ package cluster
 import (
 	"fmt"
 	"github.com/MusicDin/kubitect/cli/pkg/utils/file"
-	validation2 "github.com/MusicDin/kubitect/cli/pkg/utils/validation"
+	"github.com/MusicDin/kubitect/cli/pkg/utils/validation"
 )
 
 // readConfig reads configuration file on the given path and converts it into
 // the provided model.
-func readConfig[T validation2.Validatable](path string, model T) (*T, error) {
+func readConfig[T validation.Validatable](path string, model T) (*T, error) {
 	if !file.Exists(path) {
 		return nil, fmt.Errorf("file '%s' does not exist", path)
 	}
@@ -19,7 +19,7 @@ func readConfig[T validation2.Validatable](path string, model T) (*T, error) {
 // readConfig reads configuration file on the given path and converts it into
 // the provided model. If file on the provided path does not exist, neither error
 // nor model is returned.
-func readConfigIfExists[T validation2.Validatable](path string, model T) (*T, error) {
+func readConfigIfExists[T validation.Validatable](path string, model T) (*T, error) {
 	if !file.Exists(path) {
 		return nil, nil
 	}
@@ -28,7 +28,7 @@ func readConfigIfExists[T validation2.Validatable](path string, model T) (*T, er
 }
 
 // validateConfig validates provided configuration file.
-func validateConfig[T validation2.Validatable](config T) []error {
+func validateConfig[T validation.Validatable](config T) []error {
 	var errs []error
 
 	err := config.Validate()
@@ -37,7 +37,7 @@ func validateConfig[T validation2.Validatable](config T) []error {
 		return nil
 	}
 
-	for _, e := range err.(validation2.ValidationErrors) {
+	for _, e := range err.(validation.ValidationErrors) {
 		errs = append(errs, NewValidationError(e.Error(), e.Namespace))
 	}
 

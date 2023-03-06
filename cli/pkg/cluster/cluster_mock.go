@@ -1,7 +1,7 @@
 package cluster
 
 import (
-	app2 "github.com/MusicDin/kubitect/cli/pkg/app"
+	"github.com/MusicDin/kubitect/cli/pkg/app"
 	"github.com/MusicDin/kubitect/cli/pkg/cluster/executors"
 	"github.com/MusicDin/kubitect/cli/pkg/cluster/provisioner"
 	"github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
@@ -18,11 +18,11 @@ import (
 type (
 	ClusterMock struct {
 		*Cluster
-		appContextMock app2.AppContextMock
+		appContextMock app.AppContextMock
 	}
 )
 
-func (m *ClusterMock) AppContext() app2.AppContextMock {
+func (m *ClusterMock) AppContext() app.AppContextMock {
 	return m.appContextMock
 }
 
@@ -33,11 +33,11 @@ func (m *ClusterMock) Ui() ui.UiMock {
 func MockCluster(t *testing.T) *ClusterMock {
 	t.Helper()
 
-	ctxOptions := app2.AppContextOptions{
+	ctxOptions := app.AppContextOptions{
 		Local:       false,
 		AutoApprove: true,
 	}
-	ctx := app2.MockAppContext(t, ctxOptions)
+	ctx := app.MockAppContext(t, ctxOptions)
 
 	c, err := NewCluster(ctx, mockConfigFile(t))
 	assert.NoError(t, err)

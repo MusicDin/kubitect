@@ -1,7 +1,7 @@
 package virtualenv
 
 import (
-	ui2 "github.com/MusicDin/kubitect/cli/pkg/ui"
+	"github.com/MusicDin/kubitect/cli/pkg/ui"
 	"io/ioutil"
 	"os"
 	"path"
@@ -31,7 +31,7 @@ func MockVirtualEnv(t *testing.T) *virtualEnv {
 }
 
 func TestCreate(t *testing.T) {
-	ui2.MockGlobalUi(t, ui2.UiOptions{Debug: true})
+	ui.MockGlobalUi(t, ui.UiOptions{Debug: true})
 
 	env := MockVirtualEnv(t)
 
@@ -40,7 +40,7 @@ func TestCreate(t *testing.T) {
 }
 
 func TestInstallPipReq(t *testing.T) {
-	ui2.MockGlobalUi(t, ui2.UiOptions{Debug: true})
+	ui.MockGlobalUi(t, ui.UiOptions{Debug: true})
 
 	env := MockVirtualEnv(t)
 

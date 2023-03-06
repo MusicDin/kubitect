@@ -1,7 +1,7 @@
 package cluster
 
 import (
-	app2 "github.com/MusicDin/kubitect/cli/pkg/app"
+	"github.com/MusicDin/kubitect/cli/pkg/app"
 	"github.com/MusicDin/kubitect/cli/pkg/utils/template"
 	"io/ioutil"
 	"os"
@@ -12,7 +12,7 @@ import (
 )
 
 func TestNewCluster(t *testing.T) {
-	ctx := app2.MockAppContext(t)
+	ctx := app.MockAppContext(t)
 
 	c, err := NewCluster(ctx, mockConfigFile(t))
 	assert.NoError(t, err)
@@ -20,7 +20,7 @@ func TestNewCluster(t *testing.T) {
 }
 
 func TestNewCluster_Local(t *testing.T) {
-	ctx := app2.MockAppContext(t, app2.AppContextOptions{Local: true})
+	ctx := app.MockAppContext(t, app.AppContextOptions{Local: true})
 
 	c, err := NewCluster(ctx, mockConfigFile(t))
 	assert.NoError(t, err)
@@ -49,12 +49,12 @@ func TestNewCluster_InvalidClusterName(t *testing.T) {
 				version: v1.0.0
 	`))
 
-	_, err := NewCluster(app2.MockAppContext(t), cfgPath)
+	_, err := NewCluster(app.MockAppContext(t), cfgPath)
 	assert.ErrorContains(t, err, "Cluster name cannot contain a prefix 'local'.")
 }
 
 func TestNewCluster_ConfigNotExists(t *testing.T) {
-	_, err := NewCluster(app2.MockAppContext(t), "config.yaml")
+	_, err := NewCluster(app.MockAppContext(t), "config.yaml")
 	assert.EqualError(t, err, "file 'config.yaml' does not exist")
 }
 
@@ -64,7 +64,7 @@ func TestNewCluster_InvalidConfig(t *testing.T) {
 	_, err := os.Create(cfgPath)
 	assert.NoError(t, err)
 
-	_, err = NewCluster(app2.MockAppContext(t), cfgPath)
+	_, err = NewCluster(app.MockAppContext(t), cfgPath)
 	assert.ErrorContains(t, err, "invalid configuration file")
 }
 

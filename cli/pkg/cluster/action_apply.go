@@ -2,10 +2,10 @@ package cluster
 
 import (
 	"fmt"
-	event2 "github.com/MusicDin/kubitect/cli/pkg/cluster/event"
+	"github.com/MusicDin/kubitect/cli/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/cli/pkg/env"
 	"github.com/MusicDin/kubitect/cli/pkg/tools/git"
-	ui2 "github.com/MusicDin/kubitect/cli/pkg/ui"
+	"github.com/MusicDin/kubitect/cli/pkg/ui"
 	"github.com/MusicDin/kubitect/cli/pkg/utils/cmp"
 	"github.com/MusicDin/kubitect/cli/pkg/utils/file"
 	"github.com/MusicDin/kubitect/cli/pkg/utils/keygen"
@@ -28,14 +28,14 @@ func (a ApplyAction) String() string {
 }
 
 // events returns events of the corresponding action.
-func (a ApplyAction) events() event2.Events {
+func (a ApplyAction) events() event.Events {
 	switch a {
 	case CREATE:
-		return event2.ModifyEvents
+		return event.ModifyEvents
 	case SCALE:
-		return event2.ScaleEvents
+		return event.ScaleEvents
 	case UPGRADE:
-		return event2.UpgradeEvents
+		return event.UpgradeEvents
 	default:
 		return nil
 	}
@@ -64,9 +64,9 @@ func (c *Cluster) Apply(a string) error {
 	}
 
 	if c.AppliedConfig == nil && (action == SCALE || action == UPGRADE) {
-		ui2.Printf(ui2.INFO, "Cannot %s cluster '%s'. It has not been created yet.\n\n", action, c.Name)
+		ui.Printf(ui.INFO, "Cannot %s cluster '%s'. It has not been created yet.\n\n", action, c.Name)
 
-		err := ui2.Ask("Would you like to create it instead?")
+		err := ui.Ask("Would you like to create it instead?")
 
 		if err != nil {
 			return err
@@ -75,7 +75,7 @@ func (c *Cluster) Apply(a string) error {
 		action = CREATE
 	}
 
-	var events event2.Events
+	var events event.Events
 
 	if c.AppliedConfig != nil {
 		events, err = c.plan(action)
@@ -84,7 +84,7 @@ func (c *Cluster) Apply(a string) error {
 		}
 
 		if len(events) == 0 {
-			ui2.Println(ui2.INFO, "No changes detected.")
+			ui.Println(ui.INFO, "No changes detected.")
 			return nil
 		}
 	}
@@ -116,7 +116,7 @@ func (c *Cluster) Apply(a string) error {
 // error is returned.
 // If blocking changes are detected, an error is returned.
 // If warnings are detected, user is asked for permission to continue.
-func (c *Cluster) plan(action ApplyAction) (event2.Events, error) {
+func (c *Cluster) plan(action ApplyAction) (event.Events, error) {
 	if c.AppliedConfig == nil {
 		return nil, nil
 	}
@@ -136,22 +136,22 @@ func (c *Cluster) plan(action ApplyAction) (event2.Events, error) {
 	fmt.Printf("Following changes have been detected:\n\n")
 	fmt.Println(diff.ToYamlDiff())
 
-	events := event2.TriggerEvents(diff, action.events())
+	events := event.TriggerEvents(diff, action.events())
 	blocking := events.Blocking()
 
 	if len(blocking) > 0 {
-		ui2.PrintBlockE(blocking.Errors()...)
+		ui.PrintBlockE(blocking.Errors()...)
 		return nil, fmt.Errorf("Aborted. Configuration file contains errors.")
 	}
 
 	warnings := events.Warns()
 
 	if len(warnings) > 0 {
-		ui2.PrintBlockE(warnings.Errors()...)
+		ui.PrintBlockE(warnings.Errors()...)
 		fmt.Println("Above warnings indicate potentially destructive actions.")
 	}
 
-	return events, ui2.Ask()
+	return events, ui.Ask()
 }
 
 // create creates a new cluster or modifies the current
@@ -202,7 +202,7 @@ func (c *Cluster) upgrade() error {
 }
 
 // scale scales an existing cluster.
-func (c *Cluster) scale(events event2.Events) error {
+func (c *Cluster) scale(events event.Events) error {
 	if err := c.Executor().ScaleDown(events); err != nil {
 		return err
 	}
@@ -237,19 +237,19 @@ func (c *Cluster) prepare() error {
 		tmpDir := filepath.Join(dstDir, "tmp")
 		proj := git.NewGitProject(env.ConstProjectUrl, env.ConstProjectVersion)
 
-		ui2.Printf(ui2.DEBUG, "kubitect.url: %s\n", proj.Url())
-		ui2.Printf(ui2.DEBUG, "kubitect.version: %s\n", proj.Version())
+		ui.Printf(ui.DEBUG, "kubitect.url: %s\n", proj.Url())
+		ui.Printf(ui.DEBUG, "kubitect.version: %s\n", proj.Version())
 
 		err = cloneAndCopyReqFiles(proj, tmpDir, c.Path)
 	}
 
 	if err != nil {
-		e, ok := err.(ui2.ErrorBlock)
+		e, ok := err.(ui.ErrorBlock)
 		if !ok {
 			return err
 		}
 
-		ui2.PrintBlockE(e)
+		ui.PrintBlockE(e)
 		return fmt.Errorf("cluster directory (%s) is missing some required files", srcDir)
 	}
 
@@ -264,7 +264,7 @@ func (c *Cluster) prepare() error {
 // the configuration file. However, if SSH keys already exist in the
 // cluster directory, no action is taken.
 func (c *Cluster) generateSshKeys() error {
-	ui2.Println(ui2.INFO, "Ensuring SSH keys are present...")
+	ui.Println(ui.INFO, "Ensuring SSH keys are present...")
 
 	kpName := path.Base(c.PrivateSshKeyPath())
 	kpDir := path.Dir(c.PrivateSshKeyPath())

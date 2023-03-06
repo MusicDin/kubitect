@@ -1,9 +1,9 @@
 package terraform
 
 import (
-	modelconfig2 "github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/cli/pkg/env"
-	ui2 "github.com/MusicDin/kubitect/cli/pkg/ui"
+	"github.com/MusicDin/kubitect/cli/pkg/ui"
 	"io/ioutil"
 	"os"
 	"path"
@@ -13,7 +13,7 @@ import (
 )
 
 func MockTerraform(t *testing.T) *terraform {
-	ui2.MockGlobalUi(t, ui2.UiOptions{NoColor: true, Debug: true})
+	ui.MockGlobalUi(t, ui.UiOptions{NoColor: true, Debug: true})
 
 	tmpDir := t.TempDir()
 
@@ -51,20 +51,20 @@ func MockInvalidTerraform(t *testing.T) *terraform {
 }
 
 func TestNewTerraformProvisioner(t *testing.T) {
-	hosts := []modelconfig2.Host{
-		modelconfig2.MockLocalHost(t, "test1", false),
-		modelconfig2.MockLocalHost(t, "test2", true),
-		modelconfig2.MockRemoteHost(t, "test3", false, false),
+	hosts := []modelconfig.Host{
+		modelconfig.MockLocalHost(t, "test1", false),
+		modelconfig.MockLocalHost(t, "test2", true),
+		modelconfig.MockRemoteHost(t, "test3", false, false),
 	}
 
-	cfg := modelconfig2.Config{Hosts: hosts}
+	cfg := modelconfig.Config{Hosts: hosts}
 
 	prov := NewTerraformProvisioner(clsPath(t), "shared/path", true, &cfg)
 	assert.NoError(t, prov.Init())
 }
 
 func TestNewTerraformProvisioner_InvalidHosts(t *testing.T) {
-	cfg := modelconfig2.Config{}
+	cfg := modelconfig.Config{}
 
 	prov := NewTerraformProvisioner(clsPath(t), "shared/path", true, &cfg)
 	assert.ErrorContains(t, prov.Init(), "hosts list is empty")

@@ -2,9 +2,9 @@ package kubespray
 
 import (
 	"fmt"
-	event2 "github.com/MusicDin/kubitect/cli/pkg/cluster/event"
+	"github.com/MusicDin/kubitect/cli/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/cli/pkg/cluster/executors"
-	modelconfig2 "github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/cli/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/cli/pkg/config/modelinfra"
 	"github.com/MusicDin/kubitect/cli/pkg/env"
 	"github.com/MusicDin/kubitect/cli/pkg/tools/ansible"
@@ -32,10 +32,10 @@ func (a *invalidAnsibleMock) Exec(ansible.Playbook) error { return fmt.Errorf("e
 func MockExecutor(t *testing.T) *kubespray {
 	tmpDir := t.TempDir()
 
-	cfg := &modelconfig2.Config{}
+	cfg := &modelconfig.Config{}
 	cfg.Kubernetes.Version = env.ConstKubernetesVersion
-	cfg.Cluster.NodeTemplate.User = modelconfig2.User("test")
-	cfg.Cluster.NodeTemplate.SSH.PrivateKeyPath = modelconfig2.File(path.Join(tmpDir, ".ssh", "id_rsa"))
+	cfg.Cluster.NodeTemplate.User = modelconfig.User("test")
+	cfg.Cluster.NodeTemplate.SSH.PrivateKeyPath = modelconfig.File(path.Join(tmpDir, ".ssh", "id_rsa"))
 
 	iCfg := &modelinfra.Config{}
 
@@ -57,7 +57,7 @@ func MockInvalidExecutor(t *testing.T) executors.Executor {
 	return ks
 }
 
-func MockEvents(t *testing.T, obj interface{}, eType event2.EventType) []event2.Event {
+func MockEvents(t *testing.T, obj interface{}, eType event.EventType) []event.Event {
 	changes := []cmp.Change{
 		{
 			Type:   reflect.TypeOf(obj),
@@ -66,8 +66,8 @@ func MockEvents(t *testing.T, obj interface{}, eType event2.EventType) []event2.
 		},
 	}
 
-	return []event2.Event{
-		event2.MockEvent(t, eType, changes),
+	return []event.Event{
+		event.MockEvent(t, eType, changes),
 	}
 }
 
@@ -79,7 +79,7 @@ func TestNewExecutor(t *testing.T) {
 		path.Join(tmpDir, clsName),
 		path.Join(tmpDir, "id_rsa"),
 		path.Join(tmpDir, "config"),
-		&modelconfig2.Config{},
+		&modelconfig.Config{},
 		&modelinfra.Config{},
 		&virtualEnvMock{},
 	)
@@ -109,23 +109,23 @@ func TestCreateAndUpgrade_Invalid(t *testing.T) {
 }
 
 func TestExtractRemovedNodes(t *testing.T) {
-	w := modelconfig2.WorkerInstance{
+	w := modelconfig.WorkerInstance{
 		Id: "worker",
 	}
 
-	events := MockEvents(t, w, event2.SCALE_DOWN)
+	events := MockEvents(t, w, event.SCALE_DOWN)
 
 	rmNodes, err := extractRemovedNodes(events)
 	assert.NoError(t, err)
-	assert.ElementsMatch(t, []modelconfig2.Instance{w}, rmNodes)
+	assert.ElementsMatch(t, []modelconfig.Instance{w}, rmNodes)
 }
 
 func TestScaleDown(t *testing.T) {
-	w := modelconfig2.WorkerInstance{
+	w := modelconfig.WorkerInstance{
 		Id: "worker",
 	}
 
-	events := MockEvents(t, w, event2.SCALE_DOWN)
+	events := MockEvents(t, w, event.SCALE_DOWN)
 
 	err := MockExecutor(t).ScaleDown(events)
 	assert.NoError(t, err)
@@ -137,18 +137,18 @@ func TestScaleDown_NoEvents(t *testing.T) {
 }
 
 func TestScaleDown_InvalidEvent(t *testing.T) {
-	events := MockEvents(t, modelconfig2.Host{}, event2.SCALE_DOWN)
+	events := MockEvents(t, modelconfig.Host{}, event.SCALE_DOWN)
 
 	err := MockExecutor(t).ScaleDown(events)
 	assert.EqualError(t, err, "Host cannot be scaled")
 }
 
 func TestScaleUp(t *testing.T) {
-	w := modelconfig2.WorkerInstance{
+	w := modelconfig.WorkerInstance{
 		Id: "worker",
 	}
 
-	events := MockEvents(t, w, event2.SCALE_UP)
+	events := MockEvents(t, w, event.SCALE_UP)
 
 	err := MockExecutor(t).ScaleUp(events)
 	assert.NoError(t, err)

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	app2 "github.com/MusicDin/kubitect/cli/pkg/app"
+	"github.com/MusicDin/kubitect/cli/pkg/app"
 	"github.com/MusicDin/kubitect/cli/pkg/cluster"
 	"os"
 	"path"
@@ -17,8 +17,8 @@ import (
 func MockMetaClusters(t *testing.T, names []string) MetaClusters {
 	t.Helper()
 
-	ctxOptions := app2.AppContextOptions{Local: false}
-	ctx := app2.MockAppContext(t, ctxOptions)
+	ctxOptions := app.AppContextOptions{Local: false}
+	ctx := app.MockAppContext(t, ctxOptions)
 
 	var clusters MetaClusters
 	for _, clsName := range names {
@@ -92,7 +92,7 @@ func TestAllClusters(t *testing.T) {
 }
 
 func TestAllClusters_InvalidClustersDir(t *testing.T) {
-	cs, err := AllClusters(app2.MockAppContext(t))
+	cs, err := AllClusters(app.MockAppContext(t))
 	assert.ErrorContains(t, err, "failed to read clusters directory")
 	assert.Empty(t, cs)
 }

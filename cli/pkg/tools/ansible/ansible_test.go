@@ -1,7 +1,7 @@
 package ansible
 
 import (
-	ui2 "github.com/MusicDin/kubitect/cli/pkg/ui"
+	"github.com/MusicDin/kubitect/cli/pkg/ui"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -75,7 +75,7 @@ func TestAnsible_InvalidBinPath(t *testing.T) {
 func TestAnsible_InvalidBinPath2(t *testing.T) {
 	a := NewAnsible(t.TempDir())
 
-	ui2.MockGlobalUi(t, ui2.UiOptions{Debug: true, NoColor: true})
+	ui.MockGlobalUi(t, ui.UiOptions{Debug: true, NoColor: true})
 
 	pb := Playbook{
 		Path:      "pb.yaml",

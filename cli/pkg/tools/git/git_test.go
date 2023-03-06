@@ -2,7 +2,7 @@ package git
 
 import (
 	"github.com/MusicDin/kubitect/cli/pkg/env"
-	ui2 "github.com/MusicDin/kubitect/cli/pkg/ui"
+	"github.com/MusicDin/kubitect/cli/pkg/ui"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,7 +15,7 @@ func TestNewGit(t *testing.T) {
 }
 
 func TestClone_Branch(t *testing.T) {
-	u := ui2.MockGlobalUi(t)
+	u := ui.MockGlobalUi(t)
 	p := NewGitProject(env.ConstProjectUrl, "master")
 
 	assert.NoError(t, p.Clone(t.TempDir()))
@@ -23,8 +23,8 @@ func TestClone_Branch(t *testing.T) {
 }
 
 func TestClone_Version(t *testing.T) {
-	o := ui2.UiOptions{Debug: true}
-	u := ui2.MockGlobalUi(t, o)
+	o := ui.UiOptions{Debug: true}
+	u := ui.MockGlobalUi(t, o)
 	p := NewGitProject(env.ConstProjectUrl, "v2.0.0")
 
 	assert.NoError(t, p.Clone(t.TempDir()))
