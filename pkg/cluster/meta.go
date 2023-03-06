@@ -1,12 +1,13 @@
 package cluster
 
 import (
+	"path/filepath"
+
 	"github.com/MusicDin/kubitect/pkg/app"
 	"github.com/MusicDin/kubitect/pkg/cluster/executors"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner/terraform"
 	"github.com/MusicDin/kubitect/pkg/utils/file"
-	"path/filepath"
 )
 
 const (

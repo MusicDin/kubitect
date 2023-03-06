@@ -1,11 +1,12 @@
 package virtualenv
 
 import (
-	"github.com/MusicDin/kubitect/pkg/ui"
 	"io/ioutil"
 	"os"
 	"path"
 	"testing"
+
+	"github.com/MusicDin/kubitect/pkg/ui"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -2,11 +2,12 @@ package event
 
 import (
 	"fmt"
-	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
-	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 
 	"github.com/stretchr/testify/assert"
 )

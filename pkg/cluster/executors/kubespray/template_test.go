@@ -1,9 +1,10 @@
 package kubespray
 
 import (
+	"testing"
+
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/pkg/utils/template"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )

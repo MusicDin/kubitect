@@ -1,9 +1,10 @@
 package app
 
 import (
-	"github.com/MusicDin/kubitect/pkg/ui"
 	"path"
 	"testing"
+
+	"github.com/MusicDin/kubitect/pkg/ui"
 )
 
 type (

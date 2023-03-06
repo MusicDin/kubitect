@@ -1,8 +1,6 @@
 package defaults
 
-import (
-	def "github.com/creasty/defaults"
-)
+import def "github.com/creasty/defaults"
 
 // Set sets default values for the structure on a
 // given pointer and returns a potential error.

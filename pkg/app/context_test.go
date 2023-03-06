@@ -1,10 +1,11 @@
 package app
 
 import (
-	"github.com/MusicDin/kubitect/pkg/env"
 	"os"
 	"path"
 	"testing"
+
+	"github.com/MusicDin/kubitect/pkg/env"
 
 	"github.com/stretchr/testify/assert"
 )

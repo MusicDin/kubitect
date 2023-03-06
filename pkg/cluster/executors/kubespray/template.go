@@ -1,9 +1,10 @@
 package kubespray
 
 import (
+	"path"
+
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/pkg/utils/template"
-	"path"
 )
 
 const groupVarsDir = "group_vars"

@@ -3,10 +3,11 @@ package ansible
 import (
 	"context"
 	"fmt"
-	"github.com/MusicDin/kubitect/pkg/ui"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/MusicDin/kubitect/pkg/ui"
 
 	"github.com/apenella/go-ansible/pkg/execute"
 	"github.com/apenella/go-ansible/pkg/options"

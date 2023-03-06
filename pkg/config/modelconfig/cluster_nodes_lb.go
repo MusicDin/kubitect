@@ -2,7 +2,7 @@ package modelconfig
 
 import (
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
-	"github.com/MusicDin/kubitect/pkg/utils/validation"
+	v "github.com/MusicDin/kubitect/pkg/utils/validation"
 )
 
 var (
@@ -17,10 +17,10 @@ type LBDefault struct {
 }
 
 func (def LBDefault) Validate() error {
-	return validation.Struct(&def,
-		validation.Field(&def.CPU),
-		validation.Field(&def.RAM),
-		validation.Field(&def.MainDiskSize),
+	return v.Struct(&def,
+		v.Field(&def.CPU),
+		v.Field(&def.RAM),
+		v.Field(&def.MainDiskSize),
 	)
 }
 
@@ -39,16 +39,16 @@ type LB struct {
 }
 
 func (lb LB) Validate() error {
-	return validation.Struct(&lb,
-		validation.Field(&lb.VIP,
-			validation.NotEmpty().When(len(lb.Instances) > 1).Error("Virtual IP (VIP) is required when multiple load balancer instances are configured."),
-			validation.OmitEmpty(),
-			validation.Custom(IP_IN_CIDR),
+	return v.Struct(&lb,
+		v.Field(&lb.VIP,
+			v.NotEmpty().When(len(lb.Instances) > 1).Error("Virtual IP (VIP) is required when multiple load balancer instances are configured."),
+			v.OmitEmpty(),
+			v.Custom(IP_IN_CIDR),
 		),
-		validation.Field(&lb.VirtualRouterId),
-		validation.Field(&lb.Default),
-		validation.Field(&lb.Instances, validation.UniqueField("Id")),
-		validation.Field(&lb.ForwardPorts),
+		v.Field(&lb.VirtualRouterId),
+		v.Field(&lb.Default),
+		v.Field(&lb.Instances, v.UniqueField("Id")),
+		v.Field(&lb.ForwardPorts),
 	)
 }
 
@@ -76,11 +76,11 @@ type LBPortForward struct {
 }
 
 func (pf LBPortForward) Validate() error {
-	return validation.Struct(&pf,
-		validation.Field(&pf.Name, validation.NotEmpty(), validation.AlphaNumericHypUS()),
-		validation.Field(&pf.Port, validation.NotEmpty()),
-		validation.Field(&pf.TargetPort),
-		validation.Field(&pf.Target),
+	return v.Struct(&pf,
+		v.Field(&pf.Name, v.NotEmpty(), v.AlphaNumericHypUS()),
+		v.Field(&pf.Port, v.NotEmpty()),
+		v.Field(&pf.TargetPort),
+		v.Field(&pf.Target),
 	)
 }
 
@@ -98,7 +98,7 @@ const (
 )
 
 func (pft LBPortForwardTarget) Validate() error {
-	return validation.Var(pft, validation.OmitEmpty(), validation.OneOf(WORKERS, MASTERS, ALL))
+	return v.Var(pft, v.OmitEmpty(), v.OneOf(WORKERS, MASTERS, ALL))
 }
 
 type LBInstance struct {
@@ -130,14 +130,14 @@ func (i LBInstance) GetMAC() MAC {
 }
 
 func (i LBInstance) Validate() error {
-	return validation.Struct(&i,
-		validation.Field(&i.Id, validation.NotEmpty(), validation.AlphaNumericHypUS()),
-		validation.Field(&i.Host, validation.OmitEmpty(), validation.Custom(VALID_HOST)),
-		validation.Field(&i.IP, validation.OmitEmpty(), validation.Custom(IP_IN_CIDR)),
-		validation.Field(&i.MAC, validation.OmitEmpty()),
-		validation.Field(&i.CPU),
-		validation.Field(&i.RAM),
-		validation.Field(&i.MainDiskSize),
-		validation.Field(&i.Priority),
+	return v.Struct(&i,
+		v.Field(&i.Id, v.NotEmpty(), v.AlphaNumericHypUS()),
+		v.Field(&i.Host, v.OmitEmpty(), v.Custom(VALID_HOST)),
+		v.Field(&i.IP, v.OmitEmpty(), v.Custom(IP_IN_CIDR)),
+		v.Field(&i.MAC, v.OmitEmpty()),
+		v.Field(&i.CPU),
+		v.Field(&i.RAM),
+		v.Field(&i.MainDiskSize),
+		v.Field(&i.Priority),
 	)
 }

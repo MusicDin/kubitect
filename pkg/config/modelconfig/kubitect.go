@@ -1,8 +1,6 @@
 package modelconfig
 
-import (
-	"github.com/MusicDin/kubitect/pkg/utils/validation"
-)
+import v "github.com/MusicDin/kubitect/pkg/utils/validation"
 
 type Kubitect struct {
 	Url     URL           `yaml:"url,omitempty"`
@@ -10,8 +8,8 @@ type Kubitect struct {
 }
 
 func (k Kubitect) Validate() error {
-	return validation.Struct(&k,
-		validation.Field(&k.Url, validation.OmitEmpty()),
-		validation.Field(&k.Version, validation.OmitEmpty()),
+	return v.Struct(&k,
+		v.Field(&k.Url, v.OmitEmpty()),
+		v.Field(&k.Version, v.OmitEmpty()),
 	)
 }

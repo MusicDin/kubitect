@@ -1,8 +1,9 @@
 package ui
 
 import (
-	"github.com/MusicDin/kubitect/pkg/ui/streams"
 	"strings"
+
+	"github.com/MusicDin/kubitect/pkg/ui/streams"
 )
 
 // format formats given string into multiple lines that fit the

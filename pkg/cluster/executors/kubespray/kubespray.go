@@ -2,6 +2,9 @@ package kubespray
 
 import (
 	"fmt"
+	"os"
+	"path"
+
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/pkg/cluster/executors"
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
@@ -11,8 +14,6 @@ import (
 	"github.com/MusicDin/kubitect/pkg/tools/git"
 	"github.com/MusicDin/kubitect/pkg/tools/virtualenv"
 	"github.com/MusicDin/kubitect/pkg/ui"
-	"os"
-	"path"
 )
 
 type kubespray struct {

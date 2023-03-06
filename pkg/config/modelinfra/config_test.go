@@ -1,8 +1,9 @@
 package modelinfra
 
 import (
-	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"testing"
+
+	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 
 	"github.com/stretchr/testify/assert"
 )

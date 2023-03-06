@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/MusicDin/kubitect/pkg/app"
 	"github.com/MusicDin/kubitect/pkg/utils/file"
-	"os"
 
 	"github.com/spf13/cobra"
 )

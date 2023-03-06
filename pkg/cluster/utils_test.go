@@ -1,11 +1,12 @@
 package cluster
 
 import (
-	v "github.com/MusicDin/kubitect/pkg/utils/validation"
 	"io/ioutil"
 	"os"
 	"path"
 	"testing"
+
+	v "github.com/MusicDin/kubitect/pkg/utils/validation"
 
 	"github.com/stretchr/testify/assert"
 )

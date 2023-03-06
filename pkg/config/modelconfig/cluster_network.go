@@ -2,7 +2,7 @@ package modelconfig
 
 import (
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
-	"github.com/MusicDin/kubitect/pkg/utils/validation"
+	v "github.com/MusicDin/kubitect/pkg/utils/validation"
 )
 
 type NetworkMode string
@@ -14,7 +14,7 @@ const (
 )
 
 func (mode NetworkMode) Validate() error {
-	return validation.Var(mode, validation.OneOf(NAT, ROUTE, BRIDGE))
+	return v.Var(mode, v.OneOf(NAT, ROUTE, BRIDGE))
 }
 
 type Network struct {
@@ -25,11 +25,11 @@ type Network struct {
 }
 
 func (n Network) Validate() error {
-	return validation.Struct(&n,
-		validation.Field(&n.CIDR, validation.NotEmpty()),
-		validation.Field(&n.Gateway),
-		validation.Field(&n.Mode),
-		validation.Field(&n.Bridge, validation.NotEmpty().When(n.Mode == BRIDGE).Errorf("Field '{.Field}' is required when network mode is set to '%v'.", BRIDGE)),
+	return v.Struct(&n,
+		v.Field(&n.CIDR, v.NotEmpty()),
+		v.Field(&n.Gateway),
+		v.Field(&n.Mode),
+		v.Field(&n.Bridge, v.NotEmpty().When(n.Mode == BRIDGE).Errorf("Field '{.Field}' is required when network mode is set to '%v'.", BRIDGE)),
 	)
 }
 
@@ -40,9 +40,9 @@ func (n *Network) SetDefaults() {
 type NetworkBridge string
 
 func (br NetworkBridge) Validate() error {
-	return validation.Var(br,
-		validation.OmitEmpty(),
-		validation.AlphaNumeric(),
-		validation.MaxLen(16),
+	return v.Var(br,
+		v.OmitEmpty(),
+		v.AlphaNumeric(),
+		v.MaxLen(16),
 	)
 }

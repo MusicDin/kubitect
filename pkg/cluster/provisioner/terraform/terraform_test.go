@@ -1,13 +1,14 @@
 package terraform
 
 import (
-	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
-	"github.com/MusicDin/kubitect/pkg/env"
-	"github.com/MusicDin/kubitect/pkg/ui"
 	"io/ioutil"
 	"os"
 	"path"
 	"testing"
+
+	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/pkg/env"
+	"github.com/MusicDin/kubitect/pkg/ui"
 
 	"github.com/stretchr/testify/assert"
 )

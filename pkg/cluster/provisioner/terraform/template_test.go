@@ -2,10 +2,11 @@ package terraform
 
 import (
 	"fmt"
-	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -6,8 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TEST DATA
-
 type SimpleStruct struct {
 	Field string `yaml:"wrong" opt:"name"`
 }
@@ -40,8 +38,6 @@ func (ie Elem) Validate() error {
 		Field(&ie.A, Required()),
 	)
 }
-
-// TESTS
 
 func TestErrorFieldIsNotPointer(t *testing.T) {
 	test := SimpleStruct{}

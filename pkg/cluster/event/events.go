@@ -1,8 +1,6 @@
 package event
 
-import (
-	"github.com/MusicDin/kubitect/pkg/utils/cmp"
-)
+import "github.com/MusicDin/kubitect/pkg/utils/cmp"
 
 type EventType string
 

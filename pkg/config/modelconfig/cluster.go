@@ -1,8 +1,6 @@
 package modelconfig
 
-import (
-	"github.com/MusicDin/kubitect/pkg/utils/validation"
-)
+import v "github.com/MusicDin/kubitect/pkg/utils/validation"
 
 type Cluster struct {
 	Name         string       `yaml:"name"`
@@ -12,17 +10,17 @@ type Cluster struct {
 }
 
 func (c Cluster) Validate() error {
-	return validation.Struct(&c,
-		validation.Field(&c.Name, validation.NotEmpty(), validation.AlphaNumericHyp()),
-		validation.Field(&c.Network),
-		validation.Field(&c.Nodes, c.uniqueIpValidator(), c.uniqueMacValidator()),
-		validation.Field(&c.NodeTemplate),
+	return v.Struct(&c,
+		v.Field(&c.Name, v.NotEmpty(), v.AlphaNumericHyp()),
+		v.Field(&c.Network),
+		v.Field(&c.Nodes, c.uniqueIpValidator(), c.uniqueMacValidator()),
+		v.Field(&c.NodeTemplate),
 	)
 }
 
 // uniqueIpValidator returns a validator that triggers an error if multiple nodes
 // are assigned the same IP address.
-func (c Cluster) uniqueIpValidator() validation.Validator {
+func (c Cluster) uniqueIpValidator() v.Validator {
 	var duplicates []string
 
 	ips := c.Nodes.IPs()
@@ -36,15 +34,15 @@ func (c Cluster) uniqueIpValidator() validation.Validator {
 	}
 
 	if len(duplicates) == 0 {
-		return validation.None
+		return v.None
 	}
 
-	return validation.Fail().Errorf("IP address of each node instance (including VIP) must be unique. (duplicates: %v)", duplicates)
+	return v.Fail().Errorf("IP address of each node instance (including VIP) must be unique. (duplicates: %v)", duplicates)
 }
 
 // uniqueMacValidator returns a validator that triggers an error if multiple nodes
 // are assigned the same MAC address.
-func (c Cluster) uniqueMacValidator() validation.Validator {
+func (c Cluster) uniqueMacValidator() v.Validator {
 	var duplicates []string
 
 	macs := c.Nodes.MACs()
@@ -58,8 +56,8 @@ func (c Cluster) uniqueMacValidator() validation.Validator {
 	}
 
 	if len(duplicates) == 0 {
-		return validation.None
+		return v.None
 	}
 
-	return validation.Fail().Errorf("MAC address of each node instance must be unique. (duplicates: %v)", duplicates)
+	return v.Fail().Errorf("MAC address of each node instance must be unique. (duplicates: %v)", duplicates)
 }

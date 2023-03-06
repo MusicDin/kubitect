@@ -2,9 +2,10 @@ package virtualenv
 
 import (
 	"fmt"
-	"github.com/MusicDin/kubitect/pkg/ui"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/MusicDin/kubitect/pkg/ui"
 )
 
 type (

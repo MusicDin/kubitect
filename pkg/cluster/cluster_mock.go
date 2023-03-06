@@ -1,16 +1,17 @@
 package cluster
 
 import (
+	"io/ioutil"
+	"os"
+	"path"
+	"testing"
+
 	"github.com/MusicDin/kubitect/pkg/app"
 	"github.com/MusicDin/kubitect/pkg/cluster/executors"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/pkg/ui"
 	"github.com/MusicDin/kubitect/pkg/utils/template"
-	"io/ioutil"
-	"os"
-	"path"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
