@@ -1,9 +1,5 @@
 kubitect
 ========
-
-Command line tool writen in Golang that lets you set up, upgrade, scale, and destroy Kubernetes clusters via the command
-line.
-
 ### Installation
 
 A valid installation of [Go](https://go.dev/doc/install) is required. This installs the latest stable version of

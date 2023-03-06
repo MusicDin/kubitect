@@ -32,3 +32,4 @@ versions.tf.save
 /downloads/
 /utils/
 /dev/
+.idea

@@ -28,6 +28,14 @@ It is recommended to use official releases, as unreleased versions from the mast
 
 </br>
 
+### Installation
+
+```bash
+go install github.com/MusicDin/kubitect/cli/cmd/kubitect@latest
+```
+
+</br>
+
 ### Authors
 
 [Din Mušić](https://github.com/MusicDin) and [all contributors](https://github.com/MusicDin/kubitect/graphs/contributors).
