@@ -1,9 +1,10 @@
 package modelconfig
 
 import (
+	"testing"
+
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -61,13 +62,4 @@ func TestDefault(t *testing.T) {
 	k := Kubernetes{}
 	assert.NoError(t, defaults.Set(&k))
 	assert.Equal(t, COREDNS, k.DnsMode)
-}
-
-func TestDefault_Fail(t *testing.T) {
-	dns := KUBEDNS
-	k := Kubernetes{
-		DnsMode: dns,
-	}
-	assert.NoError(t, defaults.Set(&k))
-	assert.Equal(t, KUBEDNS, k.DnsMode)
 }

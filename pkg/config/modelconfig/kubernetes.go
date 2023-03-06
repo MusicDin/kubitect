@@ -2,6 +2,7 @@ package modelconfig
 
 import (
 	"fmt"
+
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
 	"github.com/MusicDin/kubitect/pkg/utils/validation"
@@ -49,11 +50,10 @@ type DnsMode string
 
 const (
 	COREDNS DnsMode = "coredns"
-	KUBEDNS DnsMode = "kubedns"
 )
 
 func (m DnsMode) Validate() error {
-	return validation.Var(m, validation.OneOf(COREDNS, KUBEDNS))
+	return validation.Var(m, validation.OneOf(COREDNS))
 }
 
 type NetworkPlugin string
