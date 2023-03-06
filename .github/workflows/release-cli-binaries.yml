@@ -5,7 +5,7 @@ on:
     types: [ published ]
 
 env:
-  CLI_PATH: ./cli
+  CLI_PATH: .
 
 jobs:
   releases-matrix:

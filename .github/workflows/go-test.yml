@@ -11,7 +11,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v3
       with:
-        go-version-file: "cli/go.mod"
+        go-version-file: "go.mod"
     - name: Install Python
       uses: actions/setup-python@v4
       with:
@@ -21,6 +21,5 @@ jobs:
         pip install --upgrade virtualenv
     - name: Run Go Tests
       run: |
-        cd cli
         go test ./... -v 
     
