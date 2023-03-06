@@ -5,7 +5,7 @@ on:
     types: [ published ]
 
 env:
-  CLI_PATH: ./cli/cmd/kubitect
+  CLI_PATH: .
 
 jobs:
   releases-matrix:
