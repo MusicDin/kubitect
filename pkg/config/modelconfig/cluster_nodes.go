@@ -1,7 +1,7 @@
 package modelconfig
 
 import (
-	"github.com/MusicDin/kubitect/pkg/utils/validation"
+	v "github.com/MusicDin/kubitect/pkg/utils/validation"
 )
 
 const (
@@ -24,29 +24,29 @@ type Nodes struct {
 }
 
 func (n Nodes) Validate() error {
-	defer validation.RemoveCustomValidator(LB_REQUIRED)
+	defer v.RemoveCustomValidator(LB_REQUIRED)
 
-	validation.RegisterCustomValidator(LB_REQUIRED, n.isLBRequiredValidator())
+	v.RegisterCustomValidator(LB_REQUIRED, n.isLBRequiredValidator())
 
-	return validation.Struct(&n,
-		validation.Field(&n.LoadBalancer),
-		validation.Field(&n.Master),
-		validation.Field(&n.Worker),
+	return v.Struct(&n,
+		v.Field(&n.LoadBalancer),
+		v.Field(&n.Master),
+		v.Field(&n.Worker),
 	)
 }
 
 // isLBRequired is a cross-validator that triggers an error when multiple master
 // nodes are configured, but the load balancer is not.
-func (n Nodes) isLBRequiredValidator() validation.Validator {
+func (n Nodes) isLBRequiredValidator() v.Validator {
 	if len(n.Master.Instances) <= 1 {
-		return validation.None
+		return v.None
 	}
 
 	if len(n.LoadBalancer.Instances) == 0 {
-		return validation.Fail().Error("At least one load balancer instance is required when multiple master instances are configured.")
+		return v.Fail().Error("At least one load balancer instance is required when multiple master instances are configured.")
 	}
 
-	return validation.None
+	return v.None
 }
 
 func (n Nodes) Instances() []Instance {

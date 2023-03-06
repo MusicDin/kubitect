@@ -2,9 +2,10 @@ package git
 
 import (
 	"fmt"
-	"github.com/MusicDin/kubitect/pkg/ui"
 	"os"
 	"regexp"
+
+	"github.com/MusicDin/kubitect/pkg/ui"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"

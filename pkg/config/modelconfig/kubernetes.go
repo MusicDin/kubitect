@@ -5,7 +5,7 @@ import (
 
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
-	"github.com/MusicDin/kubitect/pkg/utils/validation"
+	v "github.com/MusicDin/kubitect/pkg/utils/validation"
 )
 
 type Kubernetes struct {
@@ -16,11 +16,11 @@ type Kubernetes struct {
 }
 
 func (k Kubernetes) Validate() error {
-	return validation.Struct(&k,
-		validation.Field(&k.Version, validation.NotEmpty()),
-		validation.Field(&k.DnsMode, validation.NotEmpty()),
-		validation.Field(&k.NetworkPlugin, validation.NotEmpty()),
-		validation.Field(&k.Other),
+	return v.Struct(&k,
+		v.Field(&k.Version, v.NotEmpty()),
+		v.Field(&k.DnsMode, v.NotEmpty()),
+		v.Field(&k.NetworkPlugin, v.NotEmpty()),
+		v.Field(&k.Other),
 	)
 }
 
@@ -43,7 +43,7 @@ func (ver KubernetesVersion) Validate() error {
 	msg := fmt.Sprintf("Unsupported Kubernetes version (%s).", ver)
 	msg += fmt.Sprintf("Supported versions are: %v", env.ProjectK8sVersions)
 
-	return validation.Var(ver, validation.RegexAny(rs...).Error(msg))
+	return v.Var(ver, v.RegexAny(rs...).Error(msg))
 }
 
 type DnsMode string
@@ -53,7 +53,7 @@ const (
 )
 
 func (m DnsMode) Validate() error {
-	return validation.Var(m, validation.OneOf(COREDNS))
+	return v.Var(m, v.OneOf(COREDNS))
 }
 
 type NetworkPlugin string
@@ -68,7 +68,7 @@ const (
 )
 
 func (p NetworkPlugin) Validate() error {
-	return validation.Var(p, validation.OneOf(CALICO, CILIUM, CANAL, FLANNEL, WEAVE, KUBE_ROUTER))
+	return v.Var(p, v.OneOf(CALICO, CILIUM, CANAL, FLANNEL, WEAVE, KUBE_ROUTER))
 }
 
 type Other struct {

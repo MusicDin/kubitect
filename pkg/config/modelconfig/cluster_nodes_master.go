@@ -2,7 +2,7 @@ package modelconfig
 
 import (
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
-	"github.com/MusicDin/kubitect/pkg/utils/validation"
+	v "github.com/MusicDin/kubitect/pkg/utils/validation"
 )
 
 type MasterDefault struct {
@@ -15,13 +15,13 @@ type MasterDefault struct {
 }
 
 func (d MasterDefault) Validate() error {
-	return validation.Struct(&d,
-		validation.Field(&d.CPU),
-		validation.Field(&d.RAM),
-		validation.Field(&d.MainDiskSize),
-		validation.Field(&d.Labels),
-		validation.Field(&d.Taints),
-		validation.Field(&d.DataDisks, validation.OmitEmpty(), validation.UniqueField("Name")),
+	return v.Struct(&d,
+		v.Field(&d.CPU),
+		v.Field(&d.RAM),
+		v.Field(&d.MainDiskSize),
+		v.Field(&d.Labels),
+		v.Field(&d.Taints),
+		v.Field(&d.DataDisks, v.OmitEmpty(), v.UniqueField("Name")),
 	)
 }
 
@@ -37,13 +37,13 @@ type Master struct {
 }
 
 func (m Master) Validate() error {
-	return validation.Struct(&m,
-		validation.Field(&m.Default),
-		validation.Field(&m.Instances,
-			validation.MinLen(1).Error("At least one master instance must be configured."),
-			validation.Fail().When(len(m.Instances)%2 == 0).Error("Number of master instances must be odd (1, 3, 5 etc.)."),
-			validation.UniqueField("Id"),
-			validation.Custom(LB_REQUIRED),
+	return v.Struct(&m,
+		v.Field(&m.Default),
+		v.Field(&m.Instances,
+			v.MinLen(1).Error("At least one master instance must be configured."),
+			v.Fail().When(len(m.Instances)%2 == 0).Error("Number of master instances must be odd (1, 3, 5 etc.)."),
+			v.UniqueField("Id"),
+			v.Custom(LB_REQUIRED),
 		),
 	)
 }
@@ -88,20 +88,20 @@ func (i MasterInstance) GetMAC() MAC {
 }
 
 func (i MasterInstance) Validate() error {
-	defer validation.RemoveCustomValidator(VALID_POOL)
+	defer v.RemoveCustomValidator(VALID_POOL)
 
-	validation.RegisterCustomValidator(VALID_POOL, poolNameValidator(i.Host))
+	v.RegisterCustomValidator(VALID_POOL, poolNameValidator(i.Host))
 
-	return validation.Struct(&i,
-		validation.Field(&i.Id, validation.NotEmpty(), validation.AlphaNumericHypUS()),
-		validation.Field(&i.Host, validation.OmitEmpty(), validation.Custom(VALID_HOST)),
-		validation.Field(&i.IP, validation.OmitEmpty(), validation.Custom(IP_IN_CIDR)),
-		validation.Field(&i.MAC, validation.OmitEmpty()),
-		validation.Field(&i.CPU),
-		validation.Field(&i.RAM),
-		validation.Field(&i.MainDiskSize),
-		validation.Field(&i.DataDisks, validation.OmitEmpty(), validation.UniqueField("Name")),
-		validation.Field(&i.Labels),
-		validation.Field(&i.Taints),
+	return v.Struct(&i,
+		v.Field(&i.Id, v.NotEmpty(), v.AlphaNumericHypUS()),
+		v.Field(&i.Host, v.OmitEmpty(), v.Custom(VALID_HOST)),
+		v.Field(&i.IP, v.OmitEmpty(), v.Custom(IP_IN_CIDR)),
+		v.Field(&i.MAC, v.OmitEmpty()),
+		v.Field(&i.CPU),
+		v.Field(&i.RAM),
+		v.Field(&i.MainDiskSize),
+		v.Field(&i.DataDisks, v.OmitEmpty(), v.UniqueField("Name")),
+		v.Field(&i.Labels),
+		v.Field(&i.Taints),
 	)
 }

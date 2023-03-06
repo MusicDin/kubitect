@@ -2,6 +2,10 @@ package cluster
 
 import (
 	"fmt"
+	"os"
+	"path"
+	"path/filepath"
+
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/tools/git"
@@ -9,9 +13,6 @@ import (
 	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 	"github.com/MusicDin/kubitect/pkg/utils/file"
 	"github.com/MusicDin/kubitect/pkg/utils/keygen"
-	"os"
-	"path"
-	"path/filepath"
 )
 
 type ApplyAction string

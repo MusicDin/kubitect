@@ -1,8 +1,6 @@
 package cmd
 
-import (
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 var (
 	exportShort = "Export specific configuration file"

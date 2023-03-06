@@ -1,9 +1,10 @@
 package ui
 
 import (
-	"github.com/MusicDin/kubitect/pkg/ui/streams"
 	"os"
 	"testing"
+
+	"github.com/MusicDin/kubitect/pkg/ui/streams"
 
 	"github.com/stretchr/testify/assert"
 )

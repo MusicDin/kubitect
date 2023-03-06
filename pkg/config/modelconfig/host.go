@@ -2,7 +2,7 @@ package modelconfig
 
 import (
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
-	"github.com/MusicDin/kubitect/pkg/utils/validation"
+	v "github.com/MusicDin/kubitect/pkg/utils/validation"
 )
 
 const (
@@ -18,11 +18,11 @@ type Host struct {
 }
 
 func (h Host) Validate() error {
-	return validation.Struct(&h,
-		validation.Field(&h.Name, validation.NotEmpty(), validation.AlphaNumericHypUS()),
-		validation.Field(&h.Connection),
-		validation.Field(&h.MainResourcePoolPath), // TODO: validate dir path which does not have to exist
-		validation.Field(&h.DataResourcePools, validation.UniqueField("Name")),
+	return v.Struct(&h,
+		v.Field(&h.Name, v.NotEmpty(), v.AlphaNumericHypUS()),
+		v.Field(&h.Connection),
+		v.Field(&h.MainResourcePoolPath), // TODO: validate dir path which does not have to exist
+		v.Field(&h.DataResourcePools, v.UniqueField("Name")),
 	)
 }
 
@@ -36,9 +36,9 @@ type DataResourcePool struct {
 }
 
 func (rp DataResourcePool) Validate() error {
-	return validation.Struct(&rp,
-		validation.Field(&rp.Name, validation.NotEmpty(), validation.AlphaNumericHyp()),
-		validation.Field(&rp.Path, validation.NotEmpty()), // TODO: Valid file path. File does not need to exist.
+	return v.Struct(&rp,
+		v.Field(&rp.Name, v.NotEmpty(), v.AlphaNumericHyp()),
+		v.Field(&rp.Path, v.NotEmpty()), // TODO: Valid file path. File does not need to exist.
 	)
 }
 

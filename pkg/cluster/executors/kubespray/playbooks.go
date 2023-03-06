@@ -1,9 +1,10 @@
 package kubespray
 
 import (
-	"github.com/MusicDin/kubitect/pkg/tools/ansible"
 	"path/filepath"
 	"strings"
+
+	"github.com/MusicDin/kubitect/pkg/tools/ansible"
 )
 
 type PlaybookTag string

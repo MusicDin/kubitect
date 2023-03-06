@@ -23,7 +23,6 @@ func TestKubernetesVersion(t *testing.T) {
 func TestDnsMode(t *testing.T) {
 	assert.Error(t, DnsMode("").Validate())
 	assert.Error(t, DnsMode("wrong").Validate())
-	assert.NoError(t, DnsMode("kubedns").Validate())
 	assert.NoError(t, DnsMode("coredns").Validate())
 }
 

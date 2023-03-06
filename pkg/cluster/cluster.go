@@ -2,6 +2,11 @@ package cluster
 
 import (
 	"fmt"
+	"os"
+	"path"
+	"path/filepath"
+	"strings"
+
 	"github.com/MusicDin/kubitect/pkg/app"
 	"github.com/MusicDin/kubitect/pkg/cluster/executors"
 	"github.com/MusicDin/kubitect/pkg/cluster/executors/kubespray"
@@ -14,10 +19,6 @@ import (
 	"github.com/MusicDin/kubitect/pkg/ui"
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
 	"github.com/MusicDin/kubitect/pkg/utils/file"
-	"os"
-	"path"
-	"path/filepath"
-	"strings"
 )
 
 type Cluster struct {

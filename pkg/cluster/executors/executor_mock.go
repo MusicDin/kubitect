@@ -1,8 +1,9 @@
 package executors
 
 import (
-	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"testing"
+
+	"github.com/MusicDin/kubitect/pkg/cluster/event"
 )
 
 type executorMock struct{}

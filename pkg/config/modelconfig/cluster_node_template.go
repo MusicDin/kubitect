@@ -3,7 +3,7 @@ package modelconfig
 import (
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
-	"github.com/MusicDin/kubitect/pkg/utils/validation"
+	v "github.com/MusicDin/kubitect/pkg/utils/validation"
 )
 
 type NodeTemplate struct {
@@ -16,11 +16,11 @@ type NodeTemplate struct {
 }
 
 func (n NodeTemplate) Validate() error {
-	return validation.Struct(&n,
-		validation.Field(&n.User),
-		validation.Field(&n.OS),
-		validation.Field(&n.DNS),
-		validation.Field(&n.SSH),
+	return v.Struct(&n,
+		v.Field(&n.User),
+		v.Field(&n.OS),
+		v.Field(&n.DNS),
+		v.Field(&n.SSH),
 	)
 }
 
@@ -37,10 +37,10 @@ type OS struct {
 }
 
 func (s OS) Validate() error {
-	return validation.Struct(&s,
-		validation.Field(&s.Distro),
-		validation.Field(&s.NetworkInterface),
-		validation.Field(&s.Source),
+	return v.Struct(&s,
+		v.Field(&s.Distro),
+		v.Field(&s.NetworkInterface),
+		v.Field(&s.Source),
 	)
 }
 
@@ -61,19 +61,19 @@ const (
 )
 
 func (d OSDistro) Validate() error {
-	return validation.Var(d, validation.OneOf(UBUNTU, UBUNTU20, UBUNTU22, DEBIAN, DEBIAN11))
+	return v.Var(d, v.OneOf(UBUNTU, UBUNTU20, UBUNTU22, DEBIAN, DEBIAN11))
 }
 
 type OSNetworkInterface string
 
 func (nic OSNetworkInterface) Validate() error {
-	return validation.Var(nic, validation.AlphaNumeric(), validation.MaxLen(16))
+	return v.Var(nic, v.AlphaNumeric(), v.MaxLen(16))
 }
 
 type OSSource string
 
 func (os OSSource) Validate() error {
-	return validation.Var(os) // TODO: URL or FileExists
+	return v.Var(os) // TODO: URL or FileExists
 }
 
 type NodeTemplateSSH struct {
@@ -82,7 +82,7 @@ type NodeTemplateSSH struct {
 }
 
 func (ssh NodeTemplateSSH) Validate() error {
-	return validation.Struct(&ssh)
+	return v.Struct(&ssh)
 	// v.Field(&ssh.PrivateKeyPath, v.Skip()),
 }
 
@@ -98,5 +98,5 @@ const (
 )
 
 func (m CpuMode) Validate() error {
-	return validation.Var(m, validation.OneOf(PASSTHROUGH, CUSTOM))
+	return v.Var(m, v.OneOf(PASSTHROUGH, CUSTOM))
 }

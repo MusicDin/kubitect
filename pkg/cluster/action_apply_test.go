@@ -2,13 +2,14 @@ package cluster
 
 import (
 	"fmt"
-	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
-	"github.com/MusicDin/kubitect/pkg/env"
-	"github.com/MusicDin/kubitect/pkg/tools/git"
 	"os"
 	"path"
 	"testing"
 	"time"
+
+	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/pkg/env"
+	"github.com/MusicDin/kubitect/pkg/tools/git"
 
 	"github.com/stretchr/testify/assert"
 )

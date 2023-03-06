@@ -1,8 +1,6 @@
 package event
 
-import (
-	"github.com/MusicDin/kubitect/pkg/ui"
-)
+import "github.com/MusicDin/kubitect/pkg/ui"
 
 func NewConfigChangeError(msg string, paths ...string) error {
 	return ui.NewErrorBlock(ui.ERROR,
@@ -23,12 +21,3 @@ func NewConfigChangeWarning(msg string, paths ...string) error {
 		},
 	)
 }
-
-// func NewInvalidClusterDirError(missingFiles []string) error {
-// 	return ui.NewErrorBlock(ui.ERROR,
-// 		[]ui.Content{
-// 			ui.NewErrorLine("Error type:", "Invalid working directory"),
-// 			ui.NewErrorSection("Missing files:", missingFiles...),
-// 		},
-// 	)
-// }

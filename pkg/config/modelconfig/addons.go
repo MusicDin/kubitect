@@ -1,8 +1,6 @@
 package modelconfig
 
-import (
-	"github.com/MusicDin/kubitect/pkg/utils/validation"
-)
+import v "github.com/MusicDin/kubitect/pkg/utils/validation"
 
 type Addons struct {
 	Kubespray string `yaml:"kubespray,omitempty" opt:"-"`
@@ -10,8 +8,8 @@ type Addons struct {
 }
 
 func (a Addons) Validate() error {
-	return validation.Struct(&a,
-		validation.Field(&a.Rook),
+	return v.Struct(&a,
+		v.Field(&a.Rook),
 	)
 }
 
@@ -22,8 +20,8 @@ type Rook struct {
 }
 
 func (r Rook) Validate() error {
-	return validation.Struct(&r,
-		validation.Field(&r.Version, validation.OmitEmpty()),
-		validation.Field(&r.NodeSelector, validation.OmitEmpty()),
+	return v.Struct(&r,
+		v.Field(&r.Version, v.OmitEmpty()),
+		v.Field(&r.NodeSelector, v.OmitEmpty()),
 	)
 }

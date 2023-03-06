@@ -1,8 +1,9 @@
 package modelconfig
 
 import (
-	"github.com/MusicDin/kubitect/pkg/env"
 	"testing"
+
+	"github.com/MusicDin/kubitect/pkg/env"
 
 	"github.com/stretchr/testify/assert"
 )

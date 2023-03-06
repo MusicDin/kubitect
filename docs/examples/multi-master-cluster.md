@@ -114,7 +114,6 @@ By default, the load balancer is configured to distribute traffic received on po
     kubernetes:
       version: v1.24.7
       networkPlugin: calico
-      dnsMode: coredns
     ```
 
 ## Step 2: Applying the configuration

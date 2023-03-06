@@ -2,9 +2,10 @@ package ui
 
 import (
 	"fmt"
-	"github.com/MusicDin/kubitect/pkg/ui/streams"
 	"strings"
 	"sync"
+
+	"github.com/MusicDin/kubitect/pkg/ui/streams"
 )
 
 // Global Ui singleton

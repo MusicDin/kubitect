@@ -2,8 +2,9 @@ package modelconfig
 
 import (
 	"fmt"
+
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
-	"github.com/MusicDin/kubitect/pkg/utils/validation"
+	v "github.com/MusicDin/kubitect/pkg/utils/validation"
 )
 
 type Connection struct {
@@ -17,11 +18,11 @@ func (c Connection) Validate() error {
 	isRemote := (c.Type == REMOTE)
 	reqForRemoteErr := fmt.Sprintf("Field '{.Field}' is required when connection type is set to '%s'.", REMOTE)
 
-	return validation.Struct(&c,
-		validation.Field(&c.Type, validation.NotEmpty()),
-		validation.Field(&c.IP, validation.Skip().When(!isRemote), validation.NotEmpty().Error(reqForRemoteErr)),
-		validation.Field(&c.User, validation.Skip().When(!isRemote), validation.NotEmpty().Error(reqForRemoteErr)),
-		validation.Field(&c.SSH, validation.Skip().When(!isRemote), validation.NotEmpty().Error(reqForRemoteErr)),
+	return v.Struct(&c,
+		v.Field(&c.Type, v.NotEmpty()),
+		v.Field(&c.IP, v.Skip().When(!isRemote), v.NotEmpty().Error(reqForRemoteErr)),
+		v.Field(&c.User, v.Skip().When(!isRemote), v.NotEmpty().Error(reqForRemoteErr)),
+		v.Field(&c.SSH, v.Skip().When(!isRemote), v.NotEmpty().Error(reqForRemoteErr)),
 	)
 }
 
@@ -34,7 +35,7 @@ const (
 )
 
 func (t ConnectionType) Validate() error {
-	return validation.Var(t, validation.OneOf(LOCALHOST, LOCAL, REMOTE))
+	return v.Var(t, v.OneOf(LOCALHOST, LOCAL, REMOTE))
 }
 
 type ConnectionSSH struct {
@@ -44,9 +45,9 @@ type ConnectionSSH struct {
 }
 
 func (s ConnectionSSH) Validate() error {
-	return validation.Struct(&s,
-		validation.Field(&s.Keyfile, validation.NotEmpty().Error("Path to password-less private key of the remote host is required.")),
-		validation.Field(&s.Port),
+	return v.Struct(&s,
+		v.Field(&s.Keyfile, v.NotEmpty().Error("Path to password-less private key of the remote host is required.")),
+		v.Field(&s.Port),
 	)
 }
 

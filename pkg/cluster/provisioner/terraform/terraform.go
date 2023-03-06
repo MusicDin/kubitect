@@ -3,15 +3,16 @@ package terraform
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/exec"
+	"path"
+	"syscall"
+
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/ui"
 	"github.com/MusicDin/kubitect/pkg/utils/file"
-	"os"
-	"os/exec"
-	"path"
-	"syscall"
 
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hc-install/fs"

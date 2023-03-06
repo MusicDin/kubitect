@@ -2,7 +2,7 @@ package modelinfra
 
 import (
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
-	"github.com/MusicDin/kubitect/pkg/utils/validation"
+	v "github.com/MusicDin/kubitect/pkg/utils/validation"
 )
 
 type Config struct {
@@ -10,14 +10,14 @@ type Config struct {
 }
 
 func (c Config) Validate() error {
-	return validation.Struct(&c,
-		validation.Field(&c.Nodes, c.uniqueIpValidator(), c.uniqueMacValidator(), validation.Skip()),
+	return v.Struct(&c,
+		v.Field(&c.Nodes, c.uniqueIpValidator(), c.uniqueMacValidator(), v.Skip()),
 	)
 }
 
 // uniqueIpValidator returns a validator that triggers an error if multiple nodes
 // are assigned the same IP address.
-func (c Config) uniqueIpValidator() validation.Validator {
+func (c Config) uniqueIpValidator() v.Validator {
 	var duplicates []string
 
 	ips := c.Nodes.IPs()
@@ -31,15 +31,15 @@ func (c Config) uniqueIpValidator() validation.Validator {
 	}
 
 	if len(duplicates) == 0 {
-		return validation.None
+		return v.None
 	}
 
-	return validation.Fail().Errorf("Duplicate IPs detected in the provisioned infrastructure. (duplicates: %v)", duplicates)
+	return v.Fail().Errorf("Duplicate IPs detected in the provisioned infrastructure. (duplicates: %v)", duplicates)
 }
 
 // uniqueMacValidator returns a validator that triggers an error if multiple nodes
 // are assigned the same MAC address.
-func (c Config) uniqueMacValidator() validation.Validator {
+func (c Config) uniqueMacValidator() v.Validator {
 	var duplicates []string
 
 	macs := c.Nodes.MACs()
@@ -53,8 +53,8 @@ func (c Config) uniqueMacValidator() validation.Validator {
 	}
 
 	if len(duplicates) == 0 {
-		return validation.None
+		return v.None
 	}
 
-	return validation.Fail().Errorf("Duplicate MAC addresses detected in the provisioned infrastructure. (duplicates: %v)", duplicates)
+	return v.Fail().Errorf("Duplicate MAC addresses detected in the provisioned infrastructure. (duplicates: %v)", duplicates)
 }

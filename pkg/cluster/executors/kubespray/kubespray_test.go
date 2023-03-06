@@ -2,6 +2,10 @@ package kubespray
 
 import (
 	"fmt"
+	"path"
+	"reflect"
+	"testing"
+
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/pkg/cluster/executors"
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
@@ -9,9 +13,6 @@ import (
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/tools/ansible"
 	"github.com/MusicDin/kubitect/pkg/utils/cmp"
-	"path"
-	"reflect"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )

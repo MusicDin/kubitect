@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/MusicDin/kubitect/pkg/app"
-	"github.com/MusicDin/kubitect/pkg/cluster"
 	"io/ioutil"
 	"path/filepath"
+
+	"github.com/MusicDin/kubitect/pkg/app"
+	"github.com/MusicDin/kubitect/pkg/cluster"
 )
 
 type MetaClusters []cluster.ClusterMeta

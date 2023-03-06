@@ -8,8 +8,8 @@ This document shows how to build a CLI tool manually and how to use the project 
 
 ## Prerequisites
 
-+ [Go 1.18](https://go.dev/dl/) or greater installed
-+ Git client installed
++ [Go 1.18](https://go.dev/dl/) or greater
++ [Git](https://git-scm.com/)
 
 ## Step 1: Clone the project
 
@@ -23,40 +23,31 @@ Afterwards, move into the cloned project.
 cd kubitect
 ```
 
-## Step 2: Install Kubitect CLI tool
+## Step 2: Build Kubitect CLI tool
 
-
-Kubitect CLI tool is implemented in Go using [cobra](https://github.com/spf13/cobra) library.
-The tool can either be installed from already built versions available on GitHub or you can build it manually.
-
-
-To manually build the CLI tool, first change to the `cli` directory.
-```sh
-cd cli
-```
-
-Now, using build the tool using go.
+The Kubitect CLI tool can be manually built using Go. 
+Running the following command will produce a `kubitect` binary file.
 ```sh
 go build .
 ```
 
-This will create a `cli` binary file, which can be moved into `/usr/local/bin/` directory to use it globally.
+To make the binary file globally accessible, move it to the `/usr/local/bin/` directory.
 ```sh
-sudo mv cli /usr/bin/local/kubitect
+sudo mv kubitect /usr/bin/local/kubitect
 ```
 
 ## Step 3: Local development
 
-By default, Kubitect creates and manages clusters located in the Kubitect home directory (`~/.kubitect`).
+By default, Kubitect creates and manages clusters in the Kubitect's home directory (`~/.kubitect`) and pulls the required source code from the official git repository.
+However, this approach can be inconvenient for active development, as all changes must be pushed to the git repository before they can be used.
 
-Although this approach is very useful for everyday use, it can be inconvenient if you are actively making changes to the project, as each change must be committed to the Git repository. 
-
-For this very reason, the Kubitect CLI tool has the `--local` option, which replaces the project's home directory with the path of the current directory.
-This way, the source code from the current directory is used to create a cluster and all cluster-related files are created in the current directory.
-This option can be used with most actions, such as `apply` or `destroy`.
+To address this, the Kubitect CLI tool includes a `--local` option that can be used with most commands, such as `apply` or `destroy`. 
+When the `--local` option is used, a cluster is created within the current directory, and the source code from the current directory is used instead of being pulled from the remote repository.
 
 ```sh
 kubitect apply --local
 ```
+
+The resulting cluster will be created in `./.kubitect/clusters/local-<cluster-name>` directory.
 
 </div>

@@ -1,8 +1,6 @@
 package cmp
 
-import (
-	"reflect"
-)
+import "reflect"
 
 func (c *Comparator) cmpSlice(a, b reflect.Value) (*DiffNode, error) {
 	if a.Kind() == reflect.Invalid {
