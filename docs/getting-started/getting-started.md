@@ -218,14 +218,13 @@ cluster:
 ### Step 4.4 - Kubernetes properties
 
 The last section of the cluster configuration is contains the Kubernetes properties, 
-such as the version, network plugin, and DNS mode.
+such as the version and network plugin.
 
 
 ```yaml title="kubitect.yaml"
 kubernetes:
   version: v1.24.7
   networkPlugin: calico
-  dnsMode: coredns
 ```
 
 ## Step 5 - Create the cluster
@@ -276,7 +275,6 @@ cluster:
 kubernetes:
   version: v1.24.7
   networkPlugin: calico
-  dnsMode: coredns
 ```
 
 Now create the cluster by applying your custom configuration using the Kubitect command line tool. 

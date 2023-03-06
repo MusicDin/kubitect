@@ -7,7 +7,7 @@
 
 <div markdown="1" class="text-justify">
 
-The Kubernetes section of the configuration file contains properties that are closely related to Kubernetes, such as Kubernetes version, network plugin, and DNS mode.
+The Kubernetes section of the configuration file contains properties that are closely related to Kubernetes, such as Kubernetes version and network plugin.
 
 ## Configuration
 

@@ -69,7 +69,6 @@ cluster:
     kubernetes:
       version: v1.24.7
       networkPlugin: calico
-      dnsMode: coredns
     ```
 
 ## Step 2: Applying the configuration

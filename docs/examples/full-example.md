@@ -167,8 +167,8 @@ cluster:
         - id: 5
 
 #
-# The 'kubernetes' section specifies which version of Kubernetes and
-# Kubespray to use and which network plugin and DNS server to install.
+# The 'kubernetes' section contains Kubernetes related properties,
+# such as version and network plugin.
 #
 kubernetes:
   version: v1.24.7
