@@ -16,7 +16,7 @@ Kubernetes is configured on the deployed virtual machines using [Kubespray](http
 
 ### Documentation
 
-Kubitect documentation is accessible at **[:book: kubitect.io](https://kubitect.io/getting-started/installation/)**.
+Kubitect documentation is accessible at **[:book: kubitect.io](https://kubitect.io/latest/getting-started/installation/)**.
 
 </br>
 
