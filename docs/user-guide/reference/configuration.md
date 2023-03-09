@@ -179,7 +179,11 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>string</td>
       <td></td>
       <td>Yes</td>
-      <td>Custom cluster name that is used as a prefix for various cluster components.</td>
+      <td>
+        Custom cluster name that is used as a prefix for various cluster components.
+        <br/>
+        <i>Note: cluster name cannot contain prefix <code>local</code>.</i>
+      </td>
     </tr>
     <!-- Cluster network -->
     <tr>
