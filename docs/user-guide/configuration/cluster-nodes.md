@@ -532,10 +532,10 @@ cluster:
 Node roles can be seen by listing cluster nodes with `kubectl`.
 
 ```
-NAME                         STATUS   ROLES                  AGE   VERSION
-local-k8s-cluster-master-1   Ready    control-plane,master   19m   v1.22.6
-local-k8s-cluster-worker-1   Ready    node                   19m   v1.22.6
-local-k8s-cluster-worker-2   Ready    node                   19m   v1.22.6
+NAME                   STATUS   ROLES                  AGE   VERSION
+k8s-cluster-master-1   Ready    control-plane,master   19m   v1.22.6
+k8s-cluster-worker-1   Ready    node                   19m   v1.22.6
+k8s-cluster-worker-2   Ready    node                   19m   v1.22.6
 ```
 
 ### Load balance HTTP requests

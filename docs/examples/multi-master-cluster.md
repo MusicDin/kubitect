@@ -78,7 +78,7 @@ By default, the load balancer is configured to distribute traffic received on po
           type: local
 
     cluster:
-      name: local-k8s-cluster
+      name: k8s-cluster
       network:
         mode: nat
         cidr: 192.168.113.0/24

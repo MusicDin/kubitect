@@ -278,7 +278,7 @@
 
     !!! failure "Error"
 
-        Error: error deleting storage pool: failed to remove pool '/var/lib/libvirt/images/local-k8s-cluster-main-resource-pool': Directory not empty
+        Error: error deleting storage pool: failed to remove pool '/var/lib/libvirt/images/k8s-cluster-main-resource-pool': Directory not empty
 
 === ":material-information-outline: Explanation"
 
@@ -293,27 +293,27 @@
 
         1. Make sure the pool is running.
         ```sh
-        virsh pool-start --pool local-k8s-cluster-main-resource-pool
+        virsh pool-start --pool k8s-cluster-main-resource-pool
         ```
 
         2. List volumes in the pool.
         ```sh
-        virsh vol-list --pool local-k8s-cluster-main-resource-pool
+        virsh vol-list --pool k8s-cluster-main-resource-pool
 
         #  Name         Path
         # -------------------------------------------------------------------------------------
-        #  base_volume  /var/lib/libvirt/images/local-k8s-cluster-main-resource-pool/base_volume
+        #  base_volume  /var/lib/libvirt/images/k8s-cluster-main-resource-pool/base_volume
         ```
 
         3. Delete listed volumes from the pool.
         ```sh
-        virsh vol-delete --pool local-k8s-cluster-main-resource-pool --vol base_volume
+        virsh vol-delete --pool k8s-cluster-main-resource-pool --vol base_volume
         ```
 
         4. Destroy and undefine the pool.
         ```sh
-        virsh pool-destroy --pool local-k8s-cluster-main-resource-pool
-        virsh pool-undefine --pool local-k8s-cluster-main-resource-pool
+        virsh pool-destroy --pool k8s-cluster-main-resource-pool
+        virsh pool-undefine --pool k8s-cluster-main-resource-pool
         ```
 
 

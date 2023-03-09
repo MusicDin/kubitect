@@ -23,6 +23,9 @@ cluster:
 ```
 
 For example, the name of each virtual machine is generated as `<cluster.name>-<node.type>-<node.instance.id>`.
-This way, the master node with ID `1` would result in `my-cluster-master-1`.
+This means that the virtual machine name of the master node with ID `1` would result in `my-cluster-master-1`.
+
+!!! Note
+    Cluster name cannot contain prefix `local`, as it is reserved for local clusters (created with `--local` flag).
 
 </div>

@@ -93,7 +93,7 @@ Let's take a look at the following configuration:
 
 ```yaml title="kubitect.yaml"
 cluster:
-  name: local-k8s-cluster
+  name: k8s-cluster
   network:
     ...
   nodeTemplate:
@@ -242,7 +242,7 @@ hosts:
       type: local
 
 cluster:
-  name: local-k8s-cluster
+  name: k8s-cluster
   network:
     mode: nat
     cidr: 192.168.113.0/24
