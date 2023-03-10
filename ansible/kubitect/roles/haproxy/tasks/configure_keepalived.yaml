@@ -1,8 +1,8 @@
 ---
 - name: Set load balancer facts
   set_fact:
-    load_balancer_ips: "{{ infra.cluster.nodes.loadBalancer.instances | map(attribute='ip') }}"
-    control_plane_ip: "{{ infra.cluster.nodes.loadBalancer.vip }}"
+    load_balancer_ips: "{{ infra.nodes.loadBalancer.instances | map(attribute='ip') }}"
+    control_plane_ip: "{{ infra.nodes.loadBalancer.vip }}"
 
   # When control plane IP is not one of the load balancer IPs
   # then it is a virtual IP (VIP), and Keepalived is required.
@@ -15,7 +15,7 @@
 
     - name: Configure Keepalived
       vars:
-        network_interface: "{{ infra.cluster.nodeTemplate.os.networkInterface }}"
+        network_interface: "{{ config.cluster.nodeTemplate.os.networkInterface }}"
         virtual_router_id: "{{ config.cluster.nodes.loadBalancer.virtualRouterId | default( default.routerId ) }}"
       template:
         src: keepalived.cfg.j2

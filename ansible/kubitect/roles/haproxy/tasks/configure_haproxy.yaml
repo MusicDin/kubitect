@@ -6,8 +6,8 @@
 
 - name: Create HAProxy config
   vars:
-    control_plane_instances: "{{ infra.cluster.nodes.master.instances }}"
-    worker_instances: "{{ infra.cluster.nodes.worker.instances }}"
+    control_plane_instances: "{{ infra.nodes.master.instances }}"
+    worker_instances: "{{ infra.nodes.worker.instances }}"
     forward_ports: "{{ config.cluster.nodes.loadBalancer.forwardPorts | default([]) }}"
   template:
     src: haproxy.cfg.j2
