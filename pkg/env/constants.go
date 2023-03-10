@@ -51,7 +51,7 @@ var ProjectOsPresets = map[string]string{
 }
 
 var ProjectK8sVersions = []string{
-	"v1.26",
-	"v1.25",
 	"v1.24",
+	"v1.25",
+	"v1.26",
 }
