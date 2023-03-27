@@ -68,7 +68,6 @@ func (c *Cluster) Apply(a string) error {
 		ui.Printf(ui.INFO, "Cannot %s cluster '%s'. It has not been created yet.\n\n", action, c.Name)
 
 		err := ui.Ask("Would you like to create it instead?")
-
 		if err != nil {
 			return err
 		}
@@ -204,6 +203,10 @@ func (c *Cluster) upgrade() error {
 
 // scale scales an existing cluster.
 func (c *Cluster) scale(events event.Events) error {
+	if err := c.Executor().Init(); err != nil {
+		return err
+	}
+
 	if err := c.Executor().ScaleDown(events); err != nil {
 		return err
 	}

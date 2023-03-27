@@ -117,6 +117,8 @@ func (e *kubespray) Create() error {
 	return e.KubitectFinalize()
 }
 
+// Upgrades upgrades a Kubernetes cluster by calling appropriate Kubespray
+// playbooks.
 func (e *kubespray) Upgrade() error {
 	if err := e.generateHostsInventory(); err != nil {
 		return err
