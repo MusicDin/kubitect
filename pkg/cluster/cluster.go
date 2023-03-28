@@ -77,20 +77,32 @@ func NewCluster(ctx app.AppContext, configPath string) (*Cluster, error) {
 func (c *Cluster) Sync() error {
 	var err error
 
-	c.AppliedConfig, err = readConfigIfExists(c.AppliedConfigPath(), modelconfig.Config{})
+	appliedCfg, err := readConfigIfExists(c.AppliedConfigPath(), modelconfig.Config{})
 	if err != nil {
 		return fmt.Errorf("failed to read previously applied configuration file: %v", err)
 	}
 
-	c.InfraConfig, err = readConfigIfExists(c.InfrastructureConfigPath(), modelinfra.Config{})
+	if c.AppliedConfig != nil {
+		*c.AppliedConfig = *appliedCfg
+	} else {
+		c.AppliedConfig = appliedCfg
+	}
+
+	infraCfg, err := readConfigIfExists(c.InfrastructureConfigPath(), modelinfra.Config{})
 	if err != nil {
 		return fmt.Errorf("failed to read infrastructure file: %v", err)
 	}
 
-	if c.InfraConfig != nil {
-		if err := validateConfig(c.InfraConfig); err != nil {
+	if infraCfg != nil {
+		if err := validateConfig(infraCfg); err != nil {
 			ui.PrintBlockE(err...)
 			return fmt.Errorf("infrastructure file (produced by Terraform) is invalid")
+		}
+
+		if c.InfraConfig != nil {
+			*c.InfraConfig = *infraCfg
+		} else {
+			c.InfraConfig = infraCfg
 		}
 	}
 
