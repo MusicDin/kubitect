@@ -255,9 +255,9 @@ func (t *terraform) runCmd(action string, args []string, showOutput bool) (int, 
 		Pdeathsig: syscall.SIGTERM,
 	}
 
+	cmd.Stderr = ui.Streams().Err().File()
 	if showOutput || ui.Debug() {
 		cmd.Stdout = ui.Streams().Out().File()
-		cmd.Stderr = ui.Streams().Err().File()
 	}
 
 	err := cmd.Run()
