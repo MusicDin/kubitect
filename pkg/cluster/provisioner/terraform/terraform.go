@@ -263,6 +263,10 @@ func (t *terraform) runCmd(action string, args []string, showOutput bool) (int, 
 	cmd := exec.Command(t.binPath, args...)
 	cmd.Dir = t.projectDir
 
+	if ui.Debug() {
+		cmd.Env = append(cmd.Env, "TF_LOG=INFO")
+	}
+
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Pdeathsig: syscall.SIGTERM,
 	}

@@ -75,10 +75,6 @@ func (a *ansible) Exec(pb Playbook) error {
 		Tags:      strings.Join(pb.Tags, ","),
 	}
 
-	if ui.Debug() {
-		playbookOptions.Verbose = true
-	}
-
 	vars, err := extraVarsToMap(pb.ExtraVars)
 	if err != nil {
 		return err
@@ -109,6 +105,10 @@ func (a *ansible) Exec(pb Playbook) error {
 	} else {
 		// options.AnsibleForceColor()
 		options.AnsibleSetEnv("ANSIBLE_FORCE_COLOR", "true")
+	}
+
+	if ui.Debug() {
+		options.AnsibleSetEnv("ANSIBLE_VERBOSITY", "2")
 	}
 
 	options.AnsibleSetEnv("ANSIBLE_CALLBACKS_ENABLED", "yaml")
