@@ -87,9 +87,9 @@ func (e *kubespray) Init() error {
 	return e.KubitectHostsSetup()
 }
 
-// Create creates a Kubernetes cluster by calling appropriate Kubespray
-// playbooks.
-func (e *kubespray) Create() error {
+// Sync regenerates required Ansible inventories and Kubespray group
+// variables.
+func (e *kubespray) Sync() error {
 	if err := e.generateHostsInventory(); err != nil {
 		return err
 	}
@@ -98,10 +98,12 @@ func (e *kubespray) Create() error {
 		return err
 	}
 
-	if err := e.generateGroupVars(); err != nil {
-		return err
-	}
+	return e.generateGroupVars()
+}
 
+// Create creates a Kubernetes cluster by calling appropriate Kubespray
+// playbooks.
+func (e *kubespray) Create() error {
 	if err := e.KubitectHostsSetup(); err != nil {
 		return err
 	}
@@ -120,18 +122,6 @@ func (e *kubespray) Create() error {
 // Upgrades upgrades a Kubernetes cluster by calling appropriate Kubespray
 // playbooks.
 func (e *kubespray) Upgrade() error {
-	if err := e.generateHostsInventory(); err != nil {
-		return err
-	}
-
-	if err := e.generateNodesInventory(); err != nil {
-		return err
-	}
-
-	if err := e.generateGroupVars(); err != nil {
-		return err
-	}
-
 	if err := e.KubitectHostsSetup(); err != nil {
 		return err
 	}
@@ -151,11 +141,7 @@ func (e *kubespray) ScaleUp(events event.Events) error {
 		return nil
 	}
 
-	if err := e.generateNodesInventory(); err != nil {
-		return err
-	}
-
-	if err := e.generateGroupVars(); err != nil {
+	if err := e.KubitectHostsSetup(); err != nil {
 		return err
 	}
 
@@ -186,11 +172,19 @@ func (e *kubespray) ScaleDown(events event.Events) error {
 		names = append(names, name)
 	}
 
+	if err := e.KubitectHostsSetup(); err != nil {
+		return err
+	}
+
 	if err := e.generateGroupVars(); err != nil {
 		return err
 	}
 
-	return e.KubesprayRemoveNodes(names)
+	if err := e.KubesprayRemoveNodes(names); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // extractRemovedNodes returns node instances from the event changes.

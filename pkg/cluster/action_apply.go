@@ -161,7 +161,7 @@ func (c *Cluster) create() error {
 		return err
 	}
 
-	if err := c.Provisioner().Init(); err != nil {
+	if err := c.Provisioner().Init(nil); err != nil {
 		return err
 	}
 
@@ -174,6 +174,10 @@ func (c *Cluster) create() error {
 	}
 
 	if err := c.Executor().Init(); err != nil {
+		return err
+	}
+
+	if err := c.Executor().Sync(); err != nil {
 		return err
 	}
 
@@ -182,7 +186,7 @@ func (c *Cluster) create() error {
 
 // upgrade upgrades an existing cluster.
 func (c *Cluster) upgrade() error {
-	if err := c.Provisioner().Init(); err != nil {
+	if err := c.Provisioner().Init(nil); err != nil {
 		return err
 	}
 
@@ -195,6 +199,10 @@ func (c *Cluster) upgrade() error {
 	}
 
 	if err := c.Executor().Init(); err != nil {
+		return err
+	}
+
+	if err := c.Executor().Sync(); err != nil {
 		return err
 	}
 
@@ -211,7 +219,7 @@ func (c *Cluster) scale(events event.Events) error {
 		return err
 	}
 
-	if err := c.Provisioner().Init(); err != nil {
+	if err := c.Provisioner().Init(events); err != nil {
 		return err
 	}
 
@@ -220,6 +228,10 @@ func (c *Cluster) scale(events event.Events) error {
 	}
 
 	if err := c.Sync(); err != nil {
+		return err
+	}
+
+	if err := c.Executor().Sync(); err != nil {
 		return err
 	}
 

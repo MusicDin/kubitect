@@ -9,6 +9,7 @@ import (
 type executorMock struct{}
 
 func (m executorMock) Init() error                  { return nil }
+func (m executorMock) Sync() error                  { return nil }
 func (m executorMock) Create() error                { return nil }
 func (m executorMock) Upgrade() error               { return nil }
 func (m executorMock) ScaleDown(event.Events) error { return nil }

@@ -68,7 +68,7 @@ func MockEvents(t *testing.T, obj interface{}, eType event.EventType) []event.Ev
 	}
 
 	return []event.Event{
-		event.MockEvent(t, eType, changes),
+		event.MockEvent(t, eType, cmp.MODIFY, changes),
 	}
 }
 

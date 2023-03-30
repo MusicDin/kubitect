@@ -4,11 +4,14 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"reflect"
 	"testing"
 
+	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/ui"
+	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -58,17 +61,17 @@ func TestNewTerraformProvisioner(t *testing.T) {
 		modelconfig.MockRemoteHost(t, "test3", false, false),
 	}
 
-	cfg := modelconfig.Config{Hosts: hosts}
+	cfg := &modelconfig.Config{Hosts: hosts}
 
-	prov := NewTerraformProvisioner(clsPath(t), "shared/path", true, &cfg)
-	assert.NoError(t, prov.Init())
+	prov := NewTerraformProvisioner(clsPath(t), "shared/path", true, cfg)
+	assert.NoError(t, prov.Init(nil))
 }
 
 func TestNewTerraformProvisioner_InvalidHosts(t *testing.T) {
-	cfg := modelconfig.Config{}
+	cfg := &modelconfig.Config{}
 
-	prov := NewTerraformProvisioner(clsPath(t), "shared/path", true, &cfg)
-	assert.ErrorContains(t, prov.Init(), "hosts list is empty")
+	prov := NewTerraformProvisioner(clsPath(t), "shared/path", true, cfg)
+	assert.ErrorContains(t, prov.Init(nil), "hosts list is empty")
 }
 
 func TestTerraform_init(t *testing.T) {
@@ -111,4 +114,26 @@ func TestTerraform_Actions_Error(t *testing.T) {
 	assert.ErrorContains(t, err, "not a directory")
 	assert.ErrorContains(t, tf.Apply(), "not a directory")
 	assert.ErrorContains(t, tf.Destroy(), "not a directory")
+}
+
+func TestExtractRemovedHosts(t *testing.T) {
+	host := modelconfig.Host{
+		Name: "test",
+	}
+
+	change := []cmp.Change{
+		{
+			Type:   reflect.TypeOf(host),
+			Before: host,
+			After:  nil,
+		},
+	}
+
+	events := []event.Event{
+		event.MockEvent(t, event.OK, cmp.DELETE, change),
+		event.MockEvent(t, event.OK, cmp.CREATE, change),
+	}
+
+	hosts := extractRemovedHosts(events)
+	assert.Len(t, hosts, 1)
 }

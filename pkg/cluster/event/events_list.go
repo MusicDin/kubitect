@@ -30,6 +30,17 @@ var ScaleEvents = Events{
 		action: cmp.CREATE,
 		path:   "Cluster.Nodes.LoadBalancer.Instances.*",
 	},
+	// Allow addition and deletion of hosts
+	{
+		eType:  OK,
+		action: cmp.CREATE,
+		path:   "Hosts.*",
+	},
+	{
+		eType:  OK,
+		action: cmp.DELETE,
+		path:   "Hosts.*",
+	},
 }
 
 var ModifyEvents = Events{

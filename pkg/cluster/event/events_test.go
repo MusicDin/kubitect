@@ -13,7 +13,7 @@ import (
 )
 
 func TestMockEvent(t *testing.T) {
-	assert.NotNil(t, MockEvent(t, OK, nil))
+	assert.NotNil(t, MockEvent(t, OK, cmp.MODIFY, nil))
 }
 
 func TestEvent_Path(t *testing.T) {
