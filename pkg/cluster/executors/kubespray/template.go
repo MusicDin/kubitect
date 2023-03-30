@@ -149,16 +149,14 @@ func (t KubesprayEtcdTemplate) Template() string {
 }
 
 type HostsTemplate struct {
-	configDir  string
-	SshKeyFile string
-	Hosts      []modelconfig.Host
+	configDir string
+	Hosts     []modelconfig.Host
 }
 
-func NewHostsTemplate(configDir, sshPrivateKeyPath string, hosts []modelconfig.Host) HostsTemplate {
+func NewHostsTemplate(configDir string, hosts []modelconfig.Host) HostsTemplate {
 	return HostsTemplate{
-		configDir:  configDir,
-		SshKeyFile: sshPrivateKeyPath,
-		Hosts:      hosts,
+		configDir: configDir,
+		Hosts:     hosts,
 	}
 }
 
@@ -184,7 +182,6 @@ func isRemoteHost(host modelconfig.Host) bool {
 
 func (t HostsTemplate) Template() string {
 	return template.TrimTemplate(`
-		{{- $pkPath := .SshKeyFile -}}
 		all:
 			hosts:
 			{{- range .Hosts }}
@@ -194,7 +191,7 @@ func (t HostsTemplate) Template() string {
 					ansible_user: {{ .Connection.User }}
 					ansible_host: {{ .Connection.IP }}
 					ansible_port: {{ .Connection.SSH.Port }}
-					ansible_private_key_file: {{ $pkPath }}
+					ansible_private_key_file: {{ .Connection.SSH.Keyfile }}
 				{{- else }}
 					ansible_connection: local
 					ansible_host: localhost

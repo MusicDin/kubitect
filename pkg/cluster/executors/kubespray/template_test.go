@@ -1,6 +1,7 @@
 package kubespray
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
@@ -62,10 +63,10 @@ func TestHostsTemplate(t *testing.T) {
 		modelconfig.MockRemoteHost(t, "remote", false, false),
 	}
 
-	tpl := NewHostsTemplate(t.TempDir(), "~/.ssh/id_rsa", hosts)
+	tpl := NewHostsTemplate(t.TempDir(), hosts)
 	pop, err := template.Populate(tpl)
 
-	expect := template.TrimTemplate(`
+	expect := fmt.Sprintf(template.TrimTemplate(`
 		all:
 			hosts:
 				local:
@@ -79,14 +80,14 @@ func TestHostsTemplate(t *testing.T) {
 					ansible_user: mocked-user
 					ansible_host: 192.168.113.42
 					ansible_port: 22
-					ansible_private_key_file: ~/.ssh/id_rsa
+					ansible_private_key_file: %s
 			children:
 				kubitect_hosts:
 					hosts:
 						local:
 						localhost:
 						remote:
-	`)
+	`), hosts[2].Connection.SSH.Keyfile)
 
 	assert.NoError(t, err)
 	assert.NoError(t, tpl.Write())
