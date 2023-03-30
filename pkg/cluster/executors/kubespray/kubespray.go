@@ -218,7 +218,7 @@ func (e *kubespray) generateNodesInventory() error {
 
 // generateHostsInventory creates an Ansible inventory of target hosts.
 func (e *kubespray) generateHostsInventory() error {
-	return NewHostsTemplate(e.ConfigDir, e.SshPrivateKeyPath, e.Config.Hosts).Write()
+	return NewHostsTemplate(e.ConfigDir, e.Config.Hosts).Write()
 }
 
 // generateGroupVars creates a directory of Kubespray group variables.
