@@ -1,6 +1,11 @@
 package modelconfig
 
-import v "github.com/MusicDin/kubitect/pkg/utils/validation"
+import (
+	"os"
+	"strings"
+
+	v "github.com/MusicDin/kubitect/pkg/utils/validation"
+)
 
 // Uint8 is intentionally set to int to avoid panic if value is set
 // outside the uint8 size.
@@ -64,6 +69,17 @@ func (u User) Validate() error {
 type File string
 
 func (f File) Validate() error {
+	fStr := string(f)
+	if strings.HasPrefix(fStr, "~") {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return v.Var(f, v.Fail().Errorf("%v", err))
+		}
+
+		new := File(strings.Replace(fStr, "~", home, 1))
+		return v.Var(new, v.FileExists())
+	}
+
 	return v.Var(f, v.FileExists())
 }
 
