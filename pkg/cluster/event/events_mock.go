@@ -6,7 +6,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 )
 
-func MockEvent(t *testing.T, eventType EventType, changes []cmp.Change) Event {
+func MockEvent(t *testing.T, eventType EventType, action cmp.ActionType, changes []cmp.Change) Event {
 	t.Helper()
 
 	return Event{
@@ -14,6 +14,6 @@ func MockEvent(t *testing.T, eventType EventType, changes []cmp.Change) Event {
 		changes: changes,
 		path:    t.TempDir(),
 		msg:     "mock event",
-		action:  cmp.MODIFY,
+		action:  action,
 	}
 }

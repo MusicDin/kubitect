@@ -8,10 +8,12 @@ import (
 	"path"
 	"syscall"
 
+	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/ui"
+	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 	"github.com/MusicDin/kubitect/pkg/utils/file"
 
 	"github.com/hashicorp/go-version"
@@ -67,14 +69,24 @@ func NewTerraformProvisioner(
 	}
 }
 
-func (t *terraform) Init() error {
+// Init generates Terraform's main.tf file based on the provided cluster configuration.
+func (t *terraform) Init(events event.Events) error {
+	hosts := t.cfg.Hosts
+
+	// Append removed hosts when scaling down, otherwise Terraform
+	// won't be able to establish connection with the host where
+	// resources have to be removed.
+	if len(events.OfType(event.SCALE_DOWN)) >= 0 {
+		hosts = append(hosts, extractRemovedHosts(events)...)
+	}
+
 	cfgPath := path.Join(t.projectDir, "variables.yaml")
 	err := file.WriteYaml(t.cfg, cfgPath, 0644)
 	if err != nil {
 		return fmt.Errorf("terraform: failed to create input variables file: %v", err)
 	}
 
-	return NewMainTemplate(t.projectDir, t.cfg.Hosts).Write()
+	return NewMainTemplate(t.projectDir, hosts).Write()
 }
 
 // init initializes a Terraform project.
@@ -277,4 +289,20 @@ func flag(key string, value ...interface{}) string {
 	}
 
 	return fmt.Sprintf("-%s", key)
+}
+
+func extractRemovedHosts(events event.Events) []modelconfig.Host {
+	var hosts []modelconfig.Host
+	for _, e := range events {
+		if e.Action() != cmp.DELETE {
+			continue
+		}
+
+		for _, ch := range e.Changes() {
+			if i, ok := ch.Before.(modelconfig.Host); ok {
+				hosts = append(hosts, i)
+			}
+		}
+	}
+	return hosts
 }

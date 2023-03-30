@@ -34,26 +34,6 @@ type ClusterMeta struct {
 	prov provisioner.Provisioner
 }
 
-// func NewClusterMeta(ctx app.AppContext, clusterPath string) (ClusterMeta, error) {
-// 	cpStat, err := os.Stat(clusterPath)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("cluster meta: %v", err)
-// 	}
-
-// 	meta := clusterMeta{
-// 		AppContext: ctx,
-// 		Name:       cpStat.Name(),
-// 		Path:       filepath.Join(clusterPath, cpStat.Name()),
-// 		Local:      ctx.Local(),
-// 	}
-
-// 	if !cpStat.IsDir() || !meta.ContainsAppliedConfig() {
-// 		return nil, fmt.Errorf("cluster meta: %s is not a cluster directory", err)
-// 	}
-
-// 	return &meta, nil
-// }
-
 func (c ClusterMeta) ConfigDir() string {
 	return filepath.Join(c.Path, DefaultConfigDir)
 }
