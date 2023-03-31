@@ -1,0 +1,39 @@
+hosts:
+  - name: localhost
+    connection:
+      type: local
+
+cluster:
+  name: k8s-cluster
+  network:
+    mode: nat
+    cidr: 192.168.113.0/24
+  nodeTemplate:
+    user: k8s
+    updateOnBoot: true
+    ssh:
+      addToKnownHosts: true
+    os:
+      distro: ubuntu22
+  nodes:
+    master:
+      default:
+        ram: 4
+        cpu: 2
+        mainDiskSize: 32
+      instances:
+        - id: 1
+          ip: 192.168.113.10
+    worker:
+      default: 
+        ram: 8
+        cpu: 2
+        mainDiskSize: 32
+      instances:
+        - id: 1
+          ip: 192.168.113.21
+          ram: 4
+
+kubernetes:
+  version: v1.24.7
+  networkPlugin: calico
