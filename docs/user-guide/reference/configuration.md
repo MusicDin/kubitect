@@ -14,7 +14,6 @@ This document contains a reference of the Kubitect configuration file and docume
 
 The configuration sections are as follows:
 
-+ `kubitect` - Project metadata.
 + `hosts` - A list of physical hosts (local or remote).
 + `cluster` - Configuration of the cluster infrastructure. Virtual machine properties, node types to install, and the host on which to install the nodes.
 + `kubernetes` - Kubernetes configuration.
@@ -27,36 +26,6 @@ Each configuration property is documented with 5 columns: Property name, descrip
     `[*]` annotates an array.
 
 </div>
-
-## *Kubitect* section
-
-<table>
-  <tbody>
-    <tr>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Default value</th>
-      <th>Required?</th>
-      <th>Description</th>
-    </tr>
-    <tr>
-      <td><code>kubitect.url</code></td>
-      <td>string</td>
-      <td>https://github.com/MusicDin/kubitect</td>
-      <td>No</td>
-      <td>URL of the project's git repository.</td>
-    </tr>
-    <tr>
-      <td><code>kubitect.version</code></td>
-      <td>string</td>
-      <td>
-        <i>CLI tool version</i>
-      </td>
-      <td>No</td>
-      <td>Version of the git repository. Can be a branch or a tag.</td>
-    </tr>
-  </tbody>
-</table>
 
 ## *Hosts* section
 

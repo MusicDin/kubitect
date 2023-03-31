@@ -1,5 +1,6 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 [tag 2.2.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.2.0
+[tag 3.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v3.0.0
 
 <div markdown="1" class="text-center">
 # Kubernetes configuration
@@ -13,7 +14,7 @@ The Kubernetes section of the configuration file contains properties that are cl
 
 ### Kubernetes version
 
-:material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
+:material-tag-arrow-up-outline: [v3.0.0][tag 3.0.0]
 &ensp;
 :octicons-file-symlink-file-24: Default: `v1.25.6`
 
@@ -46,6 +47,14 @@ If the network plugin is not set in the Kubitect configuration file, `calico` is
 kubernetes:
   networkPlugin: calico
 ```
+
+The following table shows the compatibility matrix of supported network plugins and Kubernetes versions:
+
+| Kubernetes Version |      Calico      |       Canal      |      Cilium      |      Flannel     |    KubeRouter    |       Weave      |
+|-------------|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
+| **1.23**    | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.24**    | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.25**    | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
 
 ### Kubernetes DNS mode
 
