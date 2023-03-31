@@ -19,7 +19,6 @@ type Config struct {
 	Cluster    Cluster    `yaml:"cluster"`
 	Kubernetes Kubernetes `yaml:"kubernetes"`
 	Addons     Addons     `yaml:"addons,omitempty"`
-	Kubitect   Kubitect   `yaml:"kubitect,omitempty"`
 }
 
 func (c Config) Validate() error {
@@ -37,7 +36,6 @@ func (c Config) Validate() error {
 		v.Field(&c.Cluster, v.NotEmpty().Error("Configuration must contain '{.Field}' section.")),
 		v.Field(&c.Kubernetes, v.NotEmpty().Error("Configuration must contain '{.Field}' section.")),
 		v.Field(&c.Addons),
-		v.Field(&c.Kubitect),
 	)
 }
 
