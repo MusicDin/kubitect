@@ -191,9 +191,4 @@ var ModifyEvents = Events{
 		eType: OK,
 		path:  "Addons",
 	},
-	// Allow kubitect (project metadata) changes
-	{
-		eType: OK,
-		path:  "Kubitect",
-	},
 }

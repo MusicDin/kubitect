@@ -118,7 +118,6 @@ nav:
           - Cluster nodes: user-guide/configuration/cluster-nodes.md
           - Kubernetes: user-guide/configuration/kubernetes.md
           - Addons: user-guide/configuration/addons.md
-          - Project metadata: user-guide/configuration/project-metadata.md
       - Cluster Management:
           - Creating the cluster: user-guide/management/creating.md
           - Upgrading the cluster: user-guide/management/upgrading.md
