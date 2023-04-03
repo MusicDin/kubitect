@@ -2,44 +2,39 @@
 # Requirements
 </div>
 
-## Local machine
-
 <div markdown="1" class="text-justify">
 
-On the machine where the command-line tool (kubitect) is installed, the following requirements must be met:
+On the local host (*where Kubitect command-line tool is installed*), the following requirements must be met:
 
-+ [Git](https://git-scm.com/)
-+ [Python](https://www.python.org/) >= 3.0
-  - Python [virtualenv](https://virtualenv.pypa.io/en/latest/index.html)
+:material-record-circle-outline: [Git](https://git-scm.com/)
 
-## Hosts
+:material-record-circle-outline: [Python](https://www.python.org/) >= 3.8
 
-A host is a physical server that can be either a local or remote machine.
-Each host must have:
+:material-record-circle-outline: Python [virtualenv](https://virtualenv.pypa.io/en/latest/index.html)
 
-+ installed [libvirt](https://libvirt.org/) virtualization API and
-+ installed hypervisor that is supported by libvirt
+:material-record-circle-outline: Password-less SSH key for each **remote** host
 
-If the host is a remote server:
+<br/>
 
-+ password-less SSH key to connect to the remote server
+On hosts where a Kubernetes cluster will be deployed using Kubitect, the following requirements must be met:
 
-!!! quote ""
+:material-record-circle-outline: A [libvirt](https://libvirt.org/) virtualization API
 
-    ### Example - Install KVM
+:material-record-circle-outline: A running hypervisor that is supported by libvirt (e.g. KVM)
 
-    For example, to install the [KVM](https://www.linux-kvm.org) (Kernel-based Virtual Machine) hypervisor and libvirt, use *yum* or *apt* to install the following packages:
+??? question "How to install KVM? <i class="click-tip"></i>"
+
+    To install the [KVM](https://www.linux-kvm.org) (Kernel-based Virtual Machine) hypervisor and libvirt, use *apt* or *yum* to install the following packages:
 
     + `qemu-kvm`
     + `libvirt-clients`
     + `libvirt-daemon`
     + `libvirt-daemon-system`
 
-    After installation, add user to the `kvm` and `libvirt` groups.
+    After the installation, add your user to the `kvm` group in order to access the kvm device:
 
     ```sh
-    sudo adduser $USER kvm
-    sudo adduser $USER libvirt
+    sudo usermod -aG kvm $USER
     ```
 
 </div>

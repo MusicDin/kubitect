@@ -4,20 +4,10 @@
 
 <div markdown="1" class="text-justify">
 
-Before proceeding with the installation, make sure you meet all of the [requirements](./requirements.md).
-
 ## Install Kubitect CLI tool
 
 
-After all requirements are met, install the Kubitect command line tool.
-
 === "Release page"
-
-    !!! note "Note"
-            
-            The download URL is a combination of the operating system type, system architecture and version of Kubitect (`https://dl.kubitect.io/<os>/<arch>/<version>`).
-
-            All releases can be found on [GitHub release page](https://github.com/MusicDin/kubitect/releases).
 
     !!! quote ""
 
@@ -36,11 +26,17 @@ After all requirements are met, install the Kubitect command line tool.
         sudo mv kubitect /usr/local/bin/
         ```
 
+        !!! note "Note"
+            
+            The download URL is a combination of the operating system type, system architecture and version of Kubitect (`https://dl.kubitect.io/<os>/<arch>/<version>`).
+
+            All releases can be found on [GitHub release page](https://github.com/MusicDin/kubitect/releases).
+
 === "Go packages"
 
     !!! quote ""
 
-        Install from Go packages.
+        Install Kubitect from Go packages.
 
         ```sh
         go install github.com/MusicDin/kubitect/cmd/kubitect@latest
@@ -50,14 +46,8 @@ Verify the installation by checking the Kubitect version.
 ```sh
 kubitect --version
 
-# kubitect version v2.3.0
+# kubitect version v3.0.0
 ```
-
-!!! tip "Tip"
-
-    If you are using Kubitect for the first time, we strongly recommend you to take a look at the [getting started](./getting-started.md) tutorial.
-
-<br>
 
 ## Enable shell autocomplete
 

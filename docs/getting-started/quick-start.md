@@ -4,6 +4,14 @@
 
 <div markdown="1" class="text-justify">
 
+In this **quick guide**, we will show you how to use the Kubitect command line tool to quickly deploy a simple Kubernetes cluster.
+
+To get started, you will need to apply a cluster configuration file to the Kubitect command line tool. 
+You can either prepare this file manually, as explained in our [Getting started](../getting-started) guide, or use one of the available presets.
+
+For the purposes of this quick start guide, we will be using a `getting-started` preset, which defines a **cluster with one master and one worker node**.
+The resulting infrastructure is shown in the image below.
+
 <div class="text-center">
   <img
     class="mobile-w-100"
@@ -12,30 +20,39 @@
     width="75%">
 </div>
 
-### Step 1 - Create the cluster
+### Step 1 - Create a Kubernetes cluster
 
-Run the following command to apply the default cluster configuration, which creates a cluster with **one master and one worker node**.
-Generated cluster configuration files will be stored in `~/.kubitect/clusters/default/` directory.
+Export the `gettings-started` preset:
 
+```sh
+kubitect export preset --name getting-started > cluster.yaml 
 ```
-kubitect apply
+
+Then, apply the exported configuration file to the Kubitect:
+
+```sh
+kubitect apply --config cluster.yaml
 ```
+
+That's it! The cluster, named `k8s-cluster`, should be up and running in approximately 10 minutes.
 
 ### Step 2 - Export kubeconfig
 
-After successful installation of the Kubernetes cluster, Kubeconfig will be created within cluster's directory.
-To export the Kubeconfig into custom file run the following command.
+After successfully installing the Kubernetes cluster, a Kubeconfig file will be created within the cluster's directory. 
+To export the Kubeconfig to a custom file, use the following command:
 
-```
-kubitect export kubeconfig > kubeconfig.yaml
+```sh
+kubitect export kubeconfig --cluster k8s-cluster > kubeconfig.yaml
 ```
 
 ### Step 3 - Test the cluster
 
-Test if the cluster works by displaying all cluster nodes.
+To test that the cluster is up and running, display all cluster nodes using the exported Kubeconfig and the kubectl command:
 
-```
+```sh
 kubectl get nodes --kubeconfig kubeconfig.yaml
 ```
+
+:clap: Congratulations, you have successfully deployed a Kubernetes cluster using Kubitect! 
 
 </div>

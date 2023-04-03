@@ -8,12 +8,12 @@ This document shows how to build a CLI tool manually and how to use the project 
 
 ## Prerequisites
 
-+ [Go 1.18](https://go.dev/dl/) or greater
 + [Git](https://git-scm.com/)
++ [Go 1.18](https://go.dev/dl/) or greater
 
 ## Step 1: Clone the project
 
-First, you have to clone the project.
+First, clone the project.
 ```sh
 git clone https://github.com/MusicDin/kubitect
 ```
@@ -33,7 +33,7 @@ go build .
 
 To make the binary file globally accessible, move it to the `/usr/local/bin/` directory.
 ```sh
-sudo mv kubitect /usr/bin/local/kubitect
+sudo mv kubitect /usr/local/bin/kubitect
 ```
 
 ## Step 3: Local development

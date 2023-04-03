@@ -4,7 +4,10 @@
 
 <div markdown="1" class="text-justify">
 
-In this **step-by-step** guide, you will learn how to prepare a custom cluster configuration file from scratch and use it to create a functional Kubernetes cluster consisting of a **one master and one worker node**.
+In the [quick start](../quick-start) guide, we learned how to create a Kubernetes cluster using a preset configuration. 
+Now, we will explore how to create a customized cluster topology that meets your specific requirements.
+
+This **step-by-step** guide will walk you through the process of creating a custom cluster configuration file from scratch and using it to create a functional Kubernetes **cluster with one master and one worker node**. By following the steps outlined in this guide, you will have a Kubernetes cluster up and running in no time.
 
 <div class="text-center">
   <img
@@ -14,33 +17,21 @@ In this **step-by-step** guide, you will learn how to prepare a custom cluster c
     width="50%">
 </div>
 
-## Step 1 - Make sure all requirements are satisfied
+## Step 1 - Ensure all requirements are met
 
-For the successful installation of the Kubernetes cluster, some [requirements](../requirements) must be met.
+Before progressing with this guide, take a minute to **ensure that all of the [requirements](../requirements) are met**.
+Afterwards, simply create a new YAML file and open it in a text editor of your choice.
 
-## Step 2 - Create cluster configuration file
+## Step 2 - Prepare hosts configuration
 
-In the quick start you have created a very basic Kubernetes cluster from predefined cluster configuration file.
-If configuration is not explicitly provided to the command-line tool using `--config` option, default cluster configuration file is used (`/examples/default-cluster.yaml`).
-
-Now it's time to create your own cluster topology.
-
-Before you begin create a new yaml file.
-```sh
-touch kubitect.yaml
-```
-
-## Step 3 - Prepare hosts configuration
-
-In the cluster configuration file, we will first define hosts.
-Hosts represent target servers.
-A host can be either a local or a remote machine.
+In the cluster configuration file, the first step is to **define hosts**. 
+Hosts represent target servers that can be either local or remote machines.
 
 === "Localhost"
 
     !!! quote ""
 
-        If the cluster is set up on the same machine where the command line tool is installed, we specify a host whose connection type is set to `local`.
+        When setting up the cluster on your local host, where the command line tool is installed, be sure to specify a host with a connection type set to `local`.
 
         ```yaml title="kubitect.yaml"
         hosts:
@@ -55,7 +46,7 @@ A host can be either a local or a remote machine.
 
     !!! quote ""
 
-        When cluster is deployed on the remote machine, the IP address of the remote machine along with the SSH credentails needs to be specified for the host.
+        In case the cluster is deployed on a remote host, you will be required to provide the IP address of the remote machine along with the SSH credentials.
 
         ```yaml title="kubitect.yaml"
         hosts:
@@ -70,16 +61,16 @@ A host can be either a local or a remote machine.
 
         1. IP address of the remote host.
 
-        2. Path to the **password-less** SSH key file required for establishing connection with the remote host.
+        2. Path to the **password-less** SSH key file required for establishing connection with the remote host. 
 
-In this tutorial we will use only localhost.
+Throughout this guide, only localhost will be used.
 
-## Step 4 - Define cluster infrastructure
+## Step 3 - Define cluster infrastructure
 
 The second part of the configuration file consists of the cluster infrastructure.
-In this part, all virtual machines are defined along with their properties such as operating system, CPU cores, amount of RAM and so on.
+In this part, all cluster nodes are defined along with their properties such as operating system, CPU cores, amount of RAM and so on.
 
-For easier interpretation of the components that the final cluster will be made of, see the below image.
+Below is an image that visualizes the components of the final cluster.
 
 <div class="text-center">
   <img
@@ -89,7 +80,7 @@ For easier interpretation of the components that the final cluster will be made 
     width="75%">
 </div>
 
-Let's take a look at the following configuration:
+Let's shift our attention to the following configuration:
 
 ```yaml title="kubitect.yaml"
 cluster:
@@ -102,27 +93,42 @@ cluster:
     ...
 ```
 
-We can see that the infrastructure configuration consists of the cluster name and 3 subsections:
+As we can see, the cluster infrastructure section consists of the cluster name and three subsections:
 
-- `cluster.name` is a cluster name that is used as a prefix for each resource created by Kubitect.
-- `cluster.network` holds information about the network properties of the cluster.
-- `cluster.nodeTemplate` contains properties that apply to all our nodes. For example, properties like operating system, SSH user, and SSH private key are the same for all our nodes.
-- `cluster.nodes` subsection defines each node in our cluster.
+- `cluster.name` 
 
-Now that we have a general idea about the infrastructure configuration, we can look at each of these subsections in more detail.
+    The cluster name is used as a prefix for each resource created by Kubitect. 
+    It's an essential property that helps identify and manage resources created by Kubitect.
 
-### Step 4.1 - Cluster network
+- `cluster.network` 
 
-The cluster network subsection defines the network that our cluster will use.
-Currently, two network modes are supported - NAT and bridge.
+    The network subsection holds information about the network properties of the cluster. 
+    It defines the IP address range, the mode of networking, and other network-specific properties that apply to the entire cluster.
 
-The `nat` network mode instructs Kubitect to create a virtual network that performs network address translation. This mode allows the use of IP address ranges that do not exist within our local area network (LAN).
 
-The `bridge` network mode instructs Kubitect to use a predefined bridge interface.
-In this mode, virtual machines can connect directly to LAN.
-Use of this mode is mandatory when a cluster spreads over multipe hosts.
+- `cluster.nodeTemplate` 
 
-To keep this tutorial as simple as possible, we will use the NAT mode, as it does not require a preconfigured bridge interface.
+    The node template subsection contains properties that apply to all nodes in the cluster, such as the operating system, SSH user, and SSH private key.
+
+- `cluster.nodes` 
+
+    The nodes subsection defines each node in our cluster. 
+    This subsection includes information such as the node name, node type, and other node-specific properties.
+
+Now that we have a general idea of the cluster infrastructure configuration, let's examine each of these subsections in more detail to understand how to define them properly and configure a Kubernetes cluster using Kubitect.
+
+### Step 3.1 - Cluster network
+
+In the network subsection of the Kubernetes configuration file, we need to **define the network** that our cluster will use. 
+Currently, there are two supported network modes - NAT or bridge.
+
+The `nat` network mode creates a virtual network that performs network address translation.
+This mode allows the use of IP address ranges that do not exist within our local area network (LAN).
+
+On the other hand, the `bridge` network mode uses a predefined bridge interface, allowing virtual machines to connect directly to the LAN. 
+This mode is mandatory when the cluster spreads over multiple hosts.
+
+For the sake of simplicity, this tutorial will use the NAT mode as it does not require a preconfigured bridge interface."
 
 ```yaml title="kubitect.yaml"
 cluster:
@@ -134,21 +140,29 @@ cluster:
 
 The above configuration will instruct Kubitect to create a virtual network that uses `192.168.113.0/24` IP range.
 
-### Step 4.2 - Node template
+### Step 3.2 - Node template
 
-As mentioned earlier, the `nodeTemplate` subsection is used to define general properties of our nodes.
+The `nodeTemplate` subsection allows you to **define general properties for all nodes in the cluster**.
+While there are no required fields, there are several useful properties you may want to include.
 
-Required properties are:
++ `user` 
 
-+ `user` - the name of the user that will be created on all virtual machines and will also be used for SSH.
+    This property specifies the name of the user that will be created on all virtual machines and used for SSH. (default: `k8s`) 
 
-Besides the required properties, there are some potentially useful properties:
++ `os.distro` 
 
-+ `os.distro` - defines the operating system for the nodes (currently ubuntu and debian are supported). By default, latest Ubuntu 22.04 release is used.
-+ `ssh.addToKnownHosts` - if true, all virtual machines will be added to SSH known hosts. If you later destroy the cluster, these virtual machines will also be removed from the known hosts.
-+ `updateOnBoot` - if true, all virtual machines are updated at the first boot.
+    This property defines the operating system for the nodes. Currently, only Ubuntu and Debian are supported, and by default, the latest Ubuntu 22.04 release is used.
 
-Our `noteTemplate` subsection now looks like this:
++ `ssh.addToKnownHosts`
+
+    When this property is set to true, all nodes will be added to SSH known hosts. 
+    If you later destroy the cluster, these nodes will also be removed from the known hosts.
+
++ `updateOnBoot`
+
+    This property determines whether virtual machines are updated at first boot
+
+To illustrate, let's set these `nodeTemplate` properties in our configuration file:
 
 ```yaml title="kubitect.yaml"
 cluster:
@@ -162,17 +176,33 @@ cluster:
       distro: ubuntu22
 ```
 
-### Step 4.3 - Cluster nodes
+### Step 3.3 - Cluster nodes
 
-In the `nodes` subsection, we can define three types of nodes:
+In the `nodes` subsection, we **define all nodes that will form the cluster**.
+Each node can be defined as one of the following three types:
 
-- `loadBalancer` nodes are internal load balancers used to expose the Kubernetes control plane at a single endpoint.
-- `master` nodes are Kubernetes master nodes that also contain an etcd key-value store. Since etcd is present on these nodes, the number of master nodes must be odd. For more information, see [etcd FAQ](https://etcd.io/docs/v3.4/faq/#why-an-odd-number-of-cluster-members).
-- `worker` nodes are the nodes on which your actual workload runs.
+- `worker` 
 
-In this tutorial, we will use only one master node, so internal load balancers are not required. 
+    A worker node runs the applications and workloads that are deployed in the cluster. 
+    It communicates with the master node to receive instructions on how to schedule and run the containers. 
 
-The easiest way to explain this part is to look at the actual configuration:
+- `master` 
+    
+    Master nodes are responsible for managing and coordinating the worker nodes in the cluster.
+    Therefore, **each cluster must contain at least one master node**. 
+
+    Since etcd key-value datastore is also present on these nodes, the number of master nodes must be odd. 
+    For more information, see [etcd FAQ :octicons-link-external-16:](https://etcd.io/docs/v3.4/faq/#why-an-odd-number-of-cluster-members).
+
+- `loadBalancer` 
+
+    These nodes server as internal load balancers that expose the Kubernetes control plane at a single endpoint.
+    They are essential when more then one master node is configured in the cluster.
+
+This guide is focused on deploying a Kubernetes cluster with only one master node, which eliminates the need for internal load balancers. 
+However, if you are interested in creating a [multi-master](../../examples/multi-master-cluster) or [high-availability (HA)](../../examples/ha-cluster) cluster, please refer to the corresponding examples.
+
+To better understand this part, let's take a look at an example configuration:
 
 ```yaml title="kubitect.yaml"
 cluster:
@@ -197,27 +227,27 @@ cluster:
           ram: 4 # (8)!
 ```
 
-1.  Default properties are applied to all nodes of the same type (in this case `master` nodes).
-    They are especially useful, when multiple nodes of the same type are specified.
+1.  Default properties are applied to all nodes of the same type, which in this case are the master nodes.
+    They are particularly useful to quickly configure multiple nodes of the same type.
 
-2.  Amount of RAM allocated to the master nodes (in GiB).
+2.  The amount of RAM allocated to the master nodes (in GiB).
 
-3.  Amount of vCPU allocated to the master nodes.
+3.  The number of virtual CPUs assigned to each master node.
 
-4.  Size of the virtual disk attached to each master node (in GiB).
+4.  The size of the virtual disk attached to each master node (in GiB).
 
-5.  List of master node instances.
+5.  A list of master node instances.
 
-6.  Instance ID is the **only required field** that must be specified for each instance.
+6.  The instance ID is the **only required field** that must be specified for each instance.
 
-7.  Static IP address set for this particular instance.
-    If the `ip` property is omitted, the DHCP lease is requested when the cluster is created.
+7.  A static IP address set for this particular instance.
+    If the `ip` property is omitted, the node requests a DHCP lease during creation.
 
-8.  Since the amount of RAM (4 GiB) is specified for this particular instance, the default value (8 GiB) is overwritten.
+8.  In this example, the amount of RAM allocated to the worker node instance is set to 4 GiB, which overwrites the default value of 8 GiB.
 
-### Step 4.4 - Kubernetes properties
+### Step 3.4 - Kubernetes properties
 
-The last section of the cluster configuration is contains the Kubernetes properties, 
+The final section of the cluster configuration contains the Kubernetes properties, 
 such as the version and network plugin.
 
 
@@ -227,102 +257,109 @@ kubernetes:
   networkPlugin: calico
 ```
 
-## Step 5 - Create the cluster
+## Step 4 - Create the cluster
 
-!!! tip "Tip"
+Below is the final configuration for our Kubernetes cluster:
 
-    If you encounter any issues during the installation, please refer to the [troubleshooting](../other/troubleshooting) page first.
+??? abstract "Final cluster configuration <i class="click-tip"></i>"
 
-Our final cluster configuration looks like this:
+    ```yaml title="kubitect.yaml"
+    hosts:
+      - name: localhost
+        connection:
+          type: local
 
-```yaml title="kubitect.yaml"
-hosts:
-  - name: localhost
-    connection:
-      type: local
+    cluster:
+      name: k8s-cluster
+      network:
+        mode: nat
+        cidr: 192.168.113.0/24
+      nodeTemplate:
+        user: k8s
+        updateOnBoot: true
+        ssh:
+          addToKnownHosts: true
+        os:
+          distro: ubuntu22
+      nodes:
+        master:
+          default:
+            ram: 4
+            cpu: 2
+            mainDiskSize: 32
+          instances:
+            - id: 1
+              ip: 192.168.113.10
+        worker:
+          default: 
+            ram: 8
+            cpu: 2
+            mainDiskSize: 32
+          instances:
+            - id: 1
+              ip: 192.168.113.21
+              ram: 4
 
-cluster:
-  name: k8s-cluster
-  network:
-    mode: nat
-    cidr: 192.168.113.0/24
-  nodeTemplate:
-    user: k8s
-    updateOnBoot: true
-    ssh:
-      addToKnownHosts: true
-    os:
-      distro: ubuntu22
-  nodes:
-    master:
-      default:
-        ram: 4
-        cpu: 2
-        mainDiskSize: 32
-      instances:
-        - id: 1
-          ip: 192.168.113.10
-    worker:
-      default: 
-        ram: 8
-        cpu: 2
-        mainDiskSize: 32
-      instances:
-        - id: 1
-          ip: 192.168.113.21
-          ram: 4
+    kubernetes:
+      version: v1.24.7
+      networkPlugin: calico
+    ```
 
-kubernetes:
-  version: v1.24.7
-  networkPlugin: calico
-```
-
-Now create the cluster by applying your custom configuration using the Kubitect command line tool. 
-Also, let's name our cluster `my-first-cluster`.
+To create the cluster, **apply the configuration** file to Kubitect:
 ```sh
-kubitect apply --cluster my-first-cluster --config kubitect.yaml
+kubitect apply --config kubitect.yaml
 ```
-
-When the configuration is applied, the Terraform plan shows the changes Terraform wants to make to your infrastructure.
-User confirmation of the plan is required before Kubitect begins creating the cluster.
 
 !!! tip "Tip"
 
-    To skip the user confirmation step, the flag `--auto-approve` can be used.
+    If you encounter any issues during the installation process, please refer to the [troubleshooting](../other/troubleshooting) page first.
 
-When the cluster is applied, it is created in Kubitect's home directory, which has the following structure.
+
+After applying the configuration file to Kubitect, a directory for the created Kubernetes cluster is generated and stored in Kubitect's home directory. The default location for the home directory is `~/.kubitect` and has the following structure.
+
 ```
 ~/.kubitect
    ├── clusters
-   │   ├── default
-   │   ├── my-first-cluster
+   │   ├── k8s-cluster
+   │   ├── my-cluster
    │   └── ...
-   └── bin
-       └── ...
+   └── share
+       ├── terraform
+       └── venv
 ```
 
-All created clusters can be listed at any time using the following command.
+The `clusters` directory contains a subdirectory for each Kubernetes cluster that you have created using Kubitect. 
+Each subdirectory is named after the cluster, for example *k8s-cluster*. 
+The configuration files for each cluster are stored in these directories.
+
+The `share` directory contains files and directories that are shared between different cluster installations.
+
+All created clusters can be listed at any time using the `list` subcommand.
 ```sh
 kubitect list clusters
 
 # Clusters:
-#   - my-first-cluster (active)
+#   - k8s-cluster (active)
+#   - my-cluster (active)
 ```
 
-## Step 6 - Test the cluster
+## Step 5 - Test the cluster
 
-After successful installation of the Kubernetes cluster, Kubeconfig is created in the cluster's directory.
+Once you have successfully installed a Kubernetes cluster, the Kubeconfig file can be found in the cluster's directory. 
+However, you will most likely want to **export the Kubeconfig** to a separate file:
 
-To export the Kubeconfig to a separate file, run the following command.
+
 ```sh
-kubitect export kubeconfig --cluster my-first-cluster > kubeconfig.yaml
+kubitect export kubeconfig --cluster k8s-cluster > kubeconfig.yaml
 ```
 
-Use the exported Kubeconfig to list all cluster nodes.
+This will create a file named `kubeconfig.yaml` in your current directory.
+Finally, to confirm that the cluster is ready, you can list its nodes using the `kubectl` command:
+
 ```sh
 kubectl get nodes --kubeconfig kubeconfig.yaml
 ```
 
-:clap: Congratulations, you have completed the *getting started* tutorial.
+:clap: Congratulations, you have completed the *getting started* quide.
 
 </div>
