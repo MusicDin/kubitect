@@ -57,61 +57,6 @@ h3 {
     display: flex;
 }
 
-.roadmap {
-    display: flex;
-    flex-direction: column;
-    margin-top: 16pt;
-}
-
-.roadmap div {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.roadmap div.road {
-    margin-left: 10pt;
-    margin-right: 10pt;
-    height: 20pt;
-    width: 2pt;
-    border-left: 3px dotted #00e676;
-}
-
-.roadmap div.road.todo {
-    margin-left: 10pt;
-    margin-right: 10pt;
-    height: 20pt;
-    width: 2pt;
-    border-left: 3px dotted #aaaaaa;
-}
-
-.roadmap div.road.progress {
-    margin-left: 10pt;
-    margin-right: 10pt;
-    height: 20pt;
-    width: 2pt;
-    border-left: 3px dotted #c49a26;
-}
-
-.roadmap .question {
-    color: #999999
-}
-
-.roadmap div img {
-    width: 10pt;
-    height: 10pt;
-    margin: 5pt;
-    fill: green !important;
-}
-
-.roadmap div span {
-    margin-left: 10pt;
-}
-
-.roadmap div svg {
-    fill: green !important;
-}
-
 @media (max-width:768px) {
 
     .card-row {

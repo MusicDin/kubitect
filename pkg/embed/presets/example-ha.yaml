@@ -1,0 +1,106 @@
+hosts:
+  - name: host1
+    connection:
+      type: remote
+      user: kubitect
+      ip: 10.10.0.5
+      ssh:
+        keyfile: "~/.ssh/id_rsa_ha"
+  - name: host2
+    connection:
+      type: remote
+      user: kubitect
+      ip: 10.10.0.6
+      ssh:
+        keyfile: "~/.ssh/id_rsa_ha"
+  - name: host3
+    connection:
+      type: remote
+      user: kubitect
+      ip: 10.10.0.10
+      ssh:
+        keyfile: "~/.ssh/id_rsa_ha"
+    dataResourcePools:
+      - name: data-pool
+        path: /mnt/libvirt/pools/
+  - name: host4
+    connection:
+      type: remote
+      user: kubitect
+      ip: 10.10.0.11
+      ssh:
+        keyfile: "~/.ssh/id_rsa_ha"
+    dataResourcePools:
+      - name: data-pool
+        path: /mnt/libvirt/pools/
+  - name: host5
+    connection:
+      type: remote
+      user: kubitect
+      ip: 10.10.0.12
+      ssh:
+        keyfile: "~/.ssh/id_rsa_ha"
+    dataResourcePools:
+      - name: data-pool
+        path: /mnt/libvirt/pools/
+
+cluster:
+  name: kubitect-ha
+  network:
+    mode: bridge
+    cidr: 10.10.0.0/20
+    bridge: br0
+  nodeTemplate:
+    user: k8s
+    updateOnBoot: true
+    ssh:
+      addToKnownHosts: true
+    os:
+      distro: ubuntu
+  nodes:
+    loadBalancer:
+      vip: 10.10.13.200
+      instances:
+        - id: 1
+          ip: 10.10.13.201
+          host: host1
+        - id: 2
+          ip: 10.10.13.202
+          host: host2
+    master:
+      instances:
+        - id: 1
+          ip: 10.10.13.10
+          host: host3
+        - id: 2
+          ip: 10.10.13.11
+          host: host4
+        - id: 3
+          ip: 10.10.13.12
+          host: host5
+    worker:
+      instances:
+        - id: 1
+          ip: 10.10.13.20
+          host: host3
+          dataDisks:
+            - name: rook
+              pool: data-pool
+              size: 512
+        - id: 2
+          ip: 10.10.13.21
+          host: host4
+          dataDisks:
+            - name: rook
+              pool: data-pool
+              size: 512
+        - id: 3
+          ip: 10.10.13.22
+          host: host5
+          dataDisks:
+            - name: rook
+              pool: data-pool
+              size: 512
+
+kubernetes:
+  version: v1.24.7

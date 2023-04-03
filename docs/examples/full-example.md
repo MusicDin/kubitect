@@ -10,18 +10,6 @@ This example is meant for users that learn the fastest from an example configura
 
 ```yaml
 #
-# In the 'kubitect' section, you can specify the target git project and version.
-# This can be handy if you want to use a specific project version or refer to 
-# your forked/cloned project.
-#
-# [!] Note that this will be ignored if you use the '--local' flag with the CLI 
-#     tool actions, as you should already be in the Git repository.
-#
-kubitect:
-  url: "https://github.com/MusicDin/kubitect" # (1)!
-  version: "v2.1.0"
-
-#
 # The 'hosts' section contains data about the physical servers on which the 
 # Kubernetes cluster will be installed.
 #
@@ -128,7 +116,7 @@ cluster:
         mainDiskSize: 256
       instances:
           # IMPORTANT: There should be odd number of master nodes.
-        - id: 1 # Node with generated MAC address, IP retrieved as an DHCP lease and default RAM and CPU.
+        - id: 1
           host: remote-server-1
         - id: 2
           host: remote-server-2

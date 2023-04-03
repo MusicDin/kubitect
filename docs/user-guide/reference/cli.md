@@ -46,11 +46,6 @@ kubitect apply [flags]
     automatically approve any user permission requests
   </li>
   <li>
-    <code>--cluster &lt;string&gt;</code>
-    <br>&emsp;
-    name of the cluster to be used (default: <i>default</i>)
-  </li>
-  <li>
     <code>-c</code>, <code>--config &lt;string&gt;</code>
     <br>&emsp;
     path to the cluster config file
@@ -92,11 +87,6 @@ kubitect destroy [flags]
     <br>&emsp;
     name of the cluster to be used (default: <i>default</i>)
   </li>
-  <li>
-    <code>-l</code>, <code>--local</code>
-    <br>&emsp;
-    use a current directory as the cluster path
-  </li>
 </ul>
 
 ---
@@ -117,11 +107,6 @@ kubitect export config [flags]
     <code>--cluster &lt;string&gt;</code>
     <br>&emsp;
     name of the cluster to be used (default: <i>default</i>)
-  </li>
-  <li>
-    <code>-l</code>, <code>--local</code>
-    <br>&emsp;
-    use a current directory as the cluster path
   </li>
 </ul>
 
@@ -144,22 +129,49 @@ kubitect export kubeconfig [flags]
     <br>&emsp;
     name of the cluster to be used (default: <i>default</i>)
   </li>
+</ul>
+
+---
+### **kubitect export preset**
+
+Print cluster configuration preset to the standard output.
+
+**Usage**
+
+```sh
+kubitect export preset [flags]
+```
+
+**Flags**
+
+<ul style="list-style: none">
   <li>
-    <code>-l</code>, <code>--local</code>
+    <code>--name &lt;string&gt;</code>
     <br>&emsp;
-    use a current directory as the cluster path
+    preset name
   </li>
 </ul>
 
 ---
 ### **kubitect list clusters**
 
-List Kubitect clusters.
+List clusters.
 
 **Usage**
 
 ```sh
 kubitect list clusters
+```
+
+---
+### **kubitect list presets**
+
+List available cluster configuration presets.
+
+**Usage**
+
+```sh
+kubitect list presets
 ```
 
 ---

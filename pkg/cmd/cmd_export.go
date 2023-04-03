@@ -33,6 +33,7 @@ func NewExportCmd() *cobra.Command {
 
 	cmd.AddCommand(NewExportKcCmd())
 	cmd.AddCommand(NewExportConfigCmd())
+	cmd.AddCommand(NewExportPresetCmd())
 
 	return cmd
 }

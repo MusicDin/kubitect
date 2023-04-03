@@ -101,8 +101,8 @@ nav:
   - Home: index.md
   - Getting started:
       - Introduction: getting-started/introduction.md
-      - Requirements: getting-started/requirements.md
       - Installation: getting-started/installation.md
+      - Requirements: getting-started/requirements.md
       - Quick start: getting-started/quick-start.md
       - Getting started (step-by-step): getting-started/getting-started.md
       - Other:
