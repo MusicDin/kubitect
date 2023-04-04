@@ -24,7 +24,6 @@ var ProjectRequiredApps = []string{
 // Defines required files/directories that are copied from tmp git project.
 var ProjectRequiredFiles = []string{
 	"ansible/",
-	"resources/",
 	"terraform/modules/",
 	"terraform/templates/",
 	"terraform/scripts/",
@@ -32,7 +31,6 @@ var ProjectRequiredFiles = []string{
 	"terraform/output.tf",
 	"terraform/variables.tf",
 	"terraform/versions.tf",
-	// "LICENSE",
 }
 
 // Defines options for "apply --action" command.

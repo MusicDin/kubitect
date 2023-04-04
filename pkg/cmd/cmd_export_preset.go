@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/MusicDin/kubitect/pkg/embed"
+	"github.com/MusicDin/kubitect/embed"
 
 	"github.com/spf13/cobra"
 )
@@ -53,7 +53,7 @@ func NewExportPresetCmd() *cobra.Command {
 		}
 
 		for _, p := range presets {
-			names = append(names, p.Name)
+			names = append(names, presetName(p.Name))
 		}
 
 		return names, cobra.ShellCompDirectiveNoFileComp
@@ -63,7 +63,7 @@ func NewExportPresetCmd() *cobra.Command {
 }
 
 func (o *ExportPresetOptions) Run() error {
-	p, err := embed.GetPreset(o.PresetName)
+	p, err := embed.GetPreset(o.PresetName + ".yaml")
 	if err != nil {
 		return err
 	}

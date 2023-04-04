@@ -3,13 +3,11 @@ package cluster
 import (
 	"fmt"
 	"os"
-	"path"
 	"testing"
 	"time"
 
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/pkg/env"
-	"github.com/MusicDin/kubitect/pkg/tools/git"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -42,30 +40,6 @@ func TestVerifyClusterDir_MissingFiles(t *testing.T) {
 	assert.Equal(t, NewInvalidClusterDirError(env.ProjectRequiredFiles), verifyClusterDir(c.Path))
 }
 
-func TestCloneAndCopyReqFiles_MissingFiles(t *testing.T) {
-	tmpDir := t.TempDir()
-	proj := git.NewGitProject(env.ConstProjectUrl, "v1.0.0")
-
-	err := cloneAndCopyReqFiles(proj, path.Join(tmpDir, "tmp"), tmpDir)
-	assert.ErrorContains(t, err, "Missing files")
-}
-
-func TestCloneAndCopyReqFiles(t *testing.T) {
-	tmpDir := t.TempDir()
-	proj := git.NewGitProject(env.ConstProjectUrl, "master")
-
-	err := cloneAndCopyReqFiles(proj, path.Join(tmpDir, "tmp"), tmpDir)
-	assert.NoError(t, err)
-}
-
-func TestCloneAndCopyReqFiles_InvalidURL(t *testing.T) {
-	tmpDir := t.TempDir()
-	proj := git.NewGitProject("invalid", "master")
-
-	err := cloneAndCopyReqFiles(proj, path.Join(tmpDir, "tmp"), tmpDir)
-	assert.ErrorContains(t, err, "git clone: failed to clone project")
-}
-
 func TestGenerateMissingKeys(t *testing.T) {
 	c := MockCluster(t)
 
@@ -93,22 +67,9 @@ func TestGenerateMissingKeys_PKPathProvided(t *testing.T) {
 	assert.NoError(t, c.generateSshKeys())
 }
 
-func TestPrepare_MissingFiles(t *testing.T) {
-	c := MockCluster(t)
-
-	// Remove 1 required file
-	assert.NoError(t, os.RemoveAll(path.Join(c.Path, env.ProjectRequiredFiles[0])))
-
-	assert.ErrorContains(t, c.prepare(), "is missing some required files")
-}
-
-func TestPrepare_MissingFiles_LocalCluster(t *testing.T) {
+func TestPrepare(t *testing.T) {
 	c := MockLocalCluster(t)
-
-	// Remove 1 required file
-	assert.NoError(t, os.RemoveAll(path.Join(c.Path, env.ProjectRequiredFiles[0])))
-
-	assert.ErrorContains(t, c.prepare(), "is missing some required files")
+	assert.NoError(t, c.prepare())
 }
 
 func TestPlan(t *testing.T) {

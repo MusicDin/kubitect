@@ -38,11 +38,12 @@ sudo mv kubitect /usr/local/bin/kubitect
 
 ## Step 3: Local development
 
-By default, Kubitect creates and manages clusters in the Kubitect's home directory (`~/.kubitect`) and pulls the required source code from the official git repository.
-However, this approach can be inconvenient for active development, as all changes must be pushed to the git repository before they can be used.
+By default, Kubitect creates and manages clusters in the Kubitect's home directory (`~/.kubitect`).
+However, for development purposes, it is often more convenient to have all resources created in the current directory.
 
-To address this, the Kubitect CLI tool includes a `--local` option that can be used with most commands, such as `apply` or `destroy`. 
-When the `--local` option is used, a cluster is created within the current directory, and the source code from the current directory is used instead of being pulled from the remote repository.
+If you want to create a new cluster in the current directory, you can use the `--local` flag when applying the configuration. 
+When you create a cluster using the `--local` flag, its name will be prefixed with *local*. 
+This prefix is added to prevent any conflicts that might arise when creating new virtual resources.
 
 ```sh
 kubitect apply --local

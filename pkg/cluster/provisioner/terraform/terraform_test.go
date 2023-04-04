@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MusicDin/kubitect/embed"
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/pkg/env"
@@ -55,6 +56,8 @@ func MockInvalidTerraform(t *testing.T) *terraform {
 }
 
 func TestNewTerraformProvisioner(t *testing.T) {
+	clsPath := t.TempDir()
+
 	hosts := []modelconfig.Host{
 		modelconfig.MockLocalHost(t, "test1", false),
 		modelconfig.MockLocalHost(t, "test2", true),
@@ -63,14 +66,24 @@ func TestNewTerraformProvisioner(t *testing.T) {
 
 	cfg := &modelconfig.Config{Hosts: hosts}
 
-	prov := NewTerraformProvisioner(clsPath(t), "shared/path", true, cfg)
+	// prepare terraform template
+	err := embed.MirrorResource("terraform/main.tf.tpl", clsPath)
+	assert.NoError(t, err)
+
+	prov := NewTerraformProvisioner(clsPath, "shared/path", true, cfg)
 	assert.NoError(t, prov.Init(nil))
 }
 
 func TestNewTerraformProvisioner_InvalidHosts(t *testing.T) {
+	clsPath := t.TempDir()
+
 	cfg := &modelconfig.Config{}
 
-	prov := NewTerraformProvisioner(clsPath(t), "shared/path", true, cfg)
+	// prepare terraform template
+	err := embed.MirrorResource("terraform/main.tf.tpl", clsPath)
+	assert.NoError(t, err)
+
+	prov := NewTerraformProvisioner(clsPath, "shared/path", true, cfg)
 	assert.ErrorContains(t, prov.Init(nil), "hosts list is empty")
 }
 
