@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.3.7"
 
   backend "local" {
     path = "../config/terraform/terraform.tfstate"
@@ -8,7 +8,7 @@ terraform {
   required_providers {
     libvirt = {
       source  = "dmacvicar/libvirt"
-      version = "~> 0.6.12"
+      version = "~> 0.7.1"
     }
   }
 }

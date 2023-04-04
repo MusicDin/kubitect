@@ -11,7 +11,7 @@ const (
 	ConstKubesprayUrl      = "https://github.com/kubernetes-sigs/kubespray"
 	ConstKubesprayVersion  = "v2.21.0"
 	ConstKubernetesVersion = "v1.25.6"
-	ConstTerraformVersion  = "1.3.7"
+	ConstTerraformVersion  = "1.4.4"
 )
 
 // Defines applications that Kubitect depends on.
