@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"path"
 	"strings"
 )
 
@@ -34,4 +35,16 @@ func Example(s string) string {
 
 	out := strings.Join(trimmed, "\n")
 	return strings.TrimRight(out, " ")
+}
+
+// presetName extracts file name without extension from the given path.
+func presetName(fPath string) string {
+	base := path.Base(fPath)
+	ext := path.Ext(base)
+
+	if base == ext {
+		return base
+	}
+
+	return base[:len(base)-len(ext)]
 }

@@ -3,20 +3,12 @@ package terraform
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 
 	"github.com/stretchr/testify/assert"
 )
-
-func clsPath(t *testing.T) string {
-	clsPath, err := filepath.Abs("../../../../")
-	assert.NoError(t, err)
-
-	return filepath.Clean(clsPath)
-}
 
 func TestHostUri_Empty(t *testing.T) {
 	uri, err := hostUri(modelconfig.Host{})

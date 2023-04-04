@@ -6,9 +6,9 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/MusicDin/kubitect/embed"
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/pkg/env"
-	"github.com/MusicDin/kubitect/pkg/tools/git"
 	"github.com/MusicDin/kubitect/pkg/ui"
 	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 	"github.com/MusicDin/kubitect/pkg/utils/file"
@@ -238,35 +238,29 @@ func (c *Cluster) scale(events event.Events) error {
 	return c.Executor().ScaleUp(events)
 }
 
-// prepare prepares cluster's directory. It ensures that Kubitect project
-// files are present in the directory, new configuration file is stored in
-// the temporary location and that main virtual environment is created.
+// prepare prepares the cluster directory. It ensures all required project
+// files are present in the directory and new configuration file is stored in
+// the temporary location.
 func (c *Cluster) prepare() error {
-	var err error
-
-	srcDir := c.WorkingDir()
-	dstDir := c.Path
-
-	if c.Local {
-		err = copyReqFiles(srcDir, dstDir)
-	} else {
-		tmpDir := filepath.Join(dstDir, "tmp")
-		proj := git.NewGitProject(env.ConstProjectUrl, env.ConstProjectVersion)
-
-		ui.Printf(ui.DEBUG, "kubitect.url: %s\n", proj.Url())
-		ui.Printf(ui.DEBUG, "kubitect.version: %s\n", proj.Version())
-
-		err = cloneAndCopyReqFiles(proj, tmpDir, c.Path)
+	if err := os.MkdirAll(c.Path, os.ModePerm); err != nil {
+		return fmt.Errorf("create cluster directory: %v", err)
 	}
 
-	if err != nil {
-		e, ok := err.(ui.ErrorBlock)
+	for _, rf := range env.ProjectRequiredFiles {
+		err := embed.MirrorResource(rf, c.Path)
+		if err != nil {
+			return err
+		}
+	}
+
+	if err := verifyClusterDir(c.Path); err != nil {
+		eb, ok := err.(ui.ErrorBlock)
 		if !ok {
 			return err
 		}
 
-		ui.PrintBlockE(e)
-		return fmt.Errorf("cluster directory (%s) is missing some required files", srcDir)
+		ui.PrintBlockE(eb)
+		return fmt.Errorf("cluster %s is missing some required files", c.Name)
 	}
 
 	return c.StoreNewConfig()
@@ -291,7 +285,7 @@ func (c *Cluster) generateSshKeys() error {
 	}
 
 	// Keypair does not exist.
-	// - Check if user provided path to the custom key pair
+	// - Check if the user has provided a custom path to the key pair
 	pkPath := string(c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath)
 	if pkPath != "" {
 		kp, err := keygen.ReadKeyPair(path.Dir(pkPath), path.Base(pkPath))
@@ -311,44 +305,6 @@ func (c *Cluster) generateSshKeys() error {
 
 	return kp.Write(kpDir, kpName)
 
-}
-
-// cloneAndCopyReqFiles first clones a project using git and then
-// copies project required files from the cloned directory to the
-// destination directory.
-func cloneAndCopyReqFiles(proj git.GitProject, tmpDir, dstDir string) error {
-	if err := os.RemoveAll(tmpDir); err != nil {
-		return err
-	}
-
-	if err := proj.Clone(tmpDir); err != nil {
-		return err
-	}
-
-	if err := copyReqFiles(tmpDir, dstDir); err != nil {
-		return err
-	}
-
-	return os.RemoveAll(tmpDir)
-}
-
-// copyReqFiles copies project required files from source directory
-// to the destination directory.
-func copyReqFiles(srcDir, dstDir string) error {
-	if err := verifyClusterDir(srcDir); err != nil {
-		return err
-	}
-
-	for _, path := range env.ProjectRequiredFiles {
-		src := filepath.Join(srcDir, path)
-		dst := filepath.Join(dstDir, path)
-
-		if err := file.ForceCopy(src, dst); err != nil {
-			return err
-		}
-	}
-
-	return verifyClusterDir(dstDir)
 }
 
 // verifyClusterDir verifies if the provided cluster directory

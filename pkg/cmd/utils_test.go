@@ -19,3 +19,14 @@ func TestExample(t *testing.T) {
 	assert.Equal(t, "  a b\n", Example("\n a b \n"))
 	assert.Equal(t, "  a\n  b\n", Example("\n a \n b \n"))
 }
+
+func TestPresetName(t *testing.T) {
+	assert.Equal(t, ".", presetName(""))
+	assert.Equal(t, ".yml", presetName(".yml"))
+	assert.Equal(t, ".yml", presetName("test/.yml"))
+	assert.Equal(t, "test", presetName("test"))
+	assert.Equal(t, "test", presetName("test/test"))
+	assert.Equal(t, "test", presetName("test.yml"))
+	assert.Equal(t, "test", presetName("test/test.yml"))
+	assert.Equal(t, "test.test", presetName("test.test.yml"))
+}

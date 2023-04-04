@@ -76,7 +76,7 @@ func (t *terraform) Init(events event.Events) error {
 	// Append removed hosts when scaling down, otherwise Terraform
 	// won't be able to establish connection with the host where
 	// resources have to be removed.
-	if len(events.OfType(event.SCALE_DOWN)) >= 0 {
+	if len(events.OfType(event.SCALE_DOWN)) > 0 {
 		hosts = append(hosts, extractRemovedHosts(events)...)
 	}
 

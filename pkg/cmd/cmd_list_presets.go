@@ -1,15 +1,15 @@
 package cmd
 
 import (
+	"github.com/MusicDin/kubitect/embed"
 	"github.com/MusicDin/kubitect/pkg/app"
-	"github.com/MusicDin/kubitect/pkg/embed"
 	"github.com/MusicDin/kubitect/pkg/ui"
 
 	"github.com/spf13/cobra"
 )
 
 var (
-	listPresetsShort = "List clusters"
+	listPresetsShort = "List presets"
 	listPresetsLong  = LongDesc(`
 		Command list presets lists all available cluster configuration presets.`)
 
@@ -48,7 +48,7 @@ func (o *ListPresetsOptions) Run() error {
 
 	ui.Println(ui.INFO, "Available presets:")
 	for _, p := range presets {
-		ui.Printf(ui.INFO, "- %s\n", p.Name)
+		ui.Printf(ui.INFO, "- %s\n", presetName(p.Name))
 	}
 
 	return nil
