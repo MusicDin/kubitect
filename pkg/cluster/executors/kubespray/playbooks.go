@@ -30,6 +30,10 @@ func (e *kubespray) KubitectHostsSetup() error {
 // KubitectFinalize function calls an Ansible playbook that finalizes Kubernetes
 // cluster installation.
 func (e *kubespray) KubitectFinalize() error {
+	vars := []string{
+		"bin_dir=" + e.SharedDir,
+	}
+
 	pb := ansible.Playbook{
 		Path:       filepath.Join(e.ClusterPath, "ansible/kubitect/finalize.yaml"),
 		Inventory:  filepath.Join(e.ClusterPath, "config/nodes.yaml"),
@@ -37,6 +41,7 @@ func (e *kubespray) KubitectFinalize() error {
 		User:       e.SshUser(),
 		PrivateKey: e.SshPKey(),
 		Timeout:    3000,
+		ExtraVars:  vars,
 	}
 
 	return e.Ansible.Exec(pb)

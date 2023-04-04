@@ -123,6 +123,7 @@ func (c *Cluster) Executor() executors.Executor {
 		c.Path,
 		c.PrivateSshKeyPath(),
 		c.ConfigDir(),
+		c.ShareDir(),
 		c.NewConfig,
 		c.InfraConfig,
 		ve,
