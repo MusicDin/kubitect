@@ -6,35 +6,36 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"path/filepath"
 )
 
-//go:embed resources templates presets
+//go:embed templates presets ansible terraform
 var efs embed.FS
 
-type EmbeddedFile struct {
+type Resource struct {
 	Name    string
 	Path    string
 	Content []byte
 }
 
-// get returns an embedded file on the given path.
-func get(rootDir, filePath string) (*EmbeddedFile, error) {
-	content, err := efs.ReadFile(path.Join(rootDir, filePath))
+// GetResource returns an embedded resource on a given path.
+// If the resource is not found, an error is thrown.
+func GetResource(filePath string) (*Resource, error) {
+	content, err := efs.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
 
-	return &EmbeddedFile{
+	return &Resource{
 		Name:    path.Base(filePath),
 		Path:    filePath,
 		Content: content,
 	}, nil
 }
 
-// getAll recursively searches for all embedded files on the given path.
-func getAll(rootDir string) ([]EmbeddedFile, error) {
-	var files []EmbeddedFile
+// getAllResources recursively searches for all embedded files
+// on the given path.
+func getAllResources(rootDir string) ([]Resource, error) {
+	var resources []Resource
 
 	filter := func(fPath string, f fs.DirEntry, err error) error {
 		if err != nil {
@@ -50,12 +51,12 @@ func getAll(rootDir string) ([]EmbeddedFile, error) {
 			return err
 		}
 
-		ef := EmbeddedFile{
+		res := Resource{
 			Name:    f.Name(),
 			Path:    fPath,
 			Content: content,
 		}
-		files = append(files, ef)
+		resources = append(resources, res)
 
 		return nil
 	}
@@ -65,15 +66,15 @@ func getAll(rootDir string) ([]EmbeddedFile, error) {
 		return nil, err
 	}
 
-	return files, nil
+	return resources, nil
 }
 
-// mirror copies the embedded file to the given destination path,
+// MirrorResource copies an embedded resource to the given destination path,
 // retaining (mirroring) its full path.
-func mirror(rootDir, resPath, dstPath string) error {
-	resAbsPath := path.Join(rootDir, resPath)
+func MirrorResource(resPath, dstPath string) error {
+	resPath = path.Clean(resPath)
 
-	f, err := efs.Open(resAbsPath)
+	f, err := efs.Open(resPath)
 	if err != nil {
 		return err
 	}
@@ -85,7 +86,7 @@ func mirror(rootDir, resPath, dstPath string) error {
 	}
 
 	if !fi.IsDir() {
-		content, err := efs.ReadFile(resAbsPath)
+		content, err := efs.ReadFile(resPath)
 		if err != nil {
 			return err
 		}
@@ -95,19 +96,18 @@ func mirror(rootDir, resPath, dstPath string) error {
 		return ioutil.WriteFile(resDstPath, content, os.ModePerm)
 	}
 
-	copyDir := func(path string, f fs.DirEntry, err error) error {
+	mirrorDir := func(fPath string, f fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 
-		resRelPath, _ := filepath.Rel(rootDir, path)
-		resDstPath := filepath.Join(dstPath, resRelPath)
+		resDstPath := path.Join(dstPath, fPath)
 
 		if f.IsDir() {
 			return os.MkdirAll(resDstPath, os.ModePerm)
 		}
 
-		content, err := efs.ReadFile(path)
+		content, err := efs.ReadFile(fPath)
 		if err != nil {
 			return err
 		}
@@ -115,34 +115,22 @@ func mirror(rootDir, resPath, dstPath string) error {
 		return ioutil.WriteFile(resDstPath, content, os.ModePerm)
 	}
 
-	return fs.WalkDir(efs, resAbsPath, copyDir)
+	return fs.WalkDir(efs, resPath, mirrorDir)
 }
 
 // GetResource returns a resource on a given path. If resource is not
 // found, an error is thrown
-func GetTemplate(tplPath string) (*EmbeddedFile, error) {
-	return get("templates", tplPath)
-}
-
-// GetResource returns a resource on a given path. If resource is not
-// found, an error is thrown
-func GetResource(resPath string) (*EmbeddedFile, error) {
-	return get("resources", resPath)
-}
-
-// MirrorResource copies the resource to the given destination path,
-// retaining (mirroring) its full path.
-func MirrorResource(resPath string, dstPath string) error {
-	return mirror("resources", resPath, dstPath)
+func GetTemplate(tplPath string) (*Resource, error) {
+	return GetResource(path.Join("templates", tplPath))
 }
 
 // Presets returns a list of all available presets.
-func Presets() ([]EmbeddedFile, error) {
-	return getAll("presets")
+func Presets() ([]Resource, error) {
+	return getAllResources("presets")
 }
 
 // GetPreset returns a preset with a given name. If preset is not found,
 // an error is returned.
-func GetPreset(name string) (*EmbeddedFile, error) {
-	return get("presets", name)
+func GetPreset(name string) (*Resource, error) {
+	return GetResource(path.Join("presets", name))
 }

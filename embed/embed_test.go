@@ -14,15 +14,16 @@ func TestGetTemplate(t *testing.T) {
 }
 
 func TestMirrorResource(t *testing.T) {
+	dstPath := t.TempDir()
 	for _, f := range env.ProjectRequiredFiles {
-		err := MirrorResource(f, t.TempDir())
+		err := MirrorResource(f, dstPath)
 		assert.NoError(t, err)
 	}
 }
 
 func TestMirrorResource_InvalidResourcePath(t *testing.T) {
 	err := MirrorResource("invalid", t.TempDir())
-	assert.ErrorContains(t, err, "resources/invalid: file does not exist")
+	assert.ErrorContains(t, err, "invalid: file does not exist")
 }
 
 func TestGetResource_File(t *testing.T) {
@@ -37,7 +38,7 @@ func TestGetResource_File(t *testing.T) {
 func TestGetResources_Invalid(t *testing.T) {
 	resPath := "terraform/modules"
 	_, err := GetResource(resPath)
-	assert.ErrorContains(t, err, "resources/terraform/modules: is a directory")
+	assert.ErrorContains(t, err, "terraform/modules: is a directory")
 }
 
 func TestPresets(t *testing.T) {
@@ -61,7 +62,7 @@ func TestGetPreset(t *testing.T) {
 	p, err := GetPreset("minimal.yaml")
 	assert.NoError(t, err)
 	assert.Equal(t, "minimal.yaml", p.Name)
-	assert.Equal(t, "minimal.yaml", p.Path)
+	assert.Equal(t, "presets/minimal.yaml", p.Path)
 }
 
 func TestGetPreset_NotFound(t *testing.T) {
