@@ -21,6 +21,7 @@ type kubespray struct {
 	ClusterPath       string
 	SshPrivateKeyPath string
 	ConfigDir         string
+	SharedDir         string
 	Config            *modelconfig.Config
 	InfraConfig       *modelinfra.Config
 	VirtualEnv        virtualenv.VirtualEnv
@@ -44,6 +45,7 @@ func NewKubesprayExecutor(
 	clusterPath string,
 	sshPrivateKeyPath string,
 	configDir string,
+	sharedDir string,
 	cfg *modelconfig.Config,
 	infraCfg *modelinfra.Config,
 	virtualEnv virtualenv.VirtualEnv,
@@ -53,6 +55,7 @@ func NewKubesprayExecutor(
 		ClusterPath:       clusterPath,
 		SshPrivateKeyPath: sshPrivateKeyPath,
 		ConfigDir:         configDir,
+		SharedDir:         sharedDir,
 		Config:            cfg,
 		InfraConfig:       infraCfg,
 		VirtualEnv:        virtualEnv,

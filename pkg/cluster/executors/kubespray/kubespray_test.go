@@ -80,6 +80,7 @@ func TestNewExecutor(t *testing.T) {
 		path.Join(tmpDir, clsName),
 		path.Join(tmpDir, "id_rsa"),
 		path.Join(tmpDir, "config"),
+		path.Join(tmpDir, "share"),
 		&modelconfig.Config{},
 		&modelinfra.Config{},
 		&virtualEnvMock{},
