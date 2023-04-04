@@ -106,6 +106,7 @@ func (t *terraform) init() error {
 		flag("force-copy"),
 		flag("input", false),
 		flag("get", true),
+		flag("upgrade"),
 	}
 
 	_, err = t.runCmd("init", args, true)
