@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 
 	"github.com/stretchr/testify/assert"
@@ -181,7 +181,7 @@ func TestEventPaths(t *testing.T) {
 
 func validateConfigPath(t *testing.T, path string) {
 	paths := strings.Split(path, ".")
-	cType := reflect.TypeOf(modelconfig.Config{})
+	cType := reflect.TypeOf(config.Config{})
 
 	pass := typePathExists(cType, paths...)
 
