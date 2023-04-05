@@ -15,7 +15,7 @@ import (
 func TestNewCluster(t *testing.T) {
 	ctx := app.MockAppContext(t)
 
-	c, err := NewCluster(ctx, mockConfigFile(t))
+	c, err := NewCluster(ctx, ConfigMock{}.Write(t))
 	assert.NoError(t, err)
 	assert.Equal(t, "cluster-mock", c.Name)
 }
@@ -23,35 +23,27 @@ func TestNewCluster(t *testing.T) {
 func TestNewCluster_Local(t *testing.T) {
 	ctx := app.MockAppContext(t, app.AppContextOptions{Local: true})
 
-	c, err := NewCluster(ctx, mockConfigFile(t))
+	c, err := NewCluster(ctx, ConfigMock{}.Write(t))
+	assert.NoError(t, err)
+	assert.Equal(t, "local-cluster-mock", c.Name)
+}
+
+func TestNewCluster_ClusterNameAlreadyPrefixed(t *testing.T) {
+	ctx := app.MockAppContext(t, app.AppContextOptions{Local: true})
+	cfg := ConfigMock{ClusterName: "local-cluster-mock"}
+	cfgPath := cfg.Write(t)
+
+	c, err := NewCluster(ctx, cfgPath)
 	assert.NoError(t, err)
 	assert.Equal(t, "local-cluster-mock", c.Name)
 }
 
 func TestNewCluster_InvalidClusterName(t *testing.T) {
-	cfgPath := writeConfigFile(t, template.TrimTemplate(`
-		hosts:
-			- name: localhost
-				connection:
-					type: local
-
-		cluster:
-			name: local-cluster-mock
-			network:
-				cidr: 192.168.113.0/24
-			nodes:
-				master:
-					instances:
-						- id: 1
-
-		kubernetes:
-			version: v1.25.6
-			kubespray:
-				version: v1.0.0
-	`))
+	cfg := ConfigMock{ClusterName: "local-cluster-mock"}
+	cfgPath := cfg.Write(t)
 
 	_, err := NewCluster(app.MockAppContext(t), cfgPath)
-	assert.ErrorContains(t, err, "Cluster name cannot contain a prefix 'local'.")
+	assert.ErrorContains(t, err, "cluster name contains the prefix 'local'")
 }
 
 func TestNewCluster_ConfigNotExists(t *testing.T) {

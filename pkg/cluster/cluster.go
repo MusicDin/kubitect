@@ -59,12 +59,14 @@ func NewCluster(ctx app.AppContext, configPath string) (*Cluster, error) {
 		return nil, fmt.Errorf("invalid configuration file")
 	}
 
-	// Throw an error if cluster name contains prefix local.
-	// Prepend prefix "local" to the cluster name, if cluster is local.
-	if strings.HasPrefix(c.NewConfig.Cluster.Name, "local") {
-		return nil, fmt.Errorf("Cluster name cannot contain a prefix 'local'. This prefix is reserved for clusters created with --local flag.")
-	} else if ctx.Local() {
-		c.NewConfig.Cluster.Name = "local-" + c.NewConfig.Cluster.Name
+	// If the cluster is created locally, ensure its name has the "local-" prefix.
+	// Otherwise, disallow the use of the "local-" prefix in cluster names.
+	if ctx.Local() {
+		if !strings.HasPrefix(c.NewConfig.Cluster.Name, "local-") {
+			c.NewConfig.Cluster.Name = "local-" + c.NewConfig.Cluster.Name
+		}
+	} else if strings.HasPrefix(c.NewConfig.Cluster.Name, "local-") {
+		return nil, fmt.Errorf("cluster name contains the prefix 'local', which is reserved for clusters created with the '--local' flag")
 	}
 
 	c.Name = c.NewConfig.Cluster.Name

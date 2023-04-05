@@ -1,7 +1,6 @@
 package cluster
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -11,6 +10,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
 	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/pkg/ui"
+	"github.com/MusicDin/kubitect/pkg/utils/defaults"
 	"github.com/MusicDin/kubitect/pkg/utils/template"
 
 	"github.com/stretchr/testify/assert"
@@ -40,7 +40,7 @@ func MockCluster(t *testing.T) *ClusterMock {
 	}
 	ctx := app.MockAppContext(t, ctxOptions)
 
-	c, err := NewCluster(ctx, mockConfigFile(t))
+	c, err := NewCluster(ctx, ConfigMock{}.Write(t))
 	assert.NoError(t, err)
 
 	// Create an empty SSH key pair
@@ -65,17 +65,27 @@ func MockLocalCluster(t *testing.T) *ClusterMock {
 	return c
 }
 
-// mockConfigFile writes a sample test configuration file and
-// returns its path.
-func mockConfigFile(t *testing.T) string {
-	cfg := template.TrimTemplate(`
+type ConfigMock struct {
+	ClusterName string
+}
+
+func (c ConfigMock) Name() string {
+	return c.ClusterName
+}
+
+func (c *ConfigMock) SetDefaults() {
+	c.ClusterName = defaults.Default(c.ClusterName, "cluster-mock")
+}
+
+func (c ConfigMock) Template() string {
+	return template.TrimTemplate(`
 		hosts:
 			- name: localhost
 				connection:
 					type: local
 
 		cluster:
-			name: cluster-mock
+			name: {{ .ClusterName }}
 			network:
 				cidr: 192.168.113.0/24
 			nodes:
@@ -88,12 +98,14 @@ func mockConfigFile(t *testing.T) string {
 			kubespray:
 				version: v2.21.0
 	`)
-	return writeConfigFile(t, cfg)
 }
 
-func writeConfigFile(t *testing.T, cfg string) string {
+func (c ConfigMock) Write(t *testing.T) string {
 	cfgPath := path.Join(t.TempDir(), "config.yaml")
-	err := ioutil.WriteFile(cfgPath, []byte(cfg), 0777)
-	assert.NoError(t, err, "Failed to write configuration file!")
+	c.SetDefaults()
+
+	err := template.Write(c, cfgPath)
+	assert.NoError(t, err)
+
 	return cfgPath
 }
