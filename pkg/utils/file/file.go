@@ -5,9 +5,7 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"os"
-	"path/filepath"
-
-	"github.com/otiai10/copy"
+	"path"
 
 	"gopkg.in/yaml.v3"
 )
@@ -30,95 +28,47 @@ func Read(path string) (string, error) {
 	return string(file), nil
 }
 
-// MakeDir creates a directory named path, along with any necessary parents.
-func MakeDir(path string) error {
-	err := os.MkdirAll(path, os.ModePerm)
-
-	if err != nil {
-		return fmt.Errorf("make directory '%s': %v", path, err)
-	}
-
-	return nil
-}
-
-// Copy gracefully copies a file from source to destination path. Files
-// that already exist on the destination path will be left untouched.
-func Copy(srcPath, dstPath string) error {
-	opt := copy.Options{}
-
+// Copy reads file from the source path and writes it to the destination path
+// with the specified permissions. All required subdirectories are also
+// created. An error is thrown if destination file exists.
+func Copy(srcPath, dstPath string, mode fs.FileMode) error {
 	if Exists(dstPath) {
-		return fmt.Errorf("copy from '%s' to '%s': destination already exists", srcPath, dstPath)
+		return fmt.Errorf("copy file: destination file already exists %s", dstPath)
 	}
 
-	opt.OnDirExists = func(src, dest string) copy.DirExistsAction {
-		return copy.Untouchable
-	}
+	return ForceCopy(srcPath, dstPath, mode)
+}
 
-	err := copy.Copy(srcPath, dstPath, opt)
-
+// ForceCopy reads the file located at the source path and writes it to the
+// destination path with the specified permissions. All required subdirectories
+// are also created.
+func ForceCopy(srcPath, dstPath string, mode fs.FileMode) error {
+	file, err := ioutil.ReadFile(srcPath)
 	if err != nil {
-		return fmt.Errorf("copy from '%s' to '%s': %v", srcPath, dstPath, err)
+		return fmt.Errorf("copy file: %v", err)
+	}
+
+	if err := os.MkdirAll(path.Dir(dstPath), os.ModePerm); err != nil {
+		return err
+	}
+
+	err2 := os.WriteFile(dstPath, file, mode)
+	if err2 != nil {
+		return fmt.Errorf("copy file: %v", err2)
 	}
 
 	return nil
 }
 
-// ForceCopy copies a file from source to destination path. Files that
-// already exist on the destination path will be replaced (overwritten).
-func ForceCopy(srcPath, dstPath string) error {
-	opt := copy.Options{}
-
-	opt.OnDirExists = func(src, dest string) copy.DirExistsAction {
-		return copy.Replace
-	}
-
-	err := copy.Copy(srcPath, dstPath, opt)
-
-	if err != nil {
-		return fmt.Errorf("force copy from '%s' to '%s': %v", srcPath, dstPath, err)
-	}
-
-	return nil
-}
-
-// Move moves a file or directory to a specified location. First the
-// destination file or directory is removed, and then the source
-// content is moved.
-func Move(srcPath string, dstPath string) error {
-	if err := Remove(dstPath); err != nil {
-		return fmt.Errorf("move: %v", err)
-	}
-
-	if err := MakeDir(filepath.Dir(dstPath)); err != nil {
-		return fmt.Errorf("move: %v", err)
-	}
-
-	if err := os.Rename(srcPath, dstPath); err != nil {
-		return fmt.Errorf("move from '%s' to '%s': %v", srcPath, dstPath, err)
-	}
-
-	return nil
-}
-
-// Remove removes directory and any children it contains.
-func Remove(path string) error {
-	err := os.RemoveAll(path)
-
-	if err != nil {
-		return fmt.Errorf("remove '%s': %v", path, err)
-	}
-
-	return nil
-}
-
-// ReadYaml reads yaml file on the given path and unmarshals it into the given type.
+// ReadYaml reads yaml file on the given path and unmarshals it into the given
+// type.
 func ReadYaml[T interface{}](path string, typ T) (*T, error) {
-	yml, err := Read(path)
+	yml, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	err = yaml.Unmarshal([]byte(yml), &typ)
+	err = yaml.Unmarshal(yml, &typ)
 	return &typ, err
 }
 
@@ -129,5 +79,5 @@ func WriteYaml(obj interface{}, path string, perm fs.FileMode) error {
 		return err
 	}
 
-	return ioutil.WriteFile(path, []byte(yml), perm)
+	return ioutil.WriteFile(path, yml, perm)
 }
