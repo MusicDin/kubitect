@@ -6,17 +6,17 @@ import (
 	"path"
 	"strings"
 
-	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/utils/template"
 )
 
 type MainTemplate struct {
-	Hosts        []modelconfig.Host
-	RemovedHosts []modelconfig.Host
+	Hosts        []config.Host
+	RemovedHosts []config.Host
 	projDir      string
 }
 
-func NewMainTemplate(projectDir string, hosts, removedHosts []modelconfig.Host) MainTemplate {
+func NewMainTemplate(projectDir string, hosts, removedHosts []config.Host) MainTemplate {
 	return MainTemplate{
 		Hosts:        hosts,
 		RemovedHosts: removedHosts,
@@ -44,9 +44,9 @@ func (t MainTemplate) Write() error {
 }
 
 // defaultHost returns default host from a given list of hosts.
-func defaultHost(hosts []modelconfig.Host) (modelconfig.Host, error) {
+func defaultHost(hosts []config.Host) (config.Host, error) {
 	if hosts == nil || len(hosts) == 0 {
-		return modelconfig.Host{}, fmt.Errorf("defaultHost: hosts list is empty")
+		return config.Host{}, fmt.Errorf("defaultHost: hosts list is empty")
 	}
 
 	for _, h := range hosts {
@@ -59,10 +59,10 @@ func defaultHost(hosts []modelconfig.Host) (modelconfig.Host, error) {
 }
 
 // hostUri returns URI of a given host.
-func hostUri(host modelconfig.Host) (string, error) {
+func hostUri(host config.Host) (string, error) {
 	typ := host.Connection.Type
 
-	if typ == "" || typ == modelconfig.LOCALHOST || typ == modelconfig.LOCAL {
+	if typ == "" || typ == config.LOCALHOST || typ == config.LOCAL {
 		return "qemu:///system", nil
 	}
 

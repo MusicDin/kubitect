@@ -4,7 +4,7 @@ import (
 	"path"
 
 	"github.com/MusicDin/kubitect/embed"
-	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/utils/template"
 )
 
@@ -24,11 +24,11 @@ func fetchTemplate(name string) string {
 }
 
 type KubesprayAllTemplate struct {
-	InfraNodes modelconfig.Nodes
+	InfraNodes config.Nodes
 	configDir  string
 }
 
-func NewKubesprayAllTemplate(configDir string, infraNodes modelconfig.Nodes) KubesprayAllTemplate {
+func NewKubesprayAllTemplate(configDir string, infraNodes config.Nodes) KubesprayAllTemplate {
 	return KubesprayAllTemplate{
 		configDir:  configDir,
 		InfraNodes: infraNodes,
@@ -49,11 +49,11 @@ func (t KubesprayAllTemplate) Template() string {
 }
 
 type KubesprayK8sClusterTemplate struct {
-	Config    modelconfig.Config
+	Config    config.Config
 	configDir string
 }
 
-func NewKubesprayK8sClusterTemplate(configDir string, config modelconfig.Config) KubesprayK8sClusterTemplate {
+func NewKubesprayK8sClusterTemplate(configDir string, config config.Config) KubesprayK8sClusterTemplate {
 	return KubesprayK8sClusterTemplate{
 		configDir: configDir,
 		Config:    config,
@@ -121,10 +121,10 @@ func (t KubesprayEtcdTemplate) Template() string {
 
 type HostsTemplate struct {
 	configDir string
-	Hosts     []modelconfig.Host
+	Hosts     []config.Host
 }
 
-func NewHostsTemplate(configDir string, hosts []modelconfig.Host) HostsTemplate {
+func NewHostsTemplate(configDir string, hosts []config.Host) HostsTemplate {
 	return HostsTemplate{
 		configDir: configDir,
 		Hosts:     hosts,
@@ -147,8 +147,8 @@ func (t HostsTemplate) Functions() map[string]interface{} {
 }
 
 // isRemoteHost returns true id host's connection type equals REMOTE.
-func isRemoteHost(host modelconfig.Host) bool {
-	return host.Connection.Type == modelconfig.REMOTE
+func isRemoteHost(host config.Host) bool {
+	return host.Connection.Type == config.REMOTE
 }
 
 func (t HostsTemplate) Template() string {
@@ -157,11 +157,11 @@ func (t HostsTemplate) Template() string {
 
 type NodesTemplate struct {
 	configDir   string
-	ConfigNodes modelconfig.Nodes
-	InfraNodes  modelconfig.Nodes
+	ConfigNodes config.Nodes
+	InfraNodes  config.Nodes
 }
 
-func NewNodesTemplate(configDir string, configNodes, infraNodes modelconfig.Nodes) NodesTemplate {
+func NewNodesTemplate(configDir string, configNodes, infraNodes config.Nodes) NodesTemplate {
 	return NodesTemplate{
 		configDir:   configDir,
 		ConfigNodes: configNodes,

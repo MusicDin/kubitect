@@ -8,7 +8,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/app"
 	"github.com/MusicDin/kubitect/pkg/cluster/executors"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
-	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
+	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/ui"
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
 	"github.com/MusicDin/kubitect/pkg/utils/template"
@@ -48,7 +48,7 @@ func MockCluster(t *testing.T) *ClusterMock {
 	keyPath := path.Join(keyDir, "key")
 	os.Create(keyPath)
 	os.Create(keyPath + ".pub")
-	c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath = modelconfig.File(keyPath)
+	c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath = config.File(keyPath)
 
 	c.exec = executors.MockExecutor(t)
 	c.prov = provisioner.MockProvisioner(t)

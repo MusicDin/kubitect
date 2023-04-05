@@ -10,8 +10,8 @@ import (
 
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
-	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/pkg/env"
+	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/ui"
 	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 	"github.com/MusicDin/kubitect/pkg/utils/file"
@@ -42,7 +42,7 @@ type (
 
 		// Configuration file containing values required for
 		// main.tf template
-		cfg *modelconfig.Config
+		cfg *config.Config
 
 		// Indicates that terraform project has
 		// been already initialized.
@@ -54,7 +54,7 @@ func NewTerraformProvisioner(
 	clusterPath,
 	sharedPath string,
 	showPlan bool,
-	cfg *modelconfig.Config,
+	cfg *config.Config,
 ) provisioner.Provisioner {
 	version := env.ConstTerraformVersion
 	binDir := path.Join(sharedPath, "terraform", version)
@@ -292,15 +292,15 @@ func flag(key string, value ...interface{}) string {
 
 // extractRemovedHosts iterates over provided events and extracts
 // hosts that have been removed.
-func extractRemovedHosts(events event.Events) []modelconfig.Host {
-	var hosts []modelconfig.Host
+func extractRemovedHosts(events event.Events) []config.Host {
+	var hosts []config.Host
 	for _, e := range events {
 		if e.Action() != cmp.DELETE {
 			continue
 		}
 
 		for _, ch := range e.Changes() {
-			if host, ok := ch.Before.(modelconfig.Host); ok {
+			if host, ok := ch.Before.(config.Host); ok {
 				hosts = append(hosts, host)
 			}
 		}

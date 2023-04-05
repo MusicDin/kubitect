@@ -9,8 +9,8 @@ import (
 
 	"github.com/MusicDin/kubitect/embed"
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
-	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
 	"github.com/MusicDin/kubitect/pkg/env"
+	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/ui"
 	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 
@@ -58,13 +58,13 @@ func MockInvalidTerraform(t *testing.T) *terraform {
 func TestNewTerraformProvisioner(t *testing.T) {
 	clsPath := t.TempDir()
 
-	hosts := []modelconfig.Host{
-		modelconfig.MockLocalHost(t, "test1", false),
-		modelconfig.MockLocalHost(t, "test2", true),
-		modelconfig.MockRemoteHost(t, "test3", false, false),
+	hosts := []config.Host{
+		config.MockLocalHost(t, "test1", false),
+		config.MockLocalHost(t, "test2", true),
+		config.MockRemoteHost(t, "test3", false, false),
 	}
 
-	cfg := &modelconfig.Config{Hosts: hosts}
+	cfg := &config.Config{Hosts: hosts}
 
 	// prepare terraform template
 	err := embed.MirrorResource("terraform/main.tf.tpl", clsPath)
@@ -77,7 +77,7 @@ func TestNewTerraformProvisioner(t *testing.T) {
 func TestNewTerraformProvisioner_InvalidHosts(t *testing.T) {
 	clsPath := t.TempDir()
 
-	cfg := &modelconfig.Config{}
+	cfg := &config.Config{}
 
 	// prepare terraform template
 	err := embed.MirrorResource("terraform/main.tf.tpl", clsPath)
@@ -130,7 +130,7 @@ func TestTerraform_Actions_Error(t *testing.T) {
 }
 
 func TestExtractRemovedHosts(t *testing.T) {
-	host := modelconfig.Host{
+	host := config.Host{
 		Name: "test",
 	}
 

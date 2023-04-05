@@ -12,9 +12,9 @@ import (
 	"github.com/MusicDin/kubitect/pkg/cluster/executors/kubespray"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner/terraform"
-	"github.com/MusicDin/kubitect/pkg/config/modelconfig"
-	"github.com/MusicDin/kubitect/pkg/config/modelinfra"
 	"github.com/MusicDin/kubitect/pkg/env"
+	"github.com/MusicDin/kubitect/pkg/models/config"
+	"github.com/MusicDin/kubitect/pkg/models/infra"
 	"github.com/MusicDin/kubitect/pkg/tools/virtualenv"
 	"github.com/MusicDin/kubitect/pkg/ui"
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
@@ -27,16 +27,16 @@ type Cluster struct {
 	NewConfigPath string
 
 	// Configuration files
-	NewConfig     *modelconfig.Config
-	AppliedConfig *modelconfig.Config
-	InfraConfig   *modelinfra.Config
+	NewConfig     *config.Config
+	AppliedConfig *config.Config
+	InfraConfig   *infra.Config
 }
 
 // NewCluster returns new Cluster instance with populated general fields.
 // Cluster name and path are extracted from the provided configuration file.
 // Previously applied configuration is also read, if cluster already exists.
 func NewCluster(ctx app.AppContext, configPath string) (*Cluster, error) {
-	newCfg, err := readConfig(configPath, modelconfig.Config{})
+	newCfg, err := readConfig(configPath, config.Config{})
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func NewCluster(ctx app.AppContext, configPath string) (*Cluster, error) {
 func (c *Cluster) Sync() error {
 	var err error
 
-	appliedCfg, err := readConfigIfExists(c.AppliedConfigPath(), modelconfig.Config{})
+	appliedCfg, err := readConfigIfExists(c.AppliedConfigPath(), config.Config{})
 	if err != nil {
 		return fmt.Errorf("failed to read previously applied configuration file: %v", err)
 	}
@@ -90,7 +90,7 @@ func (c *Cluster) Sync() error {
 		c.AppliedConfig = appliedCfg
 	}
 
-	infraCfg, err := readConfigIfExists(c.InfrastructureConfigPath(), modelinfra.Config{})
+	infraCfg, err := readConfigIfExists(c.InfrastructureConfigPath(), infra.Config{})
 	if err != nil {
 		return fmt.Errorf("failed to read infrastructure file: %v", err)
 	}
