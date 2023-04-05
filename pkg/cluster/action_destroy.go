@@ -2,9 +2,9 @@ package cluster
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/MusicDin/kubitect/pkg/ui"
-	"github.com/MusicDin/kubitect/pkg/utils/file"
 )
 
 // Destroy destroys an active cluster and removes cluster's
@@ -26,7 +26,7 @@ func (c *ClusterMeta) Destroy() error {
 	}
 
 	ui.Println(ui.INFO, "Cleaning up cluster directory...", c.Name)
-	if err := file.Remove(c.Path); err != nil {
+	if err := os.RemoveAll(c.Path); err != nil {
 		return fmt.Errorf("failed to remove directory of the cluster '%s': %v", c.Name, err)
 	}
 

@@ -8,7 +8,6 @@ require (
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/hashicorp/hc-install v0.3.2
-	github.com/otiai10/copy v1.7.0
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.0
 	golang.org/x/term v0.2.0

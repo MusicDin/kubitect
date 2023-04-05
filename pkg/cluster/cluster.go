@@ -167,5 +167,5 @@ func (c *Cluster) StoreNewConfig() error {
 
 	c.NewConfigPath = dst
 
-	return file.ForceCopy(src, dst)
+	return file.ForceCopy(src, dst, 0644)
 }
