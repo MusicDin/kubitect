@@ -30,6 +30,12 @@ provider "libvirt" {
   uri   = "{{ hostUri .}}"
 }
 {{- end }}
+{{ range .RemovedHosts }}
+provider "libvirt" {
+  alias = "{{ .Name }}"
+  uri   = "{{ hostUri .}}"
+}
+{{- end }}
 
 
 #======================================================================================

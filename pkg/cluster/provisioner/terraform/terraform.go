@@ -71,22 +71,16 @@ func NewTerraformProvisioner(
 
 // Init generates Terraform's main.tf file based on the provided cluster configuration.
 func (t *terraform) Init(events event.Events) error {
-	hosts := t.cfg.Hosts
-
-	// Append removed hosts when scaling down, otherwise Terraform
-	// won't be able to establish connection with the host where
-	// resources have to be removed.
-	if len(events.OfType(event.SCALE_DOWN)) > 0 {
-		hosts = append(hosts, extractRemovedHosts(events)...)
-	}
-
 	cfgPath := path.Join(t.projectDir, "variables.yaml")
 	err := file.WriteYaml(t.cfg, cfgPath, 0644)
 	if err != nil {
 		return fmt.Errorf("terraform: failed to create input variables file: %v", err)
 	}
 
-	return NewMainTemplate(t.projectDir, hosts).Write()
+	hosts := t.cfg.Hosts
+	removedHosts := extractRemovedHosts(events)
+
+	return NewMainTemplate(t.projectDir, hosts, removedHosts).Write()
 }
 
 // init initializes a Terraform project.
@@ -296,6 +290,8 @@ func flag(key string, value ...interface{}) string {
 	return fmt.Sprintf("-%s", key)
 }
 
+// extractRemovedHosts iterates over provided events and extracts
+// hosts that have been removed.
 func extractRemovedHosts(events event.Events) []modelconfig.Host {
 	var hosts []modelconfig.Host
 	for _, e := range events {
@@ -304,8 +300,8 @@ func extractRemovedHosts(events event.Events) []modelconfig.Host {
 		}
 
 		for _, ch := range e.Changes() {
-			if i, ok := ch.Before.(modelconfig.Host); ok {
-				hosts = append(hosts, i)
+			if host, ok := ch.Before.(modelconfig.Host); ok {
+				hosts = append(hosts, host)
 			}
 		}
 	}

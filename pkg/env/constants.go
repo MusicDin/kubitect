@@ -21,16 +21,11 @@ var ProjectRequiredApps = []string{
 	"git",
 }
 
-// Defines required files/directories that are copied from tmp git project.
+// Defines required files/directories that are copied from embedded
+// resources, when cluster is created.
 var ProjectRequiredFiles = []string{
 	"ansible/",
-	"terraform/modules/",
-	"terraform/templates/",
-	"terraform/scripts/",
-	"terraform/main.tf.tpl",
-	"terraform/output.tf",
-	"terraform/variables.tf",
-	"terraform/versions.tf",
+	"terraform/",
 }
 
 // Defines options for "apply --action" command.

@@ -107,10 +107,6 @@ func (e *kubespray) Sync() error {
 // Create creates a Kubernetes cluster by calling appropriate Kubespray
 // playbooks.
 func (e *kubespray) Create() error {
-	if err := e.KubitectHostsSetup(); err != nil {
-		return err
-	}
-
 	if err := e.HAProxy(); err != nil {
 		return err
 	}
@@ -125,10 +121,6 @@ func (e *kubespray) Create() error {
 // Upgrades upgrades a Kubernetes cluster by calling appropriate Kubespray
 // playbooks.
 func (e *kubespray) Upgrade() error {
-	if err := e.KubitectHostsSetup(); err != nil {
-		return err
-	}
-
 	if err := e.KubesprayUpgrade(); err != nil {
 		return err
 	}
@@ -142,10 +134,6 @@ func (e *kubespray) ScaleUp(events event.Events) error {
 
 	if len(events) == 0 {
 		return nil
-	}
-
-	if err := e.KubitectHostsSetup(); err != nil {
-		return err
 	}
 
 	if err := e.HAProxy(); err != nil {
@@ -173,10 +161,6 @@ func (e *kubespray) ScaleDown(events event.Events) error {
 	for _, n := range rmNodes {
 		name := fmt.Sprintf("%s-%s-%s", e.ClusterName, n.GetTypeName(), n.GetID())
 		names = append(names, name)
-	}
-
-	if err := e.KubitectHostsSetup(); err != nil {
-		return err
 	}
 
 	if err := e.generateGroupVars(); err != nil {

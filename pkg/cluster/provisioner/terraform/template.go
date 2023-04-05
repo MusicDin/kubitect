@@ -11,14 +11,16 @@ import (
 )
 
 type MainTemplate struct {
-	Hosts   []modelconfig.Host
-	projDir string
+	Hosts        []modelconfig.Host
+	RemovedHosts []modelconfig.Host
+	projDir      string
 }
 
-func NewMainTemplate(projectDir string, hosts []modelconfig.Host) MainTemplate {
+func NewMainTemplate(projectDir string, hosts, removedHosts []modelconfig.Host) MainTemplate {
 	return MainTemplate{
-		Hosts:   hosts,
-		projDir: projectDir,
+		Hosts:        hosts,
+		RemovedHosts: removedHosts,
+		projDir:      projectDir,
 	}
 }
 
