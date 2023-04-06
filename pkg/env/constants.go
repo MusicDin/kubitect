@@ -37,10 +37,10 @@ var ProjectApplyActions = [...]string{
 
 var ProjectOsPresets = map[string]string{
 	"ubuntu":   "https://cloud-images.ubuntu.com/releases/jammy/release/ubuntu-22.04-server-cloudimg-amd64.img",
-	"ubuntu22": "https://cloud-images.ubuntu.com/releases/jammy/release-20220712/ubuntu-22.04-server-cloudimg-amd64.img",
-	"ubuntu20": "https://cloud-images.ubuntu.com/releases/focal/release-20220711/ubuntu-20.04-server-cloudimg-amd64.img",
+	"ubuntu22": "https://cloud-images.ubuntu.com/releases/jammy/release-20230302/ubuntu-22.04-server-cloudimg-amd64.img",
+	"ubuntu20": "https://cloud-images.ubuntu.com/releases/focal/release-20230209/ubuntu-20.04-server-cloudimg-amd64.img",
 	"debian":   "https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-generic-amd64.qcow2",
-	"debian11": "https://cloud.debian.org/images/cloud/bullseye/20220711-1073/debian-11-genericcloud-amd64-20220711-1073.qcow2",
+	"debian11": "https://cloud.debian.org/images/cloud/bullseye/20230124-1270/debian-11-genericcloud-amd64-20230124-1270.qcow2",
 }
 
 var ProjectK8sVersions = []string{
