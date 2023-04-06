@@ -219,10 +219,6 @@ func (c *Cluster) scale(events event.Events) error {
 		return err
 	}
 
-	if err := c.Executor().Sync(); err != nil {
-		return err
-	}
-
 	if err := c.Provisioner().Init(events); err != nil {
 		return err
 	}
@@ -232,6 +228,10 @@ func (c *Cluster) scale(events event.Events) error {
 	}
 
 	if err := c.Sync(); err != nil {
+		return err
+	}
+
+	if err := c.Executor().Sync(); err != nil {
 		return err
 	}
 
