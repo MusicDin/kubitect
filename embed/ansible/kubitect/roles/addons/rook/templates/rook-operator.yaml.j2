@@ -1,5 +1,5 @@
 {% set env = namespace(nodeAffinity="") %}
-{% for key, value in config.addons.rook.nodeSelector | default({}) | items %}
+{% for key, value in config.addons.rook.nodeSelector | default({}) | dict2items %}
   {% set env.nodeAffinity = env.nodeAffinity + (key~'='~value~';') %}
 {% endfor %}
 

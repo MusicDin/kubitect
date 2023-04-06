@@ -2,7 +2,7 @@
 - name: Extract Rook nodes
   vars:
     # Deploy only on worker nodes. If worker nodes are not set, use only master nodes.
-    nodes: "{{ infra.cluster.nodes.worker.instances | default( infra.cluster.nodes.master.instances ) }}"
+    nodes: "{{ infra.nodes.worker.instances | default( infra.nodes.master.instances ) }}"
     node_selector: "{{ config.addons.rook.nodeSelector | default({}) }}"
   block:
     - name: Set initial values for Rook variables
