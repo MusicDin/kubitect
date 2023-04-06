@@ -171,7 +171,7 @@ func (e *kubespray) ScaleDown(events event.Events) error {
 		return err
 	}
 
-	return nil
+	return e.generateNodesInventory()
 }
 
 // extractRemovedNodes returns node instances from the event changes.
