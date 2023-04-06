@@ -55,10 +55,10 @@ cluster:
 Available OS distribution presets are the following:
 
 + `ubuntu` - Latest Ubuntu 22.04 release. (*default*)
-+ `ubuntu22` - Ubuntu 22.04 release *2022-07-12*.
-+ `ubuntu20` - Ubuntu 20.04 release *2022-07-11*.
++ `ubuntu22` - Ubuntu 22.04 release *2023-03-02*.
++ `ubuntu20` - Ubuntu 20.04 release *2023-02-09*.
 + `debian` - Latest Debian 11 release.
-+ `debian11` - Debian 11 release *2022-07-11*.
++ `debian11` - Debian 11 release *2023-01-24*.
 
 Ubuntu images are downloaded from the [Ubuntu cloud image repository](https://cloud-images.ubuntu.com/) and Debian images are downloaded from the [Debian cloud image repository](https://cloud.debian.org/images/cloud/).
 
