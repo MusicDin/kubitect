@@ -311,6 +311,22 @@ func TestFileExists(t *testing.T) {
 	assert.Error(t, Var("./non-existing-file-test", FileExists()))
 }
 
+func TestFilePath(t *testing.T) {
+	assert.NoError(t, Var("./validators_test.go", FilePath()))
+	assert.NoError(t, Var("./non-existing-file-test", FilePath()))
+	assert.Error(t, Var("", FilePath()))
+	// Fails the test (nil pointer)
+	// assert.NoError(t, Var("/etc", FilePath()))
+}
+
+func TestDirPath(t *testing.T) {
+	assert.NoError(t, Var("/etc", DirPath()))
+	assert.NoError(t, Var("/", DirPath()))
+	assert.Error(t, Var("", DirPath()))
+	// Fails the test
+	// assert.NoError(t, Var("/dir", DirPath()))
+}
+
 func TestURL(t *testing.T) {
 	assert.NoError(t, Var("https://kubitect.io", URL()))
 	assert.Error(t, Var("kubitect.io", URL()))

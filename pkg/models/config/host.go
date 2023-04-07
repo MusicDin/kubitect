@@ -21,7 +21,7 @@ func (h Host) Validate() error {
 	return v.Struct(&h,
 		v.Field(&h.Name, v.NotEmpty(), v.AlphaNumericHypUS()),
 		v.Field(&h.Connection),
-		v.Field(&h.MainResourcePoolPath), // TODO: validate dir path which does not have to exist
+		v.Field(&h.MainResourcePoolPath), // v.Field(&h.MainResourcePoolPath, v.DirPath()),
 		v.Field(&h.DataResourcePools, v.UniqueField("Name")),
 	)
 }
@@ -38,7 +38,7 @@ type DataResourcePool struct {
 func (rp DataResourcePool) Validate() error {
 	return v.Struct(&rp,
 		v.Field(&rp.Name, v.NotEmpty(), v.AlphaNumericHyp()),
-		v.Field(&rp.Path, v.NotEmpty()), // TODO: Valid file path. File does not need to exist.
+		v.Field(&rp.Path, v.NotEmpty()), // v.Field(&h.MainResourcePoolPath, v.FilePath()),
 	)
 }
 

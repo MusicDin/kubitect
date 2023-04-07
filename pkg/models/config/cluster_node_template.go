@@ -74,7 +74,7 @@ func (nic OSNetworkInterface) Validate() error {
 type OSSource string
 
 func (os OSSource) Validate() error {
-	return v.Var(os) // TODO: URL or FileExists
+	return v.Var(os)
 }
 
 type NodeTemplateSSH struct {

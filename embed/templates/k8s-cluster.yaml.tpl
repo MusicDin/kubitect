@@ -4,7 +4,6 @@
 ##
 ---
 auto_renew_certificates: {{ .Config.Kubernetes.Other.AutoRenewCertificates }}
-# TODO: Support custom DNS domain
 cluster_name: cluster.local
 dns_mode: {{ .Config.Kubernetes.DnsMode }}
 kube_version: {{ .Config.Kubernetes.Version }}
