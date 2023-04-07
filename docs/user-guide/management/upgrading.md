@@ -11,21 +11,17 @@ Exporting the current cluster configuration is optional, but strongly recommende
 The cluster configuration file can be exported using the `export` command.
 
 ```sh
-kubitect export config --cluster my-cluster > my-cluster.yaml
+kubitect export config --cluster my-cluster > cluster.yaml
 ```
 
 
 ## Upgrade the cluster
 
-!!! warning "Important"
-    Do not skip Kubitect's minor releases when upgrading the cluster.
-
 In the cluster configuration file, change the Kubernetes version.
 
-Example:
 ```yaml title="cluster.yaml"
 kubernetes:
-  version: v1.22.5 # Old value: v1.21.6
+  version: v1.24.5 # Old value: v1.23.6
   ...
 ```
 

@@ -4,7 +4,8 @@
 
 <div markdown="1" class="text-justify">
 
-This example shows how to use Kubitect to set up a Kubernetes cluster with **one master and three worker nodes**.
+This example demonstrates how to use Kubitect to set up a Kubernetes cluster consisting of **one master and three worker nodes**. 
+The final topology of the deployed Kubernetes cluster is shown in the figure below.
 
 <div class="text-center">
   <img
@@ -16,12 +17,19 @@ This example shows how to use Kubitect to set up a Kubernetes cluster with **one
 
 !!! note "Note"
 
-    In this example we skip the explanation of some common configurations (hosts, network, node template, ...), as they are already explained in the [Getting started (step-by-step)](../../getting-started/getting-started) guide.
+    This example skips the explanation of some common configurations such as hosts, network, and node template, as they are already covered in detail in the [Getting started (step-by-step)](../../getting-started/getting-started) guide.
+
+!!! preset "Preset available"
+
+    To export the preset configuration, run:
+    <code>
+      kubitect export preset <b>example-multi-worker</b>
+    </code>
 
 ## Step 1: Cluster configuration
 
-To create a cluster with multiple workers, simply specify multiple worker nodes in the configuration.
-In this particular case, we want to have 3 worker nodes, but there can be as many as you want.
+You can easily create a cluster with multiple worker nodes by specifying them in the configuration file. 
+For this example, we have included three worker nodes, but you can add as many as you like to suit your needs.
 
 ```yaml title="multi-worker.yaml" 
 cluster:
@@ -83,7 +91,8 @@ cluster:
 
 ## Step 2: Applying the configuration
 
-Apply the cluster:
+To deploy a cluster, apply the configuration file:
+
 ```sh
 kubitect apply --config multi-worker.yaml
 ```

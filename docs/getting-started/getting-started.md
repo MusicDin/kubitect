@@ -128,7 +128,7 @@ This mode allows the use of IP address ranges that do not exist within our local
 On the other hand, the `bridge` network mode uses a predefined bridge interface, allowing virtual machines to connect directly to the LAN. 
 This mode is mandatory when the cluster spreads over multiple hosts.
 
-For the sake of simplicity, this tutorial will use the NAT mode as it does not require a preconfigured bridge interface."
+For the sake of simplicity, this tutorial will use the NAT mode as it does not require a preconfigured bridge interface.
 
 ```yaml title="kubitect.yaml"
 cluster:
@@ -192,7 +192,7 @@ Each node can be defined as one of the following three types:
     Therefore, **each cluster must contain at least one master node**. 
 
     Since etcd key-value datastore is also present on these nodes, the number of master nodes must be odd. 
-    For more information, see [etcd FAQ :octicons-link-external-16:](https://etcd.io/docs/v3.4/faq/#why-an-odd-number-of-cluster-members).
+    For more information, see [etcd FAQ](https://etcd.io/docs/v3.4/faq/#why-an-odd-number-of-cluster-members).
 
 - `loadBalancer` 
 

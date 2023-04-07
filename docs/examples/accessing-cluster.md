@@ -4,8 +4,9 @@
 
 <div markdown="1" class="text-justify">
 
-Kubernetes clusters running on cloud providers typically support provision of a load balancer from the cloud infrastructure on demand.
-By simply setting a Service type to `LoadBalancer` provisions an external load balancer that has its own unique IP address and redirects all connections to the Service, as shown in the figure below.
+Cloud providers that support Kubernetes clusters typically provide load balancer provisioning on demand. 
+By setting a Service type to `LoadBalancer`, an external load balancer is automatically provisioned with its own unique IP address.
+This load balancer redirects all incoming connections to the Service, as illustrated in the figure below.
 
 <div class="text-center">
   <img
@@ -14,7 +15,6 @@ By simply setting a Service type to `LoadBalancer` provisions an external load b
     alt="Cloud provider load balancer scheme"
     width="75%">
 </div>
-
 
 In on-premise environments, there is no load balancer that can be provisioned on demand.
 Therefore, some alternative solutions are explained in this document.

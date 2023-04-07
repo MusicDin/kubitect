@@ -14,6 +14,9 @@ theme:
   favicon: theme/assets/images/favicon.svg
   logo: theme/assets/images/logo_white.svg
 
+  font:
+    text: Roboto Flex
+
   palette:
     - scheme: default
       toggle:
@@ -110,6 +113,11 @@ nav:
           - Troubleshooting: getting-started/other/troubleshooting.md
   - User guide:
       - Before you begin: user-guide/before-you-begin.md
+      - Cluster Management:
+          # - Creating the cluster: user-guide/management/creating.md
+          - Upgrading the cluster: user-guide/management/upgrading.md
+          - Scaling the cluster: user-guide/management/scaling.md
+          - Destroying the cluster: user-guide/management/destroying.md
       - Configuration:
           - Hosts: user-guide/configuration/hosts.md
           - Cluster name: user-guide/configuration/cluster-name.md
@@ -118,11 +126,6 @@ nav:
           - Cluster nodes: user-guide/configuration/cluster-nodes.md
           - Kubernetes: user-guide/configuration/kubernetes.md
           - Addons: user-guide/configuration/addons.md
-      - Cluster Management:
-          - Creating the cluster: user-guide/management/creating.md
-          - Upgrading the cluster: user-guide/management/upgrading.md
-          - Scaling the cluster: user-guide/management/scaling.md
-          - Destroying the cluster: user-guide/management/destroying.md
       - Reference:
           - Configuration reference: user-guide/reference/configuration.md
           - CLI tool reference: user-guide/reference/cli.md
@@ -137,4 +140,4 @@ nav:
       - Other:
           - Accessing the cluster: examples/accessing-cluster.md
           - Network bridge: examples/network-bridge.md
-          - Full example: examples/full-example.md
+          # - Full example: examples/full-example.md

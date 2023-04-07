@@ -4,13 +4,12 @@
 
 <div markdown="1" class="text-justify">
 
-!!! warning "Important"
-
-    Since the Rook addon is still under development, it may not work as expected.
-    Therefore, any feedback would be greatly appreciated.
-
 This example shows how to use Kubitect to set up **distributed storage with Rook**.
 For distributed storage, we add an additional data disk to each virtual machine as shown on the figure below.
+
+This example demonstrates how to set up **distributed storage with Rook**. 
+To achieve distributed storage, we add an additional data disk to each virtual machine, as depicted in the figure below. 
+This additional data disk is utilized by Rook to provide reliable and scalable distributed storage solutions for the Kubernetes cluster.
 
 <div class="text-center">
   <img
@@ -24,11 +23,11 @@ For distributed storage, we add an additional data disk to each virtual machine 
 
 ### Step 1: Define data resource pool
 
-To configure distributed storage with Rook, the data disks must be attached to the virtual machines.
-By default, each data disk is created in a main resource pool.
-Optionally, you can configure additional resource pools and associate data disks with them later.
+To configure distributed storage with Rook, the data disks must be attached to the virtual machines. 
+By default, each data disk is created in the main resource pool. 
+However, it is also possible to configure additional resource pools and associate data disks with them later, depending on your requirements.
 
-In this example, we define an additional resource pool named 'rook-pool'.
+In this example, we define an additional resource pool named `rook-pool`.
 ```yaml title="rook-sample.yaml"
 hosts:
   - name: localhost
@@ -72,7 +71,7 @@ cluster:
 
 ### Step 3: Enable Rook addon
 
-Once the disks are configured, you only need to activate the Rook addon.
+After configuring the disks and attaching them to the virtual machines, activating the Rook add-on is all that is required to utilize the distributed storage solution.
 
 ```yaml title="rook-sample.yaml"
 addons:
@@ -80,8 +79,8 @@ addons:
     enabled: true
 ```
 
-By default, Rook resources are provisioned on all worker nodes (without any constraints).
-This behavior can be restricted with node selectors.
+By default, Rook resources are provisioned on all worker nodes in the Kubernetes cluster, without any constraints. 
+However, this behavior can be restricted using node selectors, which are explained later in the guide.
 
 ??? abstract "Final cluster configuration <i class="click-tip"></i>"
 
@@ -286,6 +285,8 @@ addons:
     ```
 
 ### Step 3: Apply the configuration
+
+To deploy a cluster, apply the configuration file:
 
 ```sh
 kubitect apply --config rook-sample.yaml

@@ -4,7 +4,9 @@
 
 <div markdown="1" class="text-justify">
 
-This example shows how to setup a single node Kubernetes cluster using Kubitect.
+This example demonstrates how to set up a single-node Kubernetes cluster using Kubitect. 
+In a single-node cluster, only one master node needs to be configured. 
+The topology of the Kubernetes cluster deployed in this guide is shown below.
 
 <div class="text-center">
   <img
@@ -16,12 +18,18 @@ This example shows how to setup a single node Kubernetes cluster using Kubitect.
 
 !!! note "Note"
 
-    In this example we skip the explanation of some common configurations (hosts, network, node template, ...), as they are already explained in the [Getting started (step-by-step)](../../getting-started/getting-started) guide.
+    This example skips the explanation of some common configurations such as hosts, network, and node template, as they are already covered in detail in the [Getting started (step-by-step)](../../getting-started/getting-started) guide.
+
+!!! preset "Preset available"
+
+    To export the preset configuration, run:
+    <code>
+      kubitect export preset <b>example-single-node</b>
+    </code>
 
 ## Step 1: Create the configuration
 
-If you want to initialize a cluster with only one node,
-specify a single master node in the cluster configuration file:
+To initialize a single-node Kubernetes cluster, you need to specify a single master node in the cluster configuration file. 
 
 ```yaml title="single-node.yaml" 
 cluster:
@@ -35,6 +43,9 @@ cluster:
 
 1.  Static IP address of the node. 
     If the `ip` property is omitted, the DHCP lease is requested when the cluster is created.
+
+When no worker nodes are specified, master nodes are labeled as schedulable, which makes them behave as both master and worker nodes. 
+This means that the single master node in the cluster will perform both the control plane functions of a Kubernetes master node and the data plane functions of a worker node.
 
 ??? abstract "Final cluster configuration <i class="click-tip"></i>"
 
@@ -73,11 +84,10 @@ cluster:
 
 ## Step 2: Applying the configuration
 
-Apply the cluster:
+To deploy a cluster, apply the configuration file:
+
 ```sh
 kubitect apply --config single-node.yaml
 ```
-
-Your master node now also becomes a worker node.
 
 </div>

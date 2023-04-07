@@ -6,10 +6,12 @@
 
 <div markdown="1" class="text-justify">
 
-Defining Kubitect hosts is esential. 
+Defining hosts is an essential step when deploying a Kubernetes cluster with Kubitect. 
 **Hosts represent the target servers** where the cluster will be deployed.
-Every valid configuration must contain at least one host, but there can be as many hosts as needed.
-The host can be either a local or remote server. 
+
+Every valid configuration must contain at least one host, which can be either local or remote.
+However, you can add as many hosts as needed to support your cluster deployment. 
+
 
 ## Configuration
 
@@ -17,9 +19,7 @@ The host can be either a local or remote server.
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-When cluster is deployed on the server where the Kubitect command line tool is installed,
-a host whose connection type is set to local needs to be specified. 
-Such host is also refered to as localhost.
+To configure a local host, you simply need to specify a host with the connection type set to `local`.
 
 ```yaml
 hosts:
@@ -34,7 +34,7 @@ hosts:
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-When cluster is deployed on the remote host, the IP address of the remote host along with the SSH credentails needs to be specified for the host.
+To configure a remote host, you need to set the connection type to `remote` and provide the IP address of the remote host, along with its SSH credentials.
 
 ```yaml
 hosts:
@@ -57,8 +57,7 @@ hosts:
 &ensp;
 :octicons-file-symlink-file-24: Default: `22`
 
-By default, port `22` is used for SSH.
-If host is running SSH client on a different port, it is possible to change it for each host separately.
+By default, SSH uses port `22`. If a host is running an SSH client on a different port, you can change the port for each host separately.
 
 ```yaml
 hosts:
@@ -75,8 +74,8 @@ hosts:
 &ensp;
 :octicons-file-symlink-file-24: Default: `false`
 
-By default remote hosts are not verified in the known SSH hosts.
-If for any reason host verification is desired, you can enable it for each host separately.
+By default, remote hosts are not verified in the known SSH hosts.
+If you want to verify hosts, you can enable host verification for each host separately.
 
 ```yaml
 hosts:
@@ -91,8 +90,8 @@ hosts:
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-If the host is specified as the default, all instances that do not point to a specific host are deployed to the default host. 
-If the default host is not specified, these instances are deployed on the first host in the list.
+If a host is specified as the default, all instances that do not point to a specific host are deployed to that default host. 
+If no default host is specified, these instances are deployed on the first host in the list.
 
 ```yaml
 hosts:
@@ -110,9 +109,8 @@ hosts:
 &ensp;
 :octicons-file-symlink-file-24: Default: `/var/lib/libvirt/images/`
 
-The main resource pool path defines the location on the host where main disks (volumes) are created for each node provisioned on that particular host.
-Because the main resource pool contains volumes on which the node's operating system and all required packages are installed, it is recommended that the main resource pool is created on fast storage devices such as SSD disks.
-By default, main disk pool path is set to `/var/lib/libvirt/images/`.
+The main resource pool path specifies the location on the host where main virtual disks (volumes) are created for each node provisioned on that particular host. 
+Because the main resource pool contains volumes on which the node's operating system and all required packages are installed, it's recommended that the main resource pool is created on fast storage devices, such as SSD disks.
 
 ```yaml
 hosts:
@@ -129,13 +127,11 @@ hosts:
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-Data resource pools define **additional resource pools** (*besides the required main resource pool*).
-For example, main disks contain the OS image and should be created on fast storage devices, while data resource pools can be used to attach additional virtual disks that can be created on slower storage devices such as HDDs.
+Data resource pools allow you to define additional resource pools, besides the required main resource pool. These pools can be used to attach additional virtual disks that can be used for various storage solutions, such as Rook or MinIO.
 
-Multiple data resource pools can be defined on each host.
-Each configured pool must have a unique name on a particular host.
-The data resource pool name is used to associate the virtual disks defined in the node configuration with the actual data resource pool.
-The path of the data resources is set to `/var/lib/libvirt/images` by default, but can be easily configured with the `path` property.
+Multiple data resource pools can be defined on each host, and each pool must have a unique name on that host. The name of the data resource pool is used to associate the virtual disks defined in the node configuration with the actual data resource pool.
+
+By default, the path of the data resources is set to `/var/lib/libvirt/images`, but it can be easily configured using the `path` property.
 
 ```yaml
 hosts:
@@ -146,14 +142,13 @@ hosts:
       - name: data-pool # (1)!
 ```
 
-1. If the path of the resource pool is not specified, it is created under the path `/var/lib/libvirt/images/`.
+1. If the path of the resource pool is not specified, it will be created under the path `/var/lib/libvirt/images/`.
 
 ## Example usage
 
 ### Multiple hosts
 
-With Kubitect the cluster can be deployed on multiple hosts.
-All hosts need to be specified in the configuration file.
+Kubitect allows you to deploy a cluster on multiple hosts, which need to be specified in the configuration file.
 
 ```yaml
 hosts:
