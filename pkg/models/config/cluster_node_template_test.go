@@ -61,11 +61,12 @@ func TestNodeTemplateSSH(t *testing.T) {
 
 	assert.NoError(t, NodeTemplateSSH{}.Validate())
 	assert.NoError(t, nts1.Validate())
-	// assert.EqualError(t, nts2.Validate(), "Field 'privateKeyPath' must be a valid file path that points to an existing file. (actual: ./non-existing)")
 	assert.NoError(t, nts2.Validate())
 }
 
 func TestCpuMode(t *testing.T) {
-	assert.NoError(t, CpuMode(PASSTHROUGH).Validate())
 	assert.NoError(t, CpuMode("custom").Validate())
+	assert.NoError(t, CpuMode(HOST_PASSTHROUGH).Validate())
+	assert.NoError(t, CpuMode("host-model").Validate())
+	assert.NoError(t, CpuMode("maximum").Validate())
 }

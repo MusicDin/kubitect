@@ -19,8 +19,9 @@ func (n NodeTemplate) Validate() error {
 	return v.Struct(&n,
 		v.Field(&n.User),
 		v.Field(&n.OS),
-		v.Field(&n.DNS),
 		v.Field(&n.SSH),
+		v.Field(&n.CpuMode),
+		v.Field(&n.DNS),
 	)
 }
 
@@ -93,10 +94,12 @@ func (ssh *NodeTemplateSSH) SetDefaults() {
 type CpuMode string
 
 const (
-	CUSTOM      CpuMode = "custom"
-	PASSTHROUGH CpuMode = "host-passthrough"
+	CUSTOM           CpuMode = "custom"
+	HOST_MODEL       CpuMode = "host-model"
+	HOST_PASSTHROUGH CpuMode = "host-passthrough"
+	MAXIMUM          CpuMode = "maximum"
 )
 
 func (m CpuMode) Validate() error {
-	return v.Var(m, v.OneOf(PASSTHROUGH, CUSTOM))
+	return v.Var(m, v.OneOf(CUSTOM, HOST_MODEL, HOST_PASSTHROUGH, MAXIMUM))
 }
