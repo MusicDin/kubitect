@@ -16,17 +16,26 @@ cluster:
     os:
       distro: ubuntu
   nodes:
+    loadBalancer:
+      instances:
+        - id: 1
+          ip: 192.168.113.100
     master:
       instances:
         - id: 1
           ip: 192.168.113.10
+        - id: 2
+          ip: 192.168.113.11
+        - id: 3
+          ip: 192.168.113.12
     worker:
       instances:
         - id: 1
+          ip: 192.168.113.20
+        - id: 2
           ip: 192.168.113.21
-        - id: 7
-          ip: 192.168.113.27
-        - id: 99
+        - id: 3
+          ip: 192.168.113.22
 
 kubernetes:
   version: v1.24.7
