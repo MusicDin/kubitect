@@ -6,9 +6,9 @@
 
 <div markdown="1" class="text-justify">
 
-The user guide is divided into three subsections: *Configuration*, *Cluster Management*, and *Reference*.
-The Configuration subsection contains explanations of the configurable Kubitect properties.
+The user guide is divided into three subsections: *Cluster Management*, *Configuration* and *Reference*.
 The Cluster Management subsection introduces the operations that can be performed over the cluster.
+The Configuration subsection contains explanations of the configurable Kubitect properties.
 Finally, the Reference subsection contains a configuration and CLI reference.
 
 The following **symbol conventions** are used throughout the user guide:

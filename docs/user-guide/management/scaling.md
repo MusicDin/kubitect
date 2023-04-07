@@ -9,7 +9,7 @@ To do so, simply change the configuration and reapply it using the `scale` actio
 
 !!! info "Info"
 
-    Currently, only load balancer and worker nodes can scale.
+    Currently, only worker nodes and load balancers can be scaled.
 
 ## Export the cluster configuration
 
