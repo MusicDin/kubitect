@@ -390,6 +390,22 @@ func FileExists() Validator {
 	}
 }
 
+// FilePath checks whether the field is a valid file path.
+func FilePath() Validator {
+	return Validator{
+		Tags: "filepath",
+		Err:  "Field '{.Field}' must be a valid file path. (actual: {.Value})",
+	}
+}
+
+// DirPath checks whether the field is a valid directory path.
+func DirPath() Validator {
+	return Validator{
+		Tags: "dirpath",
+		Err:  "Field '{.Field}' must be a valid directory path. (actual: {.Value})",
+	}
+}
+
 // URL checks whether the field is a valid URL.
 func URL() Validator {
 	return Validator{

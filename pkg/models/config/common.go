@@ -98,7 +98,7 @@ func (t Taint) Validate() error {
 type Labels map[string]string
 
 func (l Labels) Validate() error {
-	return v.Var(l, v.Required()) // TODO: Validate MAP
+	return v.Var(l, v.Required())
 }
 
 type DataDisk struct {
