@@ -4,7 +4,8 @@
 
 <div markdown="1" class="text-justify">
 
-This example demonstrates how to use Kubitect to set up a Kubernetes cluster consisting of **one master and three worker nodes**. The final topology of the deployed Kubernetes cluster is shown below in this guide.
+This example demonstrates how to use Kubitect to set up a Kubernetes cluster consisting of **one master and three worker nodes**. 
+The final topology of the deployed Kubernetes cluster is shown in the figure below.
 
 <div class="text-center">
   <img
