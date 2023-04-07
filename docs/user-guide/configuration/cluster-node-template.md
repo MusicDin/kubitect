@@ -8,8 +8,9 @@
 
 <div markdown="1" class="text-justify">
 
-The note template in the cluster section of the configuration **defines the properties of all nodes** in the cluster.
-This includes the properties of the operating system (OS), DNS, and virtual machine user.
+The node template section of the cluster configuration **defines the properties of all nodes** in the cluster.
+This includes the properties of the operating system (OS), DNS, and the virtual machine user.
+
 
 ## Configuration
 
@@ -19,10 +20,10 @@ This includes the properties of the operating system (OS), DNS, and virtual mach
 &ensp;
 :octicons-file-symlink-file-24: Default: `k8s`
 
-The user property defines the name of the passwordless user created on each virtual machine.
-It is used to access the virtual machines during cluster configuration.
-If the user property is omitted, a user named `k8s` is created on all virtual machines.
-This user can also be used later to access each virtual machine via SSH.
+The user property defines the name of the user created on each virtual machine. 
+This user is used to access the virtual machines during cluster configuration. 
+If you omit the user property, a user named `k8s` is created on all virtual machines. 
+You can also use this user later to access each virtual machine via SSH.
 
 ```yaml
 cluster:
@@ -38,10 +39,10 @@ cluster:
 &ensp;
 :octicons-file-symlink-file-24: Default: `ubuntu`
 
-The operating system for virtual machines can be specified in the node template.
-Currently, either Ubuntu or Debian can be configured.
+The operating system for virtual machines can be specified in the node template. 
+Currently, you can configure either Ubuntu or Debian. 
 By default, the Ubuntu distribution is installed on all virtual machines.
-To use Debian instead, set `os.distro` property to Debian.
+To use Debian instead, set the `os.distro` property to Debian.
 
 ```yaml
 cluster:
@@ -52,22 +53,22 @@ cluster:
 
 1. By default, `ubuntu` is used.
 
-Available OS distribution presets are the following:
+The available operating system distribution presets are:
 
-+ `ubuntu` - Latest Ubuntu 22.04 release. (*default*)
-+ `ubuntu22` - Ubuntu 22.04 release *2023-03-02*.
-+ `ubuntu20` - Ubuntu 20.04 release *2023-02-09*.
++ `ubuntu` - Latest Ubuntu 22.04 release. (default)
++ `ubuntu22` - Ubuntu 22.04 release as of *2023-03-02*.
++ `ubuntu20` - Ubuntu 20.04 release as of *2023-02-09*.
 + `debian` - Latest Debian 11 release.
-+ `debian11` - Debian 11 release *2023-01-24*.
++ `debian11` - Debian 11 release as of *2023-01-24*.
 
-Ubuntu images are downloaded from the [Ubuntu cloud image repository](https://cloud-images.ubuntu.com/) and Debian images are downloaded from the [Debian cloud image repository](https://cloud.debian.org/images/cloud/).
+Note that Ubuntu images are downloaded from the [Ubuntu cloud image repository](https://cloud-images.ubuntu.com/) and Debian images are downloaded from the [Debian cloud image repository](https://cloud.debian.org/images/cloud/).
 
-#### Custom OS source
+#### OS source
 
 :material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
 
-If the presets do not meet your needs, you can also use a custom Ubuntu or Debian image by simply specifying the image source.
-The source of an image can be either a local path on a system or an URL pointing to the image download.
+If the presets do not meet your needs, you can use a custom Ubuntu or Debian image by specifying the image source. 
+The source of an image can be either a local path on your system or a URL pointing to the image download.
 
 ```yaml
 cluster:
@@ -77,14 +78,13 @@ cluster:
       source: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
 ```
 
-#### Primary OS network interface
+#### Network interface
 
 :material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
 
-When a virtual machine is created, the network interface names are evaluated deterministically.
-Therefore, Kubitect should use the correct network interface names for all available presets.
+Generally, this setting does not have to be set, as Kubitect will correctly evaluate the network interface name to be used on each virtual machine.
 
-However, if you want to instruct Kubitect to use a specific network interface as primary, set its name as the value of the `os.networkInterface` property.
+If you want to instruct Kubitect to use a specific network interface on the virtual machine, you can set its name using the `os.networkInterface` property.
 
 ```yaml
 cluster:
@@ -97,9 +97,10 @@ cluster:
 
 :material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
 
-The list of Domain Name Servers (DNS) can be configured in the node template.
-These servers are used by all virtual machines for DNS resolution.
-By default, a DNS list contains only the network gateway.
+The configuration of Domain Name Servers (DNS) in the node template allows for customizing the DNS resolution of all virtual machines in the cluster. 
+By default, the DNS list contains only the network gateway.
+
+To add custom DNS servers, specify them using the `dns` property in the node template.
 
 ```yaml
 cluster:
@@ -117,14 +118,7 @@ cluster:
 &ensp;
 :octicons-file-symlink-file-24: Default: `custom`
 
-The CPU mode property can be used to simplify the configuration of a guest CPU to be as close as possible to the host CPU.
-Consult the [libvirt documentation](https://libvirt.org/formatdomain.html#cpu-model-and-topology) to learn about all available CPU modes:
-
-+ `custom` (default)
-+ `host-model`
-+ `host-passthrough`
-+ `maximum`
-
+The `cpuMode` property in the node template can be used to configure a guest CPU to closely resemble the host CPU.
 
 ```yaml
 cluster:
@@ -132,16 +126,34 @@ cluster:
     cpuMode: host-passthrough
 ```
 
+Currently, there are several CPU modes available:
+
+- `custom` (default)
+- `host-model`
+- `host-passthrough`
+- `maximum`
+
+In short, the `host-model` mode uses the same CPU model as the host, while the `host-passthrough` mode provides full CPU feature set to the guest virtual machine, but may impact its live migration. 
+The `maximum` mode selects the CPU with the most available features.
+For a more detailed explanation of the available CPU modes and their usage, please refer to the [libvirt documentation](https://libvirt.org/formatdomain.html#cpu-model-and-topology).
+
+!!! tip "Tip"
+
+    The `host-model` and `host-passthrough` modes makes sense only when a virtual machine can run directly on the host CPUs (e.g. virtual machines of type *kvm*).
+    The actual host CPU is irrelevant for virtual machines with emulated virtual CPUs (e.g. virtul machines of type *qemu*).
+
 ### SSH options
 
 #### Custom SSH certificate
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-Kubitect ensures that SSH certificates are automatically generated before the cluster is deployed.
-The generated certificates are located in the `config/.ssh/` directory inside a cluster directory.
-You can use a custom SSH certificate by specifying a local path to the private key.
-Note that the public key must be located in the same directory with the `.pub` suffix.
+Kubitect automatically generates SSH certificates before deploying the cluster to ensure secure communication between nodes.
+The generated certificates can be found in the `config/.ssh/` directory inside the cluster directory.
+
+If you prefer to use a custom SSH certificate, you can specify the local path to the private key. 
+Note that the public key must also be present in the same directory with the `.pub` suffix.
+
 
 ```yaml
 cluster:
@@ -150,9 +162,9 @@ cluster:
       privateKeyPath: "~/.ssh/id_rsa_test"
 ```
 
-!!! warning "Warning"
+!!! warning "Important"
 
-    SSH certificates must be passwordless, otherwise Kubespray will fail to configure the cluster.
+    SSH certificates must be **passwordless**, otherwise Kubespray will fail to configure the cluster.
 
 
 #### Adding nodes to the known hosts
@@ -161,7 +173,7 @@ cluster:
 &ensp;
 :octicons-file-symlink-file-24: Default: `false`
 
-In addition, Kubitect allows you to add all created virtual machines to SSH known hosts on the local machine.
+Kubitect allows you to add all created virtual machines to SSH known hosts and remove them once the cluster is destroyed.
 To enable this behavior, set the `addToKnownHosts` property to true.
 
 ```yaml

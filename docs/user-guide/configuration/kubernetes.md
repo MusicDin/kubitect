@@ -8,7 +8,7 @@
 
 <div markdown="1" class="text-justify">
 
-The Kubernetes section of the configuration file contains properties that are closely related to Kubernetes, such as Kubernetes version and network plugin.
+The Kubernetes section of the configuration file contains properties that are specific to Kubernetes, such as the Kubernetes version and network plugin.
 
 ## Configuration
 
@@ -18,12 +18,15 @@ The Kubernetes section of the configuration file contains properties that are cl
 &ensp;
 :octicons-file-symlink-file-24: Default: `v1.25.6`
 
-Kubernetes version to be deployed.
+By default, the Kubernetes cluster will be deployed using version `v1.25.6`, but you can specify a different version if necessary.
+
 
 ```yaml
 kubernetes:
   version: v1.24.7
 ```
+
+The supported Kubernetes versions include `v1.23`, `v1.24`, and `v1.25`.
 
 ### Kubernetes network plugin
 
@@ -31,30 +34,28 @@ kubernetes:
 &ensp;
 :octicons-file-symlink-file-24: Default: `calico`
 
-Kubitect supports multiple Kubernetes network plugins.
-Currently, the following network plugins are supported:
+The `calico` network plugin is deployed by default in a Kubernetes cluster. 
+However, there are multiple supported network plugins available to choose from:
 
-  - `calico`
-  - `canal`
-  - `cilium`
-  - `flannel`
-  - `kube-router`
-  - `weave`
-
-If the network plugin is not set in the Kubitect configuration file, `calico` is used by default.
+- `calico`
+- `canal`
+- `cilium`
+- `flannel`
+- `kube-router`
+- `weave`
 
 ```yaml
 kubernetes:
-  networkPlugin: calico
+  networkPlugin: flannel
 ```
 
 The following table shows the compatibility matrix of supported network plugins and Kubernetes versions:
 
 | Kubernetes Version |      Calico      |       Canal      |      Cilium      |      Flannel     |    KubeRouter    |       Weave      |
-|-------------|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
-| **1.23**    | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
-| **1.24**    | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
-| **1.25**    | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+|--------------------|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
+| **1.23**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.24**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.25**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
 
 ### Kubernetes DNS mode
 
@@ -76,8 +77,8 @@ kubernetes:
 &ensp;
 :octicons-file-symlink-file-24: Default: `false`
 
-Kubitect provides option to automatically copy the Kubeconfig file to `~/.kube/config` path. 
-By default, this option is disabled, as it can overwrite an existing file.
+Kubitect offers the option to automatically copy the Kubeconfig file to the `~/.kube/config` path. 
+By default, this feature is disabled to prevent overwriting an existing file.
 
 ```yaml
 kubernetes:
@@ -91,9 +92,9 @@ kubernetes:
 &ensp;
 :octicons-file-symlink-file-24: Default: `false`
 
-Control plane certificates are valid for 1 year and are renewed each time the cluster is upgraded.
-In some rare cases, this can cause clusters that are not upgraded frequently to stop working properly.
-Therefore, the control plane certificates can be renewed automatically on the first Monday of each month by setting the `autoRenewCertificates` property to true.
+Control plane certificates are renewed every time the cluster is upgraded, and their validity period is one year. 
+However, in rare cases, clusters that are not upgraded frequently may experience issues. 
+To address this, you can enable the automatic renewal of control plane certificates on the first Monday of each month by setting the `autoRenewCertificates` property to `true`.
 
 ```yaml
 kubernetes:

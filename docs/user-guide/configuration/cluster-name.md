@@ -14,16 +14,15 @@
 &ensp;
 :material-alert-circle-outline:{ .icon-required } Required
 
-The cluster name must be defined as part of the Kubitect configuration.
-It will be used as a **prefix for all resources** created by Kubitect as part of this cluster.
+The cluster name must be defined in the Kubitect configuration, as it acts as a **prefix for all cluster resources**.
 
 ```yaml
 cluster:
   name: my-cluster
 ```
 
-For example, the name of each virtual machine is generated as `<cluster.name>-<node.type>-<node.instance.id>`.
-This means that the virtual machine name of the master node with ID `1` would result in `my-cluster-master-1`.
+For instance, each virtual machine name is generated as `<cluster.name>-<node.type>-<node.instance.id>`. 
+Therefore, the name of the virtual machine for the worker node with ID `1` would be `my-cluster-master-1`.
 
 !!! Note
     Cluster name cannot contain prefix `local`, as it is reserved for local clusters (created with `--local` flag).

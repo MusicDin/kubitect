@@ -4,8 +4,10 @@
 
 <div markdown="1" class="text-justify">
 
-This example shows how to use Kubitect to set up a highly available cluster that spreads over 5 hosts.
-Such topology provides redundancy in case any node or even host fails.
+This example demonstrates how to use Kubitect to create a highly available Kubernetes cluster that spans across five hosts. 
+This topology offers redundancy in case of node or host failures.
+
+The final topology of the deployed Kubernetes cluster is shown in the figure below.
 
 <div text="text-center">
   <img 
@@ -16,21 +18,20 @@ Such topology provides redundancy in case any node or even host fails.
 
 ## Step 1: Hosts configuration
 
+This example involves the deployment of a Kubernetes cluster on five remote physical hosts. 
+The local network subnet used in this setup is `10.10.0.0/20`, with the gateway IP address set to `10.10.0.1`. 
+All hosts are connected to the same local network and feature a pre-configured bridge interface, named `br0`.
 
-!!! warning "Important"
+!!! tip "Tip"
 
     This example uses **preconfigured bridges on each host** to expose nodes on the local network.
     
     [Network bridge](../network-bridge) example shows how to configure a bridge interface using Netplan.
 
-In this example, we deploy a Kubernetes cluster on 5 (remote) physical hosts.
-The subnet of the local network is `10.10.0.0/20` and the gateway IP address is `10.10.0.1`.
-Each host is connected to the same local network and has a pre-configured bridge interface `br0`.
+Furthermore, we have configured a user named `kubitect` on each host, which can be accessed through SSH using the same certificate stored on our local machine without the need for a password. The certificate is located at `~/.ssh/id_rsa_ha`.
 
-In addition, a user `kubitect` is configured on each host, which is accessible via SSH with the same password-less certificate stored on our local machine under the path `~/.ssh/id_rsa_ha`.
-
-Each host must be specified in the Kubitect configuration file.
-In our case, the configurations of the hosts differ only by the name and IP address of the host.
+To deploy the Kubernetes cluster, each host's details must be specified in the Kubitect configuration file. 
+In this case, the host configurations differ only in the host's name and IP address.
 
 ```yaml title="ha.yaml" 
 hosts:
@@ -75,7 +76,7 @@ hosts:
 
 In the network configuration section, we specify the bridge interface that is preconfigured on each host and CIDR of our local network.
 
-The following code snippet shows the network configuration for this example.
+The code snippet below illustrates the network configuration used in this example:
 
 ```yaml title="ha.yaml" 
 cluster:
@@ -87,13 +88,14 @@ cluster:
 
 ## Step 3: Load balancer configuration
 
-Each working node stores only a single control plane IP address. 
 By placing a load balancer in front of the control plane (as shown in the [Multi-master cluster](../multi-master-cluster) example), traffic can be distributed across all control plane nodes.
 
-By having only a single load balancer in the cluster, the control plane may become unreachable if that load balancer fails.
-This would cause the entire cluster to become unavailable.
-To avoid this single point of failure, a failover (backup) load balancer can be configured.
-Its main purpose is to serve incoming requests on the same virtual (shared) IP address if the primary load balancer fails, as shown in the following figure.
+Placing a load balancer in front of the control plane, as demonstrated in the [Multi-master cluster example](../multi-master-cluster), enables traffic distribution across all healthy control plane nodes. 
+However, having only one load balancer in the cluster would create a single point of failure, potentially rendering the control plane inaccessible if the load balancer fails.
+
+To prevent this scenario, it is necessary to configure at least two load balancers. 
+One of the load balancers serves as the primary, while the other functions as a failover (backup).
+The purpose of the failover load balancer is to serve incoming requests using the same virtual (shared) IP address if the primary load balancer fails, as depicted in the figure below.
 
 <div class="text-center">
   <img
@@ -103,16 +105,16 @@ Its main purpose is to serve incoming requests on the same virtual (shared) IP a
     width="75%">
 </div>
 
+To achieve failover, a virtual router redundancy protocol (VRRP) is used. 
+In practice, each load balancer has its own IP address, but the primary load balancer also serves requests on the virtual IP address, which is not bound to any network interface.
 
-Failover is achieved using a virtual router redundancy protocol (VRRP).
-In practice, each load balancer still has its own IP address, but the primary load balancer also serves requests on the virtual IP address, which is not bound to any network interface.
-The primary load balancer periodically sends heartbeats to other load balancers (backups) to let them know it is still active.
-If the backup load balancer does not receive a heartbeat within a certain period of time, it assumes that the primary load balancer is has failed.
-The new primary load balancer is elected based on the priorities of the available load balancers.
-Once the load balancer becomes primary, it starts serving requests on the same virtual IP address as the previous one.
-This ensures that the requests are served through the same virtual IP address in case of a load balancer failure.
+The primary load balancer sends periodic heartbeats to the backup load balancers to indicate that it is still active. 
+If the backup load balancer does not receive a heartbeat within a specified time period, it assumes that the primary load balancer has failed. 
+The new primary load balancer is then elected based on the available load balancers' priorities. 
+Once the new primary load balancer is selected, it starts serving requests on the same virtual IP address as the previous primary load balancer.
 
 The following code snippet shows the configuration of two load balancers and virtual IP for their failover.
+The load balancers are also configured to be deployed on different hosts for additional redundancy.
 
 ```yaml title="ha.yaml" 
 cluster:
@@ -128,13 +130,10 @@ cluster:
           host: host2
 ```
 
-Note that for each load balancer instance, the `host` property is set.
-Its value is a name of the host on which a particular instance is to be deployed.
-
 ## Step 4: Nodes configuration
 
-The configuration of the nodes is very simple and similar to the configuration of the load balancer instances.
-Each instance is configured with an ID, an IP address, and a host affinity.
+The configuration of the nodes is straightforward and similar to the load balancer instance configuration. 
+Each node instance is configured with an ID, an IP address, and a host affinity.
 
 ```yaml title="ha.yaml" 
 cluster:
@@ -165,16 +164,19 @@ cluster:
 
 ### Step 4.1 (Optional): Data disks configuration
 
-Kubitect creates a main (system) disk for each configured virtual machine (VM).
-The main disk contains the VM's operating system along with all installed Kubernetes components.
+Kubitect automatically creates a main (system) disk for each configured node.
+Main disk contains the operating system and installed Kubernetes components.
 
-The VM's storage can be expanded by creating additional disks, also called data disks.
-This can be particularly useful when using storage solutions such as Rook.
-For example, Rook can be configured to use empty disks on worker nodes to create reliable distributed storage. 
+Additional disks, also known as data disks, can be created to expand the node's storage capacity. 
+This feature is particularly useful when using storage solutions like Rook, which can utilize empty disks to provide reliable distributed storage.
 
 Data disks in Kubitect must be configured separately for each node instance.
 They must also be connected to a resource pool, which can be either a main resource pool or a custom data resource pool.
 In this example, we have defined a custom data resource pool named `data-pool` on each host running worker nodes.
+
+Configuring data disks in Kubitect requires a separate configuration for each node instance, with each disk connected to a resource pool. 
+The resource pool can be either a main resource pool or a custom data resource pool. 
+In this example, we have defined a custom data resource pool named `data-pool` on each host that runs worker nodes.
 
 ```yaml title="ha.yaml" 
 hosts:
@@ -188,7 +190,7 @@ cluster:
   nodes:
     worker:
       - id: 1
-        ip: 10.10.13.20
+        ...
         host: host3
         dataDisks:
           - name: rook
@@ -310,7 +312,8 @@ cluster:
 
 ## Step 5: Applying the configuration
 
-Apply the cluster configuration.
+To deploy a cluster, apply the configuration file:
+
 ```sh
 kubitect apply --config ha.yaml
 ```

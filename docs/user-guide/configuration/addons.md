@@ -13,12 +13,14 @@
 
 :material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
 
-Kubespray offers many useful configurable addons, such as the [Ingress-NGINX controller](https://kubernetes.github.io/ingress-nginx/), [MetalLB](https://metallb.io/), and so on.
+Kubespray provides a variety of configurable addons to enhance the functionality of Kubernetes.
+Some popular addons include the [Ingress-NGINX controller](https://kubernetes.github.io/ingress-nginx/) and [MetalLB](https://metallb.io/).
 
-Kubespray addons can be configured in Kubitect under the `addons.kubespray` property.
-The configuration of Kubespray addons is exactly the same as the default configuration of Kubespray addons, since Kubitect simply copies the provided configuration into Kubespray's group variables when the cluster is created.
+Kubespray addons can be configured under the `addons.kubespray` property.
+It's important to note that the Kubespray addons are configured in the same as they would be for Kubespray itself, as Kubitect copies the provided configuration into Kubespray's group variables during cluster creation.
 
-All available Kubespray addons can be found in the [Kubespray addons sample](https://github.com/kubernetes-sigs/kubespray/blob/master/inventory/sample/group_vars/k8s_cluster/addons.yml), while most of them are documented in the [official Kubespray documentation](https://kubespray.io/).
+The full range of available addons can be explored in the [Kubespray addons sample](https://github.com/kubernetes-sigs/kubespray/blob/master/inventory/sample/group_vars/k8s_cluster/addons.yml), which is available on GitHub. 
+Most addons are also documented in the [official Kubespray documentation](https://kubespray.io/).
 
 ```yaml
 addons:
@@ -47,9 +49,10 @@ addons:
 &ensp;
 :material-flask-outline: **Experimental**
 
-[Rook](https://rook.io) is an orchestration tool that allows [Ceph](https://ceph.io), a reliable and scalable storage, to run within a Kubernetes cluster.
+[Rook](https://rook.io) is an orchestration tool that integrates [Ceph](https://ceph.io) with Kubernetes. 
+Ceph is a highly reliable and scalable storage solution, and Rook simplifies its management by automating the deployment, scaling and management of Ceph clusters.
 
-In Kubitect, Rook can be enabled by simply setting `addons.rook.enabled` to true.
+To enable Rook in Kubitect, set `addons.rook.enabled` property to true.
 
 ```yaml
 addons:
@@ -57,15 +60,10 @@ addons:
     enabled: true
 ```
 
-Rook is deployed only on worker nodes.
-When a cluster is created without worker nodes, Kubitect attempts to install Rook on the master node.
-
-In addition to enabling the Rook addon, **at least one [data disk](../cluster-nodes#data-disks)** must be attached to a node suitable for Rook deployment.
-If Kubitect determines that no data disks are available for Rook, it will simply skip installing Rook.
-
-By default, Rook uses all available data disks attached to worker nodes and converts them to distributed storage.
-Similarly, all worker nodes are used for Rook deployment.
-To restrict on which nodes Rook resources can be deployed, the node selector can be used.
+Note that Rook is deployed only on worker nodes. 
+When a cluster is created without worker nodes, Kubitect attempts to install Rook on the master nodes. 
+In addition to enabling the Rook addon,  **at least one [data disk](../cluster-nodes#data-disks)** must be attached to a node suitable for Rook deployment. 
+If Kubitect determines that no data disks are available for Rook, it will skip installing Rook.
 
 #### Node selector
 
@@ -81,13 +79,13 @@ addons:
 
 #### Version
 
-By default, the latest (`master`) Rook version is used.
-To use a specific version of Rook, set the `addons.rook.version` property to the desired version.
+By default, Kubitect uses the latest (master) version of Rook. 
+If you want to use a specific version of Rook, you can set the `addons.rook.version` property to the desired version.
 
 ```yaml
 addons:
   rook:
-    version: v1.9.9
+    version: v1.11.3
 ```
 
 </div>

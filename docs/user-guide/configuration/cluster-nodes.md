@@ -9,29 +9,38 @@
 
 <div markdown="1" class="text-justify">
 
+## Background
+
+Kubitect allows configuration of three distinct **node types**: worker nodes, master nodes (control plane), and load balancers. 
+
+### Worker nodes
+
+Worker nodes in a Kubernetes cluster are responsible for executing the application workloads of the system. The addition of more worker nodes to the cluster enhances redundancy in case of worker node failure. However, allocating more resources to each worker node provides less overhead and more resources for the actual applications.
+
+Kubitect does not offer automatic scaling of worker nodes based on resource demand. However, you can easily add or remove worker nodes by applying modified cluster configuration.
+
+### Master nodes
+
+The master node plays a vital role in a Kubernetes cluster as it manages the overall state of the system and coordinates the workloads running on the worker nodes. 
+Therefore, it is essential to **configure at least one master node for every cluster**.
+
+Please note that Kubitect currently supports only a stacked control plane where etcd key-value stores are deployed on control plane nodes. 
+To ensure the best possible fault tolerance, it is important to configure an odd number of control plane nodes.
+For more information, please refer to the [etcd FAQ](https://etcd.io/docs/v3.4/faq/#why-an-odd-number-of-cluster-members).
+
+### Load balancer nodes
+
+In a Kubernetes cluster with multiple control plane nodes, it is necessary to configure at least one load balancer. 
+A load balancer distributes incoming network traffic across multiple control plane nodes, ensuring the cluster operates normally even if any control plane node fails.
+
+However, configuring only one load balancer represents a single point of failure for the cluster. 
+If it fails, incoming traffic will not be distributed to the control plane nodes, potentially resulting in downtime. 
+Therefore, configuring multiple load balancers is essential to ensure high availability for the cluster.
+
 ## Nodes configuration structure
 
-Cluster's nodes configuration consists of three **node types**:
+The configuration structure for the nodes is as follows:
 
-- Master nodes (control plane)
-- Worker nodes
-- Load balancers
-
-For any cluster deployment, **at least one master node needs to be configured**.
-Configuring only one master node produces a single-node cluster.
-In most cases, a multi-node cluster is desired and therefore worker nodes should be configured as well.
-
-If the control plane of the cluster contains multiple nodes, at least one load balancer must be configured.
-Such topology allows the cluster to continue operating normally if any control plane node fails.
-In addition, configuring multiple load balancers provides failover in case the primary load balancer fails.
-
-Kubitect currently supports only stacked control plane, which means that etcd key-value stores are deployed on control plane nodes.
-Since an etcd cluster requires a majority "(n/2) + 1" of nodes to agree to a change in the cluster, an odd number of nodes (1, 3, 5, ...) provides the best fault tolerance. 
-For example, in control planes with 3 nodes, 2 nodes represent the majority, giving a fault tolerance of 1 node. 
-In control planes with 4 nodes, the majority is 3 nodes, which provides the same fault tolerance.
-For this reason, Kubitect prevents deployment of the cluster whose control plane contains an even number of nodes.
-
-The nodes configuration structure is the following:
 ```yaml
 cluster:
   nodes:
@@ -43,8 +52,8 @@ cluster:
       ...
 ```
 
-Each node type has two subsections, `default` and `instances`.
-Instances represent an array of actual nodes, while defaults provide the configuration that is applied to all instances of a certain node type.
+Each node type has two subsections: `default` and `instances`. 
+The instances subsection represents an array of actual nodes, while the default subsection provides the configuration that is applied to all instances of a particular node type. 
 Each default value can also be overwritten by setting the same property for a specific instance.
 
 ```yaml
@@ -61,9 +70,9 @@ cluster:
 
 ### Common node properties
 
-For each instance there is a set of predefined properties that can be set.
-Some properties apply for all node types, while some properties are specific for a certain node type.
-Properties that apply for all node types, are referred to as *common properties*.
+Each node instance has a set of predefined properties that can be set to configure its behavior. 
+Some properties apply to all node types, while others are specific to a certain node type. 
+Properties that apply to all node types are referred to as *common properties*.
 
 #### Instance ID
 
@@ -71,8 +80,8 @@ Properties that apply for all node types, are referred to as *common properties*
 &ensp;
 :material-alert-circle-outline: Required
 
-Each instance in the cluster must have an ID that must be unique among all instances of the same node type.
-The instance ID is used as a suffix for the name of each node.
+Each node in a cluster must have a unique identifier, or ID, that distinguishes it from other instances of the same node type. 
+The instance ID is used as a suffix for the name of each node, ensuring that each node has a unique name in the cluster.
 
 ```yaml
 cluster:
@@ -90,8 +99,8 @@ cluster:
 &ensp;
 :octicons-file-symlink-file-24: Default: `2` vCPU
 
-The `cpu` property defines an amount of vCPU cores assigned to the virtual machine.
-It can be set for a specific instance or as a default value for all instances.
+The `cpu` property defines the amount of virtual CPU cores assigned to a node instance.
+This property can be set for a specific instance, or as a default value for all instances of a certain node type.
 
 ```yaml
 cluster:
@@ -105,11 +114,11 @@ cluster:
           cpu: 4 # (2)!
 ```
 
-1. Since the `cpu` property is not set for this instance, the default value is used (2).
+1. Since the `cpu` property is not set for this instance, the default value (2) is used.
 
 2. This instance has the `cpu` property set, and therefore the set value (4) overrides the default value (2).
 
-If the property is not set at the instance level or as a default value, Kubitect uses its own default value (2 vCPU).
+If the property is not set at the instance level or as a default value, Kubitect uses its own default value (2).
 
 ```yaml
 cluster:
@@ -119,7 +128,7 @@ cluster:
         - id: 1 # (1)!
 ```
 
-1. Since the 'cpu' property is not set at instance level or as a default value, Kubitect sets the value of the 'cpu' property to **2 vCPU**.
+1. Since the `cpu` property is not set at instance level or as a default value, Kubitect sets the value of the `cpu` property to **2 vCPU**.
 
 #### RAM 
 
@@ -127,8 +136,8 @@ cluster:
 &ensp;
 :octicons-file-symlink-file-24: Default: `4` GiB
 
-The `ram` property defines an amount of RAM assigned to the virtual machine (in GiB).
-It can be set for a specific instance or as a default value for all instances.
+The `ram` property defines the amount of RAM assigned to a node instance (in GiB).
+This property can be set for a specific instance, or as a default value for all instances of a certain node type.
 
 ```yaml
 cluster:
@@ -142,7 +151,7 @@ cluster:
           ram: 16 # (2)!
 ```
 
-1. Since the `ram` property is not set for this instance, the default value is used (8 GiB).
+1. Since the `ram` property is not set for this instance, the default value (8 GiB) is used.
 
 2. This instance has the `ram` property set, and therefore the set value (16 GiB) overrides the default value (8 GiB).
 
@@ -164,8 +173,8 @@ cluster:
 &ensp;
 :octicons-file-symlink-file-24: Default: `32` GiB
 
-The `mainDiskSize` property defines an amount of space assigned to the virtual machine (in GiB).
-It can be set for a specific instance or as a default value for all instances.
+The `mainDiskSize` property defines the amount of disk space assigned to a node instance (in GiB).
+This property can be set for a specific instance, or as a default value for all instances of a certain node type.
 
 ```yaml
 cluster:
@@ -179,7 +188,7 @@ cluster:
           mainDiskSize: 256 # (2)!
 ```
 
-1. Since the `mainDiskSize` property is not set for this instance, the default value is used (128 GiB).
+1. Since the `mainDiskSize` property is not set for this instance, the default value (128 GiB) is used.
 
 2. This instance has the `mainDiskSize` property set, so therefore the set value (256 GiB) overrides the default value (128 GiB).
 
@@ -199,8 +208,9 @@ cluster:
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-For each node a static IP address can be set.
-f no IP address is set for a particular node, a DHCP lease is requested. Kubitect also checks whether all set IP addresses are within the defined network range (see [Network CIDR](../cluster-network/#network-cidr)).
+Each node in a cluster can be assigned a static IP address to ensure a predictable and consistent IP address for the node. 
+If no IP address is set for a particular node, Kubitect will request a DHCP lease for that node. 
+Additionally, Kubitect checks whether all set IP addresses are within the defined network range, as explained in the [Network CIDR](../cluster-network/#network-cidr) section of the cluster network configuration.
 
 ```yaml
 cluster:
@@ -223,7 +233,7 @@ cluster:
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-By default, MAC addresses are generated for each virtual machine created, but a custom MAC address can also be set.
+The virtual machines created by Kubitect are assigned generated MAC addresses, but a custom MAC address can be set for a virtual machine if necessary.
 
 ```yaml
 cluster:
@@ -243,8 +253,8 @@ cluster:
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-By default, all instances are deployed on the *[*default host*](../hosts/#default-host)*.
-Kubitect can be instructed to deploy the instance on a specific host by specifying the name of the host in the instance configuration.
+By default, all instances in a cluster are deployed on the [default host](../hosts/#default-host). 
+However, by specifying a specific host for an instance, you can control where that instance is deployed 
 
 ```yaml
 
@@ -270,21 +280,16 @@ cluster:
 
 ### Control plane and worker node properties
 
-The following properties can be configured only for control plane or worker nodes.
+The following properties can only be configured for control plane or worker nodes.
 
 #### Data disks
 
 :material-tag-arrow-up-outline: [v2.2.0][tag 2.2.0]
 
-By default, only a main disk (volume) is attached to each provisioned virtual machine.
-Since the main disk already contains an operating system, so it may not be suitable for storing data.
-Therefore, additional disks might be required.
-For example, a [Rook](https://rook.io/) can be easily configured to use all the empty disks attached to the virtual machine to form a storage cluster.
+By default, only a main disk (volume) is attached to each provisioned virtual machine. Since the main disk already contains an operating system, it may not be suitable for storing data, and additional disks may be required. For example, [Rook](https://rook.io/) can be easily configured to use all the empty disks attached to the virtual machine to form a storage cluster.
 
-A name and size (in GiB) must be configured for each data disk.
-By default, data disks are created in the main resource pool.
-To create a data disk in a custom [data resource pool](../hosts/#data-resource-pools), the pool property can be set to the name of the desired data resource pool.
-Also note that the data disk name must be unique among all data disks for a given instance.
+A name and size (in GiB) must be configured for each data disk. By default, data disks are created in the main resource pool. To create a data disk in a custom [data resource pool](../hosts/#data-resource-pools), you can set the pool property to the name of the desired data resource pool. Additionally, note that the data disk name must be unique among all data disks for a given instance.
+
 
 ```yaml
 cluster:
@@ -305,21 +310,16 @@ cluster:
 
 2. Custom [data resource pool](../hosts/#data-resource-pools) must be configured in the hosts section.
 
-!!! note "Note"
-
-    Default data disks are currently not supported.
-
 
 #### Node labels
 
 :material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
 
-Node labels are configured as a dictionary of key-value pairs.
-They are used to label actual Kubernetes nodes, and therefore can only be applied to control plane (master) and worker nodes.
+With node labels, you can help organize and manage your cluster by associating nodes with specific attributes or roles, and by grouping nodes for specific workloads or tasks.
 
-They can be set for a specific instance or as a default value for all instances.
-Labels set for a specific instance are merged with the default labels.
-However, labels set at the instance level take precedence over default labels.
+Node labels are used to label actual Kubernetes nodes and can be set for a specific instance or as a default value for all instances. 
+It is important to note that labels set at the instance level are merged with the default labels. 
+However, if labels have the same key, then the labels set at the instance level take precedence over the default labels.
 
 ```yaml
 cluster:
@@ -327,41 +327,44 @@ cluster:
     <node-type>: # (1)!
       default:
         labels:
-          label-key-1: def-label-value-1
-          label-key-2: def-label-value-2
+          key1: def-value-1
+          key2: def-value-2
       instances:
         - id: 1
           labels: # (2)!
-            label-key-3: instance-label-value-3
+            key1: custom-value
         - id: 2
           labels: # (3)!
-            label-key-1: new-label-value-1
+            key3: super-node
 ```
 
-1. Node labels can only be applied to **control plane** (master) and **worker** nodes.
+1. Node labels can only be applied to **worker** and **master** (control plane) nodes.
 
-2.  Labels defined at the instance level are merged with default labels.
+
+2.  Labels defined at the instance level take precedence over default labels.
     As a result, the following labels are applied to this instance:
 
-    - `#!yaml label-key-1: def-label-value-1`
-    - `#!yaml label-key-2: def-label-value-2`
-    - `#!yaml label-key-3: instance-label-value-3`
+    - `#!yaml key1: custom-value`
+    - `#!yaml key2: def-value-2`
 
-3.  Labels defined at the instance level take precedence over default labels.
+3.  Labels defined at the instance level are merged with default labels.
     As a result, the following labels are applied to this instance:
 
-    - `#!yaml label-key-1: new-label-value-1`
-    - `#!yaml label-key-2: def-label-value-2`
+    - `#!yaml key1: def-value-1`
+    - `#!yaml key2: def-value-2`
+    - `#!yaml key3: super-node`
+
 
 #### Node taints
 
 :material-tag-arrow-up-outline: [v2.2.0][tag 2.2.0]
 
-Node taints are configured as a list of strings in the format `key=value:effect`.
-Similar to node labels, taints can only be applied to control plane (master) and worker nodes.
+With node taints, you can limit which pods can be scheduled to run on a particular node, and help ensure that the workload running on that node is appropriate for its capabilities and resources.
 
-Taints can be set for a specific instance or as a default value for all instances.
-Taints set for a particular instance are merged with the default taints and duplicate entries are removed.
+Node taints are configured as a list of strings in the format `key=value:effect`. 
+Taints can be set for a specific instance or as a default value for all instances. 
+When taints are set for a particular instance, they are merged with the default taints, and any duplicate entries are removed.
+
 
 ```yaml
 cluster:
@@ -380,21 +383,20 @@ cluster:
 
 ### Load balancer properties
 
-The following properties can be configured only for load balancers.
+The following properties can only be configured for load balancers.
 
 #### Virtual IP address (VIP)
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-Load balancers distribute traffic directed to the control plane across all master nodes.
-Nevertheless, a load balancer can fail and make the control plane unreachable.
-To avoid such a situation, multiple load balancers can be configured.
-They work on the failover principle, i.e. one of them is primary and actively serves incoming traffic, while others are secondary and take over the primary position only if the primary load balancer fails.
-If one of the secondary load balancers becomes primary, it should still be reachable via the same IP.
-This IP is usually referred to as a virtual or floating IP (VIP).
+??? question "What is VIP? <i class="click-tip"></i>"
 
-VIP must be specified if multiple load balancers are configured.
-It must also be an unused host IP address within the configured network.
+    Load balancers are responsible for distributing traffic to the control plane nodes. 
+    However, a single load balancer can cause issues if it fails. 
+    To avoid this, multiple load balancers can be configured with one as the primary, actively serving incoming traffic, while others act as secondary and take over the primary position only if the primary load balancer fails. 
+    If a secondary load balancer becomes primary, it should still be reachable via the same IP, which is referred to as a virtual or floating IP (VIP).
+
+When multiple load balancers are configured, an unused IP address within the configured network must be specified as the VIP.
 
 
 ```yaml
@@ -404,20 +406,17 @@ cluster:
       vip: 168.192.113.200
 ```
 
-#### Virtual router ID
+#### Virtual router ID (VRID)
 
 :material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
 &ensp;
 :octicons-file-symlink-file-24: Default: `51`
 
-When a cluster is created with a virtual IP (VIP) set, Kubitect configures the virtual router redundancy protocol (VRRP), which provides failover for load balancers.
-A virtual router ID (VRID) identifies the group of VRRP routers.
-Each group has its own ID.
-Since there can be only one master in each group, two groups cannot have the same ID.
+When a cluster is created with a VIP, Kubitect configures Virtual Router Redundancy Protocol (VRRP), which provides failover for load balancers. 
+Each VRRP group is identified by a virtual router ID (VRID), which can be any number between 0 and 255. 
+Since there can be only one master in each group, two groups cannot have the same ID. 
 
-The virtual router ID can be any number between 0 and 255.
-By default, Kubitect sets the virtual router ID to `51`.
-If you set up multiple clusters that use VIP, you must ensure that the virtual router ID is different for each cluster.
+By default, Kubitect sets the VRID to 51, but if you set up multiple clusters that use VIP, you must ensure that the VRID is different for each cluster.
 
 
 ```yaml
@@ -425,10 +424,8 @@ cluster:
   nodes:
     loadBalancer:
       vip: 168.192.113.200
-      virtualRouterId: 30 # (1)!
+      virtualRouterId: 30
 ```
-
-1. If the virtual IP (VIP) is not set, the virtual router ID is ignored.
 
 #### Priority
 
@@ -463,23 +460,26 @@ cluster:
 
 :material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
 
-By default, all configured load balancers distribute incoming traffic on port 6443 across all control plane nodes.
-Kubitect allows additional user-defined ports to be configured.
 
-The following properties can be configured for each port:
+By default, each configured load balancer has a port forwarding rule that distribute incoming traffic on port 6443 across the available control plane nodes.
+However, Kubitect provides the flexibility to configure additional user-defined port forwarding rules.
 
-+ `name` - Name is a unique port identifier.
-+ `port` - Incoming port is a port on which the load balancer listens for incoming traffic.
-+ `targetPort` - Target port is a port where traffic is forwarded by the load balancer.
-+ `target` - Target is a group of nodes to which traffic is forwarded. Possible targets are:
+The following properties can be configured for each rule:
+
++ `name` - A unique port identifier.
++ `port` - The incoming port on which the load balancer listens for traffic.
++ `targetPort` - The port to which traffic is forwarded by the load balancer.
++ `target` - The group of nodes to which traffic is directed. The possible targets are:
     - `masters` - control plane nodes
     - `workers` - worker nodes 
-    - `all` - control plane and worker nodes.
+    - `all` - worker and control plane nodes.
 
-A unique name and a unique incoming port must be configured for each port.
-The configuration of target and target port is optional.
-If target port is not configured, it is set to the same value as the incoming port.
-If target is not configured, incoming traffic is distributed across worker nodes by default.
+Every port forwarding rule must be configured with a unique `name` and `port`. 
+The name serves as a unique identifier for the rule, while the port specifies the incoming port on which the load balancer listens for traffic.
+
+The `target` and `targetPort` configurations are optional. 
+If target port is not explicitly set, it will default to the same value as the incoming port.
+Similarly, if target is not set, incoming traffic is automatically distributed across worker nodes.
 
 ```yaml
 cluster:
@@ -513,8 +513,8 @@ cluster:
 
 ### Set a role to all worker nodes
 
-By default worker nodes have no roles (`<none>`).
-For example, to set `node` role to all worker nodes in the cluster, set default label with key `node-role.kubernetes.io/node`.
+By default, worker nodes in a Kubernetes cluster are not assigned any roles (`<none>`). 
+To set the role of all worker nodes in the cluster, the default label with the key `node-role.kubernetes.io/node` can be configured.
 
 ```yaml
 cluster:
@@ -529,19 +529,19 @@ cluster:
 
 1. If the label value is omitted, `null` is set as the label value.
 
-Node roles can be seen by listing cluster nodes with `kubectl`.
+The roles of the nodes in a Kubernetes cluster can be viewed using `kubectl get nodes`.
 
 ```
 NAME                   STATUS   ROLES                  AGE   VERSION
-k8s-cluster-master-1   Ready    control-plane,master   19m   v1.22.6
-k8s-cluster-worker-1   Ready    node                   19m   v1.22.6
-k8s-cluster-worker-2   Ready    node                   19m   v1.22.6
+k8s-cluster-master-1   Ready    control-plane,master   19m   v1.25.6
+k8s-cluster-worker-1   Ready    node                   19m   v1.25.6
+k8s-cluster-worker-2   Ready    node                   19m   v1.25.6
 ```
 
 ### Load balance HTTP requests
 
-Kubitect allows users to define custom port forwarding on load balancers.
-For example, to distribute HTTP and HTTPS requests across all worker nodes, at least one load balancer has to be specified and port forwarding must be configured, as shown in the sample configuration below.
+Kubitect enables users to define custom port forwarding rules on load balancers. 
+For example, to distribute HTTP and HTTPS requests across all worker nodes, at least one load balancer must be specified and port forwarding must be configured as follows:
 
 ```yaml
 cluster:
@@ -552,11 +552,8 @@ cluster:
           port: 80
         - name: https
           port: 443
-          target: all # (1)!
       instances:
         - id: 1
 ```
-
-1. When the target is set to `all`, load balancers distribute traffic across all nodes (master and worker nodes).
 
 </div>

@@ -14,6 +14,9 @@ theme:
   favicon: theme/assets/images/favicon.svg
   logo: theme/assets/images/logo_white.svg
 
+  font:
+    text: Roboto Flex
+
   palette:
     - scheme: default
       toggle:
@@ -119,7 +122,7 @@ nav:
           - Kubernetes: user-guide/configuration/kubernetes.md
           - Addons: user-guide/configuration/addons.md
       - Cluster Management:
-          - Creating the cluster: user-guide/management/creating.md
+          # - Creating the cluster: user-guide/management/creating.md
           - Upgrading the cluster: user-guide/management/upgrading.md
           - Scaling the cluster: user-guide/management/scaling.md
           - Destroying the cluster: user-guide/management/destroying.md
@@ -137,4 +140,4 @@ nav:
       - Other:
           - Accessing the cluster: examples/accessing-cluster.md
           - Network bridge: examples/network-bridge.md
-          - Full example: examples/full-example.md
+          # - Full example: examples/full-example.md
