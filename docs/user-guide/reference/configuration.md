@@ -681,7 +681,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
     <tr>
       <td><code>cluster.nodeTemplate.ssh.addToKnownHosts</code></td>
       <td>boolean</td>
-      <td>true</td>
+      <td>false</td>
       <td></td>
       <td>
         If set to true, each virtual machine will be added to the known hosts on the machine where the project is being run.
