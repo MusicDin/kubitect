@@ -142,6 +142,21 @@ For a more detailed explanation of the available CPU modes and their usage, plea
     The `host-model` and `host-passthrough` modes makes sense only when a virtual machine can run directly on the host CPUs (e.g. virtual machines of type *kvm*).
     The actual host CPU is irrelevant for virtual machines with emulated virtual CPUs (e.g. virtul machines of type *qemu*).
 
+### Update on boot
+
+:material-tag-arrow-up-outline: [v2.2.0][tag 2.2.0]
+&ensp;
+:octicons-file-symlink-file-24: Default: `true`
+
+By default, Kubitect updates all virtual machine packages on boot.
+To disable this behavior, set `updateOnBoot` to false.
+
+```yaml
+cluster:
+  nodeTemplate:
+    updateOnBoot: false
+```
+
 ### SSH options
 
 #### Custom SSH certificate
