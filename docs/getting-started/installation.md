@@ -69,20 +69,10 @@ Verify the installation by checking the Kubitect version.
 ```sh
 kubitect --version
 
-# kubitect version v3.0.0
+# kubitect version v3.0.1
 ```
 
 ## Enable shell autocomplete
-
-To load completions in your current shell session (`bash`):
-```sh
-source <(kubitect completion bash)
-```
-
-To load completions for every new session, execute once:
-```sh
-kubitect completion bash > /etc/bash_completion.d/kubitect
-```
 
 !!! tip "Tip"
 
@@ -92,5 +82,60 @@ kubitect completion bash > /etc/bash_completion.d/kubitect
     <code>
     kubitect completion <em>shell</em> -h
     </code>
+
+=== "Bash"
+
+    This script depends on the `bash-completion` package.
+    If it is not installed already, you can install it via your OS's package manager.
+
+    To load completions in your current shell session:
+
+    ```bash
+    source <(kubitect completion bash)
+    ```
+
+    To load completions for every new session, execute once:
+
+    **Linux:**
+
+    ```bash
+    kubitect completion bash > /etc/bash_completion.d/kubitect
+    ```
+
+    **macOS:**
+
+    ```bash
+    kubitect completion bash > $(brew --prefix)/etc/bash_completion.d/kubitect
+    ```
+
+=== "Zsh"
+
+    If shell completion is not already enabled in your environment you will need to enable it.
+    You can execute the following once:
+
+    ```zsh
+    echo "autoload -U compinit; compinit" >> ~/.zshrc
+    ```
+
+    To load completions in your current shell session:
+
+    ```zsh
+    source <(kubitect completion zsh); compdef _kubitect kubitect
+    ```
+
+    To load completions for every new session, execute once:
+
+    **Linux:**
+
+    ```zsh
+    kubitect completion zsh > "${fpath[1]}/_kubitect"
+    ```
+
+    **macOS:**
+    ```zsh
+    kubitect completion zsh > $(brew --prefix)/share/zsh/site-functions/_kubitect
+    ```
+
+
 
 </div>
