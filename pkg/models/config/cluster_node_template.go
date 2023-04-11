@@ -59,10 +59,11 @@ const (
 	UBUNTU22 OSDistro = "ubuntu22"
 	DEBIAN   OSDistro = "debian"
 	DEBIAN11 OSDistro = "debian11"
+	CENTOS9  OSDistro = "centos9"
 )
 
 func (d OSDistro) Validate() error {
-	return v.Var(d, v.OneOf(UBUNTU, UBUNTU20, UBUNTU22, DEBIAN, DEBIAN11))
+	return v.Var(d, v.OneOf(UBUNTU, UBUNTU20, UBUNTU22, DEBIAN, DEBIAN11, CENTOS9))
 }
 
 type OSNetworkInterface string

@@ -41,6 +41,7 @@ var ProjectOsPresets = map[string]string{
 	"ubuntu20": "https://cloud-images.ubuntu.com/releases/focal/release-20230209/ubuntu-20.04-server-cloudimg-amd64.img",
 	"debian":   "https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-generic-amd64.qcow2",
 	"debian11": "https://cloud.debian.org/images/cloud/bullseye/20230124-1270/debian-11-genericcloud-amd64-20230124-1270.qcow2",
+	"centos9":  "https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-20230405.1.x86_64.qcow2",
 }
 
 var ProjectK8sVersions = []string{

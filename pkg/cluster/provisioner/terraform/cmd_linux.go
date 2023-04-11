@@ -2,6 +2,7 @@ package terraform
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"syscall"
 
@@ -29,6 +30,7 @@ func (t *terraform) runCmd(action string, args []string, showOutput bool) (int, 
 		cmd.Stdout = ui.Streams().Out().File()
 	}
 
+	cmd.Env = []string{fmt.Sprintf("PATH=%s", os.Getenv("PATH"))}
 	if ui.Debug() {
 		cmd.Env = append(cmd.Env, "TF_LOG=INFO")
 	}
