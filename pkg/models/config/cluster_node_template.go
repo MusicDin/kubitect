@@ -9,7 +9,7 @@ import (
 type NodeTemplate struct {
 	User         User            `yaml:"user"`
 	OS           OS              `yaml:"os"`
-	SSH          NodeTemplateSSH `yaml:"ssh,omitempty"`
+	SSH          NodeTemplateSSH `yaml:"ssh"`
 	CpuMode      CpuMode         `yaml:"cpuMode,omitempty"`
 	DNS          []IP            `yaml:"dns,omitempty"`
 	UpdateOnBoot bool            `yaml:"updateOnBoot"`
@@ -28,7 +28,6 @@ func (n NodeTemplate) Validate() error {
 func (n *NodeTemplate) SetDefaults() {
 	n.User = defaults.Default(n.User, "k8s")
 	n.CpuMode = defaults.Default(n.CpuMode, CUSTOM)
-	n.UpdateOnBoot = defaults.Default(n.UpdateOnBoot, true)
 }
 
 type OS struct {
@@ -79,16 +78,12 @@ func (os OSSource) Validate() error {
 
 type NodeTemplateSSH struct {
 	AddToKnownHosts bool `yaml:"addToKnownHosts"`
-	PrivateKeyPath  File `yaml:"privateKeyPath"`
+	PrivateKeyPath  File `yaml:"privateKeyPath,omitempty"`
 }
 
 func (ssh NodeTemplateSSH) Validate() error {
 	return v.Struct(&ssh)
 	// v.Field(&ssh.PrivateKeyPath, v.Skip()),
-}
-
-func (ssh *NodeTemplateSSH) SetDefaults() {
-	ssh.AddToKnownHosts = defaults.Default(ssh.AddToKnownHosts, true)
 }
 
 type CpuMode string
