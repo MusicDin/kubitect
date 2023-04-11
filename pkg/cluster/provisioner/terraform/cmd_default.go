@@ -6,7 +6,6 @@ package terraform
 import (
 	"fmt"
 	"os/exec"
-	"syscall"
 
 	"github.com/MusicDin/kubitect/pkg/ui"
 )
