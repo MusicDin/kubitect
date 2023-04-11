@@ -5,6 +5,7 @@ package terraform
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 
 	"github.com/MusicDin/kubitect/pkg/ui"
