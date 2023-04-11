@@ -12,7 +12,7 @@ type NodeTemplate struct {
 	SSH          NodeTemplateSSH `yaml:"ssh"`
 	CpuMode      CpuMode         `yaml:"cpuMode,omitempty"`
 	DNS          []IP            `yaml:"dns,omitempty"`
-	UpdateOnBoot bool            `yaml:"updateOnBoot"`
+	UpdateOnBoot *bool           `yaml:"updateOnBoot"`
 }
 
 func (n NodeTemplate) Validate() error {
@@ -26,8 +26,11 @@ func (n NodeTemplate) Validate() error {
 }
 
 func (n *NodeTemplate) SetDefaults() {
+	def := true
+
 	n.User = defaults.Default(n.User, "k8s")
 	n.CpuMode = defaults.Default(n.CpuMode, CUSTOM)
+	n.UpdateOnBoot = defaults.Default(n.UpdateOnBoot, &def)
 }
 
 type OS struct {
