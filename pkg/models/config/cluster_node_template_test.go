@@ -30,7 +30,7 @@ func TestOSNetworkInterface(t *testing.T) {
 }
 
 func TestOS_Empty(t *testing.T) {
-	assert.ErrorContains(t, OS{}.Validate(), "Field 'distro' must be one of the following values: [ubuntu|ubuntu20|ubuntu22|debian|debian11]")
+	assert.ErrorContains(t, OS{}.Validate(), "Field 'distro' must be one of the following values: [ubuntu|ubuntu20|ubuntu22|debian|debian11|centos9|rocky]")
 	assert.ErrorContains(t, OS{}.Validate(), "Field 'networkInterface' can contain only alphanumeric characters.")
 }
 
