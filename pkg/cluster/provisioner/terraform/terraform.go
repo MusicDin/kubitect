@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path"
-	"syscall"
 
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
@@ -244,41 +242,6 @@ func installTerraform(ver, binDir string) (string, error) {
 	}
 
 	return installer.Install(context.Background())
-}
-
-// runCmd runs terraform command and returns exit code with
-// a potential error.
-func (t *terraform) runCmd(action string, args []string, showOutput bool) (int, error) {
-	args = append([]string{action}, args...)
-
-	if !ui.HasColor() {
-		args = append(args, flag("no-color"))
-	}
-
-	cmd := exec.Command(t.binPath, args...)
-	cmd.Dir = t.projectDir
-
-	if ui.Debug() {
-		cmd.Env = append(cmd.Env, "TF_LOG=INFO")
-	}
-
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Pdeathsig: syscall.SIGTERM,
-	}
-
-	cmd.Stderr = ui.Streams().Err().File()
-	if showOutput || ui.Debug() {
-		cmd.Stdout = ui.Streams().Out().File()
-	}
-
-	err := cmd.Run()
-	exitCode := cmd.ProcessState.ExitCode()
-
-	if err != nil {
-		err = fmt.Errorf("terraform %s failed: %v", action, err)
-	}
-
-	return exitCode, err
 }
 
 // Flag concatenates key and value with "=" if value is provided.
