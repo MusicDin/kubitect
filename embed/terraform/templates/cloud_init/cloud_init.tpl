@@ -16,6 +16,11 @@ package_upgrade: ${update}
 packages:
   - qemu-guest-agent
 
+bootcmd:
+  # Disable qemu-guest-agent to prevent reporting IP addresses
+  # before cloud-init has configured the network.
+  - cloud-init-per once disable-qemu-ga systemctl stop qemu-guest-agent.service
+
 runcmd:
   - [ systemctl, enable, qemu-guest-agent.service ]
   - [ systemctl, start, qemu-guest-agent.service ]
