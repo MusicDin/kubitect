@@ -109,6 +109,8 @@ func (a *ansible) Exec(pb Playbook) error {
 
 	if ui.Debug() {
 		options.AnsibleSetEnv("ANSIBLE_VERBOSITY", "2")
+	} else {
+		options.AnsibleSetEnv("ANSIBLE_ACTION_WARNINGS", "false")
 	}
 
 	options.AnsibleSetEnv("ANSIBLE_CALLBACKS_ENABLED", "yaml")
