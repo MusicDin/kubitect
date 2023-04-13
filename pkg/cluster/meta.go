@@ -12,7 +12,7 @@ import (
 
 const (
 	DefaultConfigDir    = "config"
-	DefaultShareDir     = "share"
+	DefaultCacheDir     = "cache"
 	DefaultTerraformDir = DefaultConfigDir + "/terraform"
 
 	DefaultNewConfigFilename     = "kubitect.yaml"
@@ -36,6 +36,15 @@ type ClusterMeta struct {
 
 func (c ClusterMeta) ConfigDir() string {
 	return filepath.Join(c.Path, DefaultConfigDir)
+}
+
+func (c ClusterMeta) CacheDir() string {
+	clustersDir := c.ClustersDir()
+	if c.Local {
+		clustersDir = c.LocalClustersDir()
+	}
+	cacheDir := filepath.Join(clustersDir, "..", DefaultCacheDir, c.Name)
+	return filepath.Clean(cacheDir)
 }
 
 func (c ClusterMeta) AppliedConfigPath() string {

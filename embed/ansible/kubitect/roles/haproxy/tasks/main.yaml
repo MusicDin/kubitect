@@ -2,7 +2,6 @@
 - name: Get operating system ID
   raw: cat /etc/os-release | grep -i "^id="
   register: os_id
-  changed_when: false
 
 - name: Configure SELinux
   block:
@@ -20,7 +19,7 @@
         setype: http_port_t
         state: present
   when:
-    - ( "'centos' in os_id.stdout" ) or ( "'rocky' in os_id.stdout" )
+    - ( "centos" in os_id.stdout ) or ( "rocky" in os_id.stdout )
 
 - name: Allow binding non-local IP
   sysctl:
