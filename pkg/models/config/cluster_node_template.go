@@ -48,9 +48,11 @@ func (s OS) Validate() error {
 }
 
 func (s *OS) SetDefaults() {
-	s.NetworkInterface = defaults.Default(s.NetworkInterface, OSNetworkInterface("ens3"))
 	s.Distro = defaults.Default(s.Distro, UBUNTU)
-	s.Source = defaults.Default(s.Source, OSSource(env.ProjectOsPresets[string(s.Distro)]))
+
+	preset := env.ProjectOsPresets[string(s.Distro)]
+	s.NetworkInterface = defaults.Default(s.NetworkInterface, OSNetworkInterface(preset.NetworkInterface))
+	s.Source = defaults.Default(s.Source, OSSource(preset.Source))
 }
 
 type OSDistro string
@@ -63,10 +65,11 @@ const (
 	DEBIAN11 OSDistro = "debian11"
 	CENTOS9  OSDistro = "centos9"
 	ROCKY    OSDistro = "rocky"
+	ROCKY9   OSDistro = "rocky9"
 )
 
 func (d OSDistro) Validate() error {
-	return v.Var(d, v.OneOf(UBUNTU, UBUNTU20, UBUNTU22, DEBIAN, DEBIAN11, CENTOS9, ROCKY))
+	return v.Var(d, v.OneOf(UBUNTU, UBUNTU20, UBUNTU22, DEBIAN, DEBIAN11, CENTOS9, ROCKY, ROCKY9))
 }
 
 type OSNetworkInterface string
