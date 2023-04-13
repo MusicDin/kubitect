@@ -133,3 +133,25 @@ func TestLB_MissingVIP(t *testing.T) {
 
 	assert.EqualError(t, defaults.Assign(&lb).Validate(), "Virtual IP (VIP) is required when multiple load balancer instances are configured.")
 }
+
+func TestLB_PortForward_UniqueName(t *testing.T) {
+	lb := LB{
+		ForwardPorts: []LBPortForward{
+			{Name: "http"},
+			{Name: "http"},
+		},
+	}
+
+	assert.EqualError(t, defaults.Assign(&lb).Validate(), "Field 'Name' must be unique for each element in 'forwardPorts'.")
+}
+
+func TestLB_PortForward_UniquePort(t *testing.T) {
+	lb := LB{
+		ForwardPorts: []LBPortForward{
+			{Name: "http", Port: 80},
+			{Name: "https", Port: 80},
+		},
+	}
+
+	assert.EqualError(t, defaults.Assign(&lb).Validate(), "Field 'Port' must be unique for each element in 'forwardPorts'.")
+}
