@@ -40,9 +40,9 @@ cluster:
 :octicons-file-symlink-file-24: Default: `ubuntu`
 
 The operating system for virtual machines can be specified in the node template. 
-Currently, you can configure either Ubuntu or Debian. 
 By default, the Ubuntu distribution is installed on all virtual machines.
-To use Debian instead, set the `os.distro` property to Debian.
+
+You can select a desired distribution by setting the `os.distro` property.
 
 ```yaml
 cluster:
@@ -53,15 +53,32 @@ cluster:
 
 1. By default, `ubuntu` is used.
 
+
 The available operating system distribution presets are:
 
-+ `ubuntu` - Latest Ubuntu 22.04 release. (default)
++ **`ubuntu`** - Latest Ubuntu 22.04 release. (default)
 + `ubuntu22` - Ubuntu 22.04 release as of *2023-03-02*.
 + `ubuntu20` - Ubuntu 20.04 release as of *2023-02-09*.
-+ `debian` - Latest Debian 11 release.
++ **`debian`** - Latest Debian 11 release.
 + `debian11` - Debian 11 release as of *2023-01-24*.
++ **`rocky`** - Latest Rocky 9 release.
++ `rocky9` - Rocky 9.1 release as of *2023-02-15*.
++ **`centos9`** - CentOS Stream 9 release as of *2023-04-05*.
 
-Note that Ubuntu images are downloaded from the [Ubuntu cloud image repository](https://cloud-images.ubuntu.com/) and Debian images are downloaded from the [Debian cloud image repository](https://cloud.debian.org/images/cloud/).
+!!! warning "Important"
+
+    Rocky Linux and CentOS Stream both require the `x86-64-v2` instruction set to run.
+    If the [CPU mode property](#cpu-mode) is not set to `host-passthrough`, `host-model`, or `maximum`, the virtual machine may not be able to boot properly.
+
+
+??? question "Where are images downloaded from? <i class="click-tip"></i>"
+
+    Images are sourced from the official cloud image repository for the corresponding Linux distribution.
+
+    - Ubuntu: [Ubuntu cloud image repository](https://cloud-images.ubuntu.com/)
+    - Debian: [Debian cloud image repository](https://cloud.debian.org/images/cloud/)
+    - CentOS: [CentOS cloud image repositroy](https://cloud.centos.org/centos/)
+    - Rocky: [Rocky cloud image repositroy](https://dl.rockylinux.org/pub/rocky/)
 
 #### OS source
 
