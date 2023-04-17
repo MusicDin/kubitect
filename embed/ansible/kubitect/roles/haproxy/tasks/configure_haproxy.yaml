@@ -4,6 +4,14 @@
     name: haproxy
     state: present
 
+- name: Create directory for HAProxy sockets
+  ansible.builtin.file:
+    path: /run/haproxy/
+    state: directory
+    owner: haproxy
+    group: haproxy
+    mode: 2775
+
 - name: Create HAProxy config
   vars:
     control_plane_instances: "{{ infra.nodes.master.instances }}"

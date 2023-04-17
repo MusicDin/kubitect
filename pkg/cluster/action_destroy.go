@@ -25,10 +25,13 @@ func (c *ClusterMeta) Destroy() error {
 		return err
 	}
 
-	ui.Println(ui.INFO, "Cleaning up cluster directory...", c.Name)
+	ui.Println(ui.INFO, "Cleaning up cluster directory...")
 	if err := os.RemoveAll(c.Path); err != nil {
 		return fmt.Errorf("failed to remove directory of the cluster '%s': %v", c.Name, err)
 	}
+
+	ui.Println(ui.INFO, "Cleaning up cluster cache...")
+	os.RemoveAll(c.CacheDir())
 
 	ui.Printf(ui.INFO, "Cluster '%s' has been successfully destroyed.\n", c.Name)
 	return nil

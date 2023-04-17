@@ -21,6 +21,7 @@ type kubespray struct {
 	ClusterPath       string
 	SshPrivateKeyPath string
 	ConfigDir         string
+	CacheDir          string
 	SharedDir         string
 	Config            *config.Config
 	InfraConfig       *infra.Config
@@ -45,6 +46,7 @@ func NewKubesprayExecutor(
 	clusterPath string,
 	sshPrivateKeyPath string,
 	configDir string,
+	cacheDir string,
 	sharedDir string,
 	cfg *config.Config,
 	infraCfg *infra.Config,
@@ -55,6 +57,7 @@ func NewKubesprayExecutor(
 		ClusterPath:       clusterPath,
 		SshPrivateKeyPath: sshPrivateKeyPath,
 		ConfigDir:         configDir,
+		CacheDir:          cacheDir,
 		SharedDir:         sharedDir,
 		Config:            cfg,
 		InfraConfig:       infraCfg,
@@ -84,7 +87,7 @@ func (e *kubespray) Init() error {
 
 	if e.Ansible == nil {
 		ansibleBinDir := path.Join(e.VirtualEnv.Path(), "bin")
-		e.Ansible = ansible.NewAnsible(ansibleBinDir)
+		e.Ansible = ansible.NewAnsible(ansibleBinDir, e.CacheDir)
 	}
 
 	return e.KubitectHostsSetup()

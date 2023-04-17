@@ -34,14 +34,14 @@ func TestExtraVarsToMap_Invalid(t *testing.T) {
 }
 
 func TestAnsible_InvalidPath(t *testing.T) {
-	a := NewAnsible(t.TempDir())
+	a := NewAnsible(t.TempDir(), "")
 
 	pb := Playbook{}
 	assert.EqualError(t, a.Exec(pb), "ansible-playbook: playbook path not set")
 }
 
 func TestAnsible_InvalidInventory(t *testing.T) {
-	a := NewAnsible(t.TempDir())
+	a := NewAnsible(t.TempDir(), "")
 
 	pb := Playbook{
 		Path: "pb.yaml",
@@ -51,7 +51,7 @@ func TestAnsible_InvalidInventory(t *testing.T) {
 }
 
 func TestAnsible_InvalidExtraVar(t *testing.T) {
-	a := NewAnsible(t.TempDir())
+	a := NewAnsible(t.TempDir(), "")
 
 	pb := Playbook{
 		Path:      "pb.yaml",
@@ -63,7 +63,7 @@ func TestAnsible_InvalidExtraVar(t *testing.T) {
 }
 
 func TestAnsible_InvalidBinPath(t *testing.T) {
-	a := NewAnsible(t.TempDir())
+	a := NewAnsible(t.TempDir(), "")
 
 	pb := Playbook{
 		Path:      "pb.yaml",
@@ -74,7 +74,7 @@ func TestAnsible_InvalidBinPath(t *testing.T) {
 }
 
 func TestAnsible_InvalidBinPath2(t *testing.T) {
-	a := NewAnsible(t.TempDir())
+	a := NewAnsible(t.TempDir(), "")
 
 	ui.MockGlobalUi(t, ui.UiOptions{Debug: true, NoColor: true})
 

@@ -111,6 +111,8 @@ func (c *Cluster) Sync() error {
 	return nil
 }
 
+// Executor returns an executor instance that is responsible for configuring
+// cluster nodes provisioned by the provisioner.
 func (c *Cluster) Executor() executors.Executor {
 	if c.exec != nil {
 		return c.exec
@@ -125,6 +127,7 @@ func (c *Cluster) Executor() executors.Executor {
 		c.Path,
 		c.PrivateSshKeyPath(),
 		c.ConfigDir(),
+		c.CacheDir(),
 		c.ShareDir(),
 		c.NewConfig,
 		c.InfraConfig,
@@ -134,6 +137,9 @@ func (c *Cluster) Executor() executors.Executor {
 	return c.exec
 }
 
+// Provisioner function returns a provisioner instance that is responsible
+// for provisioning virtual infrastructure based on the configuration file
+// provided as input.
 func (c *Cluster) Provisioner() provisioner.Provisioner {
 	if c.prov != nil {
 		return c.prov

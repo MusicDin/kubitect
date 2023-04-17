@@ -151,7 +151,9 @@ While there are no required fields, there are several useful properties you may 
 
 + `os.distro` 
 
-    This property defines the operating system for the nodes. Currently, only Ubuntu and Debian are supported, and by default, the latest Ubuntu 22.04 release is used.
+    This property defines the operating system for the nodes. 
+    By default, the nodes use the latest Ubuntu 22.04 release. 
+    To explore other available distributions, please refer to the [OS Distribution](../../user-guide/configuration/cluster-node-template#os-distribution) section in the node template of our user guide.
 
 + `ssh.addToKnownHosts`
 

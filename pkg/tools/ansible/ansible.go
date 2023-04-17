@@ -32,13 +32,15 @@ type (
 	}
 
 	ansible struct {
-		binPath string
+		binPath  string
+		cacheDir string
 	}
 )
 
-func NewAnsible(binDir string) Ansible {
+func NewAnsible(binDir, cacheDir string) Ansible {
 	return &ansible{
-		binPath: path.Join(binDir, "ansible-playbook"),
+		binPath:  path.Join(binDir, "ansible-playbook"),
+		cacheDir: cacheDir,
 	}
 }
 
@@ -73,6 +75,7 @@ func (a *ansible) Exec(pb Playbook) error {
 	playbookOptions := &playbook.AnsiblePlaybookOptions{
 		Inventory: pb.Inventory,
 		Tags:      strings.Join(pb.Tags, ","),
+		Forks:     "50",
 	}
 
 	vars, err := extraVarsToMap(pb.ExtraVars)
@@ -109,14 +112,19 @@ func (a *ansible) Exec(pb Playbook) error {
 
 	if ui.Debug() {
 		options.AnsibleSetEnv("ANSIBLE_VERBOSITY", "2")
+	} else {
+		options.AnsibleSetEnv("ANSIBLE_LOCALHOST_WARNING", "false")
+		options.AnsibleSetEnv("ANSIBLE_INVENTORY_UNPARSED_WARNING", "false")
 	}
+
+	options.AnsibleSetEnv("ANSIBLE_CACHE_PLUGIN", "jsonfile")
+	options.AnsibleSetEnv("ANSIBLE_CACHE_PLUGIN_CONNECTION", a.cacheDir)
+	options.AnsibleSetEnv("ANSIBLE_CACHE_PLUGIN_TIMEOUT", "86400")
 
 	options.AnsibleSetEnv("ANSIBLE_CALLBACKS_ENABLED", "yaml")
 	options.AnsibleSetEnv("ANSIBLE_HOST_PATTERN_MISMATCH", "ignore")
 	options.AnsibleSetEnv("ANSIBLE_DISPLAY_FAILED_STDERR", "true")
 	options.AnsibleSetEnv("ANSIBLE_DISPLAY_SKIPPED_HOSTS", "false")
-	options.AnsibleSetEnv("ANSIBLE_DISPLAY_ARGS_TO_STDOUT", "false")
-	options.AnsibleSetEnv("ANSIBLE_FORKS", "10")
 	options.AnsibleSetEnv("ANSIBLE_STDOUT_CALLBACK", "yaml")
 	options.AnsibleSetEnv("ANSIBLE_STDERR_CALLBACK", "yaml")
 
