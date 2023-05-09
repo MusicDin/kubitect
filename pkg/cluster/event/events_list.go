@@ -63,10 +63,10 @@ var ModifyEvents = Events{
 		path:   "Hosts.*.DataResourcePools.*.Path",
 		msg:    "Changing data resource pool location will trigger recreation of all resources bound to that resource pool, such as virtual machines and data disks",
 	},
-	// Allow other host changes
+	// Allow other data resource pools changes
 	{
 		eType: OK,
-		path:  "Hosts",
+		path:  "Hosts.*.DataResourcePools.*",
 	},
 	// Prevent cluster network changes
 	{
@@ -175,6 +175,11 @@ var ModifyEvents = Events{
 			"Cluster.Nodes.Master.Instances.*.DataDisks.*",
 			"Cluster.Nodes.Worker.Instances.*.DataDisks.*",
 		},
+	},
+	// Allow changes to LB forward ports
+	{
+		eType: OK,
+		path:  "Cluster.Nodes.LoadBalancer.ForwardPorts.*",
 	},
 	// Prevent VIP changes
 	{
