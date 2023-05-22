@@ -6,8 +6,10 @@ import (
 
 	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/utils/template"
+	"gopkg.in/yaml.v3"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestKubesprayAllTemplate(t *testing.T) {
@@ -37,12 +39,19 @@ func TestKubesprayK8sClusterTemplate(t *testing.T) {
 }
 
 func TestKubesprayAddonsTemplate(t *testing.T) {
-	tpl := NewKubesprayAddonsTemplate(t.TempDir(), "test: test")
+	addons := map[string]any{
+		"test": "test",
+	}
+
+	bytes, err := yaml.Marshal(addons)
+	require.NoError(t, err)
+
+	tpl := NewKubesprayAddonsTemplate(t.TempDir(), string(bytes))
 	pop, err := template.Populate(tpl)
 
-	assert.NoError(t, err)
-	assert.NoError(t, tpl.Write())
-	assert.Equal(t, pop, "test: test")
+	require.NoError(t, err)
+	require.NoError(t, tpl.Write())
+	assert.Equal(t, "test: test\n", pop)
 }
 
 func TestKubesprayEtcdTemplate(t *testing.T) {

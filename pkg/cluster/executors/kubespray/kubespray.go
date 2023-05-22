@@ -14,6 +14,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/tools/git"
 	"github.com/MusicDin/kubitect/pkg/tools/virtualenv"
 	"github.com/MusicDin/kubitect/pkg/ui"
+	"gopkg.in/yaml.v3"
 )
 
 type kubespray struct {
@@ -217,7 +218,12 @@ func (e *kubespray) generateGroupVars() error {
 		return err
 	}
 
-	err = NewKubesprayAddonsTemplate(e.ConfigDir, e.Config.Addons.Kubespray).Write()
+	addons, err := yaml.Marshal(e.Config.Addons.Kubespray)
+	if err != nil {
+		return err
+	}
+
+	err = NewKubesprayAddonsTemplate(e.ConfigDir, string(addons)).Write()
 	if err != nil {
 		return err
 	}
