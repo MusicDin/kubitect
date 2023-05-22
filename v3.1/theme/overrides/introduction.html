@@ -1,0 +1,101 @@
+{% extends "main.html" %}
+
+{% block tabs %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="../../assets/stylesheets/introduction.css">
+
+    <div class="text-center">
+        <h1>Introduction</h1>
+    </div>
+
+    <h2>What is Kubitect?</h2>
+
+    <div class="text-justify">
+        <p>
+            Kubitect is an open source project that aims to simplify the <strong>deployment</strong> and subsequent <strong>management of
+            Kubernetes clusters.</strong>
+            It provides a CLI tool written in golang that lets you <strong>set up</strong>, <strong>update</strong>, <strong>scale</strong>, and
+            <strong>destroy</strong> Kubernetes clusters.
+        </p>
+        <p>
+            Under the hood, it uses <a href="https://www.terraform.io/">Terraform</a> along with 
+            <a href="https://github.com/dmacvicar/terraform-provider-libvirt">terraform-libvirt-provider</a>
+            to deploy virtual machines on target hosts running libvirt.
+            Kubernetes is configured on the deployed virtual machines using <a href="https://kubespray.io">Kubespray</a>,
+            the popular open source project.
+        </p>
+    </div>
+
+    <h2>Core goals</h2>
+
+    <!-- CARDS Key Benefits-->
+    <div class="card-container">
+
+        <div class="card-row">
+
+            <div class="card">
+
+                <div class="card-header">As many clusters on as many hosts</div class="card-header">
+                <p class="card-content-text text-center">
+                    With Kubitect, you can set up a variety of cluster topologies, from single-node clusters to complex
+                    clusters running on multiple hosts.
+                </p>
+
+                <div class="card-footer-nav">
+                    <img src="../../assets/images/network.svg" alt="">
+                </div>
+            </div>
+
+            <div class="card">
+
+                <div class="card-header">Open source forever</div class="card-header">
+                <p class="card-content-text text-center">
+                    Kubitect is based exclusively on open source technologies and will therefore remain open source forever!
+                </p>
+
+                <div class="card-footer-nav">
+                    <img src="../../assets/images/handshake.svg" alt="">
+                </div>
+            </div>
+        </div>
+
+        <div class="card-row">
+
+            <div class="card">
+
+                <div class="card-header">Reliable, scalable and reproducible</div class="card-header">
+                <p class="card-content-text text-center">
+                    By using a single configuration file, Kubitect clusters can be easily replicated in different
+                    environments, while Kubespray ensures reliability and scalability.
+                </p>
+
+                <div class="card-footer-nav text-center">
+                    <img src="../../assets/images/filelaptop.svg" alt="">
+                </div>
+            </div>
+
+            <div class="card">
+
+                <div class="card-header">From home-labs to companies</div class="card-header">
+                <p class="card-content-text text-center">
+                    Bridging the gap between local and enterprise environments, Kubitect enables you to set up a cluster for
+                    your home lab or a business without the need for in-depth knowledge.
+                </p>
+
+                <div class="card-footer-nav">
+                    <img src="../../assets/images/lab.svg" alt="">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block footer %}
+    {{ super() }}
+{% endblock %}
