@@ -154,14 +154,18 @@ resource "null_resource" "ssh_known_hosts" {
   provisioner "local-exec" {
     command = <<-EOF
       sh ./scripts/filelock-exec.sh \
-        "touch ~/.ssh/known_hosts && ssh-keygen -R $VM_IP \
-        && ssh-keyscan -t rsa $VM_IP | tee -a ~/.ssh/known_hosts \
-        && rm -f ~/.ssh/known_hosts.old"
+        "touch $HOME/.ssh/known_hosts \
+        && ssh-keygen -R $VM_IP \
+        && ssh-keyscan -t rsa $VM_IP | tee -a $HOME/.ssh/known_hosts \
+        && rm -f $HOME/.ssh/known_hosts.old"
     EOF
 
     environment = {
+      HOME  = pathexpand("~")
       VM_IP = libvirt_domain.vm_domain.network_interface.0.addresses.0
     }
+
+    quiet = true
   }
 
   provisioner "local-exec" {
