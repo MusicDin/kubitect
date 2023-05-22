@@ -67,8 +67,14 @@ The available operating system distribution presets are:
 
 !!! warning "Important"
 
-    Rocky Linux and CentOS Stream both require the `x86-64-v2` instruction set to run.
+    **Rocky Linux** and **CentOS Stream** both require the `x86-64-v2` instruction set to run.
     If the [CPU mode property](#cpu-mode) is not set to `host-passthrough`, `host-model`, or `maximum`, the virtual machine may not be able to boot properly.
+
+
+!!! danger "Known issues"
+
+    **CentOS Stream** images already include the `qemu-guest-agent` package, which reports IP addresses of the virtual machines before they are leased from a DHCP server. 
+    This can cause issues during infrastructure provisioning if the virtual machines are not configured with static IP addresses.
 
 
 ??? question "Where are images downloaded from? <i class="click-tip"></i>"
