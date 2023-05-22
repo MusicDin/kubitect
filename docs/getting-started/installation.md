@@ -69,7 +69,7 @@ Verify the installation by checking the Kubitect version.
 ```sh
 kubitect --version
 
-# kubitect version v3.0.1
+# kubitect version v3.1.0
 ```
 
 ## Enable shell autocomplete
