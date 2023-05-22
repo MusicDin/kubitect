@@ -3,8 +3,8 @@ package config
 import v "github.com/MusicDin/kubitect/pkg/utils/validation"
 
 type Addons struct {
-	Kubespray string `yaml:"kubespray,omitempty" opt:"-"`
-	Rook      Rook   `yaml:"rook,omitempty"`
+	Kubespray map[string]any `yaml:"kubespray,omitempty" opt:"-"`
+	Rook      Rook           `yaml:"rook,omitempty"`
 }
 
 func (a Addons) Validate() error {
