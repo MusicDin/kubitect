@@ -9,7 +9,7 @@ const (
 	ConstProjectUrl        = "https://github.com/MusicDin/kubitect"
 	ConstProjectVersion    = "v3.1.0"
 	ConstKubesprayUrl      = "https://github.com/kubernetes-sigs/kubespray"
-	ConstKubesprayVersion  = "v2.21.0"
+	ConstKubesprayVersion  = "v2.22.0"
 	ConstKubernetesVersion = "v1.25.6"
 	ConstTerraformVersion  = "1.4.4"
 )
@@ -36,9 +36,9 @@ var ProjectApplyActions = [...]string{
 }
 
 var ProjectK8sVersions = []string{
-	"v1.23",
 	"v1.24",
 	"v1.25",
+	"v1.26",
 }
 
 var ProjectOsPresets = map[string]struct {
