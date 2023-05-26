@@ -17,7 +17,13 @@ variable "network_bridge" {
   description = "Network (virtual) bridge"
 }
 
-variable "network_cidr" {
+variable "network_cidr4" {
   type        = string
-  description = "Network CIDR"
+  description = "Network CIDR (v4)"
+}
+
+variable "network_cidr6" {
+  type        = string
+  description = "Network CIDR (v6)"
+  nullable    = true
 }

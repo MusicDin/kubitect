@@ -7,27 +7,6 @@ variable "lb_vip" {
   description = "Load balancer virtual IP address (VIP)"
 }
 
-# variable "vm_user" {
-#   type        = string
-#   description = "SSH user for VMs"
-# }
-
-# variable "vm_ssh" {
-#   type = object({
-#     privateKeyPath = string
-#   })
-#   description = "Location of private ssh key for VMs"
-# }
-
-# variable "vm_os" {
-#   type = object({
-#     distro           = string
-#     source           = string
-#     networkInterface = string
-#   })
-#   description = "Operating system (os) information."
-# }
-
 #======================================================================================
 # Virtual machine instances
 #======================================================================================
@@ -37,6 +16,8 @@ variable "worker_nodes" {
     id   = string
     name = string
     ip   = string
+    ip6  = string
+    ips  = list(string)
     dataDisks = list(object({
       name = string
       size = number
@@ -51,6 +32,8 @@ variable "master_nodes" {
     id   = string
     name = string
     ip   = string
+    ip6  = string
+    ips  = list(string)
     dataDisks = list(object({
       name = string
       size = number
@@ -65,6 +48,8 @@ variable "lb_nodes" {
     id   = string
     name = string
     ip   = string
+    ip6  = string
+    ips  = list(string)
   }))
   description = "Load balancers info"
 }

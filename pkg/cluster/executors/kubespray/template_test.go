@@ -120,24 +120,30 @@ func TestNodesTemplate(t *testing.T) {
 		      priority: 200
 				cls-master-1:
 					ansible_host: 192.168.113.11
+					ip: 192.168.113.11
 					node_labels:
 						label-1: value-1
 				cls-master-2:
 					ansible_host: 192.168.113.12
+					ip: 192.168.113.12
 					node_taints:
 						- "taint1=value:NoSchedule"
 				cls-master-3:
 					ansible_host: 192.168.113.13
+					ip: 192.168.113.13
 				cls-worker-1:
 					ansible_host: 192.168.113.21
+					ip: 192.168.113.21
 					node_labels:
 						label-1: value-1
 				cls-worker-2:
 					ansible_host: 192.168.113.22
+					ip: 192.168.113.22
 					node_taints:
 						- "taint1=value:NoSchedule"
 				cls-worker-3:
 					ansible_host: 192.168.113.23
+					ip: 192.168.113.23
 			children:
 				haproxy:
 					hosts:
@@ -185,14 +191,17 @@ func TestNodesTemplate_NoWorkers(t *testing.T) {
 		      priority: 200
 				cls-master-1:
 					ansible_host: 192.168.113.11
+					ip: 192.168.113.11
 					node_labels:
 						label-1: value-1
 				cls-master-2:
 					ansible_host: 192.168.113.12
+					ip: 192.168.113.12
 					node_taints:
 						- "taint1=value:NoSchedule"
 				cls-master-3:
 					ansible_host: 192.168.113.13
+					ip: 192.168.113.13
 			children:
 				haproxy:
 					hosts:

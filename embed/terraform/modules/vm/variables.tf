@@ -38,17 +38,28 @@ variable "network_mode" {
 
 variable "network_bridge" {
   type        = string
-  description = "Network bridge (used only when network mode is 'bridge')"
+  description = "Network bridge"
 }
 
-variable "network_gateway" {
+variable "network_cidr4" {
   type        = string
-  description = "Network gateway (used only when network mode is 'bridge')"
+  description = "Network CIDR (v4)"
 }
 
-variable "network_cidr" {
+variable "network_cidr6" {
   type        = string
-  description = "Network CIDR"
+  description = "Network CIDR (v6)"
+  nullable    = true
+}
+
+variable "network_gateway4" {
+  type        = string
+  description = "Network gateway (v4)"
+}
+
+variable "network_gateway6" {
+  type        = string
+  description = "Network gateway (v6)"
 }
 
 # ==================================== #
@@ -144,7 +155,12 @@ variable "vm_mac" {
   description = "The MAC address of the virtual machine"
 }
 
-variable "vm_ip" {
+variable "vm_ip4" {
   type        = string
-  description = "The IP address of the virtual machine"
+  description = "The IPv4 address of the virtual machine"
+}
+
+variable "vm_ip6" {
+  type        = string
+  description = "The IPv6 address of the virtual machine"
 }

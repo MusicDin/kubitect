@@ -90,9 +90,9 @@ func TestSync_InvalidInfraConfig(t *testing.T) {
 			master:
 				instances:
 					- id: "1"
-						ip: "192.168.113.10"
+					  ip: "192.168.113.10"
 					- id: "2"
-						ip: "192.168.113.10"
+					  ip: "192.168.113.10"
 	`)
 
 	err := os.MkdirAll(path.Dir(c.InfrastructureConfigPath()), 0777)

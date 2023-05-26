@@ -62,6 +62,7 @@ type MasterInstance struct {
 	Id           string     `yaml:"id" opt:",id"`
 	Host         string     `yaml:"host,omitempty"`
 	IP           IPv4       `yaml:"ip,omitempty"`
+	IP6          IPv6       `yaml:"ip6,omitempty"`
 	MAC          MAC        `yaml:"mac,omitempty"`
 	CPU          VCpu       `yaml:"cpu"`
 	RAM          GB         `yaml:"ram"`
