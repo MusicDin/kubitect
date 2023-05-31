@@ -750,12 +750,11 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>
         Network plugin used within a Kubernetes cluster. Possible values are: 
         <ul>
-          <li><code>flannel</code></li>
-          <li><code>weave</code></li>
           <li><code>calico</code></li>
           <li><code>cilium</code></li>
-          <li><code>canal</code></li>
+          <li><code>flannel</code></li>
           <li><code>kube-router</code></li>
+          <li><code>weave</code></li>
         </ul>
       </td>
     </tr>
