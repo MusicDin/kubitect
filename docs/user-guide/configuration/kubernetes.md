@@ -38,7 +38,6 @@ The `calico` network plugin is deployed by default in a Kubernetes cluster.
 However, there are multiple supported network plugins available to choose from:
 
 - `calico`
-- `canal`
 - `cilium`
 - `flannel`
 - `kube-router`
@@ -51,11 +50,11 @@ kubernetes:
 
 The following table shows the compatibility matrix of supported network plugins and Kubernetes versions:
 
-| Kubernetes Version |      Calico      |       Canal      |      Cilium      |      Flannel     |    KubeRouter    |       Weave      |
-|--------------------|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
-| **1.23**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
-| **1.24**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
-| **1.25**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| Kubernetes Version |      Calico      |      Cilium      |      Flannel     |    KubeRouter    |       Weave      |
+|--------------------|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
+| **1.23**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.24**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.25**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
 
 ### Kubernetes DNS mode
 

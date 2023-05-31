@@ -61,14 +61,13 @@ type NetworkPlugin string
 const (
 	CALICO      NetworkPlugin = "calico"
 	CILIUM      NetworkPlugin = "cilium"
-	CANAL       NetworkPlugin = "canal"
 	FLANNEL     NetworkPlugin = "flannel"
 	WEAVE       NetworkPlugin = "weave"
 	KUBE_ROUTER NetworkPlugin = "kube-router"
 )
 
 func (p NetworkPlugin) Validate() error {
-	return v.Var(p, v.OneOf(CALICO, CILIUM, CANAL, FLANNEL, WEAVE, KUBE_ROUTER))
+	return v.Var(p, v.OneOf(CALICO, CILIUM, FLANNEL, WEAVE, KUBE_ROUTER))
 }
 
 type Other struct {
