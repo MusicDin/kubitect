@@ -83,7 +83,7 @@ resource "libvirt_domain" "vm_domain" {
 
   cloudinit = libvirt_cloudinit_disk.cloud_init.id
 
-  qemu_agent = true
+  qemu_agent = (var.network_mode == "bridge")
 
   # Network configuration #
   network_interface {
