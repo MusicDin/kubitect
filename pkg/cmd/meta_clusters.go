@@ -65,6 +65,12 @@ func clusters(ctx app.AppContext, local bool) (MetaClusters, error) {
 	var path string
 
 	if local {
+		// Ignore local clusters if the local and global cluster directory
+		// paths are the same.
+		if ctx.LocalClustersDir() == ctx.ClustersDir() {
+			return nil, nil
+		}
+
 		path = ctx.LocalClustersDir()
 	} else {
 		path = ctx.ClustersDir()
