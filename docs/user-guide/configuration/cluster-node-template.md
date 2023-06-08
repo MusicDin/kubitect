@@ -57,7 +57,7 @@ cluster:
 The available operating system distribution presets are:
 
 + **`ubuntu`** - Latest Ubuntu 22.04 release. (default)
-+ `ubuntu22` - Ubuntu 22.04 release as of *2023-06-08*.
++ `ubuntu22` - Ubuntu 22.04 release as of *2023-06-06*.
 + `ubuntu20` - Ubuntu 20.04 release as of *2023-06-06*.
 + **`debian`** - Latest Debian 11 release.
 + `debian11` - Debian 11 release as of *2023-06-01*.

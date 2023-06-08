@@ -1,4 +1,4 @@
-// The env package provides constants for all other packages to consume,
+// Package env provides constants for all other packages to consume,
 // without creating import cycles.
 //
 // This package should not import any other packages.
@@ -14,33 +14,35 @@ const (
 	ConstTerraformVersion  = "1.4.4"
 )
 
-// Defines applications that Kubitect depends on.
+// ProjectRequiredApps define applications that Kubitect depends on.
 var ProjectRequiredApps = []string{
 	"virtualenv",
 	"python3",
 	"git",
 }
 
-// Defines required files/directories that are copied from embedded
-// resources, when cluster is created.
+// ProjectRequiredFiles define required files/directories that are copied
+// from embedded resources, when cluster is created.
 var ProjectRequiredFiles = []string{
 	"ansible/",
 	"terraform/",
 }
 
-// Defines options for "apply --action" command.
+// ProjectApplyActions define options for "apply --action" command.
 var ProjectApplyActions = [...]string{
 	"create",
 	"upgrade",
 	"scale",
 }
 
+// ProjectK8sVersions define supported Kubernetes versions.
 var ProjectK8sVersions = []string{
 	"v1.24",
 	"v1.25",
 	"v1.26",
 }
 
+// ProjectOsPresets is a list of available OS distros.
 var ProjectOsPresets = map[string]struct {
 	Source           string
 	NetworkInterface string
@@ -50,7 +52,7 @@ var ProjectOsPresets = map[string]struct {
 		NetworkInterface: "ens3",
 	},
 	"ubuntu22": {
-		Source:           "https://cloud-images.ubuntu.com/releases/jammy/release-20230608/ubuntu-22.04-server-cloudimg-amd64.img",
+		Source:           "https://cloud-images.ubuntu.com/releases/jammy/release-20230606/ubuntu-22.04-server-cloudimg-amd64.img",
 		NetworkInterface: "ens3",
 	},
 	"ubuntu20": {
