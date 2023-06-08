@@ -20,9 +20,9 @@ This includes the properties of the operating system (OS), DNS, and the virtual 
 &ensp;
 :octicons-file-symlink-file-24: Default: `k8s`
 
-The user property defines the name of the user created on each virtual machine. 
-This user is used to access the virtual machines during cluster configuration. 
-If you omit the user property, a user named `k8s` is created on all virtual machines. 
+The user property defines the name of the user created on each virtual machine.
+This user is used to access the virtual machines during cluster configuration.
+If you omit the user property, a user named `k8s` is created on all virtual machines.
 You can also use this user later to access each virtual machine via SSH.
 
 ```yaml
@@ -39,7 +39,7 @@ cluster:
 &ensp;
 :octicons-file-symlink-file-24: Default: `ubuntu`
 
-The operating system for virtual machines can be specified in the node template. 
+The operating system for virtual machines can be specified in the node template.
 By default, the Ubuntu distribution is installed on all virtual machines.
 
 You can select a desired distribution by setting the `os.distro` property.
@@ -57,13 +57,14 @@ cluster:
 The available operating system distribution presets are:
 
 + **`ubuntu`** - Latest Ubuntu 22.04 release. (default)
-+ `ubuntu22` - Ubuntu 22.04 release as of *2023-03-02*.
-+ `ubuntu20` - Ubuntu 20.04 release as of *2023-02-09*.
++ `ubuntu22` - Ubuntu 22.04 release as of *2023-06-08*.
++ `ubuntu20` - Ubuntu 20.04 release as of *2023-06-06*.
 + **`debian`** - Latest Debian 11 release.
-+ `debian11` - Debian 11 release as of *2023-01-24*.
++ `debian11` - Debian 11 release as of *2023-06-01*.
 + **`rocky`** - Latest Rocky 9 release.
-+ `rocky9` - Rocky 9.1 release as of *2023-02-15*.
-+ **`centos9`** - CentOS Stream 9 release as of *2023-04-05*.
++ `rocky9` - Rocky 9.1 release as of *2023-05-13*.
++ **`centos`** - Latest CentOS Stream 9 release.
++ `centos9` - CentOS Stream 9 release as of *2023-06-05*.
 
 !!! warning "Important"
 
@@ -73,7 +74,7 @@ The available operating system distribution presets are:
 
 !!! danger "Known issues"
 
-    **CentOS Stream** images already include the `qemu-guest-agent` package, which reports IP addresses of the virtual machines before they are leased from a DHCP server. 
+    **CentOS Stream** images already include the `qemu-guest-agent` package, which reports IP addresses of the virtual machines before they are leased from a DHCP server.
     This can cause issues during infrastructure provisioning if the virtual machines are not configured with static IP addresses.
 
 
@@ -90,7 +91,7 @@ The available operating system distribution presets are:
 
 :material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
 
-If the presets do not meet your needs, you can use a custom Ubuntu or Debian image by specifying the image source. 
+If the presets do not meet your needs, you can use a custom Ubuntu or Debian image by specifying the image source.
 The source of an image can be either a local path on your system or a URL pointing to the image download.
 
 ```yaml
@@ -120,7 +121,7 @@ cluster:
 
 :material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
 
-The configuration of Domain Name Servers (DNS) in the node template allows for customizing the DNS resolution of all virtual machines in the cluster. 
+The configuration of Domain Name Servers (DNS) in the node template allows for customizing the DNS resolution of all virtual machines in the cluster.
 By default, the DNS list contains only the network gateway.
 
 To add custom DNS servers, specify them using the `dns` property in the node template.
@@ -156,7 +157,7 @@ Currently, there are several CPU modes available:
 - `host-passthrough`
 - `maximum`
 
-In short, the `host-model` mode uses the same CPU model as the host, while the `host-passthrough` mode provides full CPU feature set to the guest virtual machine, but may impact its live migration. 
+In short, the `host-model` mode uses the same CPU model as the host, while the `host-passthrough` mode provides full CPU feature set to the guest virtual machine, but may impact its live migration.
 The `maximum` mode selects the CPU with the most available features.
 For a more detailed explanation of the available CPU modes and their usage, please refer to the [libvirt documentation](https://libvirt.org/formatdomain.html#cpu-model-and-topology).
 
@@ -189,7 +190,7 @@ cluster:
 Kubitect automatically generates SSH certificates before deploying the cluster to ensure secure communication between nodes.
 The generated certificates can be found in the `config/.ssh/` directory inside the cluster directory.
 
-If you prefer to use a custom SSH certificate, you can specify the local path to the private key. 
+If you prefer to use a custom SSH certificate, you can specify the local path to the private key.
 Note that the public key must also be present in the same directory with the `.pub` suffix.
 
 
