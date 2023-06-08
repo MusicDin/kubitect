@@ -110,7 +110,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>false</td>
       <td></td>
       <td>
-        Nodes where host is not specified will be installed on default host. 
+        Nodes where host is not specified will be installed on default host.
         The first host in the list is used as a default host if none is marked as a default.
       </td>
     </tr>
@@ -268,7 +268,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td></td>
       <td></td>
       <td>
-        Name of the host on which the instance is deployed. 
+        Name of the host on which the instance is deployed.
         If the name is not specified, the instance is deployed on the default host.
       </td>
     </tr>
@@ -312,7 +312,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td></td>
       <td>
         Keepalived priority of the load balancer.
-        A load balancer with the highest priority becomes the leader (active). 
+        A load balancer with the highest priority becomes the leader (active).
         The priority can be set to any number between 0 and 255.
       </td>
     </tr>
@@ -422,7 +422,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td></td>
       <td></td>
       <td>
-        Name of the host on which the instance is deployed. 
+        Name of the host on which the instance is deployed.
         If the name is not specified, the instance is deployed on the default host.
       </td>
     </tr>
@@ -559,7 +559,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td></td>
       <td></td>
       <td>
-        Name of the host on which the instance is deployed. 
+        Name of the host on which the instance is deployed.
         If the name is not specified, the instance is deployed on the default host.
       </td>
     </tr>
@@ -654,6 +654,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
           <li><code>debian11</code></li>
           <li><code>rocky</code></li>
           <li><code>rocky9</code></li>
+          <li><code>centos</code></li>
           <li><code>centos9</code></li>
         </ul>
       </td>
@@ -675,7 +676,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>Depends on <code>os.distro</code></td>
       <td></td>
       <td>
-        Source of an OS image. 
+        Source of an OS image.
         It can be either path on a local file system or an URL of the image.
         By default, the value from distro preset (<i>/terraform/defaults.yaml</i>)isset, but can be overwritten if needed.
       </td>
@@ -736,7 +737,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>coredns</td>
       <td></td>
       <td>
-        DNS server used within a Kubernetes cluster. Possible values are: 
+        DNS server used within a Kubernetes cluster. Possible values are:
         <ul>
           <li><code>coredns</code></li>
         </ul>
@@ -748,7 +749,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
       <td>calico</td>
       <td></td>
       <td>
-        Network plugin used within a Kubernetes cluster. Possible values are: 
+        Network plugin used within a Kubernetes cluster. Possible values are:
         <ul>
           <li><code>calico</code></li>
           <li><code>cilium</code></li>
