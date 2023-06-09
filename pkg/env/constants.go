@@ -9,7 +9,7 @@ const (
 	ConstProjectUrl        = "https://github.com/MusicDin/kubitect"
 	ConstProjectVersion    = "v3.1.0"
 	ConstKubesprayUrl      = "https://github.com/kubernetes-sigs/kubespray"
-	ConstKubesprayVersion  = "v2.22.0"
+	ConstKubesprayVersion  = "v2.22.1"
 	ConstKubernetesVersion = "v1.25.6"
 	ConstTerraformVersion  = "1.4.4"
 )

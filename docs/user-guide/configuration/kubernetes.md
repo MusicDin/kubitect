@@ -26,7 +26,7 @@ kubernetes:
   version: v1.24.7
 ```
 
-The supported Kubernetes versions include `v1.23`, `v1.24`, and `v1.25`.
+The supported Kubernetes versions include `v1.24`, `v1.25`, and `v1.26`.
 
 ### Kubernetes network plugin
 
@@ -34,7 +34,7 @@ The supported Kubernetes versions include `v1.23`, `v1.24`, and `v1.25`.
 &ensp;
 :octicons-file-symlink-file-24: Default: `calico`
 
-The `calico` network plugin is deployed by default in a Kubernetes cluster. 
+The `calico` network plugin is deployed by default in a Kubernetes cluster.
 However, there are multiple supported network plugins available to choose from:
 
 - `calico`
@@ -52,9 +52,9 @@ The following table shows the compatibility matrix of supported network plugins 
 
 | Kubernetes Version |      Calico      |      Cilium      |      Flannel     |    KubeRouter    |       Weave      |
 |--------------------|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
-| **1.23**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.24**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.25**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.26**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
 
 ### Kubernetes DNS mode
 
@@ -76,7 +76,7 @@ kubernetes:
 &ensp;
 :octicons-file-symlink-file-24: Default: `false`
 
-Kubitect offers the option to automatically copy the Kubeconfig file to the `~/.kube/config` path. 
+Kubitect offers the option to automatically copy the Kubeconfig file to the `~/.kube/config` path.
 By default, this feature is disabled to prevent overwriting an existing file.
 
 ```yaml
@@ -91,8 +91,8 @@ kubernetes:
 &ensp;
 :octicons-file-symlink-file-24: Default: `false`
 
-Control plane certificates are renewed every time the cluster is upgraded, and their validity period is one year. 
-However, in rare cases, clusters that are not upgraded frequently may experience issues. 
+Control plane certificates are renewed every time the cluster is upgraded, and their validity period is one year.
+However, in rare cases, clusters that are not upgraded frequently may experience issues.
 To address this, you can enable the automatic renewal of control plane certificates on the first Monday of each month by setting the `autoRenewCertificates` property to `true`.
 
 ```yaml
