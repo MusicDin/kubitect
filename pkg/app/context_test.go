@@ -8,6 +8,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/env"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMock(t *testing.T) {
@@ -18,10 +19,10 @@ func TestMock(t *testing.T) {
 
 func TestNewAppContext(t *testing.T) {
 	wd, err := os.Getwd()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	home, err := os.UserHomeDir()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	ctx := AppContextOptions{}.AppContext()
 	assert.Equal(t, wd, ctx.WorkingDir())

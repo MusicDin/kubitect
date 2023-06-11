@@ -15,6 +15,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func MockTerraform(t *testing.T) *terraform {
@@ -29,7 +30,7 @@ func MockTerraform(t *testing.T) *terraform {
 	maintf := "output \"test\" { value = \"test\" }"
 	maintfPath := path.Join(projDir, "main.tf")
 	err := ioutil.WriteFile(maintfPath, []byte(maintf), 0777)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	return &terraform{
 		version:    env.ConstTerraformVersion,
@@ -50,7 +51,7 @@ func MockInvalidTerraform(t *testing.T) *terraform {
 	// Create a file on binDir path
 	tf.binDir = path.Join(tf.projectDir, "invalid")
 	_, err := os.Create(tf.binDir)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	return tf
 }
@@ -68,7 +69,7 @@ func TestNewTerraformProvisioner(t *testing.T) {
 
 	// prepare terraform template
 	err := embed.MirrorResource("terraform/main.tf.tpl", clsPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	prov := NewTerraformProvisioner(clsPath, "shared/path", true, cfg)
 	assert.NoError(t, prov.Init(nil))
@@ -81,7 +82,7 @@ func TestNewTerraformProvisioner_InvalidHosts(t *testing.T) {
 
 	// prepare terraform template
 	err := embed.MirrorResource("terraform/main.tf.tpl", clsPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	prov := NewTerraformProvisioner(clsPath, "shared/path", true, cfg)
 	assert.ErrorContains(t, prov.Init(nil), "hosts list is empty")
@@ -115,7 +116,7 @@ func TestTerraform_Actions(t *testing.T) {
 	tf := MockTerraform(t)
 
 	_, err := tf.Plan()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NoError(t, tf.Apply())
 	assert.NoError(t, tf.Destroy())
 }

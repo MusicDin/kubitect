@@ -7,6 +7,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/ui"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewGit(t *testing.T) {
@@ -19,7 +20,7 @@ func TestClone_Branch(t *testing.T) {
 	u := ui.MockGlobalUi(t)
 	p := NewGitProject(env.ConstProjectUrl, "master")
 
-	assert.NoError(t, p.Clone(t.TempDir()))
+	require.NoError(t, p.Clone(t.TempDir()))
 	assert.Equal(t, "", u.ReadStdout(t))
 }
 
@@ -28,7 +29,7 @@ func TestClone_Version(t *testing.T) {
 	u := ui.MockGlobalUi(t, o)
 	p := NewGitProject(env.ConstProjectUrl, "v2.0.0")
 
-	assert.NoError(t, p.Clone(t.TempDir()))
+	require.NoError(t, p.Clone(t.TempDir()))
 	assert.Contains(t, u.ReadStdout(t), "Compressing objects")
 }
 

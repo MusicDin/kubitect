@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func MockTemplateFile(t *testing.T, content string) string {
@@ -58,14 +59,14 @@ func TestPopulate_InvalidField(t *testing.T) {
 func TestPopulate_CustomDelims(t *testing.T) {
 	tpl := CustomDelimsTemplateMock{}
 	str, err := Populate(tpl)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "success", str)
 }
 
 func TestPopulate_CustomFunctions(t *testing.T) {
 	tpl := CustomFuncsTemplateMock{}
 	str, err := Populate(tpl)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "true", str)
 }
 
@@ -74,7 +75,7 @@ func TestPopulateFrom(t *testing.T) {
 
 	tpl := TemplateMock{Value: "test"}
 	str, err := PopulateFrom(tpl, path)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "test", str)
 }
 
@@ -97,7 +98,7 @@ func TestWrite_InvalidDir(t *testing.T) {
 
 	// Create file on dir location
 	_, err := os.Create(dir)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.ErrorContains(t, write(path.Join(dir, "tpl"), nil), "not a directory")
 }
@@ -107,10 +108,10 @@ func TestWrite(t *testing.T) {
 	tplPath := path.Join(t.TempDir(), "test")
 
 	err := Write(tpl, tplPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	str, err := os.ReadFile(tplPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "Test test", string(str))
 }
 
@@ -128,10 +129,10 @@ func TestWriteFrom(t *testing.T) {
 	dstPath := path.Join(t.TempDir(), "test")
 
 	err := WriteFrom(tpl, srcPath, dstPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	str, err := os.ReadFile(dstPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "test", string(str))
 }
 

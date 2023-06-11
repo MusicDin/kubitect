@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func tmpFile(t *testing.T, name string, content ...string) string {
@@ -21,7 +22,7 @@ func tmpFile(t *testing.T, name string, content ...string) string {
 	fData := strings.Join(content, " ")
 
 	err := ioutil.WriteFile(fPath, []byte(fData), os.ModePerm)
-	assert.NoErrorf(t, err, "failed creating tmp file (%s): %v", name, err)
+	require.NoErrorf(t, err, "failed creating tmp file (%s): %v", name, err)
 
 	return fPath
 }
@@ -37,7 +38,7 @@ func TestExists(t *testing.T) {
 
 func TestRead(t *testing.T) {
 	out, err := Read(tmpFile(t, "test.file", "test"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "test", out)
 }
 
@@ -51,12 +52,12 @@ func TestCopy(t *testing.T) {
 	dst := tmpPath(t)
 
 	err := Copy(src, dst, os.ModePerm)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.FileExists(t, src)
 	assert.FileExists(t, dst)
 
 	out, err := Read(dst)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "test", out)
 }
 
@@ -77,10 +78,10 @@ func TestForceCopy(t *testing.T) {
 	dst := tmpFile(t, "dst.file", "destination")
 
 	err := ForceCopy(src, dst, os.ModePerm)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	out, err := Read(dst)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "source", out)
 }
 
@@ -92,7 +93,7 @@ func TestWriteYaml(t *testing.T) {
 	fPath := path.Join(t.TempDir(), "file.yaml")
 
 	err := WriteYaml(T{7}, fPath, os.ModePerm)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	f, err := ioutil.ReadFile(fPath)
 	assert.Equal(t, "value: 7\n", string(f))
@@ -110,10 +111,10 @@ func TestReadYaml(t *testing.T) {
 	fPath := path.Join(t.TempDir(), "file.yaml")
 
 	err := WriteYaml(S{T{7}}, fPath, os.ModePerm)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	s, err := ReadYaml(fPath, S{})
-	assert.NoError(t, err, "failed reading YAML file")
+	require.NoError(t, err, "failed reading YAML file")
 	assert.Equal(t, 7, s.Test.Value)
 }
 

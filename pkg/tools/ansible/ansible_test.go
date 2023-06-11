@@ -6,6 +6,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/ui"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestExtraVarsToMap(t *testing.T) {
@@ -13,7 +14,7 @@ func TestExtraVarsToMap(t *testing.T) {
 	expect := map[string]string{"key": "value"}
 
 	varsMap, err := extraVarsToMap(vars)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expect, varsMap)
 }
 
@@ -22,7 +23,7 @@ func TestExtraVarsToMap_Empty(t *testing.T) {
 	expect := map[string]string{}
 
 	varsMap, err := extraVarsToMap(vars)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expect, varsMap)
 }
 

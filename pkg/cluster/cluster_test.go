@@ -10,13 +10,14 @@ import (
 	"github.com/MusicDin/kubitect/pkg/utils/template"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewCluster(t *testing.T) {
 	ctx := app.MockAppContext(t)
 
 	c, err := NewCluster(ctx, ConfigMock{}.Write(t))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "cluster-mock", c.Name)
 }
 
@@ -24,7 +25,7 @@ func TestNewCluster_Local(t *testing.T) {
 	ctx := app.MockAppContext(t, app.AppContextOptions{Local: true})
 
 	c, err := NewCluster(ctx, ConfigMock{}.Write(t))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "local-cluster-mock", c.Name)
 }
 
@@ -34,7 +35,7 @@ func TestNewCluster_ClusterNameAlreadyPrefixed(t *testing.T) {
 	cfgPath := cfg.Write(t)
 
 	c, err := NewCluster(ctx, cfgPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "local-cluster-mock", c.Name)
 }
 
@@ -55,7 +56,7 @@ func TestNewCluster_InvalidConfig(t *testing.T) {
 	// Create empty configuration file
 	cfgPath := path.Join(t.TempDir(), "config.yaml")
 	_, err := os.Create(cfgPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, err = NewCluster(app.MockAppContext(t), cfgPath)
 	assert.ErrorContains(t, err, "invalid configuration file")
@@ -66,7 +67,7 @@ func TestSync_FailReadingAppliedConfig(t *testing.T) {
 
 	// Make directory on path of applied config
 	err := os.MkdirAll(c.AppliedConfigPath(), 0777)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.ErrorContains(t, c.Sync(), "failed to read previously applied configuration file")
 }
@@ -76,7 +77,7 @@ func TestSync_FailReadingInfraConfig(t *testing.T) {
 
 	// Make directory on path of applied config
 	err := os.MkdirAll(c.InfrastructureConfigPath(), 0777)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.ErrorContains(t, c.Sync(), "failed to read infrastructure file")
 }
@@ -96,9 +97,10 @@ func TestSync_InvalidInfraConfig(t *testing.T) {
 	`)
 
 	err := os.MkdirAll(path.Dir(c.InfrastructureConfigPath()), 0777)
-	assert.NoError(t, err)
+	require.NoError(t, err)
+
 	err = ioutil.WriteFile(c.InfrastructureConfigPath(), []byte(cfg), 0777)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.ErrorContains(t, c.Sync(), "infrastructure file (produced by Terraform) is invalid")
 }

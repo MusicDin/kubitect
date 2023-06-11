@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func colorsEqual(c1, c2 Color) bool {
@@ -139,7 +140,7 @@ func TestUi_Ask_TerminalDefaultQuestion(t *testing.T) {
 	ui := MockGlobalTerminalUi(t)
 	ui.WriteStdin(t, "yes")
 
-	assert.NoError(t, ui.Ask())
+	require.NoError(t, ui.Ask())
 	assert.Equal(t, "\nWould you like to continue? (yes/no) ", ui.ReadStdout(t))
 }
 
@@ -147,7 +148,7 @@ func TestUi_Ask_TerminalCustomQuestion(t *testing.T) {
 	ui := MockTerminalUi(t)
 	ui.WriteStdin(t, "yes")
 
-	assert.NoError(t, ui.Ask("Test", "1", "23"))
+	require.NoError(t, ui.Ask("Test", "1", "23"))
 	assert.Equal(t, "\nTest 1 23 (yes/no) ", ui.ReadStdout(t))
 }
 

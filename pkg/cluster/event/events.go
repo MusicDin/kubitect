@@ -109,7 +109,7 @@ func (es *Events) add(event Event, c cmp.Change) {
 	*es = append(*es, event)
 }
 
-// triggerEvents returns triggered events of the corresponding action.
+// TriggerEvents returns triggered events of the corresponding action.
 func TriggerEvents(diff *cmp.DiffNode, events Events) Events {
 	var trig Events
 

@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Execute(t *testing.T, cmdFunc any, ctx ...app.AppContextMock) (string, error) {
@@ -47,18 +48,12 @@ func ExecuteWithArgs(t *testing.T, cmdFunc interface{}, args []string, opts ...a
 
 func TestRootCmd_Help(t *testing.T) {
 	out, err := Execute(t, NewRootCmd)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Contains(t, out, rootLong)
 }
 
 func TestExportCmd_Help(t *testing.T) {
 	out, err := Execute(t, NewExportCmd)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Contains(t, out, exportLong)
 }
-
-// func TestListCmd_NoClusters(t *testing.T) {
-// 	out, err := Execute(t, NewListCmd)
-// 	assert.NoError(t, err)
-// 	assert.Contains(t, out, "No clusters initialized yet.")
-// }

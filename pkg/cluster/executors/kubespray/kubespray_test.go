@@ -15,6 +15,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type virtualEnvMock struct{}
@@ -119,7 +120,7 @@ func TestExtractRemovedNodes(t *testing.T) {
 	events := MockEvents(t, w, event.SCALE_DOWN)
 
 	rmNodes, err := extractRemovedNodes(events)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.ElementsMatch(t, []config.Instance{w}, rmNodes)
 }
 
