@@ -6,11 +6,11 @@
 
 <div markdown="1" class="text-justify">
 
-Defining hosts is an essential step when deploying a Kubernetes cluster with Kubitect. 
+Defining hosts is an essential step when deploying a Kubernetes cluster with Kubitect.
 **Hosts represent the target servers** where the cluster will be deployed.
 
 Every valid configuration must contain at least one host, which can be either local or remote.
-However, you can add as many hosts as needed to support your cluster deployment. 
+However, you can add as many hosts as needed to support your cluster deployment.
 
 
 ## Configuration
@@ -26,7 +26,7 @@ hosts:
   - name: localhost # (1)!
     connection:
       type: local
-``` 
+```
 
 1. Custom **unique** name of the host.
 
@@ -90,7 +90,7 @@ hosts:
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-If a host is specified as the default, all instances that do not point to a specific host are deployed to that default host. 
+If a host is specified as the default, all instances that do not point to a specific host are deployed to that default host.
 If no default host is specified, these instances are deployed on the first host in the list.
 
 ```yaml
@@ -109,13 +109,13 @@ hosts:
 &ensp;
 :octicons-file-symlink-file-24: Default: `/var/lib/libvirt/images/`
 
-The main resource pool path specifies the location on the host where main virtual disks (volumes) are created for each node provisioned on that particular host. 
+The main resource pool path specifies the location on the host where main virtual disks (volumes) are created for each node provisioned on that particular host.
 Because the main resource pool contains volumes on which the node's operating system and all required packages are installed, it's recommended that the main resource pool is created on fast storage devices, such as SSD disks.
 
 ```yaml
 hosts:
   - name: host1 # (1)!
-  - name: host2 
+  - name: host2
     mainResourcePoolPath: /mnt/ssd/kubitect/ # (2)!
 ```
 

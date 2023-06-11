@@ -25,7 +25,7 @@ cd kubitect
 
 ## Step 2: Build Kubitect CLI tool
 
-The Kubitect CLI tool can be manually built using Go. 
+The Kubitect CLI tool can be manually built using Go.
 Running the following command will produce a `kubitect` binary file.
 ```sh
 go build .
@@ -41,8 +41,8 @@ sudo mv kubitect /usr/local/bin/kubitect
 By default, Kubitect creates and manages clusters in the Kubitect's home directory (`~/.kubitect`).
 However, for development purposes, it is often more convenient to have all resources created in the current directory.
 
-If you want to create a new cluster in the current directory, you can use the `--local` flag when applying the configuration. 
-When you create a cluster using the `--local` flag, its name will be prefixed with *local*. 
+If you want to create a new cluster in the current directory, you can use the `--local` flag when applying the configuration.
+When you create a cluster using the `--local` flag, its name will be prefixed with *local*.
 This prefix is added to prevent any conflicts that might arise when creating new virtual resources.
 
 ```sh

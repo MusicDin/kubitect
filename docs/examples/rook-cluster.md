@@ -7,14 +7,14 @@
 This example shows how to use Kubitect to set up **distributed storage with Rook**.
 For distributed storage, we add an additional data disk to each virtual machine as shown on the figure below.
 
-This example demonstrates how to set up **distributed storage with Rook**. 
-To achieve distributed storage, we add an additional data disk to each virtual machine, as depicted in the figure below. 
+This example demonstrates how to set up **distributed storage with Rook**.
+To achieve distributed storage, we add an additional data disk to each virtual machine, as depicted in the figure below.
 This additional data disk is utilized by Rook to provide reliable and scalable distributed storage solutions for the Kubernetes cluster.
 
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/rook-cluster-arch.png" 
+    src="../../assets/images/rook-cluster-arch.png"
     alt="Basic Rook cluster scheme"
     width="75%">
 </div>
@@ -23,8 +23,8 @@ This additional data disk is utilized by Rook to provide reliable and scalable d
 
 ### Step 1: Define data resource pool
 
-To configure distributed storage with Rook, the data disks must be attached to the virtual machines. 
-By default, each data disk is created in the main resource pool. 
+To configure distributed storage with Rook, the data disks must be attached to the virtual machines.
+By default, each data disk is created in the main resource pool.
 However, it is also possible to configure additional resource pools and associate data disks with them later, depending on your requirements.
 
 In this example, we define an additional resource pool named `rook-pool`.
@@ -79,7 +79,7 @@ addons:
     enabled: true
 ```
 
-By default, Rook resources are provisioned on all worker nodes in the Kubernetes cluster, without any constraints. 
+By default, Rook resources are provisioned on all worker nodes in the Kubernetes cluster, without any constraints.
 However, this behavior can be restricted using node selectors, which are explained later in the guide.
 
 ??? abstract "Final cluster configuration <i class="click-tip"></i>"
@@ -162,7 +162,7 @@ Only the nodes where Rook should be deployed are labeled `#!yaml rook: true`, as
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/rook-cluster-labels.png" 
+    src="../../assets/images/rook-cluster-labels.png"
     alt="Cluster scheme with labels to restrict Rook deployment"
     width="85%">
 </div>
@@ -189,7 +189,7 @@ cluster:
         - id: 4
 ```
 
-1.  By default, the label `#!yaml rook: false` is set for all worker nodes. 
+1.  By default, the label `#!yaml rook: false` is set for all worker nodes.
     Setting the label `#!yaml rook: true` for this particular instance overrides the default label.
 
 ### Step 2: Configure a node selector
@@ -202,7 +202,7 @@ We want to deploy Rook on the nodes labeled with the label `#!yaml rook: true`, 
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/rook-cluster-node-selector.png" 
+    src="../../assets/images/rook-cluster-node-selector.png"
     alt="Cluster scheme of Rook deployment with applied node selector"
     width="85%">
 </div>

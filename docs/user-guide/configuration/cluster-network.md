@@ -27,16 +27,16 @@ cluster:
 
 #### NAT mode
 
-In NAT (Network Address Translation) mode, the libvirt virtual network is created for the cluster, which reduces the need for manual configurations. 
+In NAT (Network Address Translation) mode, the libvirt virtual network is created for the cluster, which reduces the need for manual configurations.
 However, it's limited to a single host, i.e., a single physical server.
 
 #### Bridge mode
 
-In bridge mode, a real host network device is shared with the virtual machines, allowing each virtual machine to bind to any available IP address on the local network, just like a physical computer. 
+In bridge mode, a real host network device is shared with the virtual machines, allowing each virtual machine to bind to any available IP address on the local network, just like a physical computer.
 This approach makes the virtual machine visible on the network, enabling the creation of clusters across multiple physical servers.
 
-To use bridged networks, you need to preconfigure the bridge interface on each target host. 
-This is necessary because each environment is unique. For instance, you might use link aggregation (also known as link bonding or teaming), which cannot be detected automatically and therefore requires manual configuration. 
+To use bridged networks, you need to preconfigure the bridge interface on each target host.
+This is necessary because each environment is unique. For instance, you might use link aggregation (also known as link bonding or teaming), which cannot be detected automatically and therefore requires manual configuration.
 The [Network bridge example](../../examples/network-bridge.md) provides instructions on how to create a bridge interface with netplan and configure Kubitect to use it.
 
 ### Network CIDR
@@ -66,7 +66,7 @@ cluster:
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-The network gateway, also known as the default gateway, represents the IP address of the router. 
+The network gateway, also known as the default gateway, represents the IP address of the router.
 By default, it doesn't need to be specified, as the first client IP in the network range is used as the gateway address. However, if the gateway IP differs from this, it must be specified manually.
 
 ```yaml
@@ -87,9 +87,9 @@ cluster:
 
 The network bridge determines the bridge interface that virtual machines connect to.
 
-In NAT network mode, a virtual network bridge interface is created on the host. 
-These bridges are usually prefixed with *vir*, such as *virbr44*. 
-If you omit this option, the virtual bridge name is automatically determined by libvirt. 
+In NAT network mode, a virtual network bridge interface is created on the host.
+These bridges are usually prefixed with *vir*, such as *virbr44*.
+If you omit this option, the virtual bridge name is automatically determined by libvirt.
 Alternatively, you can specify the name to be used for the virtual bridge.
 
 In bridge network mode, the network bridge should be the name of the preconfigured bridge interface, such as *br0*.
@@ -114,17 +114,17 @@ cluster:
     cidr: 192.168.113.0/24
 ```
 
-### Bridged network 
+### Bridged network
 
-To make the cluster nodes visible on the local network as physical machines or to create the cluster across multiple hosts, you must use bridge network mode. 
+To make the cluster nodes visible on the local network as physical machines or to create the cluster across multiple hosts, you must use bridge network mode.
 Additionally, you need to specify the network CIDR of an existing network along with the preconfigured host bridge interface.
 
 ```yaml
 cluster:
   network:
-    mode: bridge 
-    cidr: 10.10.64.0/24 
-    bridge: br0 
+    mode: bridge
+    cidr: 10.10.64.0/24
+    bridge: br0
 ```
 
 </div>

@@ -8,7 +8,7 @@
 
 !!! warning "Important"
 
-    This action is irreversible and any data stored within the cluster will be lost. 
+    This action is irreversible and any data stored within the cluster will be lost.
 
 To destroy a specific cluster, simply run the destroy command, specifying the name of the cluster to be destroyed.
 
@@ -16,6 +16,6 @@ To destroy a specific cluster, simply run the destroy command, specifying the na
 kubitect destroy --cluster my-cluster
 ```
 
-Keep in mind that this action will permanently remove all resources associated with the cluster, including virtual machines, resource pools and configuration files. 
+Keep in mind that this action will permanently remove all resources associated with the cluster, including virtual machines, resource pools and configuration files.
 
 </div>

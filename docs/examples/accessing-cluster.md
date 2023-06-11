@@ -4,14 +4,14 @@
 
 <div markdown="1" class="text-justify">
 
-Cloud providers that support Kubernetes clusters typically provide load balancer provisioning on demand. 
+Cloud providers that support Kubernetes clusters typically provide load balancer provisioning on demand.
 By setting a Service type to `LoadBalancer`, an external load balancer is automatically provisioned with its own unique IP address.
 This load balancer redirects all incoming connections to the Service, as illustrated in the figure below.
 
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/access-cloud-provider.png" 
+    src="../../assets/images/access-cloud-provider.png"
     alt="Cloud provider load balancer scheme"
     width="75%">
 </div>
@@ -27,7 +27,7 @@ As a result, the Service becomes available on `<NodeIP>:<NodePort>`, as shown in
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/access-nodeport.png" 
+    src="../../assets/images/access-nodeport.png"
     alt="Node port Service access scheme"
     width="75%">
 </div>
@@ -42,7 +42,7 @@ With Kubitect, it is possible to configure the port forwarding of the load balan
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/access-self-provisioned-edge.png" 
+    src="../../assets/images/access-self-provisioned-edge.png"
     alt="Node port Service access scheme"
     width="75%">
 </div>
@@ -58,7 +58,7 @@ cluster:
         - name: http
           port: 80
         - name: https
-          port: 443          
+          port: 443
       instances:
         - id: 1
 ```

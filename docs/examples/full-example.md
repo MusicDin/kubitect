@@ -10,18 +10,18 @@ This example is meant for users that learn the fastest from an example configura
 
 ```yaml
 #
-# The 'hosts' section contains data about the physical servers on which the 
+# The 'hosts' section contains data about the physical servers on which the
 # Kubernetes cluster will be installed.
 #
-# For each host, a name and connection type must be specified. Only one host can 
+# For each host, a name and connection type must be specified. Only one host can
 # have the connection type set to 'local' or 'localhost'.
 #
 # If the host is a remote machine, the path to the SSH key file must be specified.
 # Note that connections to remote hosts support only passwordless certificates.
 #
-# The host can also be marked as default, i.e. if no specific host is specified 
-# for an instance (in the cluster.nodes section), it will be installed on a 
-# default host. If none of the hosts are marked as default, the first host in the 
+# The host can also be marked as default, i.e. if no specific host is specified
+# for an instance (in the cluster.nodes section), it will be installed on a
+# default host. If none of the hosts are marked as default, the first host in the
 # list is used as the default host.
 #
 hosts:
@@ -55,7 +55,7 @@ hosts:
 #
 # The 'cluster' section of the configuration contains general data about the
 # cluster, the nodes that are part of the cluster, and the cluster's network.
-# 
+#
 cluster:
   name: my-k8s-cluster # (15)!
   network:
@@ -170,7 +170,7 @@ kubernetes:
 # will be installed on the Kubernetes cluster as part of the cluster setup.
 #
 addons:
-  kubespray: 
+  kubespray:
     # Sample Nginx ingress controller deployment
     ingress_nginx_enabled: true
     ingress_nginx_namespace: "ingress-nginx"
@@ -191,13 +191,13 @@ addons:
 
 2.  Kubitect version.
 
-3.  Custom host name. 
+3.  Custom host name.
     It is used to link instances to the specific host.
 
-4.  Makes the host a default host. 
+4.  Makes the host a default host.
     This means that if no host is specified for the node instance, the instance will be linked to the default host.
 
-5.  Connection type can be either `local` or `remote`. 
+5.  Connection type can be either `local` or `remote`.
 
     If it is set to *remote*, at least the following fields must be set:
 
@@ -205,7 +205,7 @@ addons:
     + `ip`
     + `ssh.keyfile`
 
-6.  Remote host user that is used to connect to the remote hypervisor. 
+6.  Remote host user that is used to connect to the remote hypervisor.
     This user must be added in the `libvirt` group.
 
 7.  IP address of the remote host.
@@ -227,12 +227,12 @@ addons:
 15. Cluster name used as a prefix for the various components.
 
 16. Network mode. Possible values are
-    
+
     + `bridge` mode uses **predefined** bridge interface. This mode is mandatory for deployments across multiple hosts.
     + `nat` mode creates virtual network with IP range defined in `network.cidr`
     + `route`
 
-17. Network CIDR represents the network IP together with the network mask. 
+17. Network CIDR represents the network IP together with the network mask.
     In `nat` mode, CIDR is used for the new network.
     In `bridge` mode, CIDR represents the current local area network (LAN).
 
@@ -246,22 +246,22 @@ addons:
 20. Set custom DNS list for all nodes.
     If omitted, network gateway is also used as a DNS.
 
-21. Specify the network interface used by the virtual machine. In general, this option can be omitted. 
+21. Specify the network interface used by the virtual machine. In general, this option can be omitted.
 
     If omitted, a network interface from distro preset (`/terraform/defaults.yaml`) is used.
 
-22. Virtual (floating) IP shared between load balancers. 
+22. Virtual (floating) IP shared between load balancers.
 
 23. Virtual router ID that is set in Keepalived configuration when virtual IP is used.
-    By default it is set to 51. 
+    By default it is set to 51.
     If multiple clusters are created it must be ensured that it is unique for each cluster.
 
 24. Default values apply for all virtual machines (VMs) of the same type.
 
-25. Static IP address of the virtual machine. 
+25. Static IP address of the virtual machine.
     If omitted DHCP lease is requested.
 
-26. Static MAC address. 
+26. Static MAC address.
     If omitted MAC address is generated.
 
 27. Overrides default RAM value for this node.
