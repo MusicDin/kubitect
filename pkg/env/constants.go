@@ -10,7 +10,7 @@ const (
 	ConstProjectVersion    = "v3.1.0"
 	ConstKubesprayUrl      = "https://github.com/kubernetes-sigs/kubespray"
 	ConstKubesprayVersion  = "v2.22.1"
-	ConstKubernetesVersion = "v1.25.6"
+	ConstKubernetesVersion = "v1.26.5"
 	ConstTerraformVersion  = "1.4.4"
 )
 

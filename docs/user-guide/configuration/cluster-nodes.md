@@ -11,7 +11,7 @@
 
 ## Background
 
-Kubitect allows configuration of three distinct **node types**: worker nodes, master nodes (control plane), and load balancers. 
+Kubitect allows configuration of three distinct **node types**: worker nodes, master nodes (control plane), and load balancers.
 
 ### Worker nodes
 
@@ -21,20 +21,20 @@ Kubitect does not offer automatic scaling of worker nodes based on resource dema
 
 ### Master nodes
 
-The master node plays a vital role in a Kubernetes cluster as it manages the overall state of the system and coordinates the workloads running on the worker nodes. 
+The master node plays a vital role in a Kubernetes cluster as it manages the overall state of the system and coordinates the workloads running on the worker nodes.
 Therefore, it is essential to **configure at least one master node for every cluster**.
 
-Please note that Kubitect currently supports only a stacked control plane where etcd key-value stores are deployed on control plane nodes. 
+Please note that Kubitect currently supports only a stacked control plane where etcd key-value stores are deployed on control plane nodes.
 To ensure the best possible fault tolerance, it is important to configure an odd number of control plane nodes.
 For more information, please refer to the [etcd FAQ](https://etcd.io/docs/v3.4/faq/#why-an-odd-number-of-cluster-members).
 
 ### Load balancer nodes
 
-In a Kubernetes cluster with multiple control plane nodes, it is necessary to configure at least one load balancer. 
+In a Kubernetes cluster with multiple control plane nodes, it is necessary to configure at least one load balancer.
 A load balancer distributes incoming network traffic across multiple control plane nodes, ensuring the cluster operates normally even if any control plane node fails.
 
-However, configuring only one load balancer represents a single point of failure for the cluster. 
-If it fails, incoming traffic will not be distributed to the control plane nodes, potentially resulting in downtime. 
+However, configuring only one load balancer represents a single point of failure for the cluster.
+If it fails, incoming traffic will not be distributed to the control plane nodes, potentially resulting in downtime.
 Therefore, configuring multiple load balancers is essential to ensure high availability for the cluster.
 
 ## Nodes configuration structure
@@ -52,8 +52,8 @@ cluster:
       ...
 ```
 
-Each node type has two subsections: `default` and `instances`. 
-The instances subsection represents an array of actual nodes, while the default subsection provides the configuration that is applied to all instances of a particular node type. 
+Each node type has two subsections: `default` and `instances`.
+The instances subsection represents an array of actual nodes, while the default subsection provides the configuration that is applied to all instances of a particular node type.
 Each default value can also be overwritten by setting the same property for a specific instance.
 
 ```yaml
@@ -70,8 +70,8 @@ cluster:
 
 ### Common node properties
 
-Each node instance has a set of predefined properties that can be set to configure its behavior. 
-Some properties apply to all node types, while others are specific to a certain node type. 
+Each node instance has a set of predefined properties that can be set to configure its behavior.
+Some properties apply to all node types, while others are specific to a certain node type.
 Properties that apply to all node types are referred to as *common properties*.
 
 #### Instance ID
@@ -80,7 +80,7 @@ Properties that apply to all node types are referred to as *common properties*.
 &ensp;
 :material-alert-circle-outline: Required
 
-Each node in a cluster must have a unique identifier, or ID, that distinguishes it from other instances of the same node type. 
+Each node in a cluster must have a unique identifier, or ID, that distinguishes it from other instances of the same node type.
 The instance ID is used as a suffix for the name of each node, ensuring that each node has a unique name in the cluster.
 
 ```yaml
@@ -130,7 +130,7 @@ cluster:
 
 1. Since the `cpu` property is not set at instance level or as a default value, Kubitect sets the value of the `cpu` property to **2 vCPU**.
 
-#### RAM 
+#### RAM
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 &ensp;
@@ -208,8 +208,8 @@ cluster:
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-Each node in a cluster can be assigned a static IP address to ensure a predictable and consistent IP address for the node. 
-If no IP address is set for a particular node, Kubitect will request a DHCP lease for that node. 
+Each node in a cluster can be assigned a static IP address to ensure a predictable and consistent IP address for the node.
+If no IP address is set for a particular node, Kubitect will request a DHCP lease for that node.
 Additionally, Kubitect checks whether all set IP addresses are within the defined network range, as explained in the [Network CIDR](../cluster-network/#network-cidr) section of the cluster network configuration.
 
 ```yaml
@@ -253,8 +253,8 @@ cluster:
 
 :material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
 
-By default, all instances in a cluster are deployed on the [default host](../hosts/#default-host). 
-However, by specifying a specific host for an instance, you can control where that instance is deployed 
+By default, all instances in a cluster are deployed on the [default host](../hosts/#default-host).
+However, by specifying a specific host for an instance, you can control where that instance is deployed
 
 ```yaml
 
@@ -317,8 +317,8 @@ cluster:
 
 With node labels, you can help organize and manage your cluster by associating nodes with specific attributes or roles, and by grouping nodes for specific workloads or tasks.
 
-Node labels are used to label actual Kubernetes nodes and can be set for a specific instance or as a default value for all instances. 
-It is important to note that labels set at the instance level are merged with the default labels. 
+Node labels are used to label actual Kubernetes nodes and can be set for a specific instance or as a default value for all instances.
+It is important to note that labels set at the instance level are merged with the default labels.
 However, if labels have the same key, then the labels set at the instance level take precedence over the default labels.
 
 ```yaml
@@ -361,8 +361,8 @@ cluster:
 
 With node taints, you can limit which pods can be scheduled to run on a particular node, and help ensure that the workload running on that node is appropriate for its capabilities and resources.
 
-Node taints are configured as a list of strings in the format `key=value:effect`. 
-Taints can be set for a specific instance or as a default value for all instances. 
+Node taints are configured as a list of strings in the format `key=value:effect`.
+Taints can be set for a specific instance or as a default value for all instances.
 When taints are set for a particular instance, they are merged with the default taints, and any duplicate entries are removed.
 
 
@@ -391,9 +391,9 @@ The following properties can only be configured for load balancers.
 
 ??? question "What is VIP? <i class="click-tip"></i>"
 
-    Load balancers are responsible for distributing traffic to the control plane nodes. 
-    However, a single load balancer can cause issues if it fails. 
-    To avoid this, multiple load balancers can be configured with one as the primary, actively serving incoming traffic, while others act as secondary and take over the primary position only if the primary load balancer fails. 
+    Load balancers are responsible for distributing traffic to the control plane nodes.
+    However, a single load balancer can cause issues if it fails.
+    To avoid this, multiple load balancers can be configured with one as the primary, actively serving incoming traffic, while others act as secondary and take over the primary position only if the primary load balancer fails.
     If a secondary load balancer becomes primary, it should still be reachable via the same IP, which is referred to as a virtual or floating IP (VIP).
 
 When multiple load balancers are configured, an unused IP address within the configured network must be specified as the VIP.
@@ -412,9 +412,9 @@ cluster:
 &ensp;
 :octicons-file-symlink-file-24: Default: `51`
 
-When a cluster is created with a VIP, Kubitect configures Virtual Router Redundancy Protocol (VRRP), which provides failover for load balancers. 
-Each VRRP group is identified by a virtual router ID (VRID), which can be any number between 0 and 255. 
-Since there can be only one master in each group, two groups cannot have the same ID. 
+When a cluster is created with a VIP, Kubitect configures Virtual Router Redundancy Protocol (VRRP), which provides failover for load balancers.
+Each VRRP group is identified by a virtual router ID (VRID), which can be any number between 0 and 255.
+Since there can be only one master in each group, two groups cannot have the same ID.
 
 By default, Kubitect sets the VRID to 51, but if you set up multiple clusters that use VIP, you must ensure that the VRID is different for each cluster.
 
@@ -447,7 +447,7 @@ cluster:
     loadBalancer:
       instances:
         - id: 1 # (1)!
-        - id: 2 
+        - id: 2
           priority: 200 # (2)!
 ```
 
@@ -471,13 +471,13 @@ The following properties can be configured for each rule:
 + `targetPort` - The port to which traffic is forwarded by the load balancer.
 + `target` - The group of nodes to which traffic is directed. The possible targets are:
     - `masters` - control plane nodes
-    - `workers` - worker nodes 
+    - `workers` - worker nodes
     - `all` - worker and control plane nodes.
 
-Every port forwarding rule must be configured with a unique `name` and `port`. 
+Every port forwarding rule must be configured with a unique `name` and `port`.
 The name serves as a unique identifier for the rule, while the port specifies the incoming port on which the load balancer listens for traffic.
 
-The `target` and `targetPort` configurations are optional. 
+The `target` and `targetPort` configurations are optional.
 If target port is not explicitly set, it will default to the same value as the incoming port.
 Similarly, if target is not set, incoming traffic is automatically distributed across worker nodes.
 
@@ -495,7 +495,7 @@ cluster:
 1.  Incoming port is the port on which a load balancer listens for incoming traffic.
     It can be any number between 1 and 65353, excluding ports 6443 (Kubernetes API server) and 22 (SSH).
 
-2.  Target port is the port on which the traffic is forwarded. 
+2.  Target port is the port on which the traffic is forwarded.
     By default, it is set to the same value as the incoming port.
 
 3.  Target represents a group of nodes to which incoming traffic is forwarded.
@@ -513,7 +513,7 @@ cluster:
 
 ### Set a role to all worker nodes
 
-By default, worker nodes in a Kubernetes cluster are not assigned any roles (`<none>`). 
+By default, worker nodes in a Kubernetes cluster are not assigned any roles (`<none>`).
 To set the role of all worker nodes in the cluster, the default label with the key `node-role.kubernetes.io/node` can be configured.
 
 ```yaml
@@ -533,14 +533,14 @@ The roles of the nodes in a Kubernetes cluster can be viewed using `kubectl get 
 
 ```
 NAME                   STATUS   ROLES                  AGE   VERSION
-k8s-cluster-master-1   Ready    control-plane,master   19m   v1.25.6
-k8s-cluster-worker-1   Ready    node                   19m   v1.25.6
-k8s-cluster-worker-2   Ready    node                   19m   v1.25.6
+k8s-cluster-master-1   Ready    control-plane,master   19m   v1.26.5
+k8s-cluster-worker-1   Ready    node                   19m   v1.26.5
+k8s-cluster-worker-2   Ready    node                   19m   v1.26.5
 ```
 
 ### Load balance HTTP requests
 
-Kubitect enables users to define custom port forwarding rules on load balancers. 
+Kubitect enables users to define custom port forwarding rules on load balancers.
 For example, to distribute HTTP and HTTPS requests across all worker nodes, at least one load balancer must be specified and port forwarding must be configured as follows:
 
 ```yaml

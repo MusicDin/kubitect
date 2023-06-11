@@ -16,9 +16,9 @@ The Kubernetes section of the configuration file contains properties that are sp
 
 :material-tag-arrow-up-outline: [v3.0.0][tag 3.0.0]
 &ensp;
-:octicons-file-symlink-file-24: Default: `v1.25.6`
+:octicons-file-symlink-file-24: Default: `v1.26.5`
 
-By default, the Kubernetes cluster will be deployed using version `v1.25.6`, but you can specify a different version if necessary.
+By default, the Kubernetes cluster will be deployed using version `v1.26.5`, but you can specify a different version if necessary.
 
 
 ```yaml
