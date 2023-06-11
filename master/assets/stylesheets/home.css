@@ -153,7 +153,7 @@ a#btn_learn-more:hover {
 .terminal-command.terminal-cursor {
   padding-right: 0;
   border-right: .35em solid transparent;
-  animation: 
+  animation:
     blink-cursor .75s step-end infinite;
 }
 
@@ -184,11 +184,11 @@ a#btn_learn-more:hover {
 /* The typewriter cursor effect */
 @keyframes blink-cursor {
 
-  from, to { 
-    border-color: transparent 
+  from, to {
+    border-color: transparent
   }
 
-  50% { 
-    border-color: rgba(255, 255, 255, 0.2); 
+  50% {
+    border-color: rgba(255, 255, 255, 0.2);
   }
-} 
+}

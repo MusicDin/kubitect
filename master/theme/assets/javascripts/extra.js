@@ -21,7 +21,7 @@ window.onload = function () {
 
             if (window.location.pathname === '/') {
                 terminalAnimation()
-            } 
+            }
         }
     })
 
@@ -43,7 +43,7 @@ function terminalAnimation() {
 
     // milliseconds between each command character typed
     const commandCharDelay = 20
-    
+
     const Output = Symbol("output")
     const Command = Symbol("command")
 
@@ -115,13 +115,13 @@ function terminalAnimation() {
 
                     // add empty command element
                     target.innerHTML += wrapCommand("")
-                    
+
                     // get added command element
                     let cmdElement = target.lastChild
 
                     // add cursor when writing command
                     cmdElement.classList.add("terminal-cursor")
-                    
+
                     await delay(startCommandDelay)
                     await typeSequence(cmdElement, line.value)
                     await delay(applyCommandDelay)
@@ -133,7 +133,7 @@ function terminalAnimation() {
                     break
 
                 case Output:
-                    
+
                     target.innerHTML += wrapOutput(line.value)
                     await delay(outputDelay)
                     break
@@ -159,23 +159,23 @@ function terminalAnimation() {
 
         target.innerHTML += placeholder
     }
-    
+
     // event that is triggered on scroll
     const scrollEvent = () => {
-        
+
         let terminal = document.getElementById('terminal');
         let position = terminal.getBoundingClientRect();
-        
+
         // check for partial visibility
         if (position.top < window.innerHeight && position.bottom >= 0) {
             printContent(terminalContent)
             document.getElementById('main-box').removeEventListener('scroll', scrollEvent)
         }
     }
-    
+
     let terminalContent = document.getElementById('terminal-content');
     let terminalPlaceholder = document.getElementById('terminal-placeholder')
-    
+
     // Prevent animation if terminal placeholder element is not found
     if (terminalPlaceholder == null) {
         return
