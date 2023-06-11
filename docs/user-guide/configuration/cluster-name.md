@@ -21,7 +21,7 @@ cluster:
   name: my-cluster
 ```
 
-For instance, each virtual machine name is generated as `<cluster.name>-<node.type>-<node.instance.id>`. 
+For instance, each virtual machine name is generated as `<cluster.name>-<node.type>-<node.instance.id>`.
 Therefore, the name of the virtual machine for the worker node with ID `1` would be `my-cluster-master-1`.
 
 !!! Note

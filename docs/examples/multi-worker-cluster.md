@@ -4,13 +4,13 @@
 
 <div markdown="1" class="text-justify">
 
-This example demonstrates how to use Kubitect to set up a Kubernetes cluster consisting of **one master and three worker nodes**. 
+This example demonstrates how to use Kubitect to set up a Kubernetes cluster consisting of **one master and three worker nodes**.
 The final topology of the deployed Kubernetes cluster is shown in the figure below.
 
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/topology-1m3w-arch.png" 
+    src="../../assets/images/topology-1m3w-arch.png"
     alt="Architecture of the cluster with 1 master and 3 worker nodes"
     width="75%">
 </div>
@@ -28,10 +28,10 @@ The final topology of the deployed Kubernetes cluster is shown in the figure bel
 
 ## Step 1: Cluster configuration
 
-You can easily create a cluster with multiple worker nodes by specifying them in the configuration file. 
+You can easily create a cluster with multiple worker nodes by specifying them in the configuration file.
 For this example, we have included three worker nodes, but you can add as many as you like to suit your needs.
 
-```yaml title="multi-worker.yaml" 
+```yaml title="multi-worker.yaml"
 cluster:
   ...
   nodes:
@@ -48,12 +48,12 @@ cluster:
         - id: 99
 ```
 
-1.  Static IP address of the node. 
+1.  Static IP address of the node.
     If the `ip` property is omitted, the DHCP lease is requested when the cluster is created.
 
 ??? abstract "Final cluster configuration <i class="click-tip"></i>"
 
-    ```yaml title="multi-worker.yaml" 
+    ```yaml title="multi-worker.yaml"
     hosts:
       - name: localhost
         connection:

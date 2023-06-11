@@ -14,7 +14,7 @@ The final topology of the deployed Kubernetes cluster is depicted in the figure 
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/topology-3m3w1lb-arch.png" 
+    src="../../assets/images/topology-3m3w1lb-arch.png"
     alt="Architecture of the cluster with 3 master and 3 worker nodes"
     width="75%">
 </div>
@@ -41,15 +41,15 @@ The figure below provides a visual representation of this approach.
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/topology-3m3w1lb-base.png" 
+    src="../../assets/images/topology-3m3w1lb-base.png"
     alt="Scheme of load balancing between control plane nodes"
     width="75%">
 </div>
 
-To create such a cluster, all we need to do is specify the desired node instances and configure one load balancer. 
+To create such a cluster, all we need to do is specify the desired node instances and configure one load balancer.
 The control plane will be accessible through the load balancer's IP address.
 
-```yaml title="multi-master.yaml" 
+```yaml title="multi-master.yaml"
 cluster:
   ...
   nodes:
@@ -78,11 +78,11 @@ cluster:
 1. Size of the control plane (number of master nodes) must be odd.
 
 Kubitect automatically detects the load balancer instance in the configuration file and installs the *HAProxy* load balancer on an additional virtual machine.
-The load balancer is then configured to distribute traffic received on port 6443, which is the Kubernetes API server port, to all control plane nodes. 
+The load balancer is then configured to distribute traffic received on port 6443, which is the Kubernetes API server port, to all control plane nodes.
 
 ??? abstract "Final cluster configuration <i class="click-tip"></i>"
 
-    ```yaml title="multi-master.yaml" 
+    ```yaml title="multi-master.yaml"
     hosts:
       - name: localhost
         connection:

@@ -11,7 +11,7 @@ This example shows how to configure a simple bridge interface using [Netplan](ht
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/network-bridge.png" 
+    src="../../assets/images/network-bridge.png"
     alt="NAT vs bridge network scheme"
     width="75%">
 </div>
@@ -80,7 +80,7 @@ The final step is to prevent packets traversing the bridge from being sent to ip
  net.bridge.bridge-nf-call-iptables = 0
  net.bridge.bridge-nf-call-arptables = 0
  EOF
- 
+
  sysctl -p /etc/sysctl.conf
 ```
 

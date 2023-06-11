@@ -132,7 +132,7 @@
 
         + Make sure the directory exists.
         + Make sure the directory of the file that is being denied has appropriate user permissions.
-        + Optionally qemu security driver can be disabled. 
+        + Optionally qemu security driver can be disabled.
 
 === ":material-check-bold: Solution"
 
@@ -171,7 +171,7 @@
 
     !!! success "Solution"
 
-        The resource you are trying to create already exists. 
+        The resource you are trying to create already exists.
         Make sure you destroy the resource:
         ```
         virsh destroy your-domain
@@ -345,7 +345,7 @@
         # Proto Recv-Q Send-Q Local Address           Foreign Address   State       PID/Program name
         # tcp        0      0 192.168.113.200:80      0.0.0.0:*         LISTEN      1976/haproxy
         # tcp        0      0 192.168.113.200:80      0.0.0.0:*         LISTEN      1897/haproxy
-        ``` 
+        ```
 
         If you see more than one process, kill the unnecessary process:
         ```sh

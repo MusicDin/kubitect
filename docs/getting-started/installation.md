@@ -23,7 +23,7 @@ sudo mv kubitect /usr/local/bin/
 ```
 
 !!! note "Note"
-    
+
     The download URL is a combination of the operating system type, system architecture and version of Kubitect (`https://dl.kubitect.io/<os>/<arch>/<version>`).
 
     All releases can be found on [GitHub release page](https://github.com/MusicDin/kubitect/releases).
@@ -49,7 +49,7 @@ sudo mv kubitect /usr/local/bin/
         ```
 
         !!! note "Note"
-            
+
             The download URL is a combination of the operating system type, system architecture and version of Kubitect (`https://dl.kubitect.io/<os>/<arch>/<version>`).
 
             All releases can be found on [GitHub release page](https://github.com/MusicDin/kubitect/releases).

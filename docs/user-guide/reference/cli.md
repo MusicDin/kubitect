@@ -61,12 +61,12 @@ kubitect apply [flags]
 ### **kubitect destroy**
 
 Destroy the cluster with a given name.
-Executing the following command will permanently delete all resources associated with the cluster, including virtual machines and configuration files. 
+Executing the following command will permanently delete all resources associated with the cluster, including virtual machines and configuration files.
 
 !!! warning "Important"
 
-    Please be aware that this action is irreversible and any data stored within the cluster will be lost. 
-    
+    Please be aware that this action is irreversible and any data stored within the cluster will be lost.
+
 
 **Usage**
 

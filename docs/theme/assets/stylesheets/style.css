@@ -1,4 +1,4 @@
-/* 
+/*
  * COLORS
  */
 
@@ -10,7 +10,6 @@
     --md-default-fg-color--darkest: #f8f8f212;
     --md-default-bg-color--darker: #3234434d;
     --md-default-bg-color--darkest: #3234431f;
-    
 
     --md-primary-fg-color: #1371ff;
     --md-primary-fg-color--transparent: #6071a41a;
@@ -60,7 +59,7 @@
     --md-primary-bg-color: var(--md-default-bg-color);
     --md-primary-bg-color--light: var(--md-default-bg-color--light);
     --md-primary-code-bg-color: #303446;
-    
+
     --md-accent-fg-color: #75e3fd;
     --md-accent-fg-color--transparent: #72e3fd1a;
     --md-accent-bg-color: var(--md-default-bg-color);
@@ -71,10 +70,10 @@
     --md-code-inline-bg-color: #323443;
     --md-code-link-accent-bg-color: #324553;
     --md-code-link-accent-bg-color: var(--md-code-link-bg-color);
-    
+
     --md-typeset-a-color: var(--md-primary-fg-color);
     --md-typeset-mark-color: #a0ad4b;
-    --md-typeset-del-color: #734568;    
+    --md-typeset-del-color: #734568;
     --md-typeset-ins-color: #36724e;
     /* --md-typeset-kbd-color: var(--md-default-fg-color--lightest); */
     /* --md-typeset-kbd-border-color: var(--md-default-bg-color--darkest); */
@@ -111,7 +110,7 @@
 }
 
 /*
- * HEADER 
+ * HEADER
  */
 
 .md-header {
@@ -287,7 +286,7 @@
 
 /* Disable table line breaks */
 .md-typeset td code {
-    word-break: normal 
+    word-break: normal
 }
 
 /* Click tip */
@@ -302,7 +301,7 @@ details[open] > summary > i.click-tip:after {
 }
 
 /* Mobile devices */
-@media (max-width:768px) {  
+@media (max-width:768px) {
 
     img.mobile-w-100 {
         width: 100%;
