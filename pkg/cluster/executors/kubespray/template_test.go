@@ -18,8 +18,8 @@ func TestKubesprayAllTemplate(t *testing.T) {
 	tpl := NewKubesprayAllTemplate(t.TempDir(), nodes)
 	pop, err := template.Populate(tpl)
 
-	assert.NoError(t, err)
-	assert.NoError(t, tpl.Write())
+	require.NoError(t, err)
+	require.NoError(t, tpl.Write())
 	assert.Contains(t, pop, "apiserver_loadbalancer_domain_name: \"192.168.113.200\"")
 	assert.Contains(t, pop, "loadbalancer_apiserver:\n  address: \"192.168.113.200\"\n  port: 6443")
 }
@@ -30,8 +30,8 @@ func TestKubesprayK8sClusterTemplate(t *testing.T) {
 	tpl := NewKubesprayK8sClusterTemplate(t.TempDir(), cfg)
 	pop, err := template.Populate(tpl)
 
-	assert.NoError(t, err)
-	assert.NoError(t, tpl.Write())
+	require.NoError(t, err)
+	require.NoError(t, tpl.Write())
 	assert.Contains(t, pop, "kube_version: v1.24.7")
 	assert.Contains(t, pop, "kube_network_plugin: calico")
 	assert.Contains(t, pop, "dns_mode: coredns")
@@ -60,8 +60,8 @@ func TestKubesprayEtcdTemplate(t *testing.T) {
 	tpl := NewKubesprayEtcdTemplate(tmpDir)
 	pop, err := template.Populate(tpl)
 
-	assert.NoError(t, err)
-	assert.NoError(t, tpl.Write())
+	require.NoError(t, err)
+	require.NoError(t, tpl.Write())
 	assert.Contains(t, pop, "etcd_deployment_type: host")
 }
 
@@ -98,8 +98,8 @@ func TestHostsTemplate(t *testing.T) {
 						remote:
 	`), hosts[2].Connection.SSH.Keyfile)
 
-	assert.NoError(t, err)
-	assert.NoError(t, tpl.Write())
+	require.NoError(t, err)
+	require.NoError(t, tpl.Write())
 	assert.Equal(t, expect, pop)
 }
 
@@ -162,8 +162,8 @@ func TestNodesTemplate(t *testing.T) {
 								cls-worker-3:
 	`)
 
-	assert.NoError(t, err)
-	assert.NoError(t, tpl.Write())
+	require.NoError(t, err)
+	require.NoError(t, tpl.Write())
 	assert.Equal(t, expect, pop)
 }
 
@@ -217,6 +217,6 @@ func TestNodesTemplate_NoWorkers(t *testing.T) {
 								cls-master-3:
 	`)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expect, pop)
 }

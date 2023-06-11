@@ -85,7 +85,7 @@ type (
 	}
 )
 
-// NewAppContext creates new application context and initializes
+// AppContext creates new application context and initializes
 // a global UI.
 func (o AppContextOptions) AppContext() AppContext {
 	if o.appContext != nil {

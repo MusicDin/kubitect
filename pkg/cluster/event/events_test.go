@@ -10,6 +10,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/utils/cmp"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMockEvent(t *testing.T) {
@@ -109,17 +110,17 @@ func TestEvents_Add(t *testing.T) {
 	change := cmp.Change{}
 
 	events.add(e1, change)
-	assert.Len(t, events, 1)
+	require.Len(t, events, 1)
 	assert.Len(t, events[0].changes, 1)
 
 	// Add change to the already existing event
 	events.add(e1, change)
-	assert.Len(t, events, 1)
+	require.Len(t, events, 1)
 	assert.Len(t, events[0].changes, 2)
 
 	// Add new event
 	events.add(e2, change)
-	assert.Len(t, events, 2)
+	require.Len(t, events, 2)
 	assert.Len(t, events[0].changes, 2)
 	assert.Len(t, events[1].changes, 1)
 }
@@ -135,7 +136,7 @@ func TestTriggerEvents(t *testing.T) {
 	events := Events{Event{path: "Value", eType: BLOCK}}
 
 	diff, err := cmp.Compare(s1, s2)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	actual := TriggerEvents(diff, events).Errors()
 	expect := []error{NewConfigChangeError("", "Value")}
@@ -155,7 +156,7 @@ func TestTriggerEvents_Conflicting(t *testing.T) {
 	events := Events{Event{path: "Value", eType: BLOCK}}
 
 	diff, err := cmp.Compare(s1, s2)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	trig := TriggerEvents(diff, events)
 	assert.Equal(t, BLOCK, trig[1].eType)

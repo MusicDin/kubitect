@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestKeyWrite(t *testing.T) {
@@ -17,10 +18,10 @@ func TestKeyWrite(t *testing.T) {
 	}
 
 	err := key.Write(keyPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	keyFile, err := ioutil.ReadFile(keyPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "test", string(keyFile))
 }
 
@@ -36,7 +37,7 @@ func TestKeyWrite_InvalidPath(t *testing.T) {
 
 func TestGeneratePrivateKey(t *testing.T) {
 	key, err := generatePrivateKey(512)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotEmpty(t, key)
 }
 
@@ -47,19 +48,18 @@ func TestGeneratePrivateKey_Error(t *testing.T) {
 
 func TestEncodePrivateKey(t *testing.T) {
 	key, err := generatePrivateKey(512)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	pem := encodePrivateKey(key)
-	assert.NotEmpty(t, pem)
 	assert.Contains(t, string(pem), "RSA PRIVATE KEY")
 }
 
 func TestGeneratePublicKey(t *testing.T) {
 	key, err := generatePrivateKey(512)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	publicKey, err := generatePublicKey(key)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotEmpty(t, publicKey)
 }
 
@@ -77,12 +77,12 @@ func TestReadKeyPair(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	kp1, err := NewKeyPair(512)
-	assert.NoError(t, err)
-	assert.NoError(t, kp1.Write(tmpDir, "key"))
+	require.NoError(t, err)
+	require.NoError(t, kp1.Write(tmpDir, "key"))
 
 	// Existing key should be fetched
 	kp2, err := ReadKeyPair(tmpDir, "key")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, kp1, kp2)
 }
 
@@ -92,15 +92,14 @@ func TestReadKeyPair_FailReadingPrivateKey(t *testing.T) {
 	keyPath := path.Join(tmpDir, keyName)
 
 	kp, err := NewKeyPair(512)
-	assert.NoError(t, err)
-	assert.NoError(t, kp.Write(tmpDir, keyName))
+	require.NoError(t, err)
+	require.NoError(t, kp.Write(tmpDir, keyName))
 
 	// Make an empty directory on a public key path
-	assert.NoError(t, os.Remove(keyPath))
-	assert.NoError(t, os.Mkdir(keyPath, 0700))
+	require.NoError(t, os.Remove(keyPath))
+	require.NoError(t, os.Mkdir(keyPath, 0700))
 
 	_, err = ReadKeyPair(tmpDir, keyName)
-	// assert.ErrorContains(t, err, keyName+": is a directory")
 	assert.ErrorContains(t, err, NewKeyFileError("private", keyName, errors.New("")).Error())
 }
 
@@ -110,12 +109,12 @@ func TestReadKeyPair_FailReadingPublicKey(t *testing.T) {
 	keyPath := path.Join(tmpDir, keyName+".pub")
 
 	kp, err := NewKeyPair(512)
-	assert.NoError(t, err)
-	assert.NoError(t, kp.Write(tmpDir, keyName))
+	require.NoError(t, err)
+	require.NoError(t, kp.Write(tmpDir, keyName))
 
 	// Make an empty directory on a public key path
-	assert.NoError(t, os.Remove(keyPath))
-	assert.NoError(t, os.Mkdir(keyPath, 0700))
+	require.NoError(t, os.Remove(keyPath))
+	require.NoError(t, os.Mkdir(keyPath, 0700))
 
 	_, err = ReadKeyPair(tmpDir, keyName)
 	assert.ErrorContains(t, err, NewKeyFileError("public", keyName+".pub", errors.New("")).Error())
@@ -131,23 +130,23 @@ func TestKeyPair_Write(t *testing.T) {
 	keyName := "key"
 
 	kp, err := NewKeyPair(512)
-	assert.NoError(t, err)
-	assert.NoError(t, kp.Write(tmpDir, keyName))
+	require.NoError(t, err)
+	require.NoError(t, kp.Write(tmpDir, keyName))
 
 	privKeyPath := path.Join(tmpDir, keyName)
 	privKey, err := ioutil.ReadFile(privKeyPath)
-	assert.NoError(t, err)
-	assert.Contains(t, string(privKey), "RSA PRIVATE KEY")
+	require.NoError(t, err)
+	require.Contains(t, string(privKey), "RSA PRIVATE KEY")
 
 	pubKeyPath := path.Join(tmpDir, keyName+".pub")
 	pubKey, err := ioutil.ReadFile(pubKeyPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Contains(t, string(pubKey), "ssh-rsa")
 }
 
 func TestKeyPair_Write_InvalidPath(t *testing.T) {
 	kp, err := NewKeyPair(512)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = kp.Write(t.TempDir(), path.Join("invalid", "key"))
 	assert.ErrorContains(t, err, "no such file or directory")
@@ -157,7 +156,7 @@ func TestKeyPairExists(t *testing.T) {
 	keyDir := t.TempDir()
 	keyName := "key"
 	kp, err := NewKeyPair(512)
-	assert.NoError(t, err)
-	assert.NoError(t, kp.Write(keyDir, keyName))
+	require.NoError(t, err)
+	require.NoError(t, kp.Write(keyDir, keyName))
 	assert.True(t, KeyPairExists(keyDir, keyName), "KeyPair does not exists after being generated")
 }

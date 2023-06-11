@@ -9,6 +9,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/ui"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func MockReqFile(t *testing.T) string {
@@ -16,7 +17,7 @@ func MockReqFile(t *testing.T) string {
 	reqPath := path.Join(t.TempDir(), "requirements.txt")
 
 	err := ioutil.WriteFile(reqPath, []byte(reqFile), os.ModePerm)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	return reqPath
 }

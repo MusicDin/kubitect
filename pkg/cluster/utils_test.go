@@ -9,6 +9,7 @@ import (
 	v "github.com/MusicDin/kubitect/pkg/utils/validation"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type configMock struct {
@@ -52,7 +53,7 @@ func TestReadConfig(t *testing.T) {
 	cfgPath := WriteConfigMockFile(t)
 
 	cfg, err := readConfig(cfgPath, configMock{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "test", cfg.Value)
 }
 
@@ -71,13 +72,13 @@ func TestReadConfig_Invalid(t *testing.T) {
 func TestReadConfigIfExists(t *testing.T) {
 	cfgPath := WriteConfigMockFile(t)
 	cfg, err := readConfigIfExists(cfgPath, configMock{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "test", cfg.Value)
 }
 
 func TestReadConfigIfExists_NotExists(t *testing.T) {
 	cfgPath := path.Join(t.TempDir(), "cfg.yaml")
 	cfg, err := readConfigIfExists(cfgPath, configMock{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Nil(t, cfg)
 }
