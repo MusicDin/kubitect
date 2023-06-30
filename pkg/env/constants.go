@@ -7,7 +7,7 @@ package env
 // Project related constants
 const (
 	ConstProjectUrl        = "https://github.com/MusicDin/kubitect"
-	ConstProjectVersion    = "v3.2.0"
+	ConstProjectVersion    = "v3.2.1"
 	ConstKubesprayUrl      = "https://github.com/kubernetes-sigs/kubespray"
 	ConstKubesprayVersion  = "v2.22.1"
 	ConstKubernetesVersion = "v1.26.5"
