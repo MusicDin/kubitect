@@ -15,7 +15,7 @@ theme:
   logo: theme/assets/images/logo_white.svg
 
   font:
-    text: Roboto Flex
+    text: Ubuntu
 
   palette:
     - scheme: default
@@ -103,16 +103,18 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting started:
-      - Introduction: getting-started/introduction.md
-      - Installation: getting-started/installation.md
-      - Requirements: getting-started/requirements.md
-      - Quick start: getting-started/quick-start.md
-      - Getting started (step-by-step): getting-started/getting-started.md
+      - Getting started:
+          - Introduction: getting-started/introduction.md
+          - Installation: getting-started/installation.md
+          - Requirements: getting-started/requirements.md
+          - Quick start: getting-started/quick-start.md
+          - Getting started (step-by-step): getting-started/getting-started.md
       - Other:
           - Local development: getting-started/other/local-development.md
           - Troubleshooting: getting-started/other/troubleshooting.md
   - User guide:
-      - Before you begin: user-guide/before-you-begin.md
+      - User guide:
+          - Before you begin: user-guide/before-you-begin.md
       - Cluster Management:
           # - Creating the cluster: user-guide/management/creating.md
           - Upgrading the cluster: user-guide/management/upgrading.md
