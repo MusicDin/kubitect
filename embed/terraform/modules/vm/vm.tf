@@ -90,6 +90,7 @@ resource "libvirt_domain" "vm_domain" {
     network_id     = var.network_id
     mac            = var.vm_mac
     bridge         = var.network_bridge
+    addresses      = var.network_mode == "nat" && var.vm_ip != null ? [var.vm_ip] : null
     wait_for_lease = true
   }
 

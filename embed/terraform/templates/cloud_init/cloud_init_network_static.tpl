@@ -1,7 +1,7 @@
 version: 2
 ethernets:
   ${network_interface}:
-    dhcp4: false
+    dhcp4: true
     dhcp6: false
     addresses: [${vm_cidr}]
     gateway4: ${network_gateway}
