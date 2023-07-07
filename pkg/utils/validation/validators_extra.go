@@ -54,6 +54,52 @@ func extra_VSemVer(fl validator.FieldLevel) bool {
 	return regex("^(v){1}(\\*|\\d+(\\.\\d+){2})$", fl.Field().String())
 }
 
+type Version struct {
+	Major int
+	Minor int
+	Patch int
+}
+
+// parseVersion converts string into semantic version.
+func parseVersion(s string) Version {
+	var v Version
+	fmt.Sscanf(s, "%d.%d.%d", &v.Major, &v.Minor, &v.Patch)
+	return v
+}
+
+// isLessThan checks whether v1 is strictly less then v2.
+func isLessThan(v1, v2 Version) bool {
+	if v1.Major > v2.Major {
+		return false
+	}
+
+	if v1.Major < v2.Major {
+		return true
+	}
+
+	if v1.Minor > v2.Minor {
+		return false
+	}
+
+	if v1.Minor < v2.Minor {
+		return true
+	}
+
+	return v1.Patch < v2.Patch
+}
+
+// extra_SemVersionInRange checks whether version (field 1) is in range
+// of minimum (field 2) and maximum (field 3) version.
+func extra_SemVersionInRange(fl validator.FieldLevel) bool {
+	verRange := strings.Split(fl.Param(), " ")
+
+	ver := parseVersion(fl.Field().String())
+	min := parseVersion(verRange[0])
+	max := parseVersion(verRange[1])
+
+	return !isLessThan(ver, min) && !isLessThan(max, ver)
+}
+
 // extra_IPInRange checks whether the field is a valid IP within provided CIDR
 func extra_IPInRange(fl validator.FieldLevel) bool {
 	_, subnet, err := net.ParseCIDR(fl.Param())

@@ -350,9 +350,79 @@ func TestVSemVer(t *testing.T) {
 	assert.Error(t, Var("1.2", VSemVer()))
 	assert.Error(t, Var("1", VSemVer()))
 	assert.Error(t, Var("", VSemVer()))
+	assert.Error(t, Var("1.2.", VSemVer()))
 	assert.Error(t, Var("1.2.*", VSemVer()))
 	assert.Error(t, Var("a.b.c", VSemVer()))
 	assert.Error(t, Var(nil, VSemVer()))
+}
+
+func TestSemVersionInRange(t *testing.T) {
+
+	tests := []struct {
+		expect bool
+		min    string
+		max    string
+		ver    string
+	}{
+		{expect: true, min: "2", max: "4", ver: "2"},
+		{expect: true, min: "2", max: "4", ver: "2.0"},
+		{expect: true, min: "2", max: "4", ver: "2.0.0"},
+		{expect: true, min: "2", max: "4", ver: "3"},
+		{expect: true, min: "2", max: "4", ver: "3.1"},
+		{expect: true, min: "2", max: "4", ver: "3.1.1"},
+		{expect: true, min: "2", max: "4", ver: "4"},
+		{expect: true, min: "2", max: "4", ver: "4.0"},
+		{expect: true, min: "2", max: "4", ver: "4.0.0"},
+
+		{expect: true, min: "2.0", max: "4.0", ver: "2"},
+		{expect: true, min: "2.0", max: "4.0", ver: "2.0"},
+		{expect: true, min: "2.0", max: "4.0", ver: "2.0.0"},
+		{expect: true, min: "2.0", max: "4.0", ver: "3"},
+		{expect: true, min: "2.0", max: "4.0", ver: "3.1"},
+		{expect: true, min: "2.0", max: "4.0", ver: "3.1.1"},
+		{expect: true, min: "2.0", max: "4.0", ver: "4"},
+		{expect: true, min: "2.0", max: "4.0", ver: "4.0"},
+		{expect: true, min: "2.0", max: "4.0", ver: "4.0.0"},
+
+		{expect: true, min: "2.0.0", max: "4.0.0", ver: "2"},
+		{expect: true, min: "2.0.0", max: "4.0.0", ver: "2.0"},
+		{expect: true, min: "2.0.0", max: "4.0.0", ver: "2.0.0"},
+		{expect: true, min: "2.0.0", max: "4.0.0", ver: "3"},
+		{expect: true, min: "2.0.0", max: "4.0.0", ver: "3.1"},
+		{expect: true, min: "2.0.0", max: "4.0.0", ver: "3.1.1"},
+		{expect: true, min: "2.0.0", max: "4.0.0", ver: "4"},
+		{expect: true, min: "2.0.0", max: "4.0.0", ver: "4.0"},
+		{expect: true, min: "2.0.0", max: "4.0.0", ver: "4.0.0"},
+
+		{expect: true, min: "2", max: "4.0.0", ver: "3"},
+		{expect: true, min: "2", max: "4.0.0", ver: "3.15"},
+		{expect: true, min: "2", max: "4.0.0", ver: "3.15.14"},
+		{expect: true, min: "2.0.0", max: "4", ver: "3"},
+		{expect: true, min: "2.0.0", max: "4", ver: "3.15"},
+		{expect: true, min: "2.0.0", max: "4", ver: "3.15.14"},
+
+		{expect: false, min: "2.2.2", max: "4.4.4", ver: "1"},
+		{expect: false, min: "2.2.2", max: "4.4.4", ver: "2.1"},
+		{expect: false, min: "2.2.2", max: "4.4.4", ver: "2.2.1"},
+		{expect: false, min: "2.2.2", max: "4.4.4", ver: "5"},
+		{expect: false, min: "2.2.2", max: "4.4.4", ver: "4.5"},
+		{expect: false, min: "2.2.2", max: "4.4.4", ver: "4.4.5"},
+
+		{expect: false, min: "0.0.1", max: "1.0.0", ver: ""},
+		{expect: false, min: "0.0.1", max: "1.0.0", ver: "test"},
+		{expect: false, min: "0.0.1", max: "1.0.0", ver: "a.b.c"},
+		{expect: false, min: "1.0.0", max: "0.0.0", ver: "0.0.5"},
+	}
+
+	for _, test := range tests {
+		result := Var(test.ver, SemVerInRange(test.min, test.max))
+
+		if test.expect {
+			assert.NoErrorf(t, result, "Version %q is not in range [%s - %s], but it should be!", test.ver, test.min, test.max)
+		} else {
+			assert.Errorf(t, result, "Version %q is in range [%s - %s], but it should not be!", test.ver, test.min, test.max)
+		}
+	}
 }
 
 func TestRegexAny(t *testing.T) {
