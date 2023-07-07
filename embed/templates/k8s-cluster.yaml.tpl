@@ -10,3 +10,4 @@ kube_version: {{ .Config.Kubernetes.Version }}
 kube_network_plugin: {{ .Config.Kubernetes.NetworkPlugin }}
 kube_proxy_strict_arp: true
 resolvconf_mode: host_resolvconf
+enable_dual_stack_networks: true

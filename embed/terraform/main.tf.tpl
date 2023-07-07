@@ -70,10 +70,12 @@ module "host_{{ .Name }}" {
   cluster_nodeTemplate_dns                 = try(local.config.cluster.nodeTemplate.dns, null)
 
   # Network configuration
-  cluster_network_mode    = local.config.cluster.network.mode
-  cluster_network_cidr    = local.config.cluster.network.cidr
-  cluster_network_gateway = try(local.config.cluster.network.gateway, null)
-  cluster_network_bridge  = try(local.config.cluster.network.bridge, null)
+  cluster_network_mode     = local.config.cluster.network.mode
+  cluster_network_bridge   = try(local.config.cluster.network.bridge, null)
+  cluster_network_cidr4    = local.config.cluster.network.cidr
+  cluster_network_cidr6    = try(local.config.cluster.network.cidr6, null)
+  cluster_network_gateway4 = try(local.config.cluster.network.gateway, null)
+  cluster_network_gateway6 = try(local.config.cluster.network.gateway6, null)
 
   # HAProxy load balancer VMs parameters
   cluster_nodes_loadBalancer_vip = try(local.config.cluster.nodes.loadBalancer.vip, null)

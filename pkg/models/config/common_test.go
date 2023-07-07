@@ -32,22 +32,36 @@ func TestPort(t *testing.T) {
 func TestIP(t *testing.T) {
 	assert.Error(t, IP("192.168.113.266").Validate())
 	assert.NoError(t, IP("192.168.113.20").Validate())
-	assert.NoError(t, IP("2001:db8:3333:4444:5555:6666:7777:8888").Validate())
 	assert.NoError(t, IP("2001:db8::8888").Validate())
+	assert.NoError(t, IP("2001:db8:3333:4444:5555:6666:7777:8888").Validate())
 }
 
 func TestIPv4(t *testing.T) {
-	assert.Error(t, IPv4("192.168.113.266").Validate())
 	assert.NoError(t, IPv4("192.168.113.20").Validate())
-	assert.Error(t, IPv4("2001:db8:3333:4444:5555:6666:7777:8888").Validate())
+	assert.Error(t, IPv4("192.168.113.266").Validate())
 	assert.Error(t, IPv4("2001:db8::8888").Validate())
+	assert.Error(t, IPv4("2001:db8:3333:4444:5555:6666:7777:8888").Validate())
+}
+
+func TestIPv6(t *testing.T) {
+	assert.Error(t, IPv6("192.168.113.20").Validate())
+	assert.Error(t, IPv6("2001:db8:::g").Validate())
+	assert.NoError(t, IPv6("2001:db8::8888").Validate())
+	assert.NoError(t, IPv6("2001:db8:3333:4444:5555:6666:7777:8888").Validate())
 }
 
 func TestCIDRv4(t *testing.T) {
-	assert.Error(t, CIDRv4("192.168.113.0").Validate())
-	assert.Error(t, CIDRv4("192.168.113.0/33").Validate())
 	assert.NoError(t, CIDRv4("192.168.113.0/20").Validate())
+	assert.Error(t, CIDRv4("192.168.113.0/33").Validate())
+	assert.Error(t, CIDRv4("192.168.113.0").Validate())
 	assert.Error(t, CIDRv4("2001:db8::8888/64").Validate())
+}
+
+func TestCIDRv6(t *testing.T) {
+	assert.Error(t, CIDRv6("192.168.113.0/20").Validate())
+	assert.Error(t, CIDRv6("192.168.113.0/33").Validate())
+	assert.Error(t, CIDRv6("192.168.113.0").Validate())
+	assert.NoError(t, CIDRv6("2001:db8::8888/64").Validate())
 }
 
 func TestMAC(t *testing.T) {

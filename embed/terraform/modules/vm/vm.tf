@@ -9,17 +9,16 @@ data "local_file" "ssh_public_key" {
 
 # Network bridge configuration (for cloud-init) #
 data "template_file" "cloud_init_network_tpl" {
-  template = file(var.vm_ip != null
-    ? "./templates/cloud_init/cloud_init_network_static.tpl"
-    : "./templates/cloud_init/cloud_init_network_dhcp.tpl"
-  )
+  template = file("./templates/cloud_init/cloud_init_network.tpl")
 
   vars = {
+    vm_cidr4          = var.vm_ip4 == null ? "" : "${var.vm_ip4}/${split("/", var.network_cidr4)[1]}"
+    vm_cidr6          = var.vm_ip6 == null || var.network_cidr6 == null ? "" : "${var.vm_ip6}/${split("/", var.network_cidr6)[1]}"
+    vm_dns_list       = length(var.vm_dns) == 0 ? var.network_gateway4 : join(", ", var.vm_dns)
     network_interface = var.vm_network_interface
     network_bridge    = var.network_bridge
-    network_gateway   = var.network_gateway
-    vm_dns_list       = length(var.vm_dns) == 0 ? var.network_gateway : join(", ", var.vm_dns)
-    vm_cidr           = var.vm_ip == null ? "" : "${var.vm_ip}/${split("/", var.network_cidr)[1]}"
+    network_gateway4  = var.network_gateway4
+    network_gateway6  = var.network_gateway6
   }
 }
 

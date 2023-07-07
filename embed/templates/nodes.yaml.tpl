@@ -13,6 +13,10 @@ all:
 		{{- $i := $cfgNodes.Master.Instances | select "Id" .Id | first }}
 		{{ .Name }}:
 			ansible_host: {{ .IP }}
+			ip: {{ .IP }}
+			{{- if .IP6 }}
+			ip6: {{ .IP6 }}
+			{{- end }}
 			{{- if $i.Labels }}
 			node_labels:
 				{{- range $k, $v := $i.Labels }}
@@ -31,6 +35,10 @@ all:
 		{{- $i := $cfgNodes.Worker.Instances | select "Id" .Id | first }}
 		{{ .Name }}:
 			ansible_host: {{ .IP }}
+			ip: {{ .IP }}
+			{{- if .IP6 }}
+			ip6: {{ .IP6 }}
+			{{- end }}
 			{{- if $i.Labels }}
 			node_labels:
 				{{- range $k, $v := $i.Labels }}

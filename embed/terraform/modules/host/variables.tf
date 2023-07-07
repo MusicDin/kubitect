@@ -113,15 +113,27 @@ variable "cluster_network_bridge" {
   nullable    = true
 }
 
-variable "cluster_network_gateway" {
+variable "cluster_network_cidr4" {
   type        = string
-  description = "Network gateway."
+  description = "Network CIDR (v4)."
+}
+
+variable "cluster_network_cidr6" {
+  type        = string
+  description = "Network CIDR (v6)."
   nullable    = true
 }
 
-variable "cluster_network_cidr" {
+variable "cluster_network_gateway4" {
   type        = string
-  description = "Network CIDR."
+  description = "Network gateway (v4)."
+  nullable    = true
+}
+
+variable "cluster_network_gateway6" {
+  type        = string
+  description = "Network gateway (v6)."
+  nullable    = true
 }
 
 #======================================================================================
@@ -138,7 +150,8 @@ variable "cluster_nodes_loadBalancer_instances" {
     id           = string
     host         = optional(string)
     mac          = optional(string)
-    ip           = optional(string)
+    ip4          = optional(string)
+    ip6          = optional(string)
     cpu          = optional(number)
     ram          = optional(number)
     mainDiskSize = optional(number)
@@ -155,7 +168,8 @@ variable "cluster_nodes_master_instances" {
     id           = string
     host         = optional(string)
     mac          = optional(string)
-    ip           = optional(string)
+    ip4          = optional(string)
+    ip6          = optional(string)
     cpu          = number
     ram          = number
     mainDiskSize = number
@@ -177,7 +191,8 @@ variable "cluster_nodes_worker_instances" {
     id           = string
     host         = optional(string)
     mac          = optional(string)
-    ip           = optional(string)
+    ip4          = optional(string)
+    ip6          = optional(string)
     cpu          = number
     ram          = number
     mainDiskSize = number

@@ -62,7 +62,8 @@ module "network_module" {
   network_name   = local.network_name
   network_mode   = var.cluster_network_mode
   network_bridge = var.cluster_network_bridge
-  network_cidr   = var.cluster_network_cidr
+  network_cidr4  = var.cluster_network_cidr4
+  network_cidr6  = var.cluster_network_cidr6
 }
 
 #================================
@@ -83,10 +84,12 @@ module "lb_module" {
   network_id              = local.is_bridge ? null : module.network_module.0.network_id
 
   # Network related variables
-  network_mode    = var.cluster_network_mode
-  network_bridge  = var.cluster_network_bridge
-  network_gateway = var.cluster_network_gateway != null ? var.cluster_network_gateway : cidrhost(var.cluster_network_cidr, 1)
-  network_cidr    = var.cluster_network_cidr
+  network_mode     = var.cluster_network_mode
+  network_bridge   = var.cluster_network_bridge
+  network_cidr4    = var.cluster_network_cidr4
+  network_cidr6    = var.cluster_network_cidr6
+  network_gateway4 = var.cluster_network_gateway4 != null ? var.cluster_network_gateway4 : cidrhost(var.cluster_network_cidr4, 1)
+  network_gateway6 = var.cluster_network_gateway6 != null ? var.cluster_network_gateway6 : cidrhost(var.cluster_network_cidr6, 1)
 
   # Load balancer specific variables #
   vm_name              = "${var.cluster_name}-${var.node_types.load_balancer}-${each.value.id}"
@@ -104,7 +107,8 @@ module "lb_module" {
   vm_data_disks        = []
   vm_id                = each.value.id
   vm_mac               = each.value.mac
-  vm_ip                = each.value.ip
+  vm_ip4               = each.value.ip4
+  vm_ip6               = each.value.ip6
 
   # Dependancy takes care that resource pool is not removed before volumes are #
   # Also network must be created before VM is initialized #
@@ -130,10 +134,12 @@ module "master_module" {
   network_id              = local.is_bridge ? null : module.network_module.0.network_id
 
   # Network related variables
-  network_mode    = var.cluster_network_mode
-  network_bridge  = var.cluster_network_bridge
-  network_gateway = var.cluster_network_gateway != null ? var.cluster_network_gateway : cidrhost(var.cluster_network_cidr, 1)
-  network_cidr    = var.cluster_network_cidr
+  network_mode     = var.cluster_network_mode
+  network_bridge   = var.cluster_network_bridge
+  network_cidr4    = var.cluster_network_cidr4
+  network_cidr6    = var.cluster_network_cidr6
+  network_gateway4 = var.cluster_network_gateway4 != null ? var.cluster_network_gateway4 : cidrhost(var.cluster_network_cidr4, 1)
+  network_gateway6 = var.cluster_network_gateway6 != null ? var.cluster_network_gateway6 : cidrhost(var.cluster_network_cidr6, 1)
 
   # Master node specific variables #
   vm_name              = "${var.cluster_name}-${var.node_types.master}-${each.value.id}"
@@ -151,7 +157,8 @@ module "master_module" {
   vm_data_disks        = each.value.dataDisks
   vm_id                = each.value.id
   vm_mac               = each.value.mac
-  vm_ip                = each.value.ip
+  vm_ip4               = each.value.ip4
+  vm_ip6               = each.value.ip6
 
   # Dependancy takes care that resource pool is not removed before volumes are #
   # Also network must be created before VM is initialized #
@@ -177,10 +184,12 @@ module "worker_module" {
   network_id              = local.is_bridge ? null : module.network_module.0.network_id
 
   # Network related variables
-  network_mode    = var.cluster_network_mode
-  network_bridge  = var.cluster_network_bridge
-  network_gateway = var.cluster_network_gateway != null ? var.cluster_network_gateway : cidrhost(var.cluster_network_cidr, 1)
-  network_cidr    = var.cluster_network_cidr
+  network_mode     = var.cluster_network_mode
+  network_bridge   = var.cluster_network_bridge
+  network_cidr4    = var.cluster_network_cidr4
+  network_cidr6    = var.cluster_network_cidr6
+  network_gateway4 = var.cluster_network_gateway4 != null ? var.cluster_network_gateway4 : cidrhost(var.cluster_network_cidr4, 1)
+  network_gateway6 = var.cluster_network_gateway6 != null ? var.cluster_network_gateway6 : cidrhost(var.cluster_network_cidr6, 1)
 
   # Worker node specific variables #
   vm_name              = "${var.cluster_name}-${var.node_types.worker}-${each.value.id}"
@@ -198,7 +207,8 @@ module "worker_module" {
   vm_data_disks        = each.value.dataDisks
   vm_id                = each.value.id
   vm_mac               = each.value.mac
-  vm_ip                = each.value.ip
+  vm_ip4               = each.value.ip4
+  vm_ip6               = each.value.ip6
 
   # Dependancies takes care that resource pool is not removed before volumes are.
   # Also network must be created before VM is initialized.

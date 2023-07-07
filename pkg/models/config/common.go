@@ -48,10 +48,22 @@ func (ip IPv4) Validate() error {
 	return v.Var(ip, v.IPv4())
 }
 
+type IPv6 string
+
+func (ip IPv6) Validate() error {
+	return v.Var(ip, v.IPv6())
+}
+
 type CIDRv4 string
 
 func (cidr CIDRv4) Validate() error {
 	return v.Var(cidr, v.CIDRv4())
+}
+
+type CIDRv6 string
+
+func (cidr CIDRv6) Validate() error {
+	return v.Var(cidr, v.CIDRv6())
 }
 
 type MAC string
