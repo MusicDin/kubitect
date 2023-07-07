@@ -7,40 +7,28 @@ data "local_file" "ssh_public_key" {
   filename = "${var.vm_ssh_private_key}.pub"
 }
 
-# Network bridge configuration (for cloud-init) #
-data "template_file" "cloud_init_network_tpl" {
-  template = file(var.vm_ip != null
-    ? "./templates/cloud_init/cloud_init_network_static.tpl"
-    : "./templates/cloud_init/cloud_init_network_dhcp.tpl"
-  )
+# Initializes cloud-init disk for user data #
+resource "libvirt_cloudinit_disk" "cloud_init" {
+  name = "${var.vm_name}-cloud-init.iso"
+  pool = var.main_resource_pool_name
 
-  vars = {
-    network_interface = var.vm_network_interface
-    network_bridge    = var.network_bridge
-    network_gateway   = var.network_gateway
-    vm_dns_list       = length(var.vm_dns) == 0 ? var.network_gateway : join(", ", var.vm_dns)
-    vm_cidr           = var.vm_ip == null ? "" : "${var.vm_ip}/${split("/", var.network_cidr)[1]}"
-  }
-}
-
-# Cloud-init configuration template #
-data "template_file" "cloud_init_tpl" {
-  template = file("./templates/cloud_init/cloud_init.tpl")
-
-  vars = {
+  user_data = templatefile("./templates/cloud_init/cloud_init.tpl", {
     hostname       = var.vm_name
     user           = var.vm_user
     update         = var.vm_update
     ssh_public_key = data.local_file.ssh_public_key.content
-  }
-}
+  })
 
-# Initializes cloud-init disk for user data #
-resource "libvirt_cloudinit_disk" "cloud_init" {
-  name           = "${var.vm_name}-cloud-init.iso"
-  pool           = var.main_resource_pool_name
-  user_data      = data.template_file.cloud_init_tpl.rendered
-  network_config = data.template_file.cloud_init_network_tpl.rendered
+  network_config = templatefile(var.vm_ip != null
+    ? "./templates/cloud_init/cloud_init_network_static.tpl"
+    : "./templates/cloud_init/cloud_init_network_dhcp.tpl"
+    , {
+      network_interface = var.vm_network_interface
+      network_bridge    = var.network_bridge
+      network_gateway   = var.network_gateway
+      vm_dns_list       = length(var.vm_dns) == 0 ? var.network_gateway : join(", ", var.vm_dns)
+      vm_cidr           = var.vm_ip == null ? "" : "${var.vm_ip}/${split("/", var.network_cidr)[1]}"
+  })
 }
 
 #================================
