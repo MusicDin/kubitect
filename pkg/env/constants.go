@@ -37,9 +37,9 @@ var ProjectApplyActions = [...]string{
 
 // ProjectK8sVersions define supported Kubernetes versions.
 var ProjectK8sVersions = []string{
-	"v1.24",
-	"v1.25",
-	"v1.26",
+	"v1.26.0 - v1.26.5",
+	"v1.25.0 - v1.25.10",
+	"v1.24.0 - v1.24.14",
 }
 
 // ProjectOsPresets is a list of available OS distros.

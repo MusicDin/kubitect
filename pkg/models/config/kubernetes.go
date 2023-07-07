@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
@@ -17,7 +18,7 @@ type Kubernetes struct {
 
 func (k Kubernetes) Validate() error {
 	return v.Struct(&k,
-		v.Field(&k.Version, v.NotEmpty()),
+		v.Field(&k.Version, v.NotEmpty(), v.VSemVer()),
 		v.Field(&k.DnsMode, v.NotEmpty()),
 		v.Field(&k.NetworkPlugin, v.NotEmpty()),
 		v.Field(&k.Other),
@@ -33,17 +34,29 @@ func (k *Kubernetes) SetDefaults() {
 type KubernetesVersion string
 
 func (ver KubernetesVersion) Validate() error {
-	var rs []string
+	var err error
 
-	for _, r := range env.ProjectK8sVersions {
-		regex := fmt.Sprintf("^%s.[0-9][0-9]?$", r)
-		rs = append(rs, regex)
+	version := strings.TrimPrefix(string(ver), "v")
+
+	msg := fmt.Sprintf("Unsupported Kubernetes version (%s). ", ver)
+	msg += fmt.Sprintf("Supported versions are:\n%s", strings.Join(env.ProjectK8sVersions, "\n"))
+
+	for _, verRange := range env.ProjectK8sVersions {
+		verRange = strings.ReplaceAll(verRange, " ", "")
+		verRange = strings.ReplaceAll(verRange, "v", "")
+
+		verRangeSplit := strings.Split(verRange, "-")
+		min := verRangeSplit[0]
+		max := verRangeSplit[1]
+
+		// If validation passes, return nil
+		err = v.Var(version, v.SemVerInRange(min, max).Error(msg))
+		if err == nil {
+			return nil
+		}
 	}
 
-	msg := fmt.Sprintf("Unsupported Kubernetes version (%s).", ver)
-	msg += fmt.Sprintf("Supported versions are: %v", env.ProjectK8sVersions)
-
-	return v.Var(ver, v.RegexAny(rs...).Error(msg))
+	return err
 }
 
 type DnsMode string
