@@ -11,12 +11,14 @@ data "local_file" "ssh_public_key" {
 resource "libvirt_cloudinit_disk" "cloud_init" {
   name = "${var.vm_name}-cloud-init.iso"
   pool = var.main_resource_pool_name
+
   user_data = templatefile("./templates/cloud_init/cloud_init.tpl", {
     hostname       = var.vm_name
     user           = var.vm_user
     update         = var.vm_update
     ssh_public_key = data.local_file.ssh_public_key.content
   })
+
   network_config = templatefile(var.vm_ip != null
     ? "./templates/cloud_init/cloud_init_network_static.tpl"
     : "./templates/cloud_init/cloud_init_network_dhcp.tpl"
