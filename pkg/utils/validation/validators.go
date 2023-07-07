@@ -59,6 +59,7 @@ func initialize() {
 	validate.RegisterValidation("extra_alphanumhyp", extra_AlphaNumericHyphen)
 	validate.RegisterValidation("extra_alphanumhypus", extra_AlphaNumericHyphenUnderscore)
 	validate.RegisterValidation("extra_vsemver", extra_VSemVer)
+	validate.RegisterValidation("extra_semverinrange", extra_SemVersionInRange)
 	validate.RegisterValidation("extra_ipinrange", extra_IPInRange)
 	validate.RegisterValidation("extra_uniquefield", extra_UniqueField)
 	validate.RegisterValidation("extra_regexany", extra_RegexAny)
@@ -427,6 +428,13 @@ func VSemVer() Validator {
 	return Validator{
 		Tags: "extra_vsemver",
 		Err:  "Field '{.Field}' must be a valid semantic version prefixed with 'v' (e.g. v1.2.3). (actual: {.Value})",
+	}
+}
+
+func SemVerInRange(min, max string) Validator {
+	return Validator{
+		Tags: fmt.Sprintf("extra_semverinrange=%s %s", min, max),
+		Err:  fmt.Sprintf("Field '{.Field}' must be in range [%s - %s] (actual: {.Value})", min, max),
 	}
 }
 
