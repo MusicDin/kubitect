@@ -24,3 +24,6 @@ bootcmd:
 runcmd:
   - [ systemctl, enable, qemu-guest-agent.service ]
   - [ systemctl, start, qemu-guest-agent.service ]
+
+power_state:
+  mode: reboot
