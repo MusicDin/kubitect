@@ -122,7 +122,7 @@ resource "libvirt_domain" "vm_domain" {
     }
 
     inline = [
-      "while ! sudo grep \"Cloud-init .* finished\" /var/log/cloud-init.log; do echo \"Waiting for cloud-init to finish...\"; sleep 2; done"
+      "cloud-init status --wait"
     ]
   }
 }
