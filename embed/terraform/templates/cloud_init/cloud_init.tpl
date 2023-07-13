@@ -27,3 +27,4 @@ runcmd:
 
 power_state:
   mode: reboot
+  condition: ${update}
