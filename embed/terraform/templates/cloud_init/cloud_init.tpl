@@ -28,3 +28,4 @@ runcmd:
 power_state:
   mode: reboot
   condition: ${update}
+  delay: 5
