@@ -68,7 +68,7 @@ func NewTerraformProvisioner(
 }
 
 // Init generates Terraform's main.tf file based on the provided cluster configuration.
-func (t *terraform) Init(events event.Events) error {
+func (t *terraform) Init(events []event.Event) error {
 	cfgPath := path.Join(t.projectDir, "variables.yaml")
 	err := file.WriteYaml(t.cfg, cfgPath, 0644)
 	if err != nil {
@@ -255,18 +255,18 @@ func flag(key string, value ...interface{}) string {
 
 // extractRemovedHosts iterates over provided events and extracts
 // hosts that have been removed.
-func extractRemovedHosts(events event.Events) []config.Host {
+func extractRemovedHosts(events []event.Event) []config.Host {
 	var hosts []config.Host
 	for _, e := range events {
-		if e.Action() != cmp.DELETE {
+		if e.Change.Type != cmp.Delete {
 			continue
 		}
 
-		for _, ch := range e.Changes() {
-			if host, ok := ch.Before.(config.Host); ok {
-				hosts = append(hosts, host)
-			}
+		host, ok := e.Change.ValueBefore.(config.Host)
+		if ok {
+			hosts = append(hosts, host)
 		}
 	}
+
 	return hosts
 }

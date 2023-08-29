@@ -20,3 +20,23 @@ func NewValidationError(msg string, path string) error {
 		},
 	)
 }
+
+func NewConfigChangeError(msg string, paths ...string) error {
+	return ui.NewErrorBlock(ui.ERROR,
+		[]ui.Content{
+			ui.NewErrorLine("Error type:", "Invalid Configuration Change"),
+			ui.NewErrorSection("Config path:", paths...),
+			ui.NewErrorSection("Error:", msg),
+		},
+	)
+}
+
+func NewConfigChangeWarning(msg string, paths ...string) error {
+	return ui.NewErrorBlock(ui.WARN,
+		[]ui.Content{
+			ui.NewErrorLine("Warning type:", "Dangerous Configuration Change"),
+			ui.NewErrorSection("Config path:", paths...),
+			ui.NewErrorSection("Warning:", msg),
+		},
+	)
+}
