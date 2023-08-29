@@ -1,7 +1,6 @@
 package cluster
 
 import (
-	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -78,12 +77,11 @@ func TestPlan(t *testing.T) {
 	assert.NoError(t, c.ApplyNewConfig())
 	assert.NoError(t, c.Sync())
 
-	// Make "blocking" change
-	ver := fmt.Sprintf("%s.%s", env.ProjectK8sVersions[0], "99")
-	c.NewConfig.Kubernetes.Version = config.KubernetesVersion(ver)
+	// Make a change that will result in a configuration error.
+	c.NewConfig.Kubernetes.Version = config.KubernetesVersion("v1.26.5")
 
 	_, err := c.plan(SCALE)
-	assert.EqualError(t, err, "Aborted. Configuration file contains errors.")
+	assert.EqualError(t, err, "Configuration file contains errors.")
 }
 
 func TestApply_Create(t *testing.T) {
@@ -106,7 +104,7 @@ func TestApply_Upgrade_AskToCreate(t *testing.T) {
 	defer func() { env.ProjectRequiredFiles = tmp }()
 
 	assert.NoError(t, c.Apply(UPGRADE.String()))
-	assert.Contains(t, c.Ui().ReadStdout(t), "Cannot upgrade cluster 'cluster-mock'. It has not been created yet.")
+	assert.Contains(t, c.Ui().ReadStdout(t), "Cannot upgrade cluster")
 }
 
 func TestApply_Upgrade_NoChanges(t *testing.T) {
@@ -130,11 +128,10 @@ func TestApply_Upgrade(t *testing.T) {
 	assert.NoError(t, c.ApplyNewConfig())
 	assert.NoError(t, c.Sync())
 
-	// Make some changes to the new config
-	ver := fmt.Sprintf("%s.%s", env.ProjectK8sVersions[0], "99")
-	c.NewConfig.Kubernetes.Version = config.KubernetesVersion(ver)
+	// Make a valid configuration change.
+	c.NewConfig.Kubernetes.Version = config.KubernetesVersion("v1.26.5")
 
-	// Skip required files check
+	// Skip required files check.
 	tmp := env.ProjectRequiredFiles
 	env.ProjectRequiredFiles = []string{}
 	defer func() { env.ProjectRequiredFiles = tmp }()

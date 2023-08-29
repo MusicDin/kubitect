@@ -29,14 +29,14 @@ func (a ApplyAction) String() string {
 }
 
 // events returns events of the corresponding action.
-func (a ApplyAction) events() event.Events {
+func (a ApplyAction) rules() []event.Rule {
 	switch a {
 	case CREATE:
-		return event.ModifyEvents
+		return event.ModifyRules
 	case SCALE:
-		return event.ScaleEvents
+		return event.ScaleRules
 	case UPGRADE:
-		return event.UpgradeEvents
+		return event.UpgradeRules
 	default:
 		return nil
 	}
@@ -65,7 +65,7 @@ func (c *Cluster) Apply(a string) error {
 	}
 
 	if c.AppliedConfig == nil && (action == SCALE || action == UPGRADE) {
-		ui.Printf(ui.INFO, "Cannot %s cluster '%s'. It has not been created yet.\n\n", action, c.Name)
+		ui.Printf(ui.INFO, "Cannot %s cluster %q. It has not been created yet.\n\n", action, c.Name)
 
 		err := ui.Ask("Would you like to create it instead?")
 		if err != nil {
@@ -75,18 +75,14 @@ func (c *Cluster) Apply(a string) error {
 		action = CREATE
 	}
 
-	var events event.Events
+	events, err := c.plan(action)
+	if err != nil {
+		return err
+	}
 
-	if c.AppliedConfig != nil {
-		events, err = c.plan(action)
-		if err != nil {
-			return err
-		}
-
-		if len(events) == 0 {
-			ui.Println(ui.INFO, "No changes detected.")
-			return nil
-		}
+	if c.AppliedConfig != nil && len(events) == 0 {
+		ui.Println(ui.INFO, "No changes detected.")
+		return nil
 	}
 
 	if err := c.prepare(); err != nil {
@@ -109,46 +105,83 @@ func (c *Cluster) Apply(a string) error {
 	return c.ApplyNewConfig()
 }
 
-// plan compares new and applied configuration files, and detects
-// events based on the apply action.
-//
-// If applied configuration file does not exist, no events and no
-// error is returned.
-// If blocking changes are detected, an error is returned.
-// If warnings are detected, user is asked for permission to continue.
+// plan compares an already applied configuration file with the new one, and
+// detects events based on the apply action. If cluster has not been
+// initialized yet, nil is returned both for an error and events.
 func (c *Cluster) plan(action ApplyAction) (event.Events, error) {
 	if c.AppliedConfig == nil {
 		return nil, nil
 	}
 
-	comp := cmp.NewComparator()
-	comp.Tag = "opt"
-	comp.ExtraNameTags = []string{"yaml"}
-	comp.IgnoreEmptyChanges = true
-	comp.PopulateStructNodes = true
+	cmpOptions := cmp.Options{
+		Tag:                "opt",
+		ExtraNameTags:      []string{"yaml"},
+		RespectSliceOrder:  false,
+		IgnoreEmptyChanges: true,
+		PopulateAllNodes:   true,
+	}
 
-	diff, err := comp.Compare(c.AppliedConfig, c.NewConfig)
-
-	if err != nil || len(diff.Changes()) == 0 {
+	// Compare configuration files.
+	res, err := cmp.Compare(c.AppliedConfig, c.NewConfig, cmpOptions)
+	if err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("Following changes have been detected:\n\n")
-	fmt.Println(diff.ToYamlDiff())
-
-	events := event.TriggerEvents(diff, action.events())
-	blocking := events.Blocking()
-
-	if len(blocking) > 0 {
-		ui.PrintBlockE(blocking.Errors()...)
-		return nil, fmt.Errorf("Aborted. Configuration file contains errors.")
+	// Return if there is no changes.
+	if !res.HasChanges() {
+		return nil, nil
 	}
 
-	warnings := events.Warns()
+	fmtOptions := cmp.FormatOptions{
+		ShowColor:            ui.HasColor(),
+		ShowDiffOnly:         true,
+		ShowChangeTypePrefix: true,
+	}
 
-	if len(warnings) > 0 {
-		ui.PrintBlockE(warnings.Errors()...)
-		fmt.Println("Above warnings indicate potentially destructive actions.")
+	fmt.Printf("Following changes have been detected:\n\n")
+	fmt.Println(res.ToYaml(fmtOptions))
+
+	// Generate events from detected configuration changes and provided rules.
+	events, err := event.GenerateEvents(res.Tree(), action.rules())
+	if err != nil {
+		return nil, err
+	}
+
+	hasError := false
+	for _, e := range events {
+		if !e.Rule.IsOfType(event.Error) {
+			continue
+		}
+
+		hasError = true
+		if e.Change.Type == cmp.Create || e.Change.Type == cmp.Delete {
+			// For create and delete events, only change's
+			// path is shown.
+			err := NewConfigChangeError(e.Rule.Message, e.Change.Path)
+			ui.PrintBlockE(err)
+		} else {
+			err := NewConfigChangeError(e.Rule.Message, e.MatchedChangePaths...)
+			ui.PrintBlockE(err)
+		}
+	}
+
+	if hasError {
+		return nil, fmt.Errorf("Configuration file contains errors.")
+	}
+
+	hasWarnings := false
+	for _, e := range events {
+		if !e.Rule.IsOfType(event.Warn) {
+			continue
+		}
+
+		hasWarnings = true
+		err := NewConfigChangeWarning(e.Rule.Message, e.Change.Path)
+		ui.PrintBlockE(err)
+	}
+
+	if hasWarnings {
+		ui.Println(ui.INFO, "Above warnings indicate potentially dangerous actions.")
 	}
 
 	return events, ui.Ask()
@@ -210,7 +243,7 @@ func (c *Cluster) upgrade() error {
 }
 
 // scale scales an existing cluster.
-func (c *Cluster) scale(events event.Events) error {
+func (c *Cluster) scale(events []event.Event) error {
 	if err := c.Executor().Init(); err != nil {
 		return err
 	}
