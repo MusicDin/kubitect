@@ -135,17 +135,23 @@ func TestExtractRemovedHosts(t *testing.T) {
 		Name: "test",
 	}
 
-	change := []cmp.Change{
-		{
-			Type:   reflect.TypeOf(host),
-			Before: host,
-			After:  nil,
-		},
-	}
-
 	events := []event.Event{
-		event.MockEvent(t, event.OK, cmp.DELETE, change),
-		event.MockEvent(t, event.OK, cmp.CREATE, change),
+		{
+			Change: cmp.Change{
+				Type:        cmp.Delete,
+				ValueType:   reflect.TypeOf(host),
+				ValueBefore: host,
+				ValueAfter:  nil,
+			},
+		},
+		{
+			Change: cmp.Change{
+				Type:        cmp.Create,
+				ValueType:   reflect.TypeOf(host),
+				ValueBefore: host,
+				ValueAfter:  nil,
+			},
+		},
 	}
 
 	hosts := extractRemovedHosts(events)
