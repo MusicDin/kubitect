@@ -134,7 +134,7 @@ func (e *kubespray) Upgrade() error {
 
 // ScaleUp adds new nodes to the cluster.
 func (e *kubespray) ScaleUp(events event.Events) error {
-	events = events.OfType(event.SCALE_UP)
+	events = events.FilterByAction(event.Action_ScaleUp)
 
 	if len(events) == 0 {
 		return nil
@@ -149,7 +149,7 @@ func (e *kubespray) ScaleUp(events event.Events) error {
 
 // ScaleDown gracefully removes nodes from the cluster.
 func (e *kubespray) ScaleDown(events event.Events) error {
-	events = events.OfType(event.SCALE_DOWN)
+	events = events.FilterByAction(event.Action_ScaleDown)
 
 	if len(events) == 0 {
 		return nil
@@ -179,18 +179,16 @@ func (e *kubespray) ScaleDown(events event.Events) error {
 }
 
 // extractRemovedNodes returns node instances from the event changes.
-func extractRemovedNodes(events event.Events) ([]config.Instance, error) {
+func extractRemovedNodes(events []event.Event) ([]config.Instance, error) {
 	var nodes []config.Instance
 
 	for _, e := range events {
-		for _, ch := range e.Changes() {
-			if i, ok := ch.Before.(config.Instance); ok {
-				nodes = append(nodes, i)
-				continue
-			}
-
-			return nil, fmt.Errorf("%v cannot be scaled", ch.Type.Name())
+		if i, ok := e.Change.ValueBefore.(config.Instance); ok {
+			nodes = append(nodes, i)
+			continue
 		}
+
+		return nil, fmt.Errorf("%v cannot be scaled", e.Change.ValueType.Name())
 	}
 
 	return nodes, nil

@@ -59,18 +59,23 @@ func MockInvalidExecutor(t *testing.T) executors.Executor {
 	return ks
 }
 
-func MockEvents(t *testing.T, obj interface{}, eType event.EventType) []event.Event {
-	changes := []cmp.Change{
-		{
-			Type:   reflect.TypeOf(obj),
-			Before: obj,
-			After:  obj,
+func MockEvents(t *testing.T, obj interface{}, action event.ActionType) []event.Event {
+	change := cmp.Change{
+		ValueType:   reflect.TypeOf(obj),
+		ValueBefore: obj,
+		ValueAfter:  obj,
+	}
+
+	e := event.Event{
+		Change: change,
+		Rule: event.Rule{
+			Type:            event.Allow,
+			MatchChangeType: cmp.Modify,
+			ActionType:      action,
 		},
 	}
 
-	return []event.Event{
-		event.MockEvent(t, eType, cmp.MODIFY, changes),
-	}
+	return []event.Event{e}
 }
 
 func TestNewExecutor(t *testing.T) {
@@ -117,8 +122,7 @@ func TestExtractRemovedNodes(t *testing.T) {
 		Id: "worker",
 	}
 
-	events := MockEvents(t, w, event.SCALE_DOWN)
-
+	events := MockEvents(t, w, event.Action_ScaleDown)
 	rmNodes, err := extractRemovedNodes(events)
 	require.NoError(t, err)
 	assert.ElementsMatch(t, []config.Instance{w}, rmNodes)
@@ -129,8 +133,7 @@ func TestScaleDown(t *testing.T) {
 		Id: "worker",
 	}
 
-	events := MockEvents(t, w, event.SCALE_DOWN)
-
+	events := MockEvents(t, w, event.Action_ScaleDown)
 	err := MockExecutor(t).ScaleDown(events)
 	assert.NoError(t, err)
 }
@@ -141,8 +144,7 @@ func TestScaleDown_NoEvents(t *testing.T) {
 }
 
 func TestScaleDown_InvalidEvent(t *testing.T) {
-	events := MockEvents(t, config.Host{}, event.SCALE_DOWN)
-
+	events := MockEvents(t, config.Host{}, event.Action_ScaleDown)
 	err := MockExecutor(t).ScaleDown(events)
 	assert.EqualError(t, err, "Host cannot be scaled")
 }
@@ -152,8 +154,7 @@ func TestScaleUp(t *testing.T) {
 		Id: "worker",
 	}
 
-	events := MockEvents(t, w, event.SCALE_UP)
-
+	events := MockEvents(t, w, event.Action_ScaleUp)
 	err := MockExecutor(t).ScaleUp(events)
 	assert.NoError(t, err)
 }
