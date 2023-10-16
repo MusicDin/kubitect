@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"testing"
@@ -8,12 +9,14 @@ import (
 	"github.com/MusicDin/kubitect/pkg/app"
 	"github.com/MusicDin/kubitect/pkg/cluster/executors"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
+	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/ui"
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
 	"github.com/MusicDin/kubitect/pkg/utils/template"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type (
@@ -41,7 +44,7 @@ func MockCluster(t *testing.T) *ClusterMock {
 	ctx := app.MockAppContext(t, ctxOptions)
 
 	c, err := NewCluster(ctx, ConfigMock{}.Write(t))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// Create an empty SSH key pair
 	keyDir := t.TempDir()
@@ -78,7 +81,7 @@ func (c *ConfigMock) SetDefaults() {
 }
 
 func (c ConfigMock) Template() string {
-	return template.TrimTemplate(`
+	return template.TrimTemplate(fmt.Sprintf(`
 		hosts:
 			- name: localhost
 				connection:
@@ -94,10 +97,8 @@ func (c ConfigMock) Template() string {
 						- id: 1
 
 		kubernetes:
-			version: v1.24.7
-			kubespray:
-				version: v2.21.0
-	`)
+			version: %s
+	`, env.ConstKubernetesVersion))
 }
 
 func (c ConfigMock) Write(t *testing.T) string {

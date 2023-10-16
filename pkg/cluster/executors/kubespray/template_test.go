@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/utils/template"
 	"gopkg.in/yaml.v3"
@@ -32,7 +33,7 @@ func TestKubesprayK8sClusterTemplate(t *testing.T) {
 
 	require.NoError(t, err)
 	require.NoError(t, tpl.Write())
-	assert.Contains(t, pop, "kube_version: v1.24.7")
+	assert.Contains(t, pop, fmt.Sprintf("kube_version: %s", env.ConstKubernetesVersion))
 	assert.Contains(t, pop, "kube_network_plugin: calico")
 	assert.Contains(t, pop, "dns_mode: coredns")
 	assert.Contains(t, pop, "auto_renew_certificates: false")

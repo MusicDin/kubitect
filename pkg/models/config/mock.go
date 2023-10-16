@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
 
 	"github.com/stretchr/testify/assert"
@@ -119,7 +120,7 @@ func MockConfig(t *testing.T) Config {
 			},
 		},
 		Kubernetes: Kubernetes{
-			Version: "v1.24.7",
+			Version: env.ConstKubernetesVersion,
 		},
 	}
 

@@ -10,14 +10,14 @@ import (
 )
 
 func TestKubernetesVersion(t *testing.T) {
-	assert.NoError(t, KubernetesVersion("v1.24.0").Validate())
-	assert.NoError(t, KubernetesVersion("v1.24.5").Validate())
 	assert.NoError(t, KubernetesVersion("v1.25.0").Validate())
 	assert.NoError(t, KubernetesVersion("v1.25.5").Validate())
 	assert.NoError(t, KubernetesVersion("v1.26.0").Validate())
 	assert.NoError(t, KubernetesVersion("v1.26.5").Validate())
+	assert.NoError(t, KubernetesVersion("v1.27.0").Validate())
+	assert.NoError(t, KubernetesVersion("v1.27.5").Validate())
 	assert.ErrorContains(t, KubernetesVersion("v1.1.1").Validate(), "Unsupported Kubernetes version")
-	assert.ErrorContains(t, KubernetesVersion("v1.26.100").Validate(), "Unsupported Kubernetes version")
+	assert.ErrorContains(t, KubernetesVersion("v1.28.100").Validate(), "Unsupported Kubernetes version")
 }
 
 func TestDnsMode(t *testing.T) {
