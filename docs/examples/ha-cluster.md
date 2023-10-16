@@ -307,7 +307,7 @@ cluster:
                   size: 512
 
     kubernetes:
-      version: v1.24.7
+      version: v1.27.5
     ```
 
 ## Step 5: Applying the configuration
