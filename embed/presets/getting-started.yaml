@@ -25,7 +25,7 @@ cluster:
         - id: 1
           ip: 192.168.113.10
     worker:
-      default: 
+      default:
         ram: 8
         cpu: 2
         mainDiskSize: 32
@@ -35,5 +35,5 @@ cluster:
           ram: 4
 
 kubernetes:
-  version: v1.24.7
+  version: v1.27.5
   networkPlugin: calico
