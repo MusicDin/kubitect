@@ -9,8 +9,8 @@ const (
 	ConstProjectUrl        = "https://github.com/MusicDin/kubitect"
 	ConstProjectVersion    = "v3.2.2"
 	ConstKubesprayUrl      = "https://github.com/kubernetes-sigs/kubespray"
-	ConstKubesprayVersion  = "v2.22.1"
-	ConstKubernetesVersion = "v1.26.5"
+	ConstKubesprayVersion  = "v2.23.0"
+	ConstKubernetesVersion = "v1.27.5"
 	ConstTerraformVersion  = "1.5.2"
 )
 
@@ -37,9 +37,9 @@ var ProjectApplyActions = [...]string{
 
 // ProjectK8sVersions define supported Kubernetes versions.
 var ProjectK8sVersions = []string{
-	"v1.26.0 - v1.26.5",
-	"v1.25.0 - v1.25.10",
-	"v1.24.0 - v1.24.14",
+	"v1.27.0 - v1.27.5",
+	"v1.26.0 - v1.26.8",
+	"v1.25.0 - v1.25.13",
 }
 
 // ProjectOsPresets is a list of available OS distros.
@@ -52,11 +52,11 @@ var ProjectOsPresets = map[string]struct {
 		NetworkInterface: "ens3",
 	},
 	"ubuntu22": {
-		Source:           "https://cloud-images.ubuntu.com/releases/jammy/release-20230606/ubuntu-22.04-server-cloudimg-amd64.img",
+		Source:           "https://cloud-images.ubuntu.com/releases/jammy/release-20231026/ubuntu-22.04-server-cloudimg-amd64.img",
 		NetworkInterface: "ens3",
 	},
 	"ubuntu20": {
-		Source:           "https://cloud-images.ubuntu.com/releases/focal/release-20230606/ubuntu-20.04-server-cloudimg-amd64.img",
+		Source:           "https://cloud-images.ubuntu.com/releases/focal/release-20231011/ubuntu-20.04-server-cloudimg-amd64.img",
 		NetworkInterface: "ens3",
 	},
 	"debian": {
@@ -64,7 +64,7 @@ var ProjectOsPresets = map[string]struct {
 		NetworkInterface: "ens3",
 	},
 	"debian11": {
-		Source:           "https://cloud.debian.org/images/cloud/bullseye/20230601-1398/debian-11-genericcloud-amd64-20230601-1398.qcow2",
+		Source:           "https://cloud.debian.org/images/cloud/bullseye/20231013-1532/debian-11-genericcloud-amd64-20230601-1398.qcow2",
 		NetworkInterface: "ens3",
 	},
 	"centos": {
@@ -72,7 +72,7 @@ var ProjectOsPresets = map[string]struct {
 		NetworkInterface: "eth0",
 	},
 	"centos9": {
-		Source:           "https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-20230605.0.x86_64.qcow2",
+		Source:           "https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-20231023.1.x86_64.qcow2",
 		NetworkInterface: "eth0",
 	},
 	"rocky": {

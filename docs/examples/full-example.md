@@ -159,7 +159,7 @@ cluster:
 # such as version and network plugin.
 #
 kubernetes:
-  version: v1.24.7
+  version: v1.27.5
   networkPlugin: calico
   dnsMode: coredns # (36)!
   other:

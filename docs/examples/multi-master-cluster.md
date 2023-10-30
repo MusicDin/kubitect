@@ -123,7 +123,7 @@ The load balancer is then configured to distribute traffic received on port 6443
               ip: 192.168.113.22
 
     kubernetes:
-      version: v1.24.7
+      version: v1.27.5
       networkPlugin: calico
     ```
 

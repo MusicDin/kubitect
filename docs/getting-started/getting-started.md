@@ -255,7 +255,7 @@ such as the version and network plugin.
 
 ```yaml title="kubitect.yaml"
 kubernetes:
-  version: v1.24.7
+  version: v1.27.5
   networkPlugin: calico
 ```
 
@@ -303,7 +303,7 @@ Below is the final configuration for our Kubernetes cluster:
               ram: 4
 
     kubernetes:
-      version: v1.24.7
+      version: v1.27.5
       networkPlugin: calico
     ```
 
