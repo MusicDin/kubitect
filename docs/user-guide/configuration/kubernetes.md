@@ -52,9 +52,9 @@ The following table shows the compatibility matrix of supported network plugins 
 
 | Kubernetes Version |      Calico      |      Cilium      |      Flannel     |    KubeRouter    |       Weave      |
 |--------------------|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
-| **1.24**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.25**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.26**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.27**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
 
 ### Kubernetes DNS mode
 
