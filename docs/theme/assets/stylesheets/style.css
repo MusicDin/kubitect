@@ -194,7 +194,10 @@
 /* Large screens only */
 @media (min-width:1220px) {
     /* Left navigation - first non-section title (main title) */
-    li.md-nav__item:not(.md-nav__item--section) > label.md-nav__link {
+    li.md-nav__item.md-nav__item--section > label.md-nav__link[id='__nav_1_label'] > span,
+    li.md-nav__item.md-nav__item--section > label.md-nav__link[id='__nav_2_label'] > span,
+    li.md-nav__item.md-nav__item--section > label.md-nav__link[id='__nav_3_label'] > span,
+    li.md-nav__item.md-nav__item--section > label.md-nav__link[id='__nav_4_label'] > span {
         height: 0;
     }
 
