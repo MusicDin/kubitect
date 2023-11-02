@@ -13,15 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        goos: [ linux, darwin ]  # Target systems,
-        goarch: [ "386", amd64, arm64 ]   # with their architecture.
+        goos: [ linux, darwin ]
+        goarch: [ "386", amd64, arm64 ]
         exclude:
-          # Exclude some combinations of system and architecture.
           - goarch: "386"
             goos: darwin
     steps:
-      - uses: actions/checkout@v2
-      - uses: wangyoucao577/go-release-action@v1.25
+      - uses: actions/checkout@v3
+      - uses: wangyoucao577/go-release-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
@@ -29,4 +28,4 @@ jobs:
           goversion: 1.18
           binary_name: "kubitect"
           project_path: ${{ env.CLI_PATH }}
-          extra_files: LICENSE  # Additional files to include with the binaries.
+          extra_files: LICENSE
