@@ -2,10 +2,10 @@
 # Documentation deployment workflow.
 #
 # Documentation is always deployed for master and release-* branches.
-# In addition, there is a 'latest' alias that points to the version 
-# of the latest release, which is updated whenever a new release is 
+# In addition, there is a 'latest' alias that points to the version
+# of the latest release, which is updated whenever a new release is
 # published.
-# 
+#
 name: docs
 on:
   push:
@@ -14,7 +14,7 @@ on:
       - release-*
     tags:
       - v*
-      
+
 jobs:
   deploy_docs:
     name: Deploy documentation
@@ -25,14 +25,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+
       - name: Get latest repository version
         id: latest_version
         uses: oprypin/find-latest-tag@v1
         with:
           repository: ${{ github.repository }}
           prefix: 'v'
-        
+
       - name: Extract version from branch name
         id: branch_version
         uses: actions/github-script@v6
@@ -48,14 +48,14 @@ jobs:
               return version.startsWith(prefix) ? version : prefix + version
             }
             return branch
-                
+
       - name: Shorten tag version
         id: tag_version
         if: ${{ github.ref_type == 'tag' }}
         uses: actions/github-script@v6
         env:
           TAG_NAME: ${{ github.ref_name }}
-        with: 
+        with:
           result-encoding: string
           script: |
             version = process.env.TAG_NAME
@@ -66,12 +66,12 @@ jobs:
           echo "BRANCH_VERSION=${{ steps.branch_version.outputs.result }}" >> $GITHUB_ENV
           echo "LATEST_VERSION=${{ steps.latest_version.outputs.tag }}" >> $GITHUB_ENV
           echo "TAG_VERSION=${{ steps.tag_version.outputs.result }}" >> $GITHUB_ENV
-      
+
       - name: Configure Git user
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          
+
       - name: Fetch gh-pages repository
         run: |
           git fetch origin gh-pages --depth=1
@@ -83,23 +83,13 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install \
-            jinja2>=3.1 \
-            markdown>=3.3 \
-            mkdocs>=1.4 \
-            mkdocs-material>=9.0 \
-            mkdocs-material-extensions>=1.1 \
-            mkdocs-minify-plugin>=0.6 \
-            mkdocs-redirects>=1.0 \
-            pygments>=2.14 \
-            pymdown-extensions>=9.9 \
-            mike>=1.1.2
+          pip install -r docs/requirements.txt
 
       - name: Deploy documentation
         if: ${{ github.ref_type == 'branch' }}
         run: |
           mike deploy --push --update-aliases ${{ env.BRANCH_VERSION }}
-          
+
       - name: Deploy documentation and update alias for latest
         if: ${{ github.ref_type == 'tag' && env.LATEST_VERSION == env.BRANCH_VERSION }}
         run: |
