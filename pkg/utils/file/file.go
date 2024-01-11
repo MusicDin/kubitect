@@ -3,7 +3,6 @@ package file
 import (
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path"
 
@@ -19,7 +18,7 @@ func Exists(path string) bool {
 
 // Read reads file on a given path and returns its content as a string.
 func Read(path string) (string, error) {
-	file, err := ioutil.ReadFile(path)
+	file, err := os.ReadFile(path)
 
 	if err != nil {
 		return "", fmt.Errorf("read file '%s': %v", path, err)
@@ -39,11 +38,23 @@ func Copy(srcPath, dstPath string, mode fs.FileMode) error {
 	return ForceCopy(srcPath, dstPath, mode)
 }
 
+// Append appends the provided byte content with an additional new line to the file.
+func Append(path string, content []byte) error {
+	file, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write(append(content, '\n'))
+	return err
+}
+
 // ForceCopy reads the file located at the source path and writes it to the
 // destination path with the specified permissions. All required subdirectories
 // are also created.
 func ForceCopy(srcPath, dstPath string, mode fs.FileMode) error {
-	file, err := ioutil.ReadFile(srcPath)
+	file, err := os.ReadFile(srcPath)
 	if err != nil {
 		return fmt.Errorf("copy file: %v", err)
 	}
@@ -63,7 +74,7 @@ func ForceCopy(srcPath, dstPath string, mode fs.FileMode) error {
 // ReadYaml reads yaml file on the given path and unmarshals it into the given
 // type.
 func ReadYaml[T interface{}](path string, typ T) (*T, error) {
-	yml, err := ioutil.ReadFile(path)
+	yml, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -79,5 +90,5 @@ func WriteYaml(obj interface{}, path string, perm fs.FileMode) error {
 		return err
 	}
 
-	return ioutil.WriteFile(path, yml, perm)
+	return os.WriteFile(path, yml, perm)
 }
