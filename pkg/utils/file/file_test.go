@@ -85,6 +85,18 @@ func TestForceCopy(t *testing.T) {
 	assert.Equal(t, "source", out)
 }
 
+func TestAppend(t *testing.T) {
+	src := tmpFile(t, "src.file", "source\n")
+
+	require.NoError(t, Append(src, []byte("test")))
+	require.NoError(t, Append(src, []byte("x=1.2.3")))
+	require.NoError(t, Append(src, []byte("$ \n \\ ")))
+
+	out, err := Read(src)
+	require.NoError(t, err)
+	assert.Equal(t, "source\ntest\nx=1.2.3\n$ \n \\ \n", out)
+}
+
 func TestWriteYaml(t *testing.T) {
 	type T struct {
 		Value int `yaml:"value"`
