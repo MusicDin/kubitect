@@ -14,6 +14,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/tools/git"
 	"github.com/MusicDin/kubitect/pkg/tools/virtualenv"
 	"github.com/MusicDin/kubitect/pkg/ui"
+	"github.com/MusicDin/kubitect/pkg/utils/file"
 	"gopkg.in/yaml.v3"
 )
 
@@ -79,6 +80,14 @@ func (e *kubespray) Init() error {
 
 	ui.Printf(ui.INFO, "Cloning Kubespray (%s)...\n", ver)
 	if err := git.NewGitProject(url, ver).Clone(dst); err != nil {
+		return err
+	}
+
+	// Patch: There is an issue with unsafe conditionals in
+	// Kubespray with ansible-core version > 2.14.11.
+	reqPath := path.Join(dst, "requirements.txt")
+	reqPatch := []byte("ansible-core==2.14.11")
+	if err := file.Append(reqPath, reqPatch); err != nil {
 		return err
 	}
 
