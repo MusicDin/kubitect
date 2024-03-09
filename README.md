@@ -24,7 +24,7 @@ Kubitect documentation is accessible at **[:book: kubitect.io](https://kubitect.
 
 All Kubitect releases are available on the [release page](https://github.com/MusicDin/kubitect/releases).
 </br>
-It is recommended to use official releases, as unreleased versions from the master branch may be unstable.
+It is recommended to use official releases, as unreleased versions from the main branch may be unstable.
 
 </br>
 
