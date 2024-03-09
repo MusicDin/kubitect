@@ -1,7 +1,6 @@
 package terraform
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"reflect"
@@ -29,7 +28,7 @@ func MockTerraform(t *testing.T) *terraform {
 	// Create sample terraform main.tf file
 	maintf := "output \"test\" { value = \"test\" }"
 	maintfPath := path.Join(projDir, "main.tf")
-	err := ioutil.WriteFile(maintfPath, []byte(maintf), 0777)
+	err := os.WriteFile(maintfPath, []byte(maintf), 0777)
 	require.NoError(t, err)
 
 	return &terraform{
@@ -41,7 +40,7 @@ func MockTerraform(t *testing.T) *terraform {
 
 func MockMissingTerraform(t *testing.T) *terraform {
 	tf := MockTerraform(t)
-	tf.version = "1.0.0"
+	tf.version = env.ConstTerraformVersion
 	return tf
 }
 
@@ -92,19 +91,19 @@ func TestTerraform_init(t *testing.T) {
 	tf := MockMissingTerraform(t)
 	tfPath := path.Join(tf.binDir, "terraform")
 
-	assert.NoError(t, tf.init())
-	assert.Equal(t, tfPath, tf.binPath)
-	assert.Equal(t, true, tf.initialized)
+	require.NoError(t, tf.init())
+	require.Equal(t, tfPath, tf.binPath)
+	require.Equal(t, true, tf.initialized)
 
 	// tf.init() should quit immediately if initialized == true
-	assert.NoError(t, tf.init())
+	require.NoError(t, tf.init())
 
 	// Set initialized to false to call findAndInstall again.
 	// Since tf is already installed, tf must be found locally
 	tf.initialized = false
-	assert.NoError(t, tf.init())
-	assert.Equal(t, tfPath, tf.binPath)
-	assert.Equal(t, true, tf.initialized)
+	require.NoError(t, tf.init())
+	require.Equal(t, tfPath, tf.binPath)
+	require.Equal(t, true, tf.initialized)
 }
 
 func TestTerraform_init_InvalidBinDir(t *testing.T) {
