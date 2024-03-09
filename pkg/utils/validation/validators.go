@@ -61,6 +61,7 @@ func initialize() {
 	validate.RegisterValidation("extra_vsemver", extra_VSemVer)
 	validate.RegisterValidation("extra_semverinrange", extra_SemVersionInRange)
 	validate.RegisterValidation("extra_ipinrange", extra_IPInRange)
+	validate.RegisterValidation("extra_cidrv4", extra_CIDRv4)
 	validate.RegisterValidation("extra_uniquefield", extra_UniqueField)
 	validate.RegisterValidation("extra_regexany", extra_RegexAny)
 	validate.RegisterValidation("extra_regexall", extra_RegexAll)
@@ -276,7 +277,7 @@ func CIDR() Validator {
 // CIDRv4 checks whether the field value is a valid v4 CIDR address.
 func CIDRv4() Validator {
 	return Validator{
-		Tags: "cidrv4",
+		Tags: "extra_cidrv4",
 		Err:  "Field '{.Field}' must be a valid CIDRv4 address (actual: {.Value}).",
 	}
 }

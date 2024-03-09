@@ -112,6 +112,13 @@ func extra_IPInRange(fl validator.FieldLevel) bool {
 	return subnet.Contains(ip)
 }
 
+// extra_CIDRv4 returns true if struct filed is a valid v4 CIDR address.
+// Note: Required since breaking change in go-playground/validation@10.15.5
+func extra_CIDRv4(fl validator.FieldLevel) bool {
+	ip, _, err := net.ParseCIDR(fl.Field().String())
+	return err == nil && ip.To4() != nil
+}
+
 // extra_UniqueField returns true if struct field with a given name is unique for
 // all slice elements.
 func extra_UniqueField(fl validator.FieldLevel) bool {
