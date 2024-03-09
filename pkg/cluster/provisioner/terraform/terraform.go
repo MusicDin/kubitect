@@ -235,6 +235,9 @@ func installTerraform(ver, binDir string) (string, error) {
 		return "", err
 	}
 
+	fmt.Printf("==> Installing Terraform %v\n", ver)
+	fmt.Printf("==> Installing Terraform %v\n", version.Must(version.NewVersion(ver)))
+
 	installer := &releases.ExactVersion{
 		Product:    product.Terraform,
 		Version:    version.Must(version.NewVersion(ver)),

@@ -45,7 +45,7 @@ func (t MainTemplate) Write() error {
 
 // defaultHost returns default host from a given list of hosts.
 func defaultHost(hosts []config.Host) (config.Host, error) {
-	if hosts == nil || len(hosts) == 0 {
+	if len(hosts) == 0 {
 		return config.Host{}, fmt.Errorf("defaultHost: hosts list is empty")
 	}
 
