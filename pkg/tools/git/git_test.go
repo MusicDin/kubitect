@@ -18,7 +18,7 @@ func TestNewGit(t *testing.T) {
 
 func TestClone_Branch(t *testing.T) {
 	u := ui.MockGlobalUi(t)
-	p := NewGitProject(env.ConstProjectUrl, "master")
+	p := NewGitProject(env.ConstProjectUrl, "main")
 
 	require.NoError(t, p.Clone(t.TempDir()))
 	assert.Equal(t, "", u.ReadStdout(t))
