@@ -1,0 +1,40 @@
+name: Setup Environment
+description: Composite action that sets up the environment for deploying Kubitect clusters.
+
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: |
+        sudo apt update
+        sudo apt-get install -y --no-install-recommends \
+          curl \
+          libvirt-clients \
+          libvirt-daemon-system \
+          mkisofs \
+          virtualenv \
+          python3-pip \
+          qemu-utils \
+          qemu-system \
+          spice-client-gtk
+
+    - name: Configure libvirt
+      shell: bash
+      run: |
+        sudo usermod -aG libvirt $(whoami)
+        sudo chmod o+rw /var/run/libvirt/libvirt-sock
+        echo 'security_driver = "none"' | sudo tee -a /etc/libvirt/qemu.conf > /dev/null
+        sudo systemctl restart libvirtd
+
+    - name: Install Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+
+    - name: Build Kubitect
+      shell: bash
+      run: |
+        go build -ldflags "-s -w" -trimpath .
+        sudo mv kubitect /usr/local/bin/kubitect
+        kubitect --version
