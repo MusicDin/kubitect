@@ -755,7 +755,6 @@ Each configuration property is documented with 5 columns: Property name, descrip
           <li><code>cilium</code></li>
           <li><code>flannel</code></li>
           <li><code>kube-router</code></li>
-          <li><code>weave</code></li>
         </ul>
       </td>
     </tr>
