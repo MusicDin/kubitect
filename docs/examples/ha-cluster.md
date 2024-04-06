@@ -260,7 +260,7 @@ cluster:
         ssh:
           addToKnownHosts: true
         os:
-          distro: ubuntu
+          distro: ubuntu22
       nodes:
         loadBalancer:
           vip: 10.10.13.200

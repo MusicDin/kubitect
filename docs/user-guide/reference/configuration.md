@@ -642,20 +642,17 @@ Each configuration property is documented with 5 columns: Property name, descrip
     <tr>
       <td><code>cluster.nodeTemplate.os.distro</code></td>
       <td>string</td>
-      <td>ubuntu</td>
+      <td>ubuntu22</td>
       <td></td>
       <td>
         Set OS distribution. Possible values are:
         <ul>
-          <li><code>ubuntu</code></li>
-          <li><code>ubuntu22</code></li>
           <li><code>ubuntu20</code></li>
-          <li><code>debian</code></li>
+          <li><code>ubuntu22</code></li>
           <li><code>debian11</code></li>
-          <li><code>rocky</code></li>
-          <li><code>rocky9</code></li>
-          <li><code>centos</code></li>
+          <li><code>debian12</code></li>
           <li><code>centos9</code></li>
+          <li><code>rocky9</code></li>
         </ul>
       </td>
     </tr>

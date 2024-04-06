@@ -69,7 +69,7 @@ cluster:
       privateKeyPath: "~/.ssh/id_rsa_test"
       addToKnownHosts: true
     os:
-      distro: ubuntu
+      distro: ubuntu22
       networkInterface: ens3 # (20)!
     dns: # (21)!
       - 1.1.1.1

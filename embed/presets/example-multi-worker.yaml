@@ -14,7 +14,7 @@ cluster:
     ssh:
       addToKnownHosts: true
     os:
-      distro: ubuntu
+      distro: ubuntu22
   nodes:
     master:
       instances:

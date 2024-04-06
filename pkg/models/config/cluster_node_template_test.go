@@ -10,10 +10,10 @@ import (
 )
 
 func TestOSDistro(t *testing.T) {
-	assert.NoError(t, OSDistro(UBUNTU).Validate())
-	assert.NoError(t, OSDistro("ubuntu").Validate())
-	assert.NoError(t, OSDistro("debian").Validate())
-	assert.Error(t, OSDistro("wrong").Validate())
+	assert.NoError(t, OSDistro(UBUNTU20).Validate())
+	assert.NoError(t, OSDistro("ubuntu22").Validate())
+	assert.NoError(t, OSDistro("debian12").Validate())
+	assert.Error(t, OSDistro("invalid").Validate())
 }
 
 func TestOSDistro_Presets(t *testing.T) {
@@ -30,13 +30,13 @@ func TestOSNetworkInterface(t *testing.T) {
 }
 
 func TestOS_Empty(t *testing.T) {
-	assert.ErrorContains(t, OS{}.Validate(), "Field 'distro' must be one of the following values: [ubuntu|")
+	assert.ErrorContains(t, OS{}.Validate(), "Field 'distro' must be one of the following values: [ubuntu20|")
 	assert.ErrorContains(t, OS{}.Validate(), "Field 'networkInterface' can contain only alphanumeric characters.")
 }
 
 func TestOS_Defaults(t *testing.T) {
-	os1 := OS{Distro: UBUNTU}
-	os2 := OS{Distro: ROCKY}
+	os1 := OS{Distro: CENTOS9}
+	os2 := OS{Distro: ROCKY9}
 	os3 := OS{Source: OSSource("./cluster_node_template_test.go")}
 
 	assert.NoError(t, defaults.Assign(&OS{}).Validate())
@@ -44,14 +44,14 @@ func TestOS_Defaults(t *testing.T) {
 	assert.NoError(t, defaults.Assign(&os2).Validate())
 	assert.NoError(t, defaults.Assign(&os3).Validate())
 
-	assert.Equal(t, UBUNTU, os1.Distro)
-	assert.Equal(t, ROCKY, os2.Distro)
-	assert.Equal(t, UBUNTU, os3.Distro)
-	assert.Equal(t, "ens3", string(os1.NetworkInterface))
+	assert.Equal(t, CENTOS9, os1.Distro)
+	assert.Equal(t, ROCKY9, os2.Distro)
+	assert.Equal(t, UBUNTU22, os3.Distro)
+	assert.Equal(t, "eth0", string(os1.NetworkInterface))
 	assert.Equal(t, "eth0", string(os2.NetworkInterface))
 	assert.Equal(t, "ens3", string(os3.NetworkInterface))
-	assert.Equal(t, env.ProjectOsPresets["ubuntu"].Source, string(os1.Source))
-	assert.Equal(t, env.ProjectOsPresets["rocky"].Source, string(os2.Source))
+	assert.Equal(t, env.ProjectOsPresets["centos9"].Source, string(os1.Source))
+	assert.Equal(t, env.ProjectOsPresets["rocky9"].Source, string(os2.Source))
 	assert.Equal(t, "./cluster_node_template_test.go", string(os3.Source))
 }
 
