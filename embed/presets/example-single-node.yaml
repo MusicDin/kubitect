@@ -26,5 +26,5 @@ cluster:
           ip: 192.168.113.10
 
 kubernetes:
-  version: v1.27.5
+  version: v1.28.6
   networkPlugin: calico
