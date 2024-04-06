@@ -162,9 +162,9 @@
 <span class=w>      </span><span class=nt>instances</span><span class=p>:</span>
 <span class=w>        </span><span class="l l-Scalar l-Scalar-Plain">...</span>
 </code></pre></div> <ol> <li>If the label value is omitted, <code>null</code> is set as the label value.</li> </ol> <p>The roles of the nodes in a Kubernetes cluster can be viewed using <code>kubectl get nodes</code>.</p> <div class=highlight><pre><span></span><code>NAME                   STATUS   ROLES                  AGE   VERSION
-k8s-cluster-master-1   Ready    control-plane,master   19m   v1.27.5
-k8s-cluster-worker-1   Ready    node                   19m   v1.27.5
-k8s-cluster-worker-2   Ready    node                   19m   v1.27.5
+k8s-cluster-master-1   Ready    control-plane,master   19m   v1.28.6
+k8s-cluster-worker-1   Ready    node                   19m   v1.28.6
+k8s-cluster-worker-2   Ready    node                   19m   v1.28.6
 </code></pre></div> <h3 id=load-balance-http-requests>Load balance HTTP requests<a class=headerlink href=#load-balance-http-requests title="Anchor link">&#128279;&#xFE0E;</a></h3> <p>Kubitect enables users to define custom port forwarding rules on load balancers. For example, to distribute HTTP and HTTPS requests across all worker nodes, at least one load balancer must be specified and port forwarding must be configured as follows:</p> <div class=highlight><pre><span></span><code><span class=nt>cluster</span><span class=p>:</span>
 <span class=w>  </span><span class=nt>nodes</span><span class=p>:</span>
 <span class=w>    </span><span class=nt>loadBalancer</span><span class=p>:</span>
