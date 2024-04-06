@@ -131,7 +131,7 @@ However, this behavior can be restricted using node selectors, which are explain
                   size: 32
 
     kubernetes:
-      version: v1.27.5
+      version: v1.28.6
 
     addons:
       rook:
@@ -275,7 +275,7 @@ addons:
                   size: 32
 
     kubernetes:
-      version: v1.27.5
+      version: v1.28.6
 
     addons:
       rook:

@@ -16,17 +16,17 @@ The Kubernetes section of the configuration file contains properties that are sp
 
 :material-tag-arrow-up-outline: [v3.0.0][tag 3.0.0]
 &ensp;
-:octicons-file-symlink-file-24: Default: `v1.27.5`
+:octicons-file-symlink-file-24: Default: `v1.28.6`
 
-By default, the Kubernetes cluster will be deployed using version `v1.27.5`, but you can specify a different version if necessary.
+By default, the Kubernetes cluster will be deployed using version `v1.28.6`, but you can specify a different version if necessary.
 
 
 ```yaml
 kubernetes:
-  version: v1.27.5
+  version: v1.28.6
 ```
 
-The supported Kubernetes versions include `v1.25`, `v1.26`, and `v1.27`.
+The supported Kubernetes versions include `v1.26`, `v1.27`, and `v1.28`.
 
 ### Kubernetes network plugin
 
@@ -51,9 +51,9 @@ The following table shows the compatibility matrix of supported network plugins 
 
 | Kubernetes Version |      Calico      |      Cilium      |      Flannel     |    KubeRouter    |
 |--------------------|:----------------:|:----------------:|:----------------:|:----------------:|
-| **1.25**           | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.26**           | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.27**           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.28**           | :material-check: | :material-check: | :material-check: | :material-check: |
 
 ### Kubernetes DNS mode
 
