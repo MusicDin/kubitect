@@ -143,7 +143,8 @@ resource "null_resource" "ssh_known_hosts" {
   provisioner "local-exec" {
     command = <<-EOF
       sh ./scripts/filelock-exec.sh \
-        "touch $HOME/.ssh/known_hosts \
+        "mkdir -p $HOME/.ssh \
+        && touch $HOME/.ssh/known_hosts \
         && ssh-keygen -R $VM_IP \
         && ssh-keyscan -t rsa $VM_IP | tee -a $HOME/.ssh/known_hosts \
         && rm -f $HOME/.ssh/known_hosts.old"
