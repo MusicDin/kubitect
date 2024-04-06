@@ -41,7 +41,6 @@ However, there are multiple supported network plugins available to choose from:
 - `cilium`
 - `flannel`
 - `kube-router`
-- `weave`
 
 ```yaml
 kubernetes:
@@ -50,11 +49,11 @@ kubernetes:
 
 The following table shows the compatibility matrix of supported network plugins and Kubernetes versions:
 
-| Kubernetes Version |      Calico      |      Cilium      |      Flannel     |    KubeRouter    |       Weave      |
-|--------------------|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
-| **1.25**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
-| **1.26**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
-| **1.27**           | :material-check: | :material-check: | :material-check: | :material-check: | :material-check: |
+| Kubernetes Version |      Calico      |      Cilium      |      Flannel     |    KubeRouter    |
+|--------------------|:----------------:|:----------------:|:----------------:|:----------------:|
+| **1.25**           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.26**           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.27**           | :material-check: | :material-check: | :material-check: | :material-check: |
 
 ### Kubernetes DNS mode
 
