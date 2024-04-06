@@ -99,7 +99,7 @@ The load balancer is then configured to distribute traffic received on port 6443
         ssh:
           addToKnownHosts: true
         os:
-          distro: ubuntu
+          distro: ubuntu22
       nodes:
         loadBalancer:
           instances:

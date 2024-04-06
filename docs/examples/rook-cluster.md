@@ -103,7 +103,7 @@ However, this behavior can be restricted using node selectors, which are explain
         ssh:
           addToKnownHosts: true
         os:
-          distro: ubuntu
+          distro: ubuntu22
       nodes:
         master:
           instances:
@@ -238,7 +238,7 @@ addons:
         ssh:
           addToKnownHosts: true
         os:
-          distro: ubuntu
+          distro: ubuntu22
       nodes:
         master:
           instances:

@@ -37,7 +37,7 @@ cluster:
 
 :material-tag-arrow-up-outline: [v2.1.0][tag 2.1.0]
 &ensp;
-:octicons-file-symlink-file-24: Default: `ubuntu`
+:octicons-file-symlink-file-24: Default: `ubuntu22`
 
 The operating system for virtual machines can be specified in the node template.
 By default, the Ubuntu distribution is installed on all virtual machines.
@@ -48,23 +48,20 @@ You can select a desired distribution by setting the `os.distro` property.
 cluster:
   nodeTemplate:
     os:
-      distro: debian # (1)!
+      distro: debian12 # (1)!
 ```
 
-1. By default, `ubuntu` is used.
+1. By default, `ubuntu22` is used.
 
 
 The available operating system distribution presets are:
 
-+ **`ubuntu`** - Latest Ubuntu 22.04 release. (default)
-+ `ubuntu22` - Ubuntu 22.04 release as of *2023-10-26*.
-+ `ubuntu20` - Ubuntu 20.04 release as of *2023-10-11*.
-+ **`debian`** - Latest Debian 11 release.
-+ `debian11` - Debian 11 release as of *2023-10-13*.
-+ **`rocky`** - Latest Rocky 9 release.
-+ `rocky9` - Rocky 9.2 release as of *2023-05-13*.
-+ **`centos`** - Latest CentOS Stream 9 release.
-+ `centos9` - CentOS Stream 9 release as of *2023-10-23*.
++ **`ubuntu20`** - Latest Ubuntu 20.04 (Focal) release.
++ **`ubuntu22`** - Latest Ubuntu 22.04 (Jammy) release. (default)
++ **`debian11`** - Latest Debian 11 (Bullseye) release.
++ **`debian12`** - Latest Debian 12 (Bookworm) release.
++ **`centos9`** - Latest CentOS Stream 9 release.
++ **`rocky9`** - Latest Rocky 9 release.
 
 !!! warning "Important"
 
@@ -98,7 +95,7 @@ The source of an image can be either a local path on your system or a URL pointi
 cluster:
   nodeTemplate:
     os:
-      distro: ubuntu
+      distro: ubuntu20
       source: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
 ```
 

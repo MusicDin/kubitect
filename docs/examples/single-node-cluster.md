@@ -66,7 +66,7 @@ This means that the single master node in the cluster will perform both the cont
         ssh:
           addToKnownHosts: true
         os:
-          distro: ubuntu
+          distro: ubuntu22
       nodes:
         master:
           default:
