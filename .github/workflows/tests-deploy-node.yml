@@ -1,0 +1,94 @@
+name: Test Deployment (Single Node)
+run-name: "${{ github.ref_name }}: Test Deployment (Single Node)"
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    # Run every Saturday at midnight.
+    - cron: '0 0 * * 6'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Test multiple k8s versions using the default distro and network plugin.
+  test-single-node-quick:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    name: Node
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        k8sVersion:
+          - v1.26.13
+          - v1.27.10
+          - v1.28.6
+        distro:
+          - ubuntu22
+        networkPlugin:
+          - calico
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/actions/runner-setup
+
+      - name: Deploy single node
+        run: |
+          ./scripts/deploy-node.sh k8s \
+            ${{ matrix.distro }} \
+            ${{ matrix.networkPlugin }} \
+            ${{ matrix.k8sVersion }}
+
+      - name: Test
+        run: |
+          ./scripts/test-cluster.sh
+
+  # Test most combinations of Kubernetes versions, distros,
+  # and network plugins. Run this only on push.
+  test-single-node-all:
+    if: github.event_name != 'push' && github.event_name != 'pull_request'
+    name: Node
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        k8sVersion:
+          - v1.26.13
+          - v1.27.10
+          - v1.28.6
+        distro:
+          - ubuntu22
+          - debian12
+          - centos9
+          - rocky9
+        networkPlugin:
+          - calico
+          - cilium
+          - flannel
+          - kube-router
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/actions/runner-setup
+
+      - name: Deploy single node
+        run: |
+          ./scripts/deploy-node.sh k8s \
+            ${{ matrix.distro }} \
+            ${{ matrix.networkPlugin }} \
+            ${{ matrix.k8sVersion }}
+
+      - name: Test
+        run: |
+          ./scripts/test-cluster.sh
