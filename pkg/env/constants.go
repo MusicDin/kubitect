@@ -9,8 +9,8 @@ const (
 	ConstProjectUrl        = "https://github.com/MusicDin/kubitect"
 	ConstProjectVersion    = "v3.3.1"
 	ConstKubesprayUrl      = "https://github.com/kubernetes-sigs/kubespray"
-	ConstKubesprayVersion  = "v2.23.1"
-	ConstKubernetesVersion = "v1.27.5"
+	ConstKubesprayVersion  = "v2.24.1"
+	ConstKubernetesVersion = "v1.28.6"
 	ConstTerraformVersion  = "1.5.2"
 )
 
@@ -37,9 +37,9 @@ var ProjectApplyActions = [...]string{
 
 // ProjectK8sVersions define supported Kubernetes versions.
 var ProjectK8sVersions = []string{
-	"v1.27.0 - v1.27.7",
-	"v1.26.0 - v1.26.10",
-	"v1.25.0 - v1.25.15",
+	"v1.28.0 - v1.28.6",
+	"v1.27.0 - v1.27.10",
+	"v1.26.0 - v1.26.13",
 }
 
 // ProjectOsPresets is a list of available OS distros.
