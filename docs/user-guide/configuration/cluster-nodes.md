@@ -533,9 +533,9 @@ The roles of the nodes in a Kubernetes cluster can be viewed using `kubectl get 
 
 ```
 NAME                   STATUS   ROLES                  AGE   VERSION
-k8s-cluster-master-1   Ready    control-plane,master   19m   v1.27.5
-k8s-cluster-worker-1   Ready    node                   19m   v1.27.5
-k8s-cluster-worker-2   Ready    node                   19m   v1.27.5
+k8s-cluster-master-1   Ready    control-plane,master   19m   v1.28.6
+k8s-cluster-worker-1   Ready    node                   19m   v1.28.6
+k8s-cluster-worker-2   Ready    node                   19m   v1.28.6
 ```
 
 ### Load balance HTTP requests

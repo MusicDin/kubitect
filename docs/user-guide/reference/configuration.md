@@ -780,7 +780,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
     <tr>
       <td><code>kubernetes.version</code></td>
       <td>string</td>
-      <td>v1.27.5</td>
+      <td>v1.28.6</td>
       <td></td>
       <td>Kubernetes version that will be installed.</td>
     </tr>
