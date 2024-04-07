@@ -11,7 +11,7 @@ The final topology of the deployed Kubernetes cluster is shown in the figure bel
 
 <div text="text-center">
   <img
-    src="../../assets/images/topology-ha-arch.png"
+    src="../../assets/images/img_topology-ha-arch.png"
     alt="Architecture of the highly available cluster"
     width="100%">
 </div>
@@ -100,7 +100,7 @@ The purpose of the failover load balancer is to serve incoming requests using th
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/topology-ha-base.png"
+    src="../../assets/images/img_topology-ha-base.png"
     alt="Scheme of highly available topology"
     width="75%">
 </div>

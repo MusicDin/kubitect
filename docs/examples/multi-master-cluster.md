@@ -14,7 +14,7 @@ The final topology of the deployed Kubernetes cluster is depicted in the figure 
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/topology-3m3w1lb-arch.png"
+    src="../../assets/images/img_topology-3m3w1lb-arch.png"
     alt="Architecture of the cluster with 3 master and 3 worker nodes"
     width="75%">
 </div>
@@ -41,7 +41,7 @@ The figure below provides a visual representation of this approach.
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/topology-3m3w1lb-base.png"
+    src="../../assets/images/img_topology-3m3w1lb-base.png"
     alt="Scheme of load balancing between control plane nodes"
     width="75%">
 </div>

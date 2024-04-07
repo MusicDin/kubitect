@@ -11,7 +11,7 @@ The topology of the Kubernetes cluster deployed in this guide is shown below.
 <div class="text-center">
   <img
     class="mobile-w-75"
-    src="../../assets/images/topology-1m-arch.png"
+    src="../../assets/images/img_topology-1m-arch.png"
     alt="Architecture of a single node cluster"
     width="50%">
 </div>
