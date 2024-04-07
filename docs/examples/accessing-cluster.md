@@ -11,7 +11,7 @@ This load balancer redirects all incoming connections to the Service, as illustr
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/access-cloud-provider.png"
+    src="../../assets/images/img_access-cloud-provider.png"
     alt="Cloud provider load balancer scheme"
     width="75%">
 </div>
@@ -27,7 +27,7 @@ As a result, the Service becomes available on `<NodeIP>:<NodePort>`, as shown in
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/access-nodeport.png"
+    src="../../assets/images/img_access-nodeport.png"
     alt="Node port Service access scheme"
     width="75%">
 </div>
@@ -42,7 +42,7 @@ With Kubitect, it is possible to configure the port forwarding of the load balan
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/access-self-provisioned-edge.png"
+    src="../../assets/images/img_access-self-provisioned-edge.png"
     alt="Node port Service access scheme"
     width="75%">
 </div>

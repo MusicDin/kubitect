@@ -12,7 +12,7 @@ This **step-by-step** guide will walk you through the process of creating a cust
 <div class="text-center">
   <img
     class="mobile-w-75"
-    src="../../assets/images/topology-1m1w-base.png"
+    src="../../assets/images/img_topology-1m1w-base.png"
     alt="Base scheme of the cluster with one master and one worker node"
     width="50%">
 </div>
@@ -75,7 +75,7 @@ Below is an image that visualizes the components of the final cluster.
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/topology-1m1w-arch.png"
+    src="../../assets/images/img_topology-1m1w-arch.png"
     alt="Architecture of the cluster with one master and one worker node"
     width="75%">
 </div>

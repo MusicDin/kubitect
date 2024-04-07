@@ -10,7 +10,7 @@ The final topology of the deployed Kubernetes cluster is shown in the figure bel
 <div class="text-center">
   <img
     class="mobile-w-100"
-    src="../../assets/images/topology-1m3w-arch.png"
+    src="../../assets/images/img_topology-1m3w-arch.png"
     alt="Architecture of the cluster with 1 master and 3 worker nodes"
     width="75%">
 </div>

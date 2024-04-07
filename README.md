@@ -1,6 +1,6 @@
 <div align=center>
 <h1><a href="https://kubitect.io">Kubitect</a></h1>
-<img src="docs/theme/assets/images/favicon.svg" width=200></img>
+<img src="docs/assets/images/favicon.svg" width=200></img>
 
 </br>
 
