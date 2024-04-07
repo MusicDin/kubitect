@@ -19,8 +19,6 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
-        go:
-          - 1.21
     steps:
       - name: Checkout
         uses: actions/checkout@v4
