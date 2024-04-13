@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ var (
 	exportPresetExample = Example(`
 		To list available presets run:
 		> kubitect list presets
-		
+
 		To export a preset to the specific file run:
 		> kubitect export preset --name minimal > cluster.yaml`)
 )

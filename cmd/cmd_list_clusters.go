@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"strings"
@@ -12,7 +12,7 @@ import (
 var (
 	listClustersShort = "List clusters"
 	listClustersLong  = LongDesc(`
-		Command list clusters lists all clusters including local clusters if 
+		Command list clusters lists all clusters including local clusters if
 		a current (working) directory is Kubitect project.`)
 
 	listClusterExample = Example(`

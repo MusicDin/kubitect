@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"github.com/MusicDin/kubitect/pkg/app"
@@ -18,10 +18,10 @@ var (
 	applyExample = Example(`
 		Create a new cluster or modify an existing one:
 		> kubitect apply --config cluster.yaml
-		
+
 		To upgrade an existing cluster, bump the Kubernetes version in current cluster config and run:
 		> kubitect apply --config cluster.yaml --action upgrade
-		
+
 		To scale an existing cluster, add or remove node instances in current cluster config and run:
 		> kubitect apply --config cluster.yaml --action scale`)
 )

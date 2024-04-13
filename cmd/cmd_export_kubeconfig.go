@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ var (
 	exportKcExample = Example(`
 		To save a kubeconfig to the specific file, redirect command output to that file:
 		> kubitect export kubeconfig --cluster lake > lake.yaml
-					
+
 		Use kubeconfig with kubectl to access cluster:
 		> kubectl --kubeconfig lake.yaml get nodes`)
 )
