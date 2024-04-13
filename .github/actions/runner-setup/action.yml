@@ -35,6 +35,6 @@ runs:
     - name: Build Kubitect
       shell: bash
       run: |
-        go build -ldflags "-s -w" -trimpath .
+        go build -ldflags "-s -w" -trimpath -o kubitect ./cmd
         sudo mv kubitect /usr/local/bin/kubitect
         kubitect --version
