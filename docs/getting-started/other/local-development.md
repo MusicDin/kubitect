@@ -9,7 +9,7 @@ This document shows how to build a CLI tool manually and how to use the project 
 ## Prerequisites
 
 + [Git](https://git-scm.com/)
-+ [Go 1.18](https://go.dev/dl/) or greater
++ [Go 1.22](https://go.dev/dl/) or greater
 
 ## Step 1: Clone the project
 
@@ -28,7 +28,7 @@ cd kubitect
 The Kubitect CLI tool can be manually built using Go.
 Running the following command will produce a `kubitect` binary file.
 ```sh
-go build .
+go build -o kubitect ./cmd
 ```
 
 To make the binary file globally accessible, move it to the `/usr/local/bin/` directory.
