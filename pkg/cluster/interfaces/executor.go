@@ -1,4 +1,4 @@
-package executors
+package interfaces
 
 import "github.com/MusicDin/kubitect/pkg/cluster/event"
 

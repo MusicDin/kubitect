@@ -1,4 +1,4 @@
-package kubespray
+package executors
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
-	"github.com/MusicDin/kubitect/pkg/cluster/executors"
+	"github.com/MusicDin/kubitect/pkg/cluster/interfaces"
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/models/infra"
@@ -52,7 +52,7 @@ func MockExecutor(t *testing.T) *kubespray {
 	}
 }
 
-func MockInvalidExecutor(t *testing.T) executors.Executor {
+func MockInvalidExecutor(t *testing.T) interfaces.Executor {
 	ks := MockExecutor(t)
 	ks.VirtualEnv = &invalidVirtualEnvMock{}
 	ks.Ansible = &invalidAnsibleMock{}

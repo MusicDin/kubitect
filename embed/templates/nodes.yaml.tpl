@@ -1,15 +1,16 @@
-{{- $cfgNodes := .ConfigNodes -}}
+{{- $cfgNodes := .Values.ConfigNodes -}}
+{{- $infNodes := .Values.InfraNodes -}}
 all:
 	hosts:
 	{{- /* Load balancers */ -}}
-	{{- range .InfraNodes.LoadBalancer.Instances }}
+	{{- range $infNodes.LoadBalancer.Instances }}
 		{{- $i := $cfgNodes.LoadBalancer.Instances | select "Id" .Id | first }}
 		{{ .Name }}:
 			ansible_host: {{ .IP }}
 			priority: {{ $i.Priority }}
 	{{- end }}
 	{{- /* Master nodes */ -}}
-	{{- range .InfraNodes.Master.Instances }}
+	{{- range $infNodes.Master.Instances }}
 		{{- $i := $cfgNodes.Master.Instances | select "Id" .Id | first }}
 		{{ .Name }}:
 			ansible_host: {{ .IP }}
@@ -27,7 +28,7 @@ all:
 			{{- end }}
 	{{- end }}
 	{{- /* Worker nodes */ -}}
-	{{- range .InfraNodes.Worker.Instances }}
+	{{- range $infNodes.Worker.Instances }}
 		{{- $i := $cfgNodes.Worker.Instances | select "Id" .Id | first }}
 		{{ .Name }}:
 			ansible_host: {{ .IP }}
@@ -47,30 +48,30 @@ all:
 	children:
 		haproxy:
 			hosts:
-			{{- range .InfraNodes.LoadBalancer.Instances }}
+			{{- range $infNodes.LoadBalancer.Instances }}
 				{{ .Name }}:
 			{{- end }}
 		etcd:
 			hosts:
-			{{- range .InfraNodes.Master.Instances }}
+			{{- range $infNodes.Master.Instances }}
 				{{ .Name }}:
 			{{- end }}
 		k8s_cluster:
 			children:
 				kube_control_plane:
 					hosts:
-					{{- range .InfraNodes.Master.Instances }}
+					{{- range $infNodes.Master.Instances }}
 						{{ .Name }}:
 					{{- end }}
 				kube_node:
 					hosts:
-					{{- if .InfraNodes.Worker.Instances }}
-						{{- range .InfraNodes.Worker.Instances }}
+					{{- if $infNodes.Worker.Instances }}
+						{{- range $infNodes.Worker.Instances }}
 						{{ .Name }}:
 						{{- end }}
 					{{- else }}
 						{{- /* No worker nodes -> masters also become workers */ -}}
-						{{- range .InfraNodes.Master.Instances }}
+						{{- range $infNodes.Master.Instances }}
 						{{ .Name }}:
 						{{- end }}
 					{{- end }}

@@ -1,4 +1,4 @@
-package kubespray
+package executors
 
 import (
 	"fmt"
@@ -14,25 +14,21 @@ import (
 )
 
 func TestKubesprayAllTemplate(t *testing.T) {
-	nodes := config.MockNodes(t)
-
-	tpl := NewKubesprayAllTemplate(t.TempDir(), nodes)
+	tpl := NewTemplate("all.yaml", config.MockNodes(t))
 	pop, err := template.Populate(tpl)
 
 	require.NoError(t, err)
-	require.NoError(t, tpl.Write())
+	require.NoError(t, tpl.Write(t.TempDir()))
 	assert.Contains(t, pop, "apiserver_loadbalancer_domain_name: \"192.168.113.200\"")
 	assert.Contains(t, pop, "loadbalancer_apiserver:\n  address: \"192.168.113.200\"\n  port: 6443")
 }
 
 func TestKubesprayK8sClusterTemplate(t *testing.T) {
-	cfg := config.MockConfig(t)
-
-	tpl := NewKubesprayK8sClusterTemplate(t.TempDir(), cfg)
+	tpl := NewTemplate("k8s-cluster.yaml", config.MockConfig(t))
 	pop, err := template.Populate(tpl)
 
 	require.NoError(t, err)
-	require.NoError(t, tpl.Write())
+	require.NoError(t, tpl.Write(t.TempDir()))
 	assert.Contains(t, pop, fmt.Sprintf("kube_version: %s", env.ConstKubernetesVersion))
 	assert.Contains(t, pop, "kube_network_plugin: calico")
 	assert.Contains(t, pop, "dns_mode: coredns")
@@ -44,25 +40,23 @@ func TestKubesprayAddonsTemplate(t *testing.T) {
 		"test": "test",
 	}
 
-	bytes, err := yaml.Marshal(addons)
+	yaml, err := yaml.Marshal(addons)
 	require.NoError(t, err)
 
-	tpl := NewKubesprayAddonsTemplate(t.TempDir(), string(bytes))
+	tpl := NewTemplate("addons.yaml", string(yaml))
 	pop, err := template.Populate(tpl)
 
 	require.NoError(t, err)
-	require.NoError(t, tpl.Write())
+	require.NoError(t, tpl.Write(t.TempDir()))
 	assert.Equal(t, "test: test\n", pop)
 }
 
 func TestKubesprayEtcdTemplate(t *testing.T) {
-	tmpDir := t.TempDir()
-
-	tpl := NewKubesprayEtcdTemplate(tmpDir)
+	tpl := NewTemplate("etcd.yaml", "")
 	pop, err := template.Populate(tpl)
 
 	require.NoError(t, err)
-	require.NoError(t, tpl.Write())
+	require.NoError(t, tpl.Write(t.TempDir()))
 	assert.Contains(t, pop, "etcd_deployment_type: host")
 }
 
@@ -73,7 +67,7 @@ func TestHostsTemplate(t *testing.T) {
 		config.MockRemoteHost(t, "remote", false, false),
 	}
 
-	tpl := NewHostsTemplate(t.TempDir(), hosts)
+	tpl := NewTemplate("hosts.yaml", hosts)
 	pop, err := template.Populate(tpl)
 
 	expect := fmt.Sprintf(template.TrimTemplate(`
@@ -100,14 +94,22 @@ func TestHostsTemplate(t *testing.T) {
 	`), hosts[2].Connection.SSH.Keyfile)
 
 	require.NoError(t, err)
-	require.NoError(t, tpl.Write())
+	require.NoError(t, tpl.Write(t.TempDir()))
 	assert.Equal(t, expect, pop)
 }
 
 func TestNodesTemplate(t *testing.T) {
 	nodes := config.MockNodes(t)
 
-	tpl := NewNodesTemplate(t.TempDir(), nodes, nodes)
+	values := struct {
+		ConfigNodes config.Nodes
+		InfraNodes  config.Nodes
+	}{
+		ConfigNodes: nodes,
+		InfraNodes:  nodes,
+	}
+
+	tpl := NewTemplate("nodes.yaml", values)
 	pop, err := template.Populate(tpl)
 
 	expect := template.TrimTemplate(`
@@ -164,7 +166,7 @@ func TestNodesTemplate(t *testing.T) {
 	`)
 
 	require.NoError(t, err)
-	require.NoError(t, tpl.Write())
+	require.NoError(t, tpl.Write(t.TempDir()))
 	assert.Equal(t, expect, pop)
 }
 
@@ -172,7 +174,15 @@ func TestNodesTemplate_NoWorkers(t *testing.T) {
 	nodes := config.MockNodes(t)
 	nodes.Worker = config.Worker{}
 
-	tpl := NewNodesTemplate(t.TempDir(), nodes, nodes)
+	values := struct {
+		ConfigNodes config.Nodes
+		InfraNodes  config.Nodes
+	}{
+		ConfigNodes: nodes,
+		InfraNodes:  nodes,
+	}
+
+	tpl := NewTemplate("nodes.yaml", values)
 	pop, err := template.Populate(tpl)
 
 	expect := template.TrimTemplate(`

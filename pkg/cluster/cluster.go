@@ -9,7 +9,7 @@ import (
 
 	"github.com/MusicDin/kubitect/pkg/app"
 	"github.com/MusicDin/kubitect/pkg/cluster/executors"
-	"github.com/MusicDin/kubitect/pkg/cluster/executors/kubespray"
+	"github.com/MusicDin/kubitect/pkg/cluster/interfaces"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner/terraform"
 	"github.com/MusicDin/kubitect/pkg/env"
@@ -113,7 +113,7 @@ func (c *Cluster) Sync() error {
 
 // Executor returns an executor instance that is responsible for configuring
 // cluster nodes provisioned by the provisioner.
-func (c *Cluster) Executor() executors.Executor {
+func (c *Cluster) Executor() interfaces.Executor {
 	if c.exec != nil {
 		return c.exec
 	}
@@ -122,7 +122,7 @@ func (c *Cluster) Executor() executors.Executor {
 	vePath := path.Join(c.ShareDir(), "venv", "kubespray", env.ConstKubesprayVersion)
 	ve := virtualenv.NewVirtualEnv(vePath, c.Path, veReqPath)
 
-	c.exec = kubespray.NewKubesprayExecutor(
+	c.exec = executors.NewKubesprayExecutor(
 		c.Name,
 		c.Path,
 		c.PrivateSshKeyPath(),

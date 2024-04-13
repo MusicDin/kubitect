@@ -1,8 +1,8 @@
 all:
 	hosts:
-	{{- range .Hosts }}
+	{{- range .Values }}
 		{{ .Name }}:
-		{{- if isRemoteHost . }}
+		{{- if eq .Connection.Type "remote" }}
 			ansible_connection: ssh
 			ansible_user: {{ .Connection.User }}
 			ansible_host: {{ .Connection.IP }}
@@ -16,6 +16,6 @@ all:
 	children:
 		kubitect_hosts:
 			hosts:
-			{{- range .Hosts }}
+			{{- range .Values }}
 				{{ .Name }}:
 			{{- end }}

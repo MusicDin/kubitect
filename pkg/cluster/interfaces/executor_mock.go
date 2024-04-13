@@ -1,4 +1,4 @@
-package executors
+package interfaces
 
 import (
 	"testing"

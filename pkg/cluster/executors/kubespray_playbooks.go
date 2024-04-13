@@ -1,4 +1,4 @@
-package kubespray
+package executors
 
 import (
 	"path/filepath"

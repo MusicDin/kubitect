@@ -1,12 +1,13 @@
-package kubespray
+package executors
 
 import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
-	"github.com/MusicDin/kubitect/pkg/cluster/executors"
+	"github.com/MusicDin/kubitect/pkg/cluster/interfaces"
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/models/infra"
@@ -52,7 +53,7 @@ func NewKubesprayExecutor(
 	cfg *config.Config,
 	infraCfg *infra.Config,
 	virtualEnv virtualenv.VirtualEnv,
-) executors.Executor {
+) interfaces.Executor {
 	return &kubespray{
 		ClusterName:       clusterName,
 		ClusterPath:       clusterPath,
@@ -196,22 +197,32 @@ func extractRemovedNodes(events []event.Event) ([]config.Instance, error) {
 
 // generateNodesInventory creates an Ansible inventory of target nodes.
 func (e *kubespray) generateNodesInventory() error {
-	return NewNodesTemplate(e.ConfigDir, e.Config.Cluster.Nodes, e.InfraConfig.Nodes).Write()
+	nodes := struct {
+		ConfigNodes config.Nodes
+		InfraNodes  config.Nodes
+	}{
+		ConfigNodes: e.Config.Cluster.Nodes,
+		InfraNodes:  e.InfraConfig.Nodes,
+	}
+
+	return NewTemplate("nodes.yaml", nodes).Write(e.ConfigDir)
 }
 
 // generateHostsInventory creates an Ansible inventory of target hosts.
 func (e *kubespray) generateHostsInventory() error {
-	return NewHostsTemplate(e.ConfigDir, e.Config.Hosts).Write()
+	return NewTemplate("hosts.yaml", e.Config.Hosts).Write(e.ConfigDir)
 }
 
 // generateGroupVars creates a directory of Kubespray group variables.
 func (e *kubespray) generateGroupVars() error {
-	err := NewKubesprayAllTemplate(e.ConfigDir, e.InfraConfig.Nodes).Write()
+	groupVarsDir := "group_vars"
+
+	err := NewTemplate("all.yaml", e.InfraConfig.Nodes).Write(filepath.Join(e.ConfigDir, groupVarsDir, "all"))
 	if err != nil {
 		return err
 	}
 
-	err = NewKubesprayK8sClusterTemplate(e.ConfigDir, *e.Config).Write()
+	err = NewTemplate("k8s-cluster.yaml", *e.Config).Write(filepath.Join(e.ConfigDir, groupVarsDir, "k8s_cluster"))
 	if err != nil {
 		return err
 	}
@@ -221,10 +232,10 @@ func (e *kubespray) generateGroupVars() error {
 		return err
 	}
 
-	err = NewKubesprayAddonsTemplate(e.ConfigDir, string(addons)).Write()
+	err = NewTemplate("addons.yaml", string(addons)).Write(filepath.Join(e.ConfigDir, groupVarsDir, "k8s_cluster"))
 	if err != nil {
 		return err
 	}
 
-	return NewKubesprayEtcdTemplate(e.ConfigDir).Write()
+	return NewTemplate("etcd.yaml", "").Write(filepath.Join(e.ConfigDir, groupVarsDir))
 }

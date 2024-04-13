@@ -21,18 +21,28 @@ func MockTemplateFile(t *testing.T, content string) string {
 }
 
 type TemplateMock struct{ Value string }
+
+func (t TemplateMock) Name() string              { return "test.tpl" }
+func (t TemplateMock) Template() (string, error) { return "Test {{ .Value }}", nil }
+
 type InvalidTemplateMock struct{ TemplateMock }
+
+func (t InvalidTemplateMock) Template() (string, error) { return "{{ \\ }}", nil }
+
 type InvalidFieldTemplateMock struct{ TemplateMock }
+
+func (t InvalidFieldTemplateMock) Template() (string, error) { return "Test {{ .Invalid }}", nil }
+
 type CustomDelimsTemplateMock struct{ TemplateMock }
+
+func (t CustomDelimsTemplateMock) Delimiters() (string, string) { return "<<", ">>" }
+func (t CustomDelimsTemplateMock) Template() (string, error) {
+	return "<< if true >>success<< end >>", nil
+}
+
 type CustomFuncsTemplateMock struct{ TemplateMock }
 
-func (t TemplateMock) Name() string                             { return "test.tpl" }
-func (t TemplateMock) Template() string                         { return "Test {{ .Value }}" }
-func (t InvalidTemplateMock) Template() string                  { return "{{ \\ }}" }
-func (t InvalidFieldTemplateMock) Template() string             { return "Test {{ .Invalid }}" }
-func (t CustomDelimsTemplateMock) Template() string             { return "<< if true >>success<< end >>" }
-func (t CustomDelimsTemplateMock) Delimiters() (string, string) { return "<<", ">>" }
-func (t CustomFuncsTemplateMock) Template() string              { return "{{ alwaysTrue }}" }
+func (t CustomFuncsTemplateMock) Template() (string, error) { return "{{ alwaysTrue }}", nil }
 func (t CustomFuncsTemplateMock) Functions() map[string]any {
 	return map[string]any{
 		"alwaysTrue": func() bool { return true },
