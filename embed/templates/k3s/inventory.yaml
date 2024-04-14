@@ -1,0 +1,44 @@
+{{- $cfgNodes := .Values.ConfigNodes -}}
+{{- $infNodes := .Values.InfraNodes -}}
+---
+all:
+	hosts:
+	{{- /* Load balancers */ -}}
+	{{- range $infNodes.LoadBalancer.Instances }}
+		{{- $i := $cfgNodes.LoadBalancer.Instances | select "Id" .Id | first }}
+		{{ .Name }}:
+			ansible_host: {{ .IP }}
+			priority: {{ $i.Priority }}
+	{{- end }}
+	{{- /* Master nodes */ -}}
+	{{- range $infNodes.Master.Instances }}
+		{{- $i := $cfgNodes.Master.Instances | select "Id" .Id | first }}
+		{{ .Name }}:
+			ansible_host: {{ .IP }}
+	{{- end }}
+	{{- /* Worker nodes */ -}}
+	{{- range $infNodes.Worker.Instances }}
+		{{- $i := $cfgNodes.Worker.Instances | select "Id" .Id | first }}
+		{{ .Name }}:
+			ansible_host: {{ .IP }}
+	{{- end }}
+	children:
+		haproxy:
+			hosts:
+			{{- range $infNodes.LoadBalancer.Instances }}
+				{{ .Name }}:
+			{{- end }}
+		k3s_cluster:
+			children:
+				server:
+					hosts:
+					{{- range $infNodes.Master.Instances }}
+						{{ .Name }}:
+					{{- end }}
+				agent:
+					hosts:
+					{{- if $infNodes.Worker.Instances }}
+						{{- range $infNodes.Worker.Instances }}
+						{{ .Name }}:
+						{{- end }}
+					{{- end }}

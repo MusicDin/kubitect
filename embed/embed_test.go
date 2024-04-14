@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetTemplate(t *testing.T) {
-	tpl, err := GetTemplate("etcd.yaml.tpl")
+	tpl, err := GetTemplate("k3s/inventory.yaml")
 	assert.NoError(t, err)
 	assert.NotNil(t, tpl)
 }

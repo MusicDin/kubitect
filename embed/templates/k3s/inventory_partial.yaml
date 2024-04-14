@@ -1,0 +1,20 @@
+{{- $nodes := .Values -}}
+---
+k3s_cluster:
+	children:
+		server:
+			hosts:
+			{{ range $name, $node := $nodes }}
+				{{- if eq $node.GetTypeName "master" }}
+				{{ $name }}:
+					ansible_host: {{ $node.IP }}
+				{{- end }}
+			{{- end }}
+		agent:
+			hosts:
+			{{ range $name, $node := $nodes }}
+				{{- if eq $node.GetTypeName "worker" }}
+				{{ $name }}:
+					ansible_host: {{ $node.IP }}
+				{{- end }}
+			{{- end }}
