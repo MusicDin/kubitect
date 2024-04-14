@@ -118,21 +118,41 @@ func (c *Cluster) Executor() interfaces.Executor {
 		return c.exec
 	}
 
-	veReqPath := "ansible/kubespray/requirements.txt"
-	vePath := path.Join(c.ShareDir(), "venv", "kubespray", env.ConstKubesprayVersion)
-	ve := virtualenv.NewVirtualEnv(vePath, c.Path, veReqPath)
+	switch c.NewConfig.Kubernetes.Manager {
+	case config.ManagerK3s:
+		veReqPath := "ansible/kubitect/requirements.txt"
+		vePath := path.Join(c.ShareDir(), "venv", "k3s", env.ConstK3sVersion)
+		ve := virtualenv.NewVirtualEnv(vePath, c.Path, veReqPath)
 
-	c.exec = executors.NewKubesprayExecutor(
-		c.Name,
-		c.Path,
-		c.PrivateSshKeyPath(),
-		c.ConfigDir(),
-		c.CacheDir(),
-		c.ShareDir(),
-		c.NewConfig,
-		c.InfraConfig,
-		ve,
-	)
+		c.exec = executors.NewK3sExecutor(
+			c.Name,
+			c.Path,
+			c.PrivateSshKeyPath(),
+			c.ConfigDir(),
+			c.CacheDir(),
+			c.ShareDir(),
+			c.NewConfig,
+			c.InfraConfig,
+			ve,
+		)
+
+	case config.ManagerKubespray:
+		veReqPath := "ansible/kubespray/requirements.txt"
+		vePath := path.Join(c.ShareDir(), "venv", "kubespray", env.ConstKubesprayVersion)
+		ve := virtualenv.NewVirtualEnv(vePath, c.Path, veReqPath)
+
+		c.exec = executors.NewKubesprayExecutor(
+			c.Name,
+			c.Path,
+			c.PrivateSshKeyPath(),
+			c.ConfigDir(),
+			c.CacheDir(),
+			c.ShareDir(),
+			c.NewConfig,
+			c.InfraConfig,
+			ve,
+		)
+	}
 
 	return c.exec
 }

@@ -35,7 +35,7 @@ func (t Template[T]) Values() T {
 }
 
 func (t Template[T]) Template() (string, error) {
-	tpl, err := embed.GetTemplate(t.path + ".tpl")
+	tpl, err := embed.GetTemplate(t.path)
 	if err != nil {
 		return "", err
 	}
@@ -45,7 +45,7 @@ func (t Template[T]) Template() (string, error) {
 
 // Write writes the populated template to the given path.
 func (t Template[T]) Write(dstPath string) error {
-	err := template.Write(t, filepath.Join(dstPath, t.Name()))
+	err := template.Write(t, dstPath)
 	if err != nil {
 		return fmt.Errorf("Failed writing template %q: %v", t.Name(), err)
 	}

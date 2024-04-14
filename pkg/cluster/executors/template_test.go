@@ -2,103 +2,49 @@ package executors
 
 import (
 	"fmt"
+	"path/filepath"
 	"testing"
 
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/utils/template"
-	"gopkg.in/yaml.v3"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestKubesprayAllTemplate(t *testing.T) {
-	tpl := NewTemplate("all.yaml", config.MockNodes(t))
+func TestKubesprayTemplate_All(t *testing.T) {
+	tpl := NewTemplate("kubespray/all.yaml", config.MockNodes(t))
 	pop, err := template.Populate(tpl)
 
 	require.NoError(t, err)
-	require.NoError(t, tpl.Write(t.TempDir()))
+	require.NoError(t, tpl.Write(filepath.Join(t.TempDir(), "tpl")))
 	assert.Contains(t, pop, "apiserver_loadbalancer_domain_name: \"192.168.113.200\"")
 	assert.Contains(t, pop, "loadbalancer_apiserver:\n  address: \"192.168.113.200\"\n  port: 6443")
 }
 
-func TestKubesprayK8sClusterTemplate(t *testing.T) {
-	tpl := NewTemplate("k8s-cluster.yaml", config.MockConfig(t))
+func TestKubesprayTemplate_K8sCluster(t *testing.T) {
+	tpl := NewTemplate("kubespray/k8s-cluster.yaml", config.MockConfig(t))
 	pop, err := template.Populate(tpl)
 
 	require.NoError(t, err)
-	require.NoError(t, tpl.Write(t.TempDir()))
+	require.NoError(t, tpl.Write(filepath.Join(t.TempDir(), "tpl")))
 	assert.Contains(t, pop, fmt.Sprintf("kube_version: %s", env.ConstKubernetesVersion))
 	assert.Contains(t, pop, "kube_network_plugin: calico")
 	assert.Contains(t, pop, "dns_mode: coredns")
 	assert.Contains(t, pop, "auto_renew_certificates: false")
 }
 
-func TestKubesprayAddonsTemplate(t *testing.T) {
-	addons := map[string]any{
-		"test": "test",
-	}
-
-	yaml, err := yaml.Marshal(addons)
-	require.NoError(t, err)
-
-	tpl := NewTemplate("addons.yaml", string(yaml))
+func TestKubesprayTemplate_Etcd(t *testing.T) {
+	tpl := NewTemplate("kubespray/etcd.yaml", "")
 	pop, err := template.Populate(tpl)
 
 	require.NoError(t, err)
-	require.NoError(t, tpl.Write(t.TempDir()))
-	assert.Equal(t, "test: test\n", pop)
-}
-
-func TestKubesprayEtcdTemplate(t *testing.T) {
-	tpl := NewTemplate("etcd.yaml", "")
-	pop, err := template.Populate(tpl)
-
-	require.NoError(t, err)
-	require.NoError(t, tpl.Write(t.TempDir()))
+	require.NoError(t, tpl.Write(filepath.Join(t.TempDir(), "tpl")))
 	assert.Contains(t, pop, "etcd_deployment_type: host")
 }
 
-func TestHostsTemplate(t *testing.T) {
-	hosts := []config.Host{
-		config.MockLocalHost(t, "local", true),
-		config.MockLocalHost(t, "localhost", false),
-		config.MockRemoteHost(t, "remote", false, false),
-	}
-
-	tpl := NewTemplate("hosts.yaml", hosts)
-	pop, err := template.Populate(tpl)
-
-	expect := fmt.Sprintf(template.TrimTemplate(`
-		all:
-			hosts:
-				local:
-					ansible_connection: local
-					ansible_host: localhost
-				localhost:
-					ansible_connection: local
-					ansible_host: localhost
-				remote:
-					ansible_connection: ssh
-					ansible_user: mocked-user
-					ansible_host: 192.168.113.42
-					ansible_port: 22
-					ansible_private_key_file: %s
-			children:
-				kubitect_hosts:
-					hosts:
-						local:
-						localhost:
-						remote:
-	`), hosts[2].Connection.SSH.Keyfile)
-
-	require.NoError(t, err)
-	require.NoError(t, tpl.Write(t.TempDir()))
-	assert.Equal(t, expect, pop)
-}
-
-func TestNodesTemplate(t *testing.T) {
+func TestKubesprayTemplate_Inventory(t *testing.T) {
 	nodes := config.MockNodes(t)
 
 	values := struct {
@@ -109,7 +55,7 @@ func TestNodesTemplate(t *testing.T) {
 		InfraNodes:  nodes,
 	}
 
-	tpl := NewTemplate("nodes.yaml", values)
+	tpl := NewTemplate("kubespray/inventory.yaml", values)
 	pop, err := template.Populate(tpl)
 
 	expect := template.TrimTemplate(`
@@ -166,11 +112,11 @@ func TestNodesTemplate(t *testing.T) {
 	`)
 
 	require.NoError(t, err)
-	require.NoError(t, tpl.Write(t.TempDir()))
+	require.NoError(t, tpl.Write(filepath.Join(t.TempDir(), "tpl")))
 	assert.Equal(t, expect, pop)
 }
 
-func TestNodesTemplate_NoWorkers(t *testing.T) {
+func TestTemplate_Inventory_NoWorkers(t *testing.T) {
 	nodes := config.MockNodes(t)
 	nodes.Worker = config.Worker{}
 
@@ -182,7 +128,7 @@ func TestNodesTemplate_NoWorkers(t *testing.T) {
 		InfraNodes:  nodes,
 	}
 
-	tpl := NewTemplate("nodes.yaml", values)
+	tpl := NewTemplate("kubespray/inventory.yaml", values)
 	pop, err := template.Populate(tpl)
 
 	expect := template.TrimTemplate(`

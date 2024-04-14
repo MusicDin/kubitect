@@ -72,18 +72,22 @@ func NewKubesprayExecutor(
 func (e *kubespray) Init() error {
 	url := env.ConstKubesprayUrl
 	ver := env.ConstKubesprayVersion
-	dst := path.Join(e.ClusterPath, "ansible", "kubespray")
 
-	if err := os.RemoveAll(dst); err != nil {
+	dst := path.Join(e.ClusterPath, "ansible", "kubespray")
+	err := os.RemoveAll(dst)
+	if err != nil {
 		return err
 	}
 
 	ui.Printf(ui.INFO, "Cloning Kubespray (%s)...\n", ver)
-	if err := git.NewGitProject(url, ver).Clone(dst); err != nil {
+
+	err = git.NewGitRepo(url).WithRef(ver).Clone(dst)
+	if err != nil {
 		return err
 	}
 
-	if err := e.VirtualEnv.Init(); err != nil {
+	err = e.VirtualEnv.Init()
+	if err != nil {
 		return fmt.Errorf("kubespray exec: initialize virtual environment: %v", err)
 	}
 
@@ -92,17 +96,14 @@ func (e *kubespray) Init() error {
 		e.Ansible = ansible.NewAnsible(ansibleBinDir, e.CacheDir)
 	}
 
-	return e.KubitectHostsSetup()
+	return nil
 }
 
 // Sync regenerates required Ansible inventories and Kubespray group
 // variables.
 func (e *kubespray) Sync() error {
-	if err := e.generateHostsInventory(); err != nil {
-		return err
-	}
-
-	if err := e.generateNodesInventory(); err != nil {
+	err := e.generateInventory()
+	if err != nil {
 		return err
 	}
 
@@ -112,11 +113,13 @@ func (e *kubespray) Sync() error {
 // Create creates a Kubernetes cluster by calling appropriate Kubespray
 // playbooks.
 func (e *kubespray) Create() error {
-	if err := e.HAProxy(); err != nil {
+	err := e.HAProxy()
+	if err != nil {
 		return err
 	}
 
-	if err := e.KubesprayCreate(); err != nil {
+	err = e.KubesprayCreate()
+	if err != nil {
 		return err
 	}
 
@@ -126,7 +129,8 @@ func (e *kubespray) Create() error {
 // Upgrades upgrades a Kubernetes cluster by calling appropriate Kubespray
 // playbooks.
 func (e *kubespray) Upgrade() error {
-	if err := e.KubesprayUpgrade(); err != nil {
+	err := e.KubesprayUpgrade()
+	if err != nil {
 		return err
 	}
 
@@ -136,12 +140,12 @@ func (e *kubespray) Upgrade() error {
 // ScaleUp adds new nodes to the cluster.
 func (e *kubespray) ScaleUp(events event.Events) error {
 	events = events.FilterByAction(event.Action_ScaleUp)
-
 	if len(events) == 0 {
 		return nil
 	}
 
-	if err := e.HAProxy(); err != nil {
+	err := e.HAProxy()
+	if err != nil {
 		return err
 	}
 
@@ -150,53 +154,37 @@ func (e *kubespray) ScaleUp(events event.Events) error {
 
 // ScaleDown gracefully removes nodes from the cluster.
 func (e *kubespray) ScaleDown(events event.Events) error {
-	events = events.FilterByAction(event.Action_ScaleDown)
-
-	if len(events) == 0 {
-		return nil
-	}
-
 	rmNodes, err := extractRemovedNodes(events)
-	if err != nil || len(rmNodes) == 0 {
+	if err != nil {
 		return err
 	}
 
-	var names []string
+	if len(rmNodes) == 0 {
+		// No removed nodes.
+		return nil
+	}
 
+	var names []string
 	for _, n := range rmNodes {
 		name := fmt.Sprintf("%s-%s-%s", e.ClusterName, n.GetTypeName(), n.GetID())
 		names = append(names, name)
 	}
 
-	if err := e.generateGroupVars(); err != nil {
+	err = e.generateGroupVars()
+	if err != nil {
 		return err
 	}
 
-	if err := e.KubesprayRemoveNodes(names); err != nil {
+	err = e.KubesprayRemoveNodes(names)
+	if err != nil {
 		return err
 	}
 
-	return e.generateNodesInventory()
+	return e.generateInventory()
 }
 
-// extractRemovedNodes returns node instances from the event changes.
-func extractRemovedNodes(events []event.Event) ([]config.Instance, error) {
-	var nodes []config.Instance
-
-	for _, e := range events {
-		if i, ok := e.Change.ValueBefore.(config.Instance); ok {
-			nodes = append(nodes, i)
-			continue
-		}
-
-		return nil, fmt.Errorf("%v cannot be scaled", e.Change.ValueType.Name())
-	}
-
-	return nodes, nil
-}
-
-// generateNodesInventory creates an Ansible inventory of target nodes.
-func (e *kubespray) generateNodesInventory() error {
+// generateInventory creates an Ansible inventory containing cluster nodes.
+func (e *kubespray) generateInventory() error {
 	nodes := struct {
 		ConfigNodes config.Nodes
 		InfraNodes  config.Nodes
@@ -205,24 +193,19 @@ func (e *kubespray) generateNodesInventory() error {
 		InfraNodes:  e.InfraConfig.Nodes,
 	}
 
-	return NewTemplate("nodes.yaml", nodes).Write(e.ConfigDir)
-}
-
-// generateHostsInventory creates an Ansible inventory of target hosts.
-func (e *kubespray) generateHostsInventory() error {
-	return NewTemplate("hosts.yaml", e.Config.Hosts).Write(e.ConfigDir)
+	return NewTemplate("kubespray/inventory.yaml", nodes).Write(filepath.Join(e.ConfigDir, "nodes.yaml"))
 }
 
 // generateGroupVars creates a directory of Kubespray group variables.
 func (e *kubespray) generateGroupVars() error {
-	groupVarsDir := "group_vars"
+	groupVarsDir := filepath.Join(e.ConfigDir, "group_vars")
 
-	err := NewTemplate("all.yaml", e.InfraConfig.Nodes).Write(filepath.Join(e.ConfigDir, groupVarsDir, "all"))
+	err := NewTemplate("kubespray/all.yaml", e.InfraConfig.Nodes).Write(filepath.Join(groupVarsDir, "all", "all.yml"))
 	if err != nil {
 		return err
 	}
 
-	err = NewTemplate("k8s-cluster.yaml", *e.Config).Write(filepath.Join(e.ConfigDir, groupVarsDir, "k8s_cluster"))
+	err = NewTemplate("kubespray/k8s-cluster.yaml", *e.Config).Write(filepath.Join(groupVarsDir, "k8s_cluster", "k8s-cluster.yaml"))
 	if err != nil {
 		return err
 	}
@@ -232,10 +215,16 @@ func (e *kubespray) generateGroupVars() error {
 		return err
 	}
 
-	err = NewTemplate("addons.yaml", string(addons)).Write(filepath.Join(e.ConfigDir, groupVarsDir, "k8s_cluster"))
+	addonsPath := filepath.Join(groupVarsDir, "k8s_cluster", "addons.yaml")
+	err = os.WriteFile(addonsPath, addons, 0644)
 	if err != nil {
 		return err
 	}
 
-	return NewTemplate("etcd.yaml", "").Write(filepath.Join(e.ConfigDir, groupVarsDir))
+	err = NewTemplate("kubespray/etcd.yaml", "").Write(filepath.Join(groupVarsDir, "etcd.yaml"))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

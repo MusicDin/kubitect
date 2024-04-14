@@ -17,21 +17,21 @@ const (
 
 // KubitectHostsSetup function calls an Ansible playbook that ensures Kubitect target
 // hosts meet all the requirements before cluster is created.
-func (e *kubespray) KubitectHostsSetup() error {
-	pb := ansible.Playbook{
-		Path:      filepath.Join(e.ClusterPath, "ansible/kubitect/hosts-setup.yaml"),
-		Inventory: filepath.Join(e.ClusterPath, "config/hosts.yaml"),
-		Local:     true,
-	}
+// func (e *kubespray) KubitectHostsSetup() error {
+// 	pb := ansible.Playbook{
+// 		Path:      filepath.Join(e.ClusterPath, "ansible/kubitect/hosts-setup.yaml"),
+// 		Inventory: filepath.Join(e.ClusterPath, "config/hosts.yaml"),
+// 		Local:     true,
+// 	}
 
-	return e.Ansible.Exec(pb)
-}
+// 	return e.Ansible.Exec(pb)
+// }
 
 // KubitectFinalize function calls an Ansible playbook that finalizes Kubernetes
 // cluster installation.
 func (e *kubespray) KubitectFinalize() error {
-	vars := []string{
-		"bin_dir=" + e.SharedDir,
+	vars := map[string]string{
+		"bin_dir": e.SharedDir,
 	}
 
 	pb := ansible.Playbook{
@@ -65,8 +65,8 @@ func (e *kubespray) HAProxy() error {
 // KubesprayCreate function calls an Ansible playbook that configures Kubernetes
 // cluster.
 func (e *kubespray) KubesprayCreate() error {
-	vars := []string{
-		"kube_version=" + e.K8sVersion(),
+	vars := map[string]string{
+		"kube_version": e.K8sVersion(),
 	}
 
 	pb := ansible.Playbook{
@@ -85,8 +85,8 @@ func (e *kubespray) KubesprayCreate() error {
 // KubesprayUpgrade function calls an Ansible playbook that upgrades Kubernetes
 // nodes to a newer version.
 func (e *kubespray) KubesprayUpgrade() error {
-	vars := []string{
-		"kube_version=" + e.K8sVersion(),
+	vars := map[string]string{
+		"kube_version": e.K8sVersion(),
 	}
 
 	pb := ansible.Playbook{
@@ -105,8 +105,8 @@ func (e *kubespray) KubesprayUpgrade() error {
 // KubesprayScale function calls an Ansible playbook that configures virtual machines
 // that are freshly added to the cluster.
 func (e *kubespray) KubesprayScale() error {
-	vars := []string{
-		"kube_version=" + e.K8sVersion(),
+	vars := map[string]string{
+		"kube_version": e.K8sVersion(),
 	}
 
 	pb := ansible.Playbook{
@@ -125,10 +125,10 @@ func (e *kubespray) KubesprayScale() error {
 // KubesprayRemoveNodes function calls an Ansible playbook that removes the nodes with
 // the provided names.
 func (e *kubespray) KubesprayRemoveNodes(removedNodeNames []string) error {
-	vars := []string{
-		"skip_confirmation=yes",
-		"delete_nodes_confirmation=yes",
-		"node=" + strings.Join(removedNodeNames, ","),
+	vars := map[string]string{
+		"skip_confirmation":         "yes",
+		"delete_nodes_confirmation": "yes",
+		"node":                      strings.Join(removedNodeNames, ","),
 	}
 
 	pb := ansible.Playbook{

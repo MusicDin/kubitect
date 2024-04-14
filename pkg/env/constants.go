@@ -8,6 +8,8 @@ package env
 const (
 	ConstProjectUrl        = "https://github.com/MusicDin/kubitect"
 	ConstProjectVersion    = "v3.3.1"
+	ConstK3sURL            = "https://github.com/k3s-io/k3s-ansible"
+	ConstK3sVersion        = "7ec16a8d53363ace979e5585323311ab1bd1641d" // K3s has no tags, therefore use specific commit hash.
 	ConstKubesprayUrl      = "https://github.com/kubernetes-sigs/kubespray"
 	ConstKubesprayVersion  = "v2.24.1"
 	ConstKubernetesVersion = "v1.28.6"
