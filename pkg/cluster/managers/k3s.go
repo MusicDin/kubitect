@@ -1,4 +1,4 @@
-package executors
+package managers
 
 import (
 	"fmt"
@@ -44,7 +44,7 @@ func (e *k3s) SshPKey() string {
 	return e.SshPrivateKeyPath
 }
 
-func NewK3sExecutor(
+func NewK3sManager(
 	clusterName string,
 	clusterPath string,
 	sshPrivateKeyPath string,
@@ -54,7 +54,7 @@ func NewK3sExecutor(
 	cfg *config.Config,
 	infraCfg *infra.Config,
 	virtualEnv virtualenv.VirtualEnv,
-) interfaces.Executor {
+) interfaces.Manager {
 	return &k3s{
 		ClusterName:       clusterName,
 		ClusterPath:       clusterPath,

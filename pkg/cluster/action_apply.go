@@ -206,15 +206,15 @@ func (c *Cluster) create() error {
 		return err
 	}
 
-	if err := c.Executor().Init(); err != nil {
+	if err := c.Manager().Init(); err != nil {
 		return err
 	}
 
-	if err := c.Executor().Sync(); err != nil {
+	if err := c.Manager().Sync(); err != nil {
 		return err
 	}
 
-	return c.Executor().Create()
+	return c.Manager().Create()
 }
 
 // upgrade upgrades an existing cluster.
@@ -231,24 +231,24 @@ func (c *Cluster) upgrade() error {
 		return err
 	}
 
-	if err := c.Executor().Init(); err != nil {
+	if err := c.Manager().Init(); err != nil {
 		return err
 	}
 
-	if err := c.Executor().Sync(); err != nil {
+	if err := c.Manager().Sync(); err != nil {
 		return err
 	}
 
-	return c.Executor().Upgrade()
+	return c.Manager().Upgrade()
 }
 
 // scale scales an existing cluster.
 func (c *Cluster) scale(events []event.Event) error {
-	if err := c.Executor().Init(); err != nil {
+	if err := c.Manager().Init(); err != nil {
 		return err
 	}
 
-	if err := c.Executor().ScaleDown(events); err != nil {
+	if err := c.Manager().ScaleDown(events); err != nil {
 		return err
 	}
 
@@ -264,11 +264,11 @@ func (c *Cluster) scale(events []event.Event) error {
 		return err
 	}
 
-	if err := c.Executor().Sync(); err != nil {
+	if err := c.Manager().Sync(); err != nil {
 		return err
 	}
 
-	return c.Executor().ScaleUp(events)
+	return c.Manager().ScaleUp(events)
 }
 
 // prepare prepares the cluster directory. It ensures all required project

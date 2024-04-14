@@ -53,7 +53,7 @@ func MockCluster(t *testing.T) *ClusterMock {
 	os.Create(keyPath + ".pub")
 	c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath = config.File(keyPath)
 
-	c.exec = interfaces.MockExecutor(t)
+	c.exec = interfaces.MockManager(t)
 	c.prov = provisioner.MockProvisioner(t)
 
 	return &ClusterMock{c, ctx}

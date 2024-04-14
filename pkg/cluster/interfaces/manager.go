@@ -2,7 +2,7 @@ package interfaces
 
 import "github.com/MusicDin/kubitect/pkg/cluster/event"
 
-type Executor interface {
+type Manager interface {
 	Init() error
 	Sync() error
 	Create() error

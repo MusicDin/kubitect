@@ -1,4 +1,4 @@
-package executors
+package managers
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ type invalidAnsibleMock struct{}
 func (a *ansibleMock) Exec(ansible.Playbook) error        { return nil }
 func (a *invalidAnsibleMock) Exec(ansible.Playbook) error { return fmt.Errorf("error") }
 
-func MockExecutor(t *testing.T) *kubespray {
+func MockManager(t *testing.T) *kubespray {
 	tmpDir := t.TempDir()
 
 	cfg := &config.Config{}
@@ -52,8 +52,8 @@ func MockExecutor(t *testing.T) *kubespray {
 	}
 }
 
-func MockInvalidExecutor(t *testing.T) interfaces.Executor {
-	ks := MockExecutor(t)
+func MockInvalidManager(t *testing.T) interfaces.Manager {
+	ks := MockManager(t)
 	ks.VirtualEnv = &invalidVirtualEnvMock{}
 	ks.Ansible = &invalidAnsibleMock{}
 	return ks
@@ -78,10 +78,10 @@ func MockEvents(t *testing.T, obj interface{}, action event.ActionType) []event.
 	return []event.Event{e}
 }
 
-func TestNewExecutor(t *testing.T) {
+func TestNewManager(t *testing.T) {
 	tmpDir := t.TempDir()
 	clsName := "clsName"
-	e := NewKubesprayExecutor(
+	e := NewKubesprayManager(
 		clsName,
 		path.Join(tmpDir, clsName),
 		path.Join(tmpDir, "id_rsa"),
@@ -96,23 +96,23 @@ func TestNewExecutor(t *testing.T) {
 }
 
 func TestInit(t *testing.T) {
-	e := MockExecutor(t)
+	e := MockManager(t)
 	assert.NoError(t, e.Init())
 }
 
 func TestInit_InvalidVenv(t *testing.T) {
-	e := MockInvalidExecutor(t)
+	e := MockInvalidManager(t)
 	assert.EqualError(t, e.Init(), "kubespray exec: initialize virtual environment: error")
 }
 
 func TestCreateAndUpgrade(t *testing.T) {
-	e := MockExecutor(t)
+	e := MockManager(t)
 	assert.NoError(t, e.Create())
 	assert.NoError(t, e.Upgrade())
 }
 
 func TestCreateAndUpgrade_Invalid(t *testing.T) {
-	e := MockInvalidExecutor(t)
+	e := MockInvalidManager(t)
 	assert.EqualError(t, e.Create(), "error")
 	assert.EqualError(t, e.Upgrade(), "error")
 }
@@ -134,18 +134,18 @@ func TestScaleDown(t *testing.T) {
 	}
 
 	events := MockEvents(t, w, event.Action_ScaleDown)
-	err := MockExecutor(t).ScaleDown(events)
+	err := MockManager(t).ScaleDown(events)
 	assert.NoError(t, err)
 }
 
 func TestScaleDown_NoEvents(t *testing.T) {
-	err := MockExecutor(t).ScaleDown(nil)
+	err := MockManager(t).ScaleDown(nil)
 	assert.NoError(t, err)
 }
 
 func TestScaleDown_InvalidEvent(t *testing.T) {
 	events := MockEvents(t, config.Host{}, event.Action_ScaleDown)
-	err := MockExecutor(t).ScaleDown(events)
+	err := MockManager(t).ScaleDown(events)
 	assert.EqualError(t, err, "Host cannot be scaled")
 }
 
@@ -155,11 +155,11 @@ func TestScaleUp(t *testing.T) {
 	}
 
 	events := MockEvents(t, w, event.Action_ScaleUp)
-	err := MockExecutor(t).ScaleUp(events)
+	err := MockManager(t).ScaleUp(events)
 	assert.NoError(t, err)
 }
 
 func TestScaleUp_NoEvents(t *testing.T) {
-	err := MockExecutor(t).ScaleUp(nil)
+	err := MockManager(t).ScaleUp(nil)
 	assert.NoError(t, err)
 }

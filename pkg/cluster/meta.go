@@ -30,7 +30,7 @@ type ClusterMeta struct {
 	Path  string
 	Local bool
 
-	exec interfaces.Executor
+	exec interfaces.Manager
 	prov provisioner.Provisioner
 }
 

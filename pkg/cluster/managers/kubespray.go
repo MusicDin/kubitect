@@ -1,4 +1,4 @@
-package executors
+package managers
 
 import (
 	"fmt"
@@ -43,7 +43,7 @@ func (e *kubespray) SshPKey() string {
 	return e.SshPrivateKeyPath
 }
 
-func NewKubesprayExecutor(
+func NewKubesprayManager(
 	clusterName string,
 	clusterPath string,
 	sshPrivateKeyPath string,
@@ -53,7 +53,7 @@ func NewKubesprayExecutor(
 	cfg *config.Config,
 	infraCfg *infra.Config,
 	virtualEnv virtualenv.VirtualEnv,
-) interfaces.Executor {
+) interfaces.Manager {
 	return &kubespray{
 		ClusterName:       clusterName,
 		ClusterPath:       clusterPath,

@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/MusicDin/kubitect/pkg/app"
-	"github.com/MusicDin/kubitect/pkg/cluster/executors"
 	"github.com/MusicDin/kubitect/pkg/cluster/interfaces"
+	"github.com/MusicDin/kubitect/pkg/cluster/managers"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner/terraform"
 	"github.com/MusicDin/kubitect/pkg/env"
@@ -111,9 +111,9 @@ func (c *Cluster) Sync() error {
 	return nil
 }
 
-// Executor returns an executor instance that is responsible for configuring
-// cluster nodes provisioned by the provisioner.
-func (c *Cluster) Executor() interfaces.Executor {
+// Manager returns a manager instance that is responsible for managing
+// Kubernetes cluster on provisioned instances.
+func (c *Cluster) Manager() interfaces.Manager {
 	if c.exec != nil {
 		return c.exec
 	}
@@ -124,7 +124,7 @@ func (c *Cluster) Executor() interfaces.Executor {
 		vePath := path.Join(c.ShareDir(), "venv", "k3s", env.ConstK3sVersion)
 		ve := virtualenv.NewVirtualEnv(vePath, c.Path, veReqPath)
 
-		c.exec = executors.NewK3sExecutor(
+		c.exec = managers.NewK3sManager(
 			c.Name,
 			c.Path,
 			c.PrivateSshKeyPath(),
@@ -141,7 +141,7 @@ func (c *Cluster) Executor() interfaces.Executor {
 		vePath := path.Join(c.ShareDir(), "venv", "kubespray", env.ConstKubesprayVersion)
 		ve := virtualenv.NewVirtualEnv(vePath, c.Path, veReqPath)
 
-		c.exec = executors.NewKubesprayExecutor(
+		c.exec = managers.NewKubesprayManager(
 			c.Name,
 			c.Path,
 			c.PrivateSshKeyPath(),
