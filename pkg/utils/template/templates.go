@@ -2,7 +2,6 @@ package template
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -106,7 +105,7 @@ func write(dstPath string, bytes []byte) error {
 		return err
 	}
 
-	return ioutil.WriteFile(dstPath, bytes, 0644)
+	return os.WriteFile(dstPath, bytes, 0644)
 }
 
 // TrimTemplate trims alls leading and trailing spaces from each line

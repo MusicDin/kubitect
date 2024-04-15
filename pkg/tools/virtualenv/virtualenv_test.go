@@ -1,7 +1,6 @@
 package virtualenv
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -16,7 +15,7 @@ func MockReqFile(t *testing.T) string {
 	reqFile := "netaddr==0.7.19"
 	reqPath := path.Join(t.TempDir(), "requirements.txt")
 
-	err := ioutil.WriteFile(reqPath, []byte(reqFile), os.ModePerm)
+	err := os.WriteFile(reqPath, []byte(reqFile), os.ModePerm)
 	require.NoError(t, err)
 
 	return reqPath

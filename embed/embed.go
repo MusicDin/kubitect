@@ -3,7 +3,6 @@ package embed
 import (
 	"embed"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path"
 )
@@ -93,7 +92,7 @@ func MirrorResource(resPath, dstPath string) error {
 
 		resDstPath := path.Join(dstPath, resPath)
 		os.MkdirAll(path.Dir(resDstPath), os.ModePerm)
-		return ioutil.WriteFile(resDstPath, content, os.ModePerm)
+		return os.WriteFile(resDstPath, content, os.ModePerm)
 	}
 
 	mirrorDir := func(fPath string, f fs.DirEntry, err error) error {
@@ -112,7 +111,7 @@ func MirrorResource(resPath, dstPath string) error {
 			return err
 		}
 
-		return ioutil.WriteFile(resDstPath, content, os.ModePerm)
+		return os.WriteFile(resDstPath, content, os.ModePerm)
 	}
 
 	return fs.WalkDir(efs, resPath, mirrorDir)
