@@ -1,7 +1,6 @@
 package cluster
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -17,7 +16,7 @@ func TestDestroy(t *testing.T) {
 	err := os.MkdirAll(path.Dir(c.TfStatePath()), os.ModePerm)
 	require.NoError(t, err)
 
-	err = ioutil.WriteFile(c.TfStatePath(), []byte(""), os.ModePerm)
+	err = os.WriteFile(c.TfStatePath(), []byte(""), os.ModePerm)
 	require.NoError(t, err)
 
 	assert.NoError(t, c.Destroy())
@@ -25,5 +24,5 @@ func TestDestroy(t *testing.T) {
 
 func TestDestroy_NoTfStateFile(t *testing.T) {
 	c := MockCluster(t)
-	assert.EqualError(t, c.Destroy(), "cluster 'cluster-mock' is already destroyed (or not yet initialized).")
+	assert.EqualError(t, c.Destroy(), `cluster "cluster-mock" does not exist`)
 }
