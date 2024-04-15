@@ -3,24 +3,50 @@
 ---
 all:
 	hosts:
-	{{- /* Load balancers */ -}}
 	{{- range $infNodes.LoadBalancer.Instances }}
 		{{- $i := $cfgNodes.LoadBalancer.Instances | select "Id" .Id | first }}
 		{{ .Name }}:
 			ansible_host: {{ .IP }}
 			priority: {{ $i.Priority }}
 	{{- end }}
-	{{- /* Master nodes */ -}}
 	{{- range $infNodes.Master.Instances }}
 		{{- $i := $cfgNodes.Master.Instances | select "Id" .Id | first }}
 		{{ .Name }}:
 			ansible_host: {{ .IP }}
+			server_config_yaml: |-
+				---
+				tls-san: {{ $infNodes.LoadBalancer.VIP }}
+				{{- if $i.Labels }}
+				node-label:
+					{{- range $k, $v := $i.Labels }}
+					- "{{ $k }}={{ $v }}"
+					{{- end }}
+				{{- end }}
+				{{- if $i.Taints }}
+				node-taint:
+					{{- range $i.Taints }}
+					- "{{ . }}"
+					{{- end }}
+				{{- end }}
 	{{- end }}
-	{{- /* Worker nodes */ -}}
 	{{- range $infNodes.Worker.Instances }}
 		{{- $i := $cfgNodes.Worker.Instances | select "Id" .Id | first }}
 		{{ .Name }}:
 			ansible_host: {{ .IP }}
+			server_config_yaml: |-
+				---
+				{{- if $i.Labels }}
+				node-label:
+					{{- range $k, $v := $i.Labels }}
+					- "{{ $k }}={{ $v }}"
+					{{- end }}
+				{{- end }}
+				{{- if $i.Taints }}
+				node-taint:
+					{{- range $i.Taints }}
+					- "{{ . }}"
+					{{- end }}
+				{{- end }}
 	{{- end }}
 	children:
 		haproxy:
