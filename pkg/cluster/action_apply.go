@@ -132,15 +132,6 @@ func (c *Cluster) plan(action ApplyAction) (event.Events, error) {
 		return nil, nil
 	}
 
-	fmtOptions := cmp.FormatOptions{
-		ShowColor:            ui.HasColor(),
-		ShowDiffOnly:         true,
-		ShowChangeTypePrefix: true,
-	}
-
-	fmt.Printf("Following changes have been detected:\n\n")
-	fmt.Println(res.ToYaml(fmtOptions))
-
 	// Generate events from detected configuration changes and provided rules.
 	events, err := event.GenerateEvents(res.Tree(), action.rules())
 	if err != nil {
