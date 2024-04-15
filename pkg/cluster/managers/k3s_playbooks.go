@@ -12,6 +12,8 @@ import (
 // K3sCreate function calls an Ansible playbook that configures Kubernetes
 // cluster.
 func (e *k3s) K3sCreate(inventory string) error {
+	// Use hashed cluster name as token. This is not perfect, as it makes
+	// the token predictable, but removes the necessity to set it manually.
 	token := hex.EncodeToString(sha256.New().Sum([]byte(e.ClusterName)))
 
 	vars := map[string]string{
@@ -20,11 +22,9 @@ func (e *k3s) K3sCreate(inventory string) error {
 		"api_endpoint":      string(e.InfraConfig.Nodes.LoadBalancer.VIP),
 		"api_port":          "6443",
 		"user_kubectl":      "true", // Set to false to kubectl via root user.
-		"cluster_context":   "k3s",
+		"cluster_context":   e.ClusterName,
 		"extra_server_args": "",
 		"extra_agent_args":  "",
-		// # server_config_yaml:  |
-		// # registries_config_yaml:  |
 	}
 
 	pb := ansible.Playbook{
@@ -34,7 +34,7 @@ func (e *k3s) K3sCreate(inventory string) error {
 		Become:     true,
 		User:       e.SshUser(),
 		PrivateKey: e.SshPKey(),
-		Timeout:    30,
+		Timeout:    600,
 		ExtraVars:  vars,
 	}
 
@@ -51,9 +51,6 @@ func (e *k3s) K3sUpgrade() error {
 		"user_kubectl":      "true", // Set to false to kubectl via root user.
 		"extra_server_args": "",
 		"extra_agent_args":  "",
-		// "cluster_context": "k3s-ansible",
-		// # server_config_yaml:  |
-		// # registries_config_yaml:  |
 	}
 
 	pb := ansible.Playbook{
@@ -63,7 +60,7 @@ func (e *k3s) K3sUpgrade() error {
 		Become:     true,
 		User:       e.SshUser(),
 		PrivateKey: e.SshPKey(),
-		Timeout:    30,
+		Timeout:    600,
 		ExtraVars:  vars,
 	}
 

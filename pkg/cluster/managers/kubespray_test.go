@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
-	"github.com/MusicDin/kubitect/pkg/cluster/interfaces"
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/models/infra"
@@ -42,21 +41,15 @@ func MockManager(t *testing.T) *kubespray {
 	iCfg := &infra.Config{}
 
 	return &kubespray{
-		ClusterName: "mock",
-		ClusterPath: tmpDir,
-		Config:      cfg,
-		ConfigDir:   path.Join(tmpDir, "config"),
-		InfraConfig: iCfg,
-		VirtualEnv:  &virtualEnvMock{},
-		Ansible:     &ansibleMock{},
+		common: common{
+			ClusterName: "mock",
+			ClusterPath: tmpDir,
+			Config:      cfg,
+			ConfigDir:   path.Join(tmpDir, "config"),
+			InfraConfig: iCfg,
+			Ansible:     &ansibleMock{},
+		},
 	}
-}
-
-func MockInvalidManager(t *testing.T) interfaces.Manager {
-	ks := MockManager(t)
-	ks.VirtualEnv = &invalidVirtualEnvMock{}
-	ks.Ansible = &invalidAnsibleMock{}
-	return ks
 }
 
 func MockEvents(t *testing.T, obj interface{}, action event.ActionType) []event.Event {
@@ -90,7 +83,6 @@ func TestNewManager(t *testing.T) {
 		path.Join(tmpDir, "share"),
 		&config.Config{},
 		&infra.Config{},
-		&virtualEnvMock{},
 	)
 	assert.NotNil(t, e)
 }
@@ -100,21 +92,10 @@ func TestInit(t *testing.T) {
 	assert.NoError(t, e.Init())
 }
 
-func TestInit_InvalidVenv(t *testing.T) {
-	e := MockInvalidManager(t)
-	assert.EqualError(t, e.Init(), "kubespray exec: initialize virtual environment: error")
-}
-
 func TestCreateAndUpgrade(t *testing.T) {
 	e := MockManager(t)
 	assert.NoError(t, e.Create())
 	assert.NoError(t, e.Upgrade())
-}
-
-func TestCreateAndUpgrade_Invalid(t *testing.T) {
-	e := MockInvalidManager(t)
-	assert.EqualError(t, e.Create(), "error")
-	assert.EqualError(t, e.Upgrade(), "error")
 }
 
 func TestExtractRemovedNodes(t *testing.T) {

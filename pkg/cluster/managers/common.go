@@ -5,7 +5,34 @@ import (
 
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/pkg/models/config"
+	"github.com/MusicDin/kubitect/pkg/models/infra"
+	"github.com/MusicDin/kubitect/pkg/tools/ansible"
 )
+
+type common struct {
+	ClusterName       string
+	ClusterPath       string
+	SshPrivateKeyPath string
+	ConfigDir         string
+	CacheDir          string
+	SharedDir         string
+	Config            *config.Config
+	InfraConfig       *infra.Config
+
+	Ansible ansible.Ansible
+}
+
+func (e common) K8sVersion() string {
+	return string(e.Config.Kubernetes.Version)
+}
+
+func (e common) SshUser() string {
+	return string(e.Config.Cluster.NodeTemplate.User)
+}
+
+func (e common) SshPKey() string {
+	return e.SshPrivateKeyPath
+}
 
 // extractRemovedNodes returns removed node instances extracted from the event changes.
 func extractRemovedNodes(events []event.Event) ([]config.Instance, error) {

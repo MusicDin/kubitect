@@ -12,10 +12,8 @@ import (
 	"github.com/MusicDin/kubitect/pkg/cluster/managers"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner/terraform"
-	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/models/infra"
-	"github.com/MusicDin/kubitect/pkg/tools/virtualenv"
 	"github.com/MusicDin/kubitect/pkg/ui"
 	"github.com/MusicDin/kubitect/pkg/utils/defaults"
 	"github.com/MusicDin/kubitect/pkg/utils/file"
@@ -120,10 +118,6 @@ func (c *Cluster) Manager() interfaces.Manager {
 
 	switch c.NewConfig.Kubernetes.Manager {
 	case config.ManagerK3s:
-		veReqPath := "ansible/kubitect/requirements.txt"
-		vePath := path.Join(c.ShareDir(), "venv", "k3s", env.ConstK3sVersion)
-		ve := virtualenv.NewVirtualEnv(vePath, c.Path, veReqPath)
-
 		c.exec = managers.NewK3sManager(
 			c.Name,
 			c.Path,
@@ -133,14 +127,8 @@ func (c *Cluster) Manager() interfaces.Manager {
 			c.ShareDir(),
 			c.NewConfig,
 			c.InfraConfig,
-			ve,
 		)
-
 	case config.ManagerKubespray:
-		veReqPath := "ansible/kubespray/requirements.txt"
-		vePath := path.Join(c.ShareDir(), "venv", "kubespray", env.ConstKubesprayVersion)
-		ve := virtualenv.NewVirtualEnv(vePath, c.Path, veReqPath)
-
 		c.exec = managers.NewKubesprayManager(
 			c.Name,
 			c.Path,
@@ -150,7 +138,6 @@ func (c *Cluster) Manager() interfaces.Manager {
 			c.ShareDir(),
 			c.NewConfig,
 			c.InfraConfig,
-			ve,
 		)
 	}
 
@@ -188,10 +175,13 @@ func (c *Cluster) ApplyNewConfig() error {
 // StoreNewConfig makes a copy of the provided (new) configuration file in
 // cluster directory.
 func (c *Cluster) StoreNewConfig() error {
-	src := c.NewConfigPath
-	dst := filepath.Join(c.Path, DefaultConfigDir, DefaultNewConfigFilename)
+	c.NewConfigPath = filepath.Join(c.Path, DefaultConfigDir, DefaultNewConfigFilename)
 
-	c.NewConfigPath = dst
+	// Ensure config directory exists.
+	err := os.MkdirAll(path.Dir(c.NewConfigPath), 0744)
+	if err != nil {
+		return err
+	}
 
-	return file.ForceCopy(src, dst, 0644)
+	return file.WriteYaml(c.NewConfig, c.NewConfigPath, 0644)
 }

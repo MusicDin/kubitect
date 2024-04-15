@@ -7,40 +7,17 @@ import (
 	"path/filepath"
 
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
-	"github.com/MusicDin/kubitect/pkg/cluster/interfaces"
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/models/infra"
 	"github.com/MusicDin/kubitect/pkg/tools/ansible"
 	"github.com/MusicDin/kubitect/pkg/tools/git"
 	"github.com/MusicDin/kubitect/pkg/tools/virtualenv"
-	"github.com/MusicDin/kubitect/pkg/ui"
 	"gopkg.in/yaml.v3"
 )
 
 type kubespray struct {
-	ClusterName       string
-	ClusterPath       string
-	SshPrivateKeyPath string
-	ConfigDir         string
-	CacheDir          string
-	SharedDir         string
-	Config            *config.Config
-	InfraConfig       *infra.Config
-	VirtualEnv        virtualenv.VirtualEnv
-	Ansible           ansible.Ansible
-}
-
-func (e *kubespray) K8sVersion() string {
-	return string(e.Config.Kubernetes.Version)
-}
-
-func (e *kubespray) SshUser() string {
-	return string(e.Config.Cluster.NodeTemplate.User)
-}
-
-func (e *kubespray) SshPKey() string {
-	return e.SshPrivateKeyPath
+	common
 }
 
 func NewKubesprayManager(
@@ -52,18 +29,18 @@ func NewKubesprayManager(
 	sharedDir string,
 	cfg *config.Config,
 	infraCfg *infra.Config,
-	virtualEnv virtualenv.VirtualEnv,
-) interfaces.Manager {
+) *kubespray {
 	return &kubespray{
-		ClusterName:       clusterName,
-		ClusterPath:       clusterPath,
-		SshPrivateKeyPath: sshPrivateKeyPath,
-		ConfigDir:         configDir,
-		CacheDir:          cacheDir,
-		SharedDir:         sharedDir,
-		Config:            cfg,
-		InfraConfig:       infraCfg,
-		VirtualEnv:        virtualEnv,
+		common: common{
+			ClusterName:       clusterName,
+			ClusterPath:       clusterPath,
+			SshPrivateKeyPath: sshPrivateKeyPath,
+			ConfigDir:         configDir,
+			CacheDir:          cacheDir,
+			SharedDir:         sharedDir,
+			Config:            cfg,
+			InfraConfig:       infraCfg,
+		},
 	}
 }
 
@@ -79,20 +56,22 @@ func (e *kubespray) Init() error {
 		return err
 	}
 
-	ui.Printf(ui.INFO, "Cloning Kubespray (%s)...\n", ver)
-
+	// Clone repository with Kubespray playbooks.
 	err = git.NewGitRepo(url).WithRef(ver).Clone(dst)
 	if err != nil {
 		return err
 	}
 
-	err = e.VirtualEnv.Init()
-	if err != nil {
-		return fmt.Errorf("kubespray exec: initialize virtual environment: %v", err)
-	}
-
 	if e.Ansible == nil {
-		ansibleBinDir := path.Join(e.VirtualEnv.Path(), "bin")
+		// Virtual environment.
+		reqPath := filepath.Join(e.ClusterPath, "ansible/kubespray/requirements.txt")
+		venvPath := filepath.Join(e.SharedDir, "venv", "kubespray", env.ConstKubesprayVersion)
+		err = virtualenv.NewVirtualEnv(venvPath, reqPath).Init()
+		if err != nil {
+			return fmt.Errorf("kubespray: initialize virtual environment: %v", err)
+		}
+
+		ansibleBinDir := path.Join(venvPath, "bin")
 		e.Ansible = ansible.NewAnsible(ansibleBinDir, e.CacheDir)
 	}
 
@@ -123,7 +102,7 @@ func (e *kubespray) Create() error {
 		return err
 	}
 
-	return e.KubitectFinalize()
+	return e.Finalize()
 }
 
 // Upgrades upgrades a Kubernetes cluster by calling appropriate Kubespray
@@ -134,7 +113,7 @@ func (e *kubespray) Upgrade() error {
 		return err
 	}
 
-	return e.KubitectFinalize()
+	return e.Finalize()
 }
 
 // ScaleUp adds new nodes to the cluster.

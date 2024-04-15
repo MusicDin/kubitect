@@ -7,29 +7,19 @@ import (
 	"path/filepath"
 
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
-	"github.com/MusicDin/kubitect/pkg/cluster/interfaces"
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/models/infra"
 	"github.com/MusicDin/kubitect/pkg/tools/ansible"
 	"github.com/MusicDin/kubitect/pkg/tools/git"
 	"github.com/MusicDin/kubitect/pkg/tools/virtualenv"
-	"github.com/MusicDin/kubitect/pkg/ui"
 	"github.com/MusicDin/kubitect/pkg/utils/exec"
 )
 
 type k3s struct {
-	ClusterName       string
-	ClusterPath       string
-	SshPrivateKeyPath string
-	ConfigDir         string
-	CacheDir          string
-	SharedDir         string
-	ProjectDir        string
-	Config            *config.Config
-	InfraConfig       *infra.Config
-	VirtualEnv        virtualenv.VirtualEnv
-	Ansible           ansible.Ansible
+	common
+
+	ProjectDir string
 }
 
 func (e *k3s) K8sVersion() string {
@@ -53,19 +43,19 @@ func NewK3sManager(
 	sharedDir string,
 	cfg *config.Config,
 	infraCfg *infra.Config,
-	virtualEnv virtualenv.VirtualEnv,
-) interfaces.Manager {
+) *k3s {
 	return &k3s{
-		ClusterName:       clusterName,
-		ClusterPath:       clusterPath,
-		SshPrivateKeyPath: sshPrivateKeyPath,
-		ConfigDir:         configDir,
-		CacheDir:          cacheDir,
-		SharedDir:         sharedDir,
-		Config:            cfg,
-		InfraConfig:       infraCfg,
-		VirtualEnv:        virtualEnv,
-		ProjectDir:        filepath.Join(clusterPath, "ansible", "k3s"),
+		common: common{
+			ClusterName:       clusterName,
+			ClusterPath:       clusterPath,
+			SshPrivateKeyPath: sshPrivateKeyPath,
+			ConfigDir:         configDir,
+			CacheDir:          cacheDir,
+			SharedDir:         sharedDir,
+			Config:            cfg,
+			InfraConfig:       infraCfg,
+		},
+		ProjectDir: filepath.Join(clusterPath, "ansible", "k3s"),
 	}
 }
 
@@ -77,8 +67,7 @@ func (e *k3s) Init() error {
 		return err
 	}
 
-	ui.Printf(ui.INFO, "Cloning K3s ...\n")
-
+	// Clone repository with k3s playbooks.
 	url := env.ConstK3sURL
 	commitHash := env.ConstK3sVersion
 	err = git.NewGitRepo(url).WithCommitHash(commitHash).Clone(e.ProjectDir)
@@ -86,13 +75,16 @@ func (e *k3s) Init() error {
 		return err
 	}
 
-	err = e.VirtualEnv.Init()
-	if err != nil {
-		return fmt.Errorf("k3s exec: initialize virtual environment: %v", err)
-	}
-
 	if e.Ansible == nil {
-		ansibleBinDir := path.Join(e.VirtualEnv.Path(), "bin")
+		// Virtual environment.
+		reqPath := filepath.Join(e.ClusterPath, "ansible/kubitect/requirements.txt")
+		venvPath := path.Join(e.SharedDir, "venv", "k3s", env.ConstK3sVersion)
+		err = virtualenv.NewVirtualEnv(venvPath, reqPath).Init()
+		if err != nil {
+			return fmt.Errorf("k3s: initialize virtual environment: %v", err)
+		}
+
+		ansibleBinDir := path.Join(venvPath, "bin")
 		e.Ansible = ansible.NewAnsible(ansibleBinDir, e.CacheDir)
 	}
 
@@ -115,9 +107,9 @@ func (e *k3s) Sync() error {
 // Create creates a Kubernetes cluster by calling appropriate k3s
 // playbooks.
 func (e *k3s) Create() error {
-	// if err := e.HAProxy(); err != nil {
-	// 	return err
-	// }
+	if err := e.HAProxy(); err != nil {
+		return err
+	}
 
 	inventory := filepath.Join(e.ConfigDir, "nodes.yaml")
 	err := e.K3sCreate(inventory)
@@ -125,8 +117,7 @@ func (e *k3s) Create() error {
 		return err
 	}
 
-	return nil
-	// return
+	return e.Finalize()
 }
 
 // Upgrades upgrades a Kubernetes cluster by calling appropriate k3s
@@ -137,8 +128,7 @@ func (e *k3s) Upgrade() error {
 		return err
 	}
 
-	// return e.KubitectFinalize()
-	return nil
+	return e.Finalize()
 }
 
 // ScaleUp adds new nodes to the cluster.
