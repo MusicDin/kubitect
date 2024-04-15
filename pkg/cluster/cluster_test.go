@@ -1,7 +1,6 @@
 package cluster
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -99,7 +98,7 @@ func TestSync_InvalidInfraConfig(t *testing.T) {
 	err := os.MkdirAll(path.Dir(c.InfrastructureConfigPath()), 0777)
 	require.NoError(t, err)
 
-	err = ioutil.WriteFile(c.InfrastructureConfigPath(), []byte(cfg), 0777)
+	err = os.WriteFile(c.InfrastructureConfigPath(), []byte(cfg), 0777)
 	require.NoError(t, err)
 
 	assert.ErrorContains(t, c.Sync(), "infrastructure file (produced by Terraform) is invalid")

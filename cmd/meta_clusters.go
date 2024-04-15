@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/MusicDin/kubitect/pkg/app"
@@ -76,8 +76,7 @@ func clusters(ctx app.AppContext, local bool) (MetaClusters, error) {
 		path = ctx.ClustersDir()
 	}
 
-	files, err := ioutil.ReadDir(path)
-
+	files, err := os.ReadDir(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read clusters directory: %v", err)
 	}

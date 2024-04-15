@@ -1,7 +1,6 @@
 package cluster
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -34,7 +33,7 @@ func WriteConfigMockFile(t *testing.T) string {
 	cfg := "value: test"
 	cfgPath := path.Join(t.TempDir(), "cfg.yaml")
 
-	err := ioutil.WriteFile(cfgPath, []byte(cfg), os.ModePerm)
+	err := os.WriteFile(cfgPath, []byte(cfg), os.ModePerm)
 	assert.NoError(t, err)
 
 	return cfgPath

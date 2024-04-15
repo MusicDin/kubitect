@@ -1,7 +1,6 @@
 package file
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -21,7 +20,7 @@ func tmpFile(t *testing.T, name string, content ...string) string {
 	fPath := path.Join(t.TempDir(), name)
 	fData := strings.Join(content, " ")
 
-	err := ioutil.WriteFile(fPath, []byte(fData), os.ModePerm)
+	err := os.WriteFile(fPath, []byte(fData), os.ModePerm)
 	require.NoErrorf(t, err, "failed creating tmp file (%s): %v", name, err)
 
 	return fPath
@@ -107,7 +106,7 @@ func TestWriteYaml(t *testing.T) {
 	err := WriteYaml(T{7}, fPath, os.ModePerm)
 	require.NoError(t, err)
 
-	f, err := ioutil.ReadFile(fPath)
+	f, err := os.ReadFile(fPath)
 	assert.Equal(t, "value: 7\n", string(f))
 }
 
