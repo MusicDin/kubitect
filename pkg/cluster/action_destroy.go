@@ -5,34 +5,36 @@ import (
 	"os"
 
 	"github.com/MusicDin/kubitect/pkg/ui"
+	"github.com/MusicDin/kubitect/pkg/utils/file"
 )
 
-// Destroy destroys an active cluster and removes cluster's
-// directory. If cluster does not exist or does not contain
-// a terraform state file (is inactive), an error is returned.
+// Destroy destroys the cluster and removes cluster's directory.
+// Terraform resources are wiped if terraform state file is found.
 func (c *ClusterMeta) Destroy() error {
-	if !c.ContainsTfStateConfig() {
-		return fmt.Errorf("cluster '%s' is already destroyed (or not yet initialized).", c.Name)
+	if !file.Exists(c.Path) {
+		return fmt.Errorf("cluster %q does not exist", c.Name)
 	}
 
-	ui.Printf(ui.INFO, "Cluster '%s' will be destroyed.\n", c.Name)
+	ui.Printf(ui.INFO, "Cluster %q will be destroyed.\n", c.Name)
 	if err := ui.Ask(); err != nil {
 		return err
 	}
 
-	ui.Println(ui.INFO, "Destroying cluster...")
-	if err := c.Provisioner().Destroy(); err != nil {
-		return err
+	if c.ContainsTfStateConfig() {
+		ui.Println(ui.INFO, "Removing cluster resources...")
+		if err := c.Provisioner().Destroy(); err != nil {
+			return err
+		}
 	}
 
-	ui.Println(ui.INFO, "Cleaning up cluster directory...")
+	ui.Println(ui.INFO, "Removing cluster cache...")
+	_ = os.RemoveAll(c.CacheDir())
+
+	ui.Println(ui.INFO, "Removing cluster directory...")
 	if err := os.RemoveAll(c.Path); err != nil {
-		return fmt.Errorf("failed to remove directory of the cluster '%s': %v", c.Name, err)
+		return fmt.Errorf("failed to remove directory of the cluster %q: %v", c.Name, err)
 	}
 
-	ui.Println(ui.INFO, "Cleaning up cluster cache...")
-	os.RemoveAll(c.CacheDir())
-
-	ui.Printf(ui.INFO, "Cluster '%s' has been successfully destroyed.\n", c.Name)
+	ui.Printf(ui.INFO, "Cluster %q has been successfully destroyed.\n", c.Name)
 	return nil
 }
