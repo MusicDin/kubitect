@@ -73,7 +73,7 @@ func ForceCopy(srcPath, dstPath string, mode fs.FileMode) error {
 
 // ReadYaml reads yaml file on the given path and unmarshals it into the given
 // type.
-func ReadYaml[T interface{}](path string, typ T) (*T, error) {
+func ReadYaml[T any](path string, typ T) (*T, error) {
 	yml, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
@@ -83,8 +83,26 @@ func ReadYaml[T interface{}](path string, typ T) (*T, error) {
 	return &typ, err
 }
 
+// ReadYaml reads yaml file on the given path and unmarshals it into the given
+// type. File is not allowed to contain any unused/extra keys.
+func ReadYamlStrict[T any](path string, typ T) (*T, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+
+	decoder := yaml.NewDecoder(file)
+	decoder.KnownFields(true)
+	err = decoder.Decode(&typ)
+	if err != nil {
+		return nil, err
+	}
+
+	return &typ, nil
+}
+
 // WriteYaml writes a given object as a yaml file to the given path.
-func WriteYaml(obj interface{}, path string, perm fs.FileMode) error {
+func WriteYaml(obj any, path string, perm fs.FileMode) error {
 	yml, err := yaml.Marshal(obj)
 	if err != nil {
 		return err
