@@ -1,5 +1,5 @@
-name: Test Deployment (Single Node)
-run-name: "${{ github.ref_name }}: Test Deployment (Single Node)"
+name: Test Deployment
+run-name: "${{ github.ref_name }}: Test Deployment"
 
 on:
   workflow_dispatch:
@@ -16,6 +16,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Test cluster deployment.
+  test-cluster:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    name: Cluster
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        manager:
+          - kubespray
+          - k3s
+        k8s:
+          - v1.27.10
+          - v1.28.6
+        distro:
+          - ubuntu22
+        networkPlugin:
+          - calico # K3s will use flannel
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/actions/runner-setup
+
+      - name: Deploy cluster
+        run: |
+          ./scripts/deploy-cluster.sh k8s \
+            ${{ matrix.distro }} \
+            ${{ matrix.networkPlugin }} \
+            ${{ matrix.k8s }} \
+            ${{ matrix.manager }}
+
+      - name: Test
+        run: |
+          ./scripts/test-cluster.sh
+
   # Test multiple k8s versions using the default distro and network plugin.
   test-single-node-quick:
     if: github.event_name == 'push' || github.event_name == 'pull_request'
@@ -24,14 +62,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        manager:
+          - k3s
+          - kubespray
         k8sVersion:
-          - v1.26.13
           - v1.27.10
           - v1.28.6
         distro:
           - ubuntu22
         networkPlugin:
-          - calico
+          - calico # K3s will use flannel
 
     steps:
       - name: Checkout
@@ -45,7 +85,8 @@ jobs:
           ./scripts/deploy-node.sh k8s \
             ${{ matrix.distro }} \
             ${{ matrix.networkPlugin }} \
-            ${{ matrix.k8sVersion }}
+            ${{ matrix.k8sVersion }} \
+            ${{ matrix.manager }}
 
       - name: Test
         run: |
@@ -55,15 +96,18 @@ jobs:
         run: |
           ./scripts/destroy-cluster.sh k8s
 
-  # Test most combinations of Kubernetes versions, distros,
-  # and network plugins. Run this only on push.
+  # Test most combinations of managers, versions, distros,
+  # and network plugins. Run this only on schedule.
   test-single-node-all:
-    if: github.event_name != 'push' && github.event_name != 'pull_request'
-    name: Node
+    if: github.event_name == 'schedule'
+    name: Node Matrix
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        manager:
+          - k3s
+          - kubespray
         k8sVersion:
           - v1.26.13
           - v1.27.10
@@ -91,7 +135,8 @@ jobs:
           ./scripts/deploy-node.sh k8s \
             ${{ matrix.distro }} \
             ${{ matrix.networkPlugin }} \
-            ${{ matrix.k8sVersion }}
+            ${{ matrix.k8sVersion }} \
+            ${{ matrix.manager }}
 
       - name: Test
         run: |
