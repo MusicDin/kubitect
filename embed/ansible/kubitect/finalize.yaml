@@ -10,6 +10,17 @@
         dest: "{{ config_dir }}/admin.conf"
         flat: true
 
+- name: Fetch kubeconfig from first master node
+  hosts: server[0]
+  gather_facts: false
+  any_errors_fatal: true
+  tasks:
+    - name: Fetch Kubeconfig
+      fetch:
+        src: "/home/{{ ansible_user }}/.kube/config"
+        dest: "{{ config_dir }}/admin.conf"
+        flat: true
+
 - name: Finalize cluster deployment
   hosts: localhost
   gather_facts: false
@@ -46,22 +57,23 @@
   gather_facts: false
   any_errors_fatal: true
   become: false
+  vars:
+    addons_enabled: "{{ config.addons.rook.enabled | default(false) | bool }}"
 
   pre_tasks:
-    - name: Get system architecture fact
-      setup:
-        filter:
-          - ansible_architecture
+    - block:
+        - name: Get system architecture fact
+          setup:
+            filter:
+              - ansible_architecture
 
-    - name: Resolve system architecture
-      set_fact:
-        arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}"
+        - name: Resolve system architecture
+          set_fact:
+            arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}"
+      when: addons_enabled
 
   roles:
-    - role: config/cluster/import
-    - role: config/infra/import
-    - role: addons/helm
-    - role: addons/rook
-      when:
-        - config.addons.rook.enabled is defined
-        - config.addons.rook.enabled == true
+    - { role: config/cluster/import, when: addons_enabled }
+    - { role: config/infra/import, when: addons_enabled }
+    - { role: addons/helm, when: addons_enabled }
+    - { role: addons/rook, when: addons_enabled }

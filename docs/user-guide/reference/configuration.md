@@ -741,6 +741,19 @@ Each configuration property is documented with 5 columns: Property name, descrip
       </td>
     </tr>
     <tr>
+      <td><code>kubernetes.manager</code></td>
+      <td>string</td>
+      <td>kubespray</td>
+      <td></td>
+      <td>
+        Manager that is used for deploying
+        Kubernetes cluster. Possible values are:
+        <ul>
+          <li><code>kubespray</code></li>
+          <li><code>k3s</code></li>
+        </ul>
+    </tr>
+    <tr>
       <td><code>kubernetes.networkPlugin</code></td>
       <td>string</td>
       <td>calico</td>
@@ -753,6 +766,7 @@ Each configuration property is documented with 5 columns: Property name, descrip
           <li><code>flannel</code></li>
           <li><code>kube-router</code></li>
         </ul>
+        Note: k3s manager currently supports only flannel.
       </td>
     </tr>
     <tr>

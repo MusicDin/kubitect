@@ -1,9 +1,11 @@
 package git
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 
 	"github.com/MusicDin/kubitect/pkg/ui"
 
@@ -11,76 +13,108 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
-// Version regex ("v" any number "dot" any number "dot" any number)
-var versionRegex = regexp.MustCompile("^v(\\d+)(.{1}\\d+){2}$")
-
-type (
-	GitProject interface {
-		Clone(path string) error
-		Url() string
-		Version() string
-	}
-
-	gitProject struct {
-		url     string
-		version string
-	}
+var (
+	ErrInvalidRepositoryURL = errors.New("repository URL must start with https://")
+	ErrCloneFailed          = errors.New("failed to clone repository")
+	ErrCheckoutFailed       = errors.New("failed to checkout")
+	ErrFetchingFailed       = errors.New("failed to fetch")
 )
 
-func NewGitProject(url, version string) GitProject {
-	return &gitProject{
-		url:     url,
-		version: version,
+// tagRegex instructs git to clone repository by tag instead of
+// branch (if matched).
+var tagRegex = regexp.MustCompile("^v(\\d+)(.{1}\\d+){2}$")
+
+type GitRepo struct {
+	url        string
+	version    string
+	commitHash string
+}
+
+// NewGitRepo returns new instance of Git repository linked to the
+// given URL.
+func NewGitRepo(url string) GitRepo {
+	return GitRepo{
+		url: url,
 	}
 }
 
-func (p gitProject) Url() string {
-	return p.url
+// WithRef sets the repository reference to the given branch or tag.
+// Reference is used when cloning a repository.
+func (r GitRepo) WithRef(branchOrTag string) GitRepo {
+	r.version = branchOrTag
+	return r
 }
 
-func (p gitProject) Version() string {
-	return p.version
+// WithCommitHash sets the repository checkout commit hash which is
+// used when repository is cloned.
+func (r GitRepo) WithCommitHash(commitHash string) GitRepo {
+	r.commitHash = commitHash
+	return r
+}
+
+func (p GitRepo) Url() string {
+	return p.url
 }
 
 // Clone clones a git project with the given URL and version into
 // a specific directory.
-func (g *gitProject) Clone(dstPath string) error {
-	if len(g.url) < 1 {
-		return fmt.Errorf("git clone: project URL not set")
-	}
-
-	if len(g.version) < 1 {
-		return fmt.Errorf("git clone: project version not set")
-	}
-
-	// If version matches version regex, set reference name to tag,
-	// otherwise set it to branch.
-	var refName plumbing.ReferenceName
-	if versionRegex.MatchString(g.version) {
-		refName = plumbing.NewTagReferenceName(g.version)
-	} else {
-		refName = plumbing.NewBranchReferenceName(g.version)
+func (g GitRepo) Clone(dstPath string) error {
+	if !strings.HasPrefix(g.url, "https://") {
+		return ErrInvalidRepositoryURL
 	}
 
 	opts := &git.CloneOptions{
 		URL:               g.url,
-		ReferenceName:     refName,
 		Tags:              git.NoTags,
 		RecurseSubmodules: git.NoRecurseSubmodules,
 		SingleBranch:      true,
-		Depth:             1,
+	}
+
+	if g.version != "" {
+		// If version matches version regex, set reference
+		// name to tag, otherwise set it to branch.
+		opts.ReferenceName = plumbing.NewBranchReferenceName(g.version)
+		if tagRegex.MatchString(g.version) {
+			opts.ReferenceName = plumbing.NewTagReferenceName(g.version)
+		}
+	}
+
+	if g.commitHash == "" {
+		opts.Depth = 1
 	}
 
 	if ui.Debug() {
 		opts.Progress = ui.Streams().Out().File()
 	}
 
-	if err := os.MkdirAll(dstPath, 0700); err != nil {
-		return fmt.Errorf("git clone: %v", err)
+	// Ensure destination directory exists.
+	err := os.MkdirAll(dstPath, 0700)
+	if err != nil {
+		return err
 	}
 
-	if _, err := git.PlainClone(dstPath, false, opts); err != nil {
-		return fmt.Errorf("git clone: failed to clone project (url: %s, version: %s): %v", g.url, g.version, err)
+	// Clone repository.
+	repo, err := git.PlainClone(dstPath, false, opts)
+	if err != nil {
+		return fmt.Errorf("%w (url: %s, version: %s): %v", ErrCloneFailed, g.url, g.version, err)
+	}
+
+	if g.commitHash != "" {
+		// Fetch repository work tree.
+		tree, err := repo.Worktree()
+		if err != nil {
+			return err
+		}
+
+		opts := &git.CheckoutOptions{
+			Hash: plumbing.NewHash(g.commitHash),
+		}
+
+		// Checkout to specific commit hash.
+		err = tree.Checkout(opts)
+		if err != nil {
+			return fmt.Errorf("%w (commitHash: %s): %v", ErrCheckoutFailed, g.commitHash, err)
+		}
 	}
 
 	return nil

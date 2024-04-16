@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/MusicDin/kubitect/pkg/app"
-	"github.com/MusicDin/kubitect/pkg/cluster/executors"
+	"github.com/MusicDin/kubitect/pkg/cluster/interfaces"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
 	"github.com/MusicDin/kubitect/pkg/env"
 	"github.com/MusicDin/kubitect/pkg/models/config"
@@ -53,7 +53,7 @@ func MockCluster(t *testing.T) *ClusterMock {
 	os.Create(keyPath + ".pub")
 	c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath = config.File(keyPath)
 
-	c.exec = executors.MockExecutor(t)
+	c.exec = interfaces.MockManager(t)
 	c.prov = provisioner.MockProvisioner(t)
 
 	return &ClusterMock{c, ctx}
@@ -80,25 +80,27 @@ func (c *ConfigMock) SetDefaults() {
 	c.ClusterName = defaults.Default(c.ClusterName, "cluster-mock")
 }
 
-func (c ConfigMock) Template() string {
-	return template.TrimTemplate(fmt.Sprintf(`
-		hosts:
-			- name: localhost
-				connection:
-					type: local
+func (c ConfigMock) Template() (string, error) {
+	tpl := template.TrimTemplate(fmt.Sprintf(`
+	hosts:
+		- name: localhost
+			connection:
+				type: local
 
-		cluster:
-			name: {{ .ClusterName }}
-			network:
-				cidr: 192.168.113.0/24
-			nodes:
-				master:
-					instances:
-						- id: 1
+	cluster:
+		name: {{ .ClusterName }}
+		network:
+			cidr: 192.168.113.0/24
+		nodes:
+			master:
+				instances:
+					- id: 1
 
-		kubernetes:
-			version: %s
+	kubernetes:
+		version: %s
 	`, env.ConstKubernetesVersion))
+
+	return tpl, nil
 }
 
 func (c ConfigMock) Write(t *testing.T) string {

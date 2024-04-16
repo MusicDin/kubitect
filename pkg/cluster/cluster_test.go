@@ -51,7 +51,7 @@ func TestNewCluster_ConfigNotExists(t *testing.T) {
 	assert.EqualError(t, err, "file 'config.yaml' does not exist")
 }
 
-func TestNewCluster_InvalidConfig(t *testing.T) {
+func TestNewCluster_EmptyConfig(t *testing.T) {
 	// Create empty configuration file
 	cfgPath := path.Join(t.TempDir(), "config.yaml")
 	_, err := os.Create(cfgPath)

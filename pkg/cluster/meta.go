@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/MusicDin/kubitect/pkg/app"
-	"github.com/MusicDin/kubitect/pkg/cluster/executors"
+	"github.com/MusicDin/kubitect/pkg/cluster/interfaces"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner"
 	"github.com/MusicDin/kubitect/pkg/cluster/provisioner/terraform"
 	"github.com/MusicDin/kubitect/pkg/utils/file"
@@ -30,7 +30,7 @@ type ClusterMeta struct {
 	Path  string
 	Local bool
 
-	exec executors.Executor
+	exec interfaces.Manager
 	prov provisioner.Provisioner
 }
 
