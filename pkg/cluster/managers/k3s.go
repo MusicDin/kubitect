@@ -184,11 +184,6 @@ func (e *k3s) ScaleDown(events event.Events) error {
 	for _, n := range rmNodes {
 		name := fmt.Sprintf("%s-%s-%s", e.ClusterName, n.GetTypeName(), n.GetID())
 
-		err := ssh.Run(exec.NewCommand("env"))
-		if err != nil {
-			return fmt.Errorf("env %q: %v", name, err)
-		}
-
 		err = ssh.Run(exec.NewCommand("kubectl", "cordon", name))
 		if err != nil {
 			return fmt.Errorf("cordon node %q: %v", name, err)
