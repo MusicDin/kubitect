@@ -10,17 +10,6 @@
         dest: "{{ config_dir }}/admin.conf"
         flat: true
 
-- name: Fetch kubeconfig from first master node
-  hosts: server[0]
-  gather_facts: false
-  any_errors_fatal: true
-  tasks:
-    - name: Fetch Kubeconfig
-      fetch:
-        src: "/home/{{ ansible_user }}/.kube/config"
-        dest: "{{ config_dir }}/admin.conf"
-        flat: true
-
 - name: Finalize cluster deployment
   hosts: localhost
   gather_facts: false

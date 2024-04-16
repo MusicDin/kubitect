@@ -22,7 +22,8 @@ func (e *k3s) K3sCreate(inventory string) error {
 		"api_endpoint":      string(e.InfraConfig.Nodes.LoadBalancer.VIP),
 		"api_port":          "6443",
 		"user_kubectl":      "true", // Set to false to kubectl via root user.
-		"cluster_context":   e.ClusterName,
+		"cluster_context":   "default",
+		"kubeconfig":        filepath.Join(e.ConfigDir, "admin.conf"),
 		"extra_server_args": "",
 		"extra_agent_args":  "",
 	}
