@@ -58,7 +58,7 @@ func TestNewCluster_EmptyConfig(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = NewCluster(app.MockAppContext(t), cfgPath)
-	assert.ErrorContains(t, err, "invalid configuration file")
+	assert.ErrorContains(t, err, "is empty")
 }
 
 func TestSync_FailReadingAppliedConfig(t *testing.T) {
