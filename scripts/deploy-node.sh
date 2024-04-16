@@ -2,8 +2,8 @@
 set -eu
 
 # Check input arguments.
-if [ "${1:-}" = "" ] || [ "${2:-}" = "" ] || [ "${3:-}" = "" ] || [ "${4:-}" = "" ]; then
-    echo "Usage: ${0} <cluster_name> <distro> <network_plugin> <k8s_version>"
+if [ "${1:-}" = "" ] || [ "${2:-}" = "" ] || [ "${3:-}" = "" ] || [ "${4:-}" = "" ] || [ "${5:-}" = "" ]; then
+    echo "Usage: ${0} <cluster_name> <distro> <network_plugin> <k8s_version> <k8s_manager>"
     exit 1
 fi
 
@@ -11,6 +11,7 @@ CLUSTER="${1}"
 DISTRO="${2}"
 NETWORK_PLUGIN="${3}"
 K8S_VERSION="${4}"
+K8S_MANAGER="${5}"
 
 echo "==> DEPLOY: Cluster (Single Node) ${DISTRO}/${NETWORK_PLUGIN}/${K8S_VERSION}"
 
@@ -45,6 +46,7 @@ cluster:
           ip: 192.168.113.10
 
 kubernetes:
+  manager: ${K8S_MANAGER}
   version: ${K8S_VERSION}
   networkPlugin: ${NETWORK_PLUGIN}
 EOF
