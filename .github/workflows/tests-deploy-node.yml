@@ -40,7 +40,7 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/runner-setup
 
-      - name: Deploy single node
+      - name: Deploy cluster
         run: |
           ./scripts/deploy-node.sh k8s \
             ${{ matrix.distro }} \
@@ -50,6 +50,10 @@ jobs:
       - name: Test
         run: |
           ./scripts/test-cluster.sh
+
+      - name: Destroy cluster
+        run: |
+          ./scripts/destroy-cluster.sh k8s
 
   # Test most combinations of Kubernetes versions, distros,
   # and network plugins. Run this only on push.

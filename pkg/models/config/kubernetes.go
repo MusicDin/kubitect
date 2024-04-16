@@ -11,6 +11,7 @@ import (
 
 type Kubernetes struct {
 	Version       KubernetesVersion `yaml:"version"`
+	Manager       KubernetesManager `yaml:"manager"`
 	DnsMode       DnsMode           `yaml:"dnsMode"`
 	NetworkPlugin NetworkPlugin     `yaml:"networkPlugin"`
 	Other         Other             `yaml:"other"`
@@ -27,6 +28,7 @@ func (k Kubernetes) Validate() error {
 
 func (k *Kubernetes) SetDefaults() {
 	k.Version = defaults.Default(k.Version, env.ConstKubernetesVersion)
+	k.Manager = defaults.Default(k.Manager, ManagerKubespray)
 	k.DnsMode = defaults.Default(k.DnsMode, COREDNS)
 	k.NetworkPlugin = defaults.Default(k.NetworkPlugin, CALICO)
 }
@@ -57,6 +59,17 @@ func (ver KubernetesVersion) Validate() error {
 	}
 
 	return err
+}
+
+type KubernetesManager string
+
+const (
+	ManagerKubespray = "kubespray"
+	ManagerK3s       = "k3s"
+)
+
+func (m KubernetesManager) Validate() error {
+	return v.Var(m, v.OneOf(ManagerKubespray, ManagerK3s))
 }
 
 type DnsMode string

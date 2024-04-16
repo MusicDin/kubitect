@@ -2,7 +2,6 @@ package keygen
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -20,7 +19,7 @@ func TestKeyWrite(t *testing.T) {
 	err := key.Write(keyPath)
 	require.NoError(t, err)
 
-	keyFile, err := ioutil.ReadFile(keyPath)
+	keyFile, err := os.ReadFile(keyPath)
 	require.NoError(t, err)
 	assert.Equal(t, "test", string(keyFile))
 }
@@ -134,12 +133,12 @@ func TestKeyPair_Write(t *testing.T) {
 	require.NoError(t, kp.Write(tmpDir, keyName))
 
 	privKeyPath := path.Join(tmpDir, keyName)
-	privKey, err := ioutil.ReadFile(privKeyPath)
+	privKey, err := os.ReadFile(privKeyPath)
 	require.NoError(t, err)
 	require.Contains(t, string(privKey), "RSA PRIVATE KEY")
 
 	pubKeyPath := path.Join(tmpDir, keyName+".pub")
-	pubKey, err := ioutil.ReadFile(pubKeyPath)
+	pubKey, err := os.ReadFile(pubKeyPath)
 	require.NoError(t, err)
 	assert.Contains(t, string(pubKey), "ssh-rsa")
 }

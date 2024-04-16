@@ -15,7 +15,6 @@ import (
 )
 
 type Playbook struct {
-	Path       string
 	Inventory  string
 	Tags       []string
 	User       string
@@ -23,7 +22,13 @@ type Playbook struct {
 	Become     bool
 	Local      bool
 	Timeout    int
-	ExtraVars  []string
+	ExtraVars  map[string]string
+
+	// Playbook's path.
+	Path string
+
+	// Working directory. Defaults to playbook's directory.
+	WorkingDir string
 }
 
 type (
@@ -78,19 +83,19 @@ func (a *ansible) Exec(pb Playbook) error {
 		Forks:     "50",
 	}
 
-	vars, err := extraVarsToMap(pb.ExtraVars)
-	if err != nil {
-		return err
-	}
-
-	for keyVar, valueVar := range vars {
-		playbookOptions.AddExtraVar(keyVar, valueVar)
+	for k, v := range pb.ExtraVars {
+		playbookOptions.AddExtraVar(k, v)
+		ui.Printf(ui.WARN, "%s=%s\n", k, v)
 	}
 
 	executor := &execute.DefaultExecute{
 		CmdRunDir:   filepath.Dir(pb.Path),
 		Write:       ui.Streams().Out().File(),
 		WriterError: ui.Streams().Err().File(),
+	}
+
+	if pb.WorkingDir != "" {
+		executor.CmdRunDir = pb.WorkingDir
 	}
 
 	playbook := &playbook.AnsiblePlaybookCmd{
@@ -128,29 +133,10 @@ func (a *ansible) Exec(pb Playbook) error {
 	options.AnsibleSetEnv("ANSIBLE_STDOUT_CALLBACK", "yaml")
 	options.AnsibleSetEnv("ANSIBLE_STDERR_CALLBACK", "yaml")
 
-	err = playbook.Run(context.TODO())
-
+	err := playbook.Run(context.TODO())
 	if err != nil {
-		pb := filepath.Base(pb.Path)
-		return fmt.Errorf("ansible-playbook (%s): %v", pb, err)
+		return fmt.Errorf("ansible-playbook (%s): %v", filepath.Base(pb.Path), err)
 	}
 
 	return nil
-}
-
-// extraVarsToMap converts slice of "key=value" strings into map.
-func extraVarsToMap(extraVars []string) (map[string]string, error) {
-	evMap := make(map[string]string)
-
-	for _, v := range extraVars {
-		tokens := strings.Split(v, "=")
-
-		if len(tokens) != 2 {
-			return nil, fmt.Errorf("extraVarsToMap: variable (%s) must be in 'key=value' format", v)
-		}
-
-		evMap[tokens[0]] = tokens[1]
-	}
-
-	return evMap, nil
 }

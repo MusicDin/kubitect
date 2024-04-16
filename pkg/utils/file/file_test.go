@@ -1,9 +1,9 @@
 package file
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -21,7 +21,7 @@ func tmpFile(t *testing.T, name string, content ...string) string {
 	fPath := path.Join(t.TempDir(), name)
 	fData := strings.Join(content, " ")
 
-	err := ioutil.WriteFile(fPath, []byte(fData), os.ModePerm)
+	err := os.WriteFile(fPath, []byte(fData), os.ModePerm)
 	require.NoErrorf(t, err, "failed creating tmp file (%s): %v", name, err)
 
 	return fPath
@@ -107,7 +107,7 @@ func TestWriteYaml(t *testing.T) {
 	err := WriteYaml(T{7}, fPath, os.ModePerm)
 	require.NoError(t, err)
 
-	f, err := ioutil.ReadFile(fPath)
+	f, err := os.ReadFile(fPath)
 	assert.Equal(t, "value: 7\n", string(f))
 }
 
@@ -146,4 +146,51 @@ func TestReadYaml_FileNotExist(t *testing.T) {
 
 	_, err := ReadYaml(path.Join(t.TempDir(), "invalid"), S{})
 	assert.ErrorContains(t, err, "no such file or directory")
+}
+
+func TestReadYamlStrict(t *testing.T) {
+	type A struct {
+		ValueA int `yaml:"a"`
+	}
+
+	type B struct {
+		A      `yaml:",inline"`
+		ValueB int `yaml:"b"`
+	}
+
+	tests := []struct {
+		Content string
+		Expect  B
+		Error   string
+	}{
+		{
+			Content: "a: 1",
+			Expect:  B{A: A{ValueA: 1}},
+		},
+		{
+			Content: "b: 1",
+			Expect:  B{ValueB: 1},
+		},
+		{
+			Content: "a: 1\nb: 1",
+			Expect:  B{A: A{ValueA: 1}, ValueB: 1},
+		},
+		{
+			Content: "b: 1\nc: 1",
+			Error:   "field c not found in type",
+		},
+	}
+
+	for _, test := range tests {
+		path := filepath.Join(t.TempDir(), "tmp")
+		_ = os.WriteFile(path, []byte(test.Content), 0777)
+
+		out, err := ReadYamlStrict(path, B{})
+		if test.Error == "" {
+			require.NoError(t, err, "Expected no error!")
+			assert.Equal(t, test.Expect, *out)
+		} else {
+			assert.ErrorContains(t, err, test.Error)
+		}
+	}
 }

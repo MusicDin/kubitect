@@ -2,7 +2,6 @@ package template
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -30,7 +29,7 @@ type Template interface {
 
 type TextTemplate interface {
 	Template
-	Template() string
+	Template() (string, error)
 }
 
 // Populate populates the template and returns it as a string.
@@ -63,7 +62,12 @@ func populate(t Template, content string) (string, error) {
 
 // Populate populates the template and returns it as a string.
 func Populate(t TextTemplate) (string, error) {
-	return populate(t, t.Template())
+	tpl, err := t.Template()
+	if err != nil {
+		return "", err
+	}
+
+	return populate(t, tpl)
 }
 
 // PopulateFrom reads the template from a given path and returns
@@ -106,7 +110,7 @@ func write(dstPath string, bytes []byte) error {
 		return err
 	}
 
-	return ioutil.WriteFile(dstPath, bytes, 0644)
+	return os.WriteFile(dstPath, bytes, 0644)
 }
 
 // TrimTemplate trims alls leading and trailing spaces from each line

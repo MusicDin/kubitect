@@ -61,10 +61,7 @@ func (lb *LB) SetDefaults() {
 		lb.Instances[i].CPU = defaults.Default(lb.Instances[i].CPU, lb.Default.CPU)
 		lb.Instances[i].RAM = defaults.Default(lb.Instances[i].RAM, lb.Default.RAM)
 		lb.Instances[i].MainDiskSize = defaults.Default(lb.Instances[i].MainDiskSize, lb.Default.MainDiskSize)
-
-		if len(lb.Instances) > 1 {
-			lb.Instances[i].Priority = defaults.Default(lb.Instances[i].Priority, &defaultPriority)
-		}
+		lb.Instances[i].Priority = defaults.Default(lb.Instances[i].Priority, &defaultPriority)
 	}
 }
 

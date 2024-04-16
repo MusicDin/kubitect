@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 
@@ -27,7 +26,7 @@ type (
 // Note that the directory to which the key is
 // written must exist.
 func (k key) Write(path string) error {
-	return ioutil.WriteFile(path, k.value, 0600)
+	return os.WriteFile(path, k.value, 0600)
 }
 
 type (
@@ -93,14 +92,14 @@ func ReadKeyPair(dir, keyName string) (KeyPair, error) {
 	var pair keyPair
 
 	privKeyPath := path.Join(dir, keyName)
-	pair.private.value, err = ioutil.ReadFile(privKeyPath)
+	pair.private.value, err = os.ReadFile(privKeyPath)
 	if err != nil {
 		return nil, NewKeyFileError("private", keyName, err)
 	}
 
 	pubKeyName := keyName + ".pub"
 	pubKeyPath := path.Join(dir, pubKeyName)
-	pair.public.value, err = ioutil.ReadFile(pubKeyPath)
+	pair.public.value, err = os.ReadFile(pubKeyPath)
 	if err != nil {
 		return nil, NewKeyFileError("public", keyName+".pub", err)
 	}

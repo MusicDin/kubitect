@@ -1,6 +1,7 @@
 [tag 2.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.0.0
 [tag 2.2.0]: https://github.com/MusicDin/kubitect/releases/tag/v2.2.0
 [tag 3.0.0]: https://github.com/MusicDin/kubitect/releases/tag/v3.0.0
+[tag 3.4.0]: https://github.com/MusicDin/kubitect/releases/tag/v3.4.0
 
 <div markdown="1" class="text-center">
 # Kubernetes configuration
@@ -11,6 +12,23 @@
 The Kubernetes section of the configuration file contains properties that are specific to Kubernetes, such as the Kubernetes version and network plugin.
 
 ## Configuration
+
+### Kubernetes manager
+
+:material-tag-arrow-up-outline: [v3.4.0][tag 3.4.0]
+&ensp;
+:octicons-file-symlink-file-24: Default: `kubespray`
+
+Specify manager that is used for deploying Kubernetes cluster. Supported values are `kubespray` and `k3s`.
+
+```yaml
+kubernetes:
+  manager: k3s
+```
+
+!!! warning "Warning"
+
+    Support for K3s manager has been added recently, therefore, it may not be fully stable.
 
 ### Kubernetes version
 
@@ -54,6 +72,10 @@ The following table shows the compatibility matrix of supported network plugins 
 | **1.26**           | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.27**           | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.28**           | :material-check: | :material-check: | :material-check: | :material-check: |
+
+!!! note "Note"
+
+    K3s manager supports only `flannel` network plugin.
 
 ### Kubernetes DNS mode
 

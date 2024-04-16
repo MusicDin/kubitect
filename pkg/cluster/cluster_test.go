@@ -1,7 +1,6 @@
 package cluster
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -52,14 +51,14 @@ func TestNewCluster_ConfigNotExists(t *testing.T) {
 	assert.EqualError(t, err, "file 'config.yaml' does not exist")
 }
 
-func TestNewCluster_InvalidConfig(t *testing.T) {
+func TestNewCluster_EmptyConfig(t *testing.T) {
 	// Create empty configuration file
 	cfgPath := path.Join(t.TempDir(), "config.yaml")
 	_, err := os.Create(cfgPath)
 	require.NoError(t, err)
 
 	_, err = NewCluster(app.MockAppContext(t), cfgPath)
-	assert.ErrorContains(t, err, "invalid configuration file")
+	assert.ErrorContains(t, err, "is empty")
 }
 
 func TestSync_FailReadingAppliedConfig(t *testing.T) {
@@ -99,7 +98,7 @@ func TestSync_InvalidInfraConfig(t *testing.T) {
 	err := os.MkdirAll(path.Dir(c.InfrastructureConfigPath()), 0777)
 	require.NoError(t, err)
 
-	err = ioutil.WriteFile(c.InfrastructureConfigPath(), []byte(cfg), 0777)
+	err = os.WriteFile(c.InfrastructureConfigPath(), []byte(cfg), 0777)
 	require.NoError(t, err)
 
 	assert.ErrorContains(t, c.Sync(), "infrastructure file (produced by Terraform) is invalid")

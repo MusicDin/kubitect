@@ -85,7 +85,6 @@ func TestLB_Defaults(t *testing.T) {
 	defaults.Assign(&lb2)
 
 	assert.Nil(t, lb1.VirtualRouterId, "LB VRID is set even if only one instance is configured!")
-	assert.Nil(t, lb1.Instances[0].Priority, "LB instance priority is set even if only one instance is configured!")
 	assert.Equal(t, &defaultVRID, lb2.VirtualRouterId, "Default LB VRID is not set when multiple instances are configured!")
 	assert.Equal(t, &defaultPriority, lb2.Instances[0].Priority, "Default LB instance priority is not set when multiple instances are configured!")
 }
