@@ -2,11 +2,14 @@ package managers
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/pkg/models/config"
 	"github.com/MusicDin/kubitect/pkg/models/infra"
 	"github.com/MusicDin/kubitect/pkg/tools/ansible"
+	"github.com/MusicDin/kubitect/pkg/utils/exec"
 )
 
 type common struct {
@@ -32,6 +35,30 @@ func (e common) SshUser() string {
 
 func (e common) SshPKey() string {
 	return e.SshPrivateKeyPath
+}
+
+// mergeKubeconfig merges cluster kubeconfig with config default
+// config in user directory (~/.kube/config). Note that if kubectl
+// is not present locally, the command will fail.
+func (e common) mergeKubeconfig() error {
+	// Get directory of the current user.
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	defConfigPath := filepath.Join(home, ".kube", "config")
+	clsConfigPath := filepath.Join(e.ConfigDir, "admin.conf")
+
+	exec := exec.NewLocalClient()
+	exec.SetEnv("KUBECONFIG", fmt.Sprintf("%s:%s", clsConfigPath, defConfigPath))
+
+	config, err := exec.Output("kubectl", "config", "view", "--raw")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(defConfigPath, config, 0600)
 }
 
 // extractRemovedNodes returns removed node instances extracted from the event changes.

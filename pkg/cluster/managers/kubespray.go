@@ -13,6 +13,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/tools/ansible"
 	"github.com/MusicDin/kubitect/pkg/tools/git"
 	"github.com/MusicDin/kubitect/pkg/tools/virtualenv"
+	"github.com/MusicDin/kubitect/pkg/ui"
 	"gopkg.in/yaml.v3"
 )
 
@@ -102,7 +103,20 @@ func (e *kubespray) Create() error {
 		return err
 	}
 
-	return e.Finalize()
+	err = e.Finalize()
+	if err != nil {
+		return err
+	}
+
+	if e.Config.Kubernetes.Other.CopyKubeconfig {
+		err := e.mergeKubeconfig()
+		if err != nil {
+			// Just warn about failure, since deployment has succeeded.
+			ui.Print(ui.WARN, "Failed to merge kubeconfig:", err)
+		}
+	}
+
+	return nil
 }
 
 // Upgrades upgrades a Kubernetes cluster by calling appropriate Kubespray
