@@ -1,8 +1,6 @@
 #!/bin/sh
 set -eu
 
-TIMEOUT=600 # seconds
-
 defer() {
     if [ "${FAIL}" = "1" ]; then
         echo "==> DEBUG: Cluster events"
@@ -22,11 +20,21 @@ trap defer EXIT HUP INT TERM
 echo "==> TEST: All nodes ready"
 kubectl wait --for=condition=ready node --all --timeout=120s
 
-startTime=$(date +%s)
-nodes=$(kubectl get nodes | awk 'NR>1 {print $1}')
-
 echo "==> TEST: All pods ready"
-kubectl wait --for=condition=ready pods --all -A --timeout=120s
+set +e
+# Wait for all pods to be ready. Retry a few times, as it may happen that
+# cluster has no pods when check is ran, which will result in an error.
+for i in $(seq 5); do
+    podsReadiness=$(kubectl wait --for=condition=ready pods --all -A --timeout=30s)
+    if [ "$?" -eq 0 ]; then
+        break
+    else
+        echo "(attempt $i/5) Pods are still not ready. Retrying in 10 seconds..."
+        sleep 10
+    fi
+done
+set -e
+echo "${podsReadiness}"
 
 echo "==> TEST: DNS"
 kubectl apply -f https://k8s.io/examples/admin/dns/dnsutils.yaml
