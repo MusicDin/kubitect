@@ -77,13 +77,13 @@ while :; do
 done
 
 echo "==> TEST: DNS"
-kubectl run dns-test --image=busybox:1.28.4 --restart=Never -- sleep 180
-kubectl wait --for=condition=Ready pod/dns-test --timeout=60s
+kubectl apply -f https://k8s.io/examples/admin/dns/dnsutils.yaml
+kubectl wait --for=condition=Ready pod/dnsutils --timeout=60s
 
-kubectl exec dns-test -- nslookup kubernetes.default
+kubectl exec dnsutils -- nslookup kubernetes.default
 echo "===> PASS: Local lookup (kubernetes.default)."
 
-kubectl exec dns-test -- nslookup kubitect.io
+kubectl exec dnsutils -- nslookup kubitect.io
 echo "===> PASS: External lookup (kubitect.io)."
 
 # All tests have passed.
