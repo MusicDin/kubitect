@@ -37,3 +37,5 @@ cluster:
 kubernetes:
   version: v1.28.6
   networkPlugin: calico
+  other:
+    mergeKubeconfig: true
