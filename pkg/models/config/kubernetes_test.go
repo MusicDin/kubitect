@@ -48,7 +48,7 @@ func TestKubernetes_Valid(t *testing.T) {
 		NetworkPlugin: CALICO,
 		Other: Other{
 			AutoRenewCertificates: true,
-			CopyKubeconfig:        true,
+			MergeKubeconfig:       true,
 		},
 	}
 

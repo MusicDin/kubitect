@@ -123,7 +123,7 @@ func (e *k3s) Create() error {
 		return err
 	}
 
-	if e.Config.Kubernetes.Other.CopyKubeconfig {
+	if e.Config.Kubernetes.Other.MergeKubeconfig {
 		err := e.mergeKubeconfig()
 		if err != nil {
 			// Just warn about failure, since deployment has succeeded.

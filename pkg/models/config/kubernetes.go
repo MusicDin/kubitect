@@ -97,5 +97,5 @@ func (p NetworkPlugin) Validate() error {
 
 type Other struct {
 	AutoRenewCertificates bool `yaml:"autoRenewCertificates"`
-	CopyKubeconfig        bool `yaml:"copyKubeconfig"`
+	MergeKubeconfig       bool `yaml:"mergeKubeconfig"`
 }
