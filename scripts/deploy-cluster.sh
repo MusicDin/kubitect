@@ -67,6 +67,8 @@ kubernetes:
   manager: ${K8S_MANAGER}
   version: ${K8S_VERSION}
   networkPlugin: ${NETWORK_PLUGIN}
+  other:
+    mergeKubeconfig: true
 EOF
 
 echo "Config:"
@@ -74,11 +76,6 @@ echo "---"
 cat config.yaml
 echo "---"
 
-# Apply config and export kubeconfig.
+# Apply cluster config.
 mkdir -p "${HOME}/.kube"
 kubitect apply --config config.yaml
-kubitect export kubeconfig --cluster "${CLUSTER}" > "${HOME}/.kube/config"
-
-echo "==> DEBUG: Cluster info"
-kubectl cluster-info
-kubectl get nodes

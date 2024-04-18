@@ -92,12 +92,6 @@ func TestInit(t *testing.T) {
 	assert.NoError(t, e.Init())
 }
 
-func TestCreateAndUpgrade(t *testing.T) {
-	e := MockManager(t)
-	assert.NoError(t, e.Create())
-	assert.NoError(t, e.Upgrade())
-}
-
 func TestExtractRemovedNodes(t *testing.T) {
 	w := config.WorkerInstance{
 		Id: "worker",

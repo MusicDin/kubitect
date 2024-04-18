@@ -36,21 +36,12 @@ kubitect apply --config cluster.yaml
 
 That's it! The cluster, named `k8s-cluster`, should be up and running in approximately 10 minutes.
 
-### Step 2 - Export kubeconfig
-
-After successfully installing the Kubernetes cluster, a Kubeconfig file will be created within the cluster's directory.
-To export the Kubeconfig to a custom file, use the following command:
-
-```sh
-kubitect export kubeconfig --cluster k8s-cluster > kubeconfig.yaml
-```
-
-### Step 3 - Test the cluster
+### Step 2 - Test the cluster
 
 To test that the cluster is up and running, display all cluster nodes using the exported Kubeconfig and the kubectl command:
 
 ```sh
-kubectl get nodes --kubeconfig kubeconfig.yaml
+kubectl --context k8s-cluster get nodes
 ```
 
 :clap: Congratulations, you have successfully deployed a Kubernetes cluster using Kubitect!

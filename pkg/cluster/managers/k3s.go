@@ -13,6 +13,7 @@ import (
 	"github.com/MusicDin/kubitect/pkg/tools/ansible"
 	"github.com/MusicDin/kubitect/pkg/tools/git"
 	"github.com/MusicDin/kubitect/pkg/tools/virtualenv"
+	"github.com/MusicDin/kubitect/pkg/ui"
 	"github.com/MusicDin/kubitect/pkg/utils/exec"
 )
 
@@ -117,7 +118,27 @@ func (e *k3s) Create() error {
 		return err
 	}
 
-	return e.Finalize()
+	err = e.Finalize()
+	if err != nil {
+		return err
+	}
+
+	// Rewrite kubeconfig before merging to prevent accidental
+	// overwrite of an existing configuration.
+	err = e.rewriteKubeconfig()
+	if err != nil {
+		return err
+	}
+
+	if e.Config.Kubernetes.Other.MergeKubeconfig {
+		err := e.mergeKubeconfig()
+		if err != nil {
+			// Just warn about failure, since deployment has succeeded.
+			ui.Print(ui.WARN, "Failed to merge kubeconfig:", err)
+		}
+	}
+
+	return nil
 }
 
 // Upgrades upgrades a Kubernetes cluster by calling appropriate k3s
@@ -184,17 +205,17 @@ func (e *k3s) ScaleDown(events event.Events) error {
 	for _, n := range rmNodes {
 		name := fmt.Sprintf("%s-%s-%s", e.ClusterName, n.GetTypeName(), n.GetID())
 
-		err = ssh.Run(exec.NewCommand("kubectl", "cordon", name))
+		err = ssh.Run("kubectl", "cordon", name)
 		if err != nil {
 			return fmt.Errorf("cordon node %q: %v", name, err)
 		}
 
-		err = ssh.Run(exec.NewCommand("kubectl", "drain", name, "--ignore-daemonsets", "--force"))
+		err = ssh.Run("kubectl", "drain", name, "--ignore-daemonsets", "--force")
 		if err != nil {
 			return fmt.Errorf("drain node %q: %v", name, err)
 		}
 
-		err = ssh.Run(exec.NewCommand("kubectl", "delete", "node", name))
+		err = ssh.Run("kubectl", "delete", "node", name)
 		if err != nil {
 			return fmt.Errorf("delete node %q: %v", name, err)
 		}
@@ -202,4 +223,14 @@ func (e *k3s) ScaleDown(events event.Events) error {
 
 	// No need for further cleanup. This instance will be removed.
 	return nil
+}
+
+// rewriteKubeconfig replaces "default" context/cluster/user in kubeconfig
+// with a cluster name.
+func (e *k3s) rewriteKubeconfig() error {
+	replaces := map[string]string{
+		"default": e.ClusterName,
+	}
+
+	return e.common.rewriteKubeconfig(replaces)
 }

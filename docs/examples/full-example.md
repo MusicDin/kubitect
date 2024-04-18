@@ -163,7 +163,7 @@ kubernetes:
   networkPlugin: calico
   dnsMode: coredns # (36)!
   other:
-    copyKubeconfig: false
+    mergeKubeconfig: true
 
 #
 # The 'addons' section contains the configuration of the applications that

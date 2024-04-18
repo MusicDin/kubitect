@@ -245,19 +245,28 @@ cluster:
 7.  A static IP address set for this particular instance.
     If the `ip` property is omitted, the node requests a DHCP lease during creation.
 
-8.  In this example, the amount of RAM allocated to the worker node instance is set to 4 GiB, which overwrites the default value of 8 GiB.
+8.  In this example, the amount of RAM allocated to the worker node instance is set to 4 GiB,
+    which overwrites the default value of 8 GiB.
 
 ### Step 3.4 - Kubernetes properties
 
 The final section of the cluster configuration contains the Kubernetes properties,
-such as the version and network plugin.
+such as the Kubernetes version and network plugin.
 
+In addition, you can deploy the Kubernetes cluster either using `kubespray` (default) or `k3s`.
 
 ```yaml title="kubitect.yaml"
 kubernetes:
+  manager: kubespray
   version: v1.28.6
   networkPlugin: calico
+  other:
+    mergeKubeconfig: true # (1)
 ```
+
+1.  Kubeconfig can be automatically merged into `~/.kube/config` when a cluster is
+    created by setting property [mergeKubeconfig](../../user-guide/configuration/kubernetes/#merge-kubeconfig)
+    to `true` in the cluster's configuration file.
 
 ## Step 4 - Create the cluster
 
@@ -305,6 +314,8 @@ Below is the final configuration for our Kubernetes cluster:
     kubernetes:
       version: v1.28.6
       networkPlugin: calico
+      other:
+        mergeKubeconfig: true
     ```
 
 To create the cluster, **apply the configuration** file to Kubitect:
@@ -347,20 +358,24 @@ kubitect list clusters
 
 ## Step 5 - Test the cluster
 
-Once you have successfully installed a Kubernetes cluster, the Kubeconfig file can be found in the cluster's directory.
-However, you will most likely want to **export the Kubeconfig** to a separate file:
-
-
-```sh
-kubitect export kubeconfig --cluster k8s-cluster > kubeconfig.yaml
-```
-
-This will create a file named `kubeconfig.yaml` in your current directory.
 Finally, to confirm that the cluster is ready, you can list its nodes using the `kubectl` command:
 
 ```sh
-kubectl get nodes --kubeconfig kubeconfig.yaml
+kubectl --context k8s-cluster get nodes
 ```
+
+??? question "Where do I find kubeconfig? <i class="click-tip"></i>"
+
+    Once the Kubernetes cluster is deployed, the Kubeconfig file can be found in the cluster's directory.
+
+    You can easily export the Kubeconfig into a separate file using the following command, which creates a file named `kubeconfig.yaml` in your current directory.
+
+    ```sh
+    kubitect export kubeconfig --cluster k8s-cluster > kubeconfig.yaml
+    ```
+
+    Kubeconfig can be also automatically merged into existing `~/.kube/config`
+    when a cluster is created by setting property [mergeKubeconfig](../../user-guide/configuration/kubernetes/#merge-kubeconfig) to `true` in the cluster's configuration file.
 
 :clap: Congratulations, you have completed the *getting started* quide.
 

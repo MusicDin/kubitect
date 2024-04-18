@@ -14,20 +14,33 @@ import (
 )
 
 // Ensure all clients implement Client interface.
-var _ Client = LocalClient{}
-var _ Client = RemoteClient{}
+var _ Client = localClient{}
+var _ Client = remoteClient{}
 
 type Client interface {
-	Run(Command) error
-	RunCtx(context.Context, Command) error
+	Run(command string, args ...string) error
+	RunCtx(ctx context.Context, command string, args ...string) error
 	Close() error
 }
 
 // commonClient provides functions that are common for all clients.
 type commonClient struct {
+	// Streams.
 	stdin  io.Reader
 	stdout io.Writer
 	stderr io.Writer
+
+	// Environment variables.
+	envs map[string]string
+}
+
+func newCommonClient() commonClient {
+	return commonClient{
+		envs: map[string]string{
+			// Set default PATH variable.
+			"PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+		},
+	}
 }
 
 func (c *commonClient) SetStdin(stdin io.Reader) {
@@ -47,48 +60,99 @@ func (c *commonClient) SetCombinedStdout(writer io.Writer) {
 	c.stderr = writer
 }
 
+func (c *commonClient) SetEnv(key string, value string) {
+	c.envs[key] = value
+}
+
+func (c *commonClient) Envs() map[string]string {
+	// Return a copy, to prevent uncontrolled modifications
+	// or original map.
+	envs := make(map[string]string, len(c.envs))
+	for k, v := range c.envs {
+		envs[k] = v
+	}
+
+	return envs
+}
+
 func (c commonClient) Close() error {
 	return nil
 }
 
-type LocalClient struct {
+type localClient struct {
 	commonClient
+
+	workingDir string
 }
 
 // NewLocalClient initializes a client for running local commands.
-func NewLocalClient() LocalClient {
-	return LocalClient{}
+func NewLocalClient() localClient {
+	return localClient{
+		commonClient: newCommonClient(),
+	}
+}
+
+// Set working directory in which commands are executed.
+func (c localClient) WithWorkingDir(wd string) localClient {
+	c.workingDir = wd
+	return c
 }
 
 // Run runs command locally.
-func (c LocalClient) Run(command Command) error {
-	return c.RunCtx(context.Background(), command)
+func (c localClient) Run(command string, args ...string) error {
+	return c.RunCtx(context.Background(), command, args...)
 }
 
 // RunCtx runs command locally.
-func (c LocalClient) RunCtx(ctx context.Context, command Command) error {
-	cmd := exec.CommandContext(ctx, command.command, command.args...)
+func (c localClient) RunCtx(ctx context.Context, command string, args ...string) error {
+	command, args = splitOneLineCommand(command, args)
+
+	cmd := exec.CommandContext(ctx, command, args...)
 	cmd.Stdin = c.stdin
 	cmd.Stdout = c.stdout
 	cmd.Stderr = c.stderr
 
-	if len(command.envs) > 0 {
-		env := make([]string, 0, len(command.envs))
-		for k, v := range command.envs {
-			env = append(env, fmt.Sprintf("%s=%s", k, v))
-		}
-
-		cmd.Env = env
+	env := make([]string, 0, len(c.envs))
+	for k, v := range c.envs {
+		env = append(env, fmt.Sprintf("%s=%s", k, v))
 	}
 
-	if command.workingDir != "" {
-		cmd.Dir = command.workingDir
-	}
+	cmd.Env = env
+	cmd.Dir = c.workingDir
 
 	return cmd.Run()
 }
 
-type RemoteClient struct {
+// Output runs command locally and returns standard output as slice of bytes.
+func (c localClient) Output(command string, args ...string) (stdout []byte, err error) {
+	return c.OutputCtx(context.Background(), command, args...)
+}
+
+// OutputCtx runs command locally and returns standard output as slice of bytes.
+func (c localClient) OutputCtx(ctx context.Context, command string, args ...string) (stdout []byte, err error) {
+	return c.buildCommand(ctx, command, args...).Output()
+}
+
+func (c localClient) buildCommand(ctx context.Context, command string, args ...string) *exec.Cmd {
+	command, args = splitOneLineCommand(command, args)
+
+	cmd := exec.CommandContext(ctx, command, args...)
+	cmd.Stdin = c.stdin
+	cmd.Stdout = c.stdout
+	cmd.Stderr = c.stderr
+
+	env := make([]string, 0, len(c.envs))
+	for k, v := range c.envs {
+		env = append(env, fmt.Sprintf("%s=%s", k, v))
+	}
+
+	cmd.Env = env
+	cmd.Dir = c.workingDir
+
+	return cmd
+}
+
+type remoteClient struct {
 	commonClient
 
 	user           string
@@ -104,59 +168,64 @@ type RemoteClient struct {
 }
 
 // NewSSHClient initializes a new remote SSH client.
-func NewSSHClient(user string, host string) RemoteClient {
-	return RemoteClient{
-		user: user,
-		host: host,
-		port: "22",
-		mux:  &sync.Mutex{},
+func NewSSHClient(user string, host string) remoteClient {
+	return remoteClient{
+		commonClient: newCommonClient(),
+		user:         user,
+		host:         host,
+		port:         "22",
+		mux:          &sync.Mutex{},
 	}
 }
 
 // WithPort sets the host port to given value. By default, port 22 is used.
-func (c RemoteClient) WithPort(port uint16) RemoteClient {
-	// Immutable once client is initialized.
+// Immutable once client is initialized.
+func (c remoteClient) WithPort(port uint16) remoteClient {
 	if !c.isInitialized() {
 		c.port = fmt.Sprint(port)
 	}
+
 	return c
 }
 
 // WithPrivateKeyFile sets the path to the private key file that is used
-// for authentication..
-func (c RemoteClient) WithPrivateKeyFile(privateKeyPath string) RemoteClient {
-	// Immutable once client is initialized.
+// for authentication. Immutable once client is initialized.
+func (c remoteClient) WithPrivateKeyFile(privateKeyPath string) remoteClient {
 	if !c.isInitialized() {
 		c.privateKeyPath = privateKeyPath
 	}
+
 	return c
 }
 
 // WithPublicKeyFile sets the path to the public key file that is used
 // for host verification. If not set, known hosts are ignored.
-func (c RemoteClient) WithPublicKeyFile(publicKeyPath string) RemoteClient {
-	// Immutable once client is initialized.
+// Immutable once client is initialized.
+func (c remoteClient) WithPublicKeyFile(publicKeyPath string) remoteClient {
 	if !c.isInitialized() {
 		c.publicKeyPath = publicKeyPath
 	}
+
 	return c
 }
 
-func (c RemoteClient) WithSuperUser(sudo bool) RemoteClient {
-	// Immutable once client is initialized.
+// WithSuperUser runs the command as super user, effectively prepending
+// "sudo" in from of the command. Immutable once client is initialized.
+func (c remoteClient) WithSuperUser(sudo bool) remoteClient {
 	if !c.isInitialized() {
 		c.sudo = sudo
 	}
+
 	return c
 }
 
 // Endpoint returns SSH endpoint in format "user@host:port".
-func (c RemoteClient) Endpoint() string {
+func (c remoteClient) Endpoint() string {
 	return fmt.Sprintf("%s@%s:%s", c.user, c.host, c.port)
 }
 
 // Close closes potentially initialized the SSH client.
-func (c RemoteClient) Close() error {
+func (c remoteClient) Close() error {
 	if !c.isInitialized() {
 		return nil
 	}
@@ -166,13 +235,15 @@ func (c RemoteClient) Close() error {
 
 // Run establishes new connection with the remote host and executes
 // the given command.
-func (c RemoteClient) Run(command Command) error {
+func (c remoteClient) Run(command string, args ...string) error {
 	return c.RunCtx(context.Background(), command)
 }
 
 // RunCtx establishes new connection with the remote host and executes
 // the given command.
-func (c RemoteClient) RunCtx(ctx context.Context, command Command) error {
+func (c remoteClient) RunCtx(ctx context.Context, command string, args ...string) error {
+	command, args = splitOneLineCommand(command, args)
+
 	// Ensure SSH client is initialized.
 	if c.client == nil {
 		err := c.initClient(ctx)
@@ -197,7 +268,7 @@ func (c RemoteClient) RunCtx(ctx context.Context, command Command) error {
 	session.Stdout = c.stdout
 	session.Stderr = c.stderr
 
-	for k, v := range command.envs {
+	for k, v := range c.envs {
 		err := session.Setenv(k, v)
 		if err != nil {
 			return fmt.Errorf("set env variable %q: %v", k, err)
@@ -205,9 +276,9 @@ func (c RemoteClient) RunCtx(ctx context.Context, command Command) error {
 	}
 
 	// Run the command.
-	cmd := command.command
-	if len(command.args) > 0 {
-		cmd = fmt.Sprintf("%s %s", command.command, strings.Join(command.args, " "))
+	cmd := command
+	if len(args) > 0 {
+		cmd = fmt.Sprintf("%s %s", command, strings.Join(args, " "))
 	}
 
 	if c.sudo {
@@ -217,7 +288,7 @@ func (c RemoteClient) RunCtx(ctx context.Context, command Command) error {
 	return session.Run(cmd)
 }
 
-func (c *RemoteClient) initClient(ctx context.Context) error {
+func (c *remoteClient) initClient(ctx context.Context) error {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 
@@ -275,22 +346,38 @@ func (c *RemoteClient) initClient(ctx context.Context) error {
 	return nil
 }
 
-func (c RemoteClient) isInitialized() bool {
+func (c remoteClient) isInitialized() bool {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 	return c.initialized
 }
 
 // Run is a shorthand for running the given command locally.
-func Run(command Command) error {
-	return RunCtx(context.Background(), command)
+func Run(command string, args ...string) error {
+	return RunCtx(context.Background(), command, args...)
 }
 
 // RunCtx is a shorthand for running the given command locally.
-func RunCtx(ctx context.Context, command Command) error {
+func RunCtx(ctx context.Context, command string, args ...string) error {
 	c := NewLocalClient()
 	c.SetStdout(os.Stdout)
 	c.SetStderr(os.Stderr)
 
 	return c.RunCtx(ctx, command)
+}
+
+// splitOneLineCommand splits the command by spaces when no list of
+// arguments is empty. This prevents spaces in commands but allows
+// passing commands as a single string as long as input arguments
+// do not contain spaces.
+func splitOneLineCommand(command string, args []string) (string, []string) {
+	if len(args) == 0 {
+		split := strings.Split(command, " ")
+		command = split[0]
+		if len(split) > 1 {
+			args = split[1:]
+		}
+	}
+
+	return command, args
 }
