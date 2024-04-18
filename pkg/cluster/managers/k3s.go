@@ -123,6 +123,13 @@ func (e *k3s) Create() error {
 		return err
 	}
 
+	// Rewrite kubeconfig before merging to prevent accidental
+	// overwrite of an existing configuration.
+	err = e.rewriteKubeconfig()
+	if err != nil {
+		return err
+	}
+
 	if e.Config.Kubernetes.Other.MergeKubeconfig {
 		err := e.mergeKubeconfig()
 		if err != nil {
@@ -216,4 +223,14 @@ func (e *k3s) ScaleDown(events event.Events) error {
 
 	// No need for further cleanup. This instance will be removed.
 	return nil
+}
+
+// rewriteKubeconfig replaces "default" context/cluster/user in kubeconfig
+// with a cluster name.
+func (e *k3s) rewriteKubeconfig() error {
+	replaces := map[string]string{
+		"default": e.ClusterName,
+	}
+
+	return e.common.rewriteKubeconfig(replaces)
 }

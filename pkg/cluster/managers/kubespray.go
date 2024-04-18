@@ -108,6 +108,13 @@ func (e *kubespray) Create() error {
 		return err
 	}
 
+	// Rewrite kubeconfig before merging to prevent accidental
+	// overwrite of an existing configuration.
+	err = e.rewriteKubeconfig()
+	if err != nil {
+		return err
+	}
+
 	if e.Config.Kubernetes.Other.MergeKubeconfig {
 		err := e.mergeKubeconfig()
 		if err != nil {
@@ -127,7 +134,14 @@ func (e *kubespray) Upgrade() error {
 		return err
 	}
 
-	return e.Finalize()
+	err = e.Finalize()
+	if err != nil {
+		return err
+	}
+
+	// Rewrite kubeconfig on upgrade, because it is re-fetched
+	// from the server.
+	return e.rewriteKubeconfig()
 }
 
 // ScaleUp adds new nodes to the cluster.
@@ -220,4 +234,16 @@ func (e *kubespray) generateGroupVars() error {
 	}
 
 	return nil
+}
+
+// rewriteKubeconfig replaces context/cluster/user in kubeconfig with the
+// cluster name.
+func (e *kubespray) rewriteKubeconfig() error {
+	replaces := map[string]string{
+		"kubernetes-admin@cluster.local": e.ClusterName,
+		"kubernetes-admin":               e.ClusterName,
+		"cluster.local":                  e.ClusterName,
+	}
+
+	return e.common.rewriteKubeconfig(replaces)
 }

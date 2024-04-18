@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
 	"github.com/MusicDin/kubitect/pkg/models/config"
@@ -59,6 +60,28 @@ func (e common) mergeKubeconfig() error {
 	}
 
 	return os.WriteFile(defConfigPath, config, 0600)
+}
+
+// rewriteKubeconfig reads the kubeconfig file and replaces occurrences of map
+// keys with corresponding map values.
+func (e *common) rewriteKubeconfig(replaces map[string]string) error {
+	kubeconfigPath := filepath.Join(e.ConfigDir, "admin.conf")
+	kubeconfig, err := os.ReadFile(kubeconfigPath)
+	if err != nil {
+		return err
+	}
+
+	s := []string{}
+	for k, v := range replaces {
+		if k == "" || v == "" {
+			return fmt.Errorf("cannot rewrite config with empty values")
+		}
+		s = append(s, k, v)
+	}
+
+	replacer := strings.NewReplacer(s...)
+	new := replacer.Replace(string(kubeconfig))
+	return os.WriteFile(kubeconfigPath, []byte(new), 0600)
 }
 
 // extractRemovedNodes returns removed node instances extracted from the event changes.
