@@ -91,19 +91,19 @@ kubernetes:
   dnsMode: coredns
 ```
 
-### Copy kubeconfig
+### Merge kubeconfig
 
-:material-tag-arrow-up-outline: [v2.0.0][tag 2.0.0]
+:material-tag-arrow-up-outline: [v3.4.0][tag 3.4.0]
 &ensp;
 :octicons-file-symlink-file-24: Default: `false`
 
-Kubitect offers the option to automatically copy the Kubeconfig file to the `~/.kube/config` path.
-By default, this feature is disabled to prevent overwriting an existing file.
+Kubitect offers an option to merge the resulting Kubeconfig file with the config on path `~/.kube/config`.
+This means that whenever a new cluster is created, it can be selected by context which equals the cluster name.
 
 ```yaml
 kubernetes:
   other:
-    copyKubeconfig: true
+    mergeKubeconfig: true
 ```
 
 ### Auto renew control plane certificates

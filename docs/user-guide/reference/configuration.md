@@ -779,13 +779,12 @@ Each configuration property is documented with 5 columns: Property name, descrip
       </td>
     </tr>
     <tr>
-      <td><code>kubernetes.other.copyKubeconfig</code></td>
+      <td><code>kubernetes.other.mergeKubeconfig</code></td>
       <td>boolean</td>
       <td>false</td>
       <td></td>
       <td>
-        When this property is set to true, the kubeconfig of a new cluster is copied to the <code>~/.kube/config</code>.
-        Please note that setting this property to true may cause the existing file at the destination to be overwritten.
+        When this property is set to true, the kubeconfig of a new cluster is merged to the config on path <code>~/.kube/config</code>.
       </td>
     </tr>
     <tr>
