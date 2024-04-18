@@ -17,6 +17,10 @@ defer() {
 FAIL=1
 trap defer EXIT HUP INT TERM
 
+echo "==> DEBUG: Cluster info"
+kubectl cluster-info
+kubectl get nodes
+
 echo "==> TEST: All nodes ready"
 kubectl wait --for=condition=ready node --all --timeout=120s
 
