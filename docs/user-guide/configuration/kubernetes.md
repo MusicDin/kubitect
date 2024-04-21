@@ -67,15 +67,25 @@ kubernetes:
 
 The following table shows the compatibility matrix of supported network plugins and Kubernetes versions:
 
-| Kubernetes Version |      Calico      |      Cilium      |      Flannel     |    KubeRouter    |
-|--------------------|:----------------:|:----------------:|:----------------:|:----------------:|
-| **1.26**           | :material-check: | :material-check: | :material-check: | :material-check: |
-| **1.27**           | :material-check: | :material-check: | :material-check: | :material-check: |
-| **1.28**           | :material-check: | :material-check: | :material-check: | :material-check: |
+| Kubernetes Version | Operating system |      Calico      |      Cilium      |      Flannel     |    KubeRouter    |
+|--------------------|:-----------------|:----------------:|:----------------:|:----------------:|:----------------:|
+| **1.26**           | Ubuntu           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.26**           | Debian           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.26**           | CentOS           | :material-check: | :material-check: |                  |                  |
+| **1.26**           | RockyLinux       | :material-check: | :material-check: | :material-check: |                  |
+| **1.27**           | Ubuntu           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.27**           | Debian           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.27**           | CentOS           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.27**           | RockyLinux       | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.28**           | Ubuntu           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.28**           | Debian           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.28**           | CentOS           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.28**           | RockyLinux       | :material-check: | :material-check: | :material-check: | :material-check: |
+
 
 !!! note "Note"
 
-    K3s manager supports only `flannel` network plugin.
+    K3s manager currently supports only `flannel` network plugin.
 
 ### Kubernetes DNS mode
 
