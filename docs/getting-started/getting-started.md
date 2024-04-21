@@ -198,10 +198,10 @@ Each node can be defined as one of the following three types:
 
 - `loadBalancer`
 
-    These nodes server as internal load balancers that expose the Kubernetes control plane at a single endpoint.
-    They are essential when more then one master node is configured in the cluster.
+    These nodes serve as external load balancers that expose the Kubernetes control plane at a single endpoint.
+    They are required when more then one master node is configured in the cluster.
 
-This guide is focused on deploying a Kubernetes cluster with only one master node, which eliminates the need for internal load balancers.
+This guide is focused on deploying a Kubernetes cluster with a single master node.
 However, if you are interested in creating a [multi-master](../../examples/multi-master-cluster) or [high-availability (HA)](../../examples/ha-cluster) cluster, please refer to the corresponding examples.
 
 To better understand this part, let's take a look at an example configuration:
