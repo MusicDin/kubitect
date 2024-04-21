@@ -99,7 +99,7 @@ jobs:
   # Test most combinations of managers, versions, distros,
   # and network plugins. Run this only on schedule.
   test-single-node-all:
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     name: Node Matrix
     runs-on: ubuntu-latest
     strategy:
