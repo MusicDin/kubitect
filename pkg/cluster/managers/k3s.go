@@ -69,9 +69,7 @@ func (e *k3s) Init() error {
 	}
 
 	// Clone repository with k3s playbooks.
-	url := env.ConstK3sURL
-	commitHash := env.ConstK3sVersion
-	err = git.NewGitRepo(url).WithCommitHash(commitHash).Clone(e.ProjectDir)
+	err = git.NewGitRepo(env.ConstK3sURL).WithRef(env.ConstK3sVersion).Clone(e.ProjectDir)
 	if err != nil {
 		return err
 	}
