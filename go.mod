@@ -6,7 +6,7 @@ require (
 	github.com/apenella/go-ansible v1.3.0
 	github.com/creasty/defaults v1.7.0
 	github.com/go-git/go-git/v5 v5.12.0
-	github.com/go-playground/validator/v10 v10.21.0
+	github.com/go-playground/validator/v10 v10.22.0
 	github.com/hashicorp/hc-install v0.7.0
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
