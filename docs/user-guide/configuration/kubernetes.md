@@ -44,7 +44,7 @@ kubernetes:
   version: v1.28.6
 ```
 
-The supported Kubernetes versions include `v1.27`, `v1.28`, and `v1.29`.
+The supported Kubernetes versions include `v1.28`, `v1.29`, and `v1.30`.
 
 ### Kubernetes network plugin
 
@@ -69,10 +69,6 @@ The following table shows the compatibility matrix of supported network plugins 
 
 | Kubernetes Version | Operating system |      Calico      |      Cilium      |      Flannel     |    KubeRouter    |
 |--------------------|:-----------------|:----------------:|:----------------:|:----------------:|:----------------:|
-| **1.27**           | Ubuntu           | :material-check: | :material-check: | :material-check: | :material-check: |
-| **1.27**           | Debian           | :material-check: | :material-check: | :material-check: | :material-check: |
-| **1.27**           | CentOS           | :material-check: | :material-check: | :material-check: | :material-check: |
-| **1.27**           | RockyLinux       | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.28**           | Ubuntu           | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.28**           | Debian           | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.28**           | CentOS           | :material-check: | :material-check: | :material-check: | :material-check: |
@@ -81,7 +77,10 @@ The following table shows the compatibility matrix of supported network plugins 
 | **1.29**           | Debian           | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.29**           | CentOS           | :material-check: | :material-check: | :material-check: | :material-check: |
 | **1.29**           | RockyLinux       | :material-check: | :material-check: | :material-check: | :material-check: |
-
+| **1.30**           | Ubuntu           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.30**           | Debian           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.30**           | CentOS           | :material-check: | :material-check: | :material-check: | :material-check: |
+| **1.30**           | RockyLinux       | :material-check: | :material-check: | :material-check: | :material-check: |
 
 !!! note "Note"
 

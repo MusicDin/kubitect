@@ -28,8 +28,8 @@ jobs:
           - kubespray
           - k3s
         k8s:
-          - v1.28.10
-          - v1.29.5
+          - v1.29.7
+          - v1.30.4
         distro:
           - ubuntu22
         networkPlugin:
@@ -66,8 +66,8 @@ jobs:
           - k3s
           - kubespray
         k8sVersion:
-          - v1.28.10
-          - v1.29.5
+          - v1.29.7
+          - v1.30.4
         distro:
           - ubuntu22
         networkPlugin:
@@ -109,9 +109,9 @@ jobs:
           - k3s
           - kubespray
         k8sVersion:
-          - v1.27.14
-          - v1.28.10
-          - v1.29.5
+          - v1.28.12
+          - v1.29.7
+          - v1.30.4
         distro:
           - ubuntu22
           - debian12
