@@ -10,14 +10,16 @@ runs:
         sudo apt update
         sudo apt-get install -y --no-install-recommends \
           curl \
+          dnsmasq \
           libvirt-clients \
           libvirt-daemon-system \
           mkisofs \
-          virtualenv \
           python3-pip \
           qemu-utils \
           qemu-system \
-          spice-client-gtk
+          qemu-system-modules-spice \
+          spice-client-gtk \
+          virtualenv
 
     - name: Configure libvirt
       shell: bash
