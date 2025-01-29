@@ -106,7 +106,7 @@ resource "libvirt_domain" "vm_domain" {
   }
 
   graphics {
-    type        = "spice"
+    type        = "vnc"
     listen_type = "address"
     autoport    = true
   }
