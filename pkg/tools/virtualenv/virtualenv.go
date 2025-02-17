@@ -55,14 +55,25 @@ func (e *VirtualEnv) Init() error {
 
 // create creates virtual environment if it does not yet exist.
 func (e *VirtualEnv) create() error {
-	wd := path.Dir(e.path)
 
-	err := os.MkdirAll(wd, os.ModePerm)
+	// First find the active Python binary.
+	// Eg. if virtualenv is installed system-wide, then simply calling
+	// "virtualenv -p python3" may use a version of python that is not
+	// compatible with the required ansible version. This allows a
+	// user-installed python to be used instead.
+	pythonPath, err := exec.LookPath("python3")
 	if err != nil {
 		return err
 	}
 
-	cmd := exec.Command("virtualenv", "-p", "python3", e.path)
+	wd := path.Dir(e.path)
+
+	err = os.MkdirAll(wd, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("virtualenv", "-p", pythonPath, e.path)
 	cmd.Dir = wd
 
 	if ui.Debug() {
