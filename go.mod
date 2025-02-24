@@ -1,6 +1,7 @@
 module github.com/MusicDin/kubitect
 
 go 1.22.2
+toolchain go1.23.6
 
 require (
 	github.com/apenella/go-ansible v1.3.0
@@ -57,7 +58,7 @@ require (
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
-	golang.org/x/crypto v0.33.0
+	golang.org/x/crypto v0.34.0
 	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
