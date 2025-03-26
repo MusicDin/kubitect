@@ -35,6 +35,12 @@ func (t *terraform) runCmd(action string, args []string, showOutput bool) (int, 
 		cmd.Env = append(cmd.Env, "TF_LOG=INFO")
 	}
 
+	// Check if HTTPS_PROXY is set for Terraform
+	if os.Getenv("HTTPS_PROXY") != "" {
+		proxyValue := os.Getenv("HTTPS_PROXY")
+		cmd.Env = append(cmd.Env, fmt.Sprintf("HTTPS_PROXY=%s", proxyValue))
+
+	}
 	err := cmd.Run()
 	exitCode := cmd.ProcessState.ExitCode()
 
