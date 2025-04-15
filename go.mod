@@ -7,7 +7,7 @@ require (
 	github.com/creasty/defaults v1.8.0
 	github.com/go-git/go-git/v5 v5.15.0
 	github.com/go-playground/validator/v10 v10.25.0
-	github.com/hashicorp/hc-install v0.9.1
+	github.com/hashicorp/hc-install v0.9.2
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/term v0.31.0
@@ -33,7 +33,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
-	golang.org/x/mod v0.22.0 // indirect
+	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
 )
 
