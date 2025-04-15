@@ -5,7 +5,7 @@ go 1.23.6
 require (
 	github.com/apenella/go-ansible v1.3.0
 	github.com/creasty/defaults v1.8.0
-	github.com/go-git/go-git/v5 v5.14.0
+	github.com/go-git/go-git/v5 v5.15.0
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/hashicorp/hc-install v0.9.1
 	github.com/spf13/cobra v1.9.1
@@ -18,7 +18,7 @@ require gopkg.in/yaml.v2 v2.4.0 // indirect
 
 require (
 	dario.cat/mergo v1.0.0 // indirect
-	github.com/cloudflare/circl v1.6.0 // indirect
+	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/cyphar/filepath-securejoin v0.4.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
@@ -39,7 +39,7 @@ require (
 
 require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
-	github.com/ProtonMail/go-crypto v1.1.5 // indirect
+	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/apenella/go-common-utils/data v0.0.0-20221227202648-5452d804e940 // indirect
 	github.com/apenella/go-common-utils/error v0.0.0-20221227202648-5452d804e940 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
@@ -56,7 +56,7 @@ require (
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.37.0
-	golang.org/x/net v0.35.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
