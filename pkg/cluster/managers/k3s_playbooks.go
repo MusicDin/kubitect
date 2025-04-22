@@ -14,7 +14,8 @@ import (
 func (e *k3s) K3sCreate(inventory string) error {
 	// Use hashed cluster name as token. This is not perfect, as it makes
 	// the token predictable, but removes the necessity to set it manually.
-	token := hex.EncodeToString(sha256.New().Sum([]byte(e.ClusterName)))
+	hash := sha256.Sum256([]byte(e.ClusterName))
+	token := hex.EncodeToString(hash[:])
 
 	vars := map[string]string{
 		"k3s_version":       fmt.Sprintf("%s+k3s1", e.K8sVersion()),
