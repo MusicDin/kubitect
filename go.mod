@@ -5,7 +5,7 @@ go 1.23.6
 require (
 	github.com/apenella/go-ansible v1.3.0
 	github.com/creasty/defaults v1.8.0
-	github.com/go-git/go-git/v5 v5.15.0
+	github.com/go-git/go-git/v5 v5.16.0
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/hashicorp/hc-install v0.9.2
 	github.com/spf13/cobra v1.9.1
