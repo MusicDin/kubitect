@@ -19,7 +19,7 @@ resource "libvirt_cloudinit_disk" "cloud_init" {
     ssh_public_key = data.local_file.ssh_public_key.content
   })
 
-  network_config = templatefile(var.vm_ip != null
+  network_config = templatefile(var.network_mode != "nat" && var.vm_ip != null
     ? "./templates/cloud_init/cloud_init_network_static.tpl"
     : "./templates/cloud_init/cloud_init_network_dhcp.tpl"
     , {
