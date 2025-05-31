@@ -70,7 +70,7 @@ func TestKubesprayTemplate_Inventory(t *testing.T) {
 				cls-master-1:
 					ansible_host: 192.168.113.11
 					node_labels:
-						label-1: value-1
+						label-1: "value-1"
 				cls-master-2:
 					ansible_host: 192.168.113.12
 					node_taints:
@@ -80,7 +80,7 @@ func TestKubesprayTemplate_Inventory(t *testing.T) {
 				cls-worker-1:
 					ansible_host: 192.168.113.21
 					node_labels:
-						label-1: value-1
+						label-1: "value-1"
 				cls-worker-2:
 					ansible_host: 192.168.113.22
 					node_taints:
@@ -143,7 +143,7 @@ func TestTemplate_Inventory_NoWorkers(t *testing.T) {
 				cls-master-1:
 					ansible_host: 192.168.113.11
 					node_labels:
-						label-1: value-1
+						label-1: "value-1"
 				cls-master-2:
 					ansible_host: 192.168.113.12
 					node_taints:

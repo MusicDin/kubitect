@@ -17,7 +17,7 @@ all:
 			{{- if $i.Labels }}
 			node_labels:
 				{{- range $k, $v := $i.Labels }}
-				{{ $k }}: {{ $v }}
+				{{ $k }}: "{{ $v }}"
 				{{- end }}
 			{{- end }}
 			{{- if $i.Taints }}
@@ -35,7 +35,7 @@ all:
 			{{- if $i.Labels }}
 			node_labels:
 				{{- range $k, $v := $i.Labels }}
-				{{ $k }}: {{ $v }}
+				{{ $k }}: "{{ $v }}"
 				{{- end }}
 			{{- end }}
 			{{- if $i.Taints }}
