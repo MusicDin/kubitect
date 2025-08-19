@@ -62,12 +62,13 @@ const (
 	UBUNTU20 OSDistro = "ubuntu20"
 	DEBIAN11 OSDistro = "debian11"
 	DEBIAN12 OSDistro = "debian12"
+	DEBIAN13 OSDistro = "debian13"
 	CENTOS9  OSDistro = "centos9"
 	ROCKY9   OSDistro = "rocky9"
 )
 
 func (d OSDistro) Validate() error {
-	return v.Var(d, v.OneOf(UBUNTU20, UBUNTU22, DEBIAN11, DEBIAN12, CENTOS9, ROCKY9))
+	return v.Var(d, v.OneOf(UBUNTU20, UBUNTU22, DEBIAN11, DEBIAN12, DEBIAN13, CENTOS9, ROCKY9))
 }
 
 type OSNetworkInterface string
