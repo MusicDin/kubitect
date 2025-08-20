@@ -43,8 +43,6 @@ var ProjectK8sVersions = []string{
 	"v1.32.0 - v1.32.8",
 	"v1.31.0 - v1.31.12",
 	"v1.30.0 - v1.30.14",
-	"v1.29.0 - v1.29.7",
-	"v1.28.0 - v1.28.12",
 }
 
 // ProjectOsPresets is a list of available OS distros.
