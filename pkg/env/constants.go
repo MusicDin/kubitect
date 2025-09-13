@@ -11,8 +11,8 @@ const (
 	ConstK3sURL            = "https://github.com/MusicDin/k3s-ansible"
 	ConstK3sVersion        = "v0.0.1"
 	ConstKubesprayUrl      = "https://github.com/kubernetes-sigs/kubespray"
-	ConstKubesprayVersion  = "v2.26.0"
-	ConstKubernetesVersion = "v1.30.4"
+	ConstKubesprayVersion  = "master" // "v2.28.0"
+	ConstKubernetesVersion = "1.33.4"
 	ConstTerraformVersion  = "1.5.2"
 )
 
@@ -39,9 +39,10 @@ var ProjectApplyActions = [...]string{
 
 // ProjectK8sVersions define supported Kubernetes versions.
 var ProjectK8sVersions = []string{
-	"v1.30.0 - v1.30.4",
-	"v1.29.0 - v1.29.7",
-	"v1.28.0 - v1.28.12",
+	"v1.33.0 - v1.33.4",
+	"v1.32.0 - v1.32.8",
+	"v1.31.0 - v1.31.12",
+	"v1.30.0 - v1.30.14",
 }
 
 // ProjectOsPresets is a list of available OS distros.
@@ -63,6 +64,10 @@ var ProjectOsPresets = map[string]struct {
 	},
 	"debian12": {
 		Source:           "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2",
+		NetworkInterface: "ens3",
+	},
+	"debian13": {
+		Source:           "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2",
 		NetworkInterface: "ens3",
 	},
 	"centos9": {

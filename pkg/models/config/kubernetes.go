@@ -19,7 +19,7 @@ type Kubernetes struct {
 
 func (k Kubernetes) Validate() error {
 	return v.Struct(&k,
-		v.Field(&k.Version, v.NotEmpty(), v.VSemVer()),
+		v.Field(&k.Version, v.NotEmpty()),
 		v.Field(&k.DnsMode, v.NotEmpty()),
 		v.Field(&k.NetworkPlugin, v.NotEmpty()),
 		v.Field(&k.Other),

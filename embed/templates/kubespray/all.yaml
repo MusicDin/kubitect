@@ -5,7 +5,6 @@
 ---
 apiserver_loadbalancer_domain_name: "{{ .Values.LoadBalancer.VIP }}"
 deploy_container_engine: true
-etcd_kubeadm_enabled: false
 loadbalancer_apiserver:
 	address: "{{ .Values.LoadBalancer.VIP }}"
 	port: 6443
