@@ -11,7 +11,7 @@ const (
 	ConstK3sURL            = "https://github.com/MusicDin/k3s-ansible"
 	ConstK3sVersion        = "v0.0.1"
 	ConstKubesprayUrl      = "https://github.com/kubernetes-sigs/kubespray"
-	ConstKubesprayVersion  = "master" // "v2.28.0"
+	ConstKubesprayVersion  = "v2.29.0"
 	ConstKubernetesVersion = "1.33.4"
 	ConstTerraformVersion  = "1.5.2"
 )
@@ -39,10 +39,9 @@ var ProjectApplyActions = [...]string{
 
 // ProjectK8sVersions define supported Kubernetes versions.
 var ProjectK8sVersions = []string{
-	"v1.33.0 - v1.33.4",
-	"v1.32.0 - v1.32.8",
-	"v1.31.0 - v1.31.12",
-	"v1.30.0 - v1.30.14",
+	"v1.33.0 - v1.33.5",
+	"v1.32.0 - v1.32.9",
+	"v1.31.0 - v1.31.13",
 }
 
 // ProjectOsPresets is a list of available OS distros.
