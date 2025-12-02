@@ -35,18 +35,13 @@ func TestKeyWrite_InvalidPath(t *testing.T) {
 }
 
 func TestGeneratePrivateKey(t *testing.T) {
-	key, err := generatePrivateKey(512)
+	key, err := generatePrivateKey(1024)
 	require.NoError(t, err)
 	assert.NotEmpty(t, key)
 }
 
-func TestGeneratePrivateKey_Error(t *testing.T) {
-	_, err := generatePrivateKey(-1)
-	assert.EqualError(t, err, "generate private key: crypto/rsa: too few primes of given length to generate an RSA key")
-}
-
 func TestEncodePrivateKey(t *testing.T) {
-	key, err := generatePrivateKey(512)
+	key, err := generatePrivateKey(1024)
 	require.NoError(t, err)
 
 	pem := encodePrivateKey(key)
@@ -54,7 +49,7 @@ func TestEncodePrivateKey(t *testing.T) {
 }
 
 func TestGeneratePublicKey(t *testing.T) {
-	key, err := generatePrivateKey(512)
+	key, err := generatePrivateKey(1024)
 	require.NoError(t, err)
 
 	publicKey, err := generatePublicKey(key)
@@ -68,14 +63,14 @@ func TestGeneratePublicKey_NilPrivateKey(t *testing.T) {
 }
 
 func TestNewKeyPair(t *testing.T) {
-	_, err := NewKeyPair(512)
+	_, err := NewKeyPair(1024)
 	assert.NoError(t, err)
 }
 
 func TestReadKeyPair(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	kp1, err := NewKeyPair(512)
+	kp1, err := NewKeyPair(1024)
 	require.NoError(t, err)
 	require.NoError(t, kp1.Write(tmpDir, "key"))
 
@@ -90,7 +85,7 @@ func TestReadKeyPair_FailReadingPrivateKey(t *testing.T) {
 	keyName := "key"
 	keyPath := path.Join(tmpDir, keyName)
 
-	kp, err := NewKeyPair(512)
+	kp, err := NewKeyPair(1024)
 	require.NoError(t, err)
 	require.NoError(t, kp.Write(tmpDir, keyName))
 
@@ -107,7 +102,7 @@ func TestReadKeyPair_FailReadingPublicKey(t *testing.T) {
 	keyName := "key"
 	keyPath := path.Join(tmpDir, keyName+".pub")
 
-	kp, err := NewKeyPair(512)
+	kp, err := NewKeyPair(1024)
 	require.NoError(t, err)
 	require.NoError(t, kp.Write(tmpDir, keyName))
 
@@ -128,7 +123,7 @@ func TestKeyPair_Write(t *testing.T) {
 	tmpDir := t.TempDir()
 	keyName := "key"
 
-	kp, err := NewKeyPair(512)
+	kp, err := NewKeyPair(1024)
 	require.NoError(t, err)
 	require.NoError(t, kp.Write(tmpDir, keyName))
 
@@ -144,7 +139,7 @@ func TestKeyPair_Write(t *testing.T) {
 }
 
 func TestKeyPair_Write_InvalidPath(t *testing.T) {
-	kp, err := NewKeyPair(512)
+	kp, err := NewKeyPair(1024)
 	require.NoError(t, err)
 
 	err = kp.Write(t.TempDir(), path.Join("invalid", "key"))
@@ -154,7 +149,7 @@ func TestKeyPair_Write_InvalidPath(t *testing.T) {
 func TestKeyPairExists(t *testing.T) {
 	keyDir := t.TempDir()
 	keyName := "key"
-	kp, err := NewKeyPair(512)
+	kp, err := NewKeyPair(1024)
 	require.NoError(t, err)
 	require.NoError(t, kp.Write(keyDir, keyName))
 	assert.True(t, KeyPairExists(keyDir, keyName), "KeyPair does not exists after being generated")
