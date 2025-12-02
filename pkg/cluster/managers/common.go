@@ -27,7 +27,7 @@ type common struct {
 }
 
 func (e common) K8sVersion() string {
-	return string(e.Config.Kubernetes.Version)
+	return strings.TrimPrefix(string(e.Config.Kubernetes.Version), "v")
 }
 
 func (e common) SshUser() string {
