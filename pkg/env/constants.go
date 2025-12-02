@@ -11,7 +11,7 @@ const (
 	ConstK3sURL            = "https://github.com/MusicDin/k3s-ansible"
 	ConstK3sVersion        = "v0.0.1"
 	ConstKubesprayUrl      = "https://github.com/kubernetes-sigs/kubespray"
-	ConstKubesprayVersion  = "master" // "v2.28.0"
+	ConstKubesprayVersion  = "v2.29.0"
 	ConstKubernetesVersion = "1.33.4"
 	ConstTerraformVersion  = "1.5.2"
 )
