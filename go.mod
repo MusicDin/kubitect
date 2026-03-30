@@ -5,7 +5,7 @@ go 1.25.4
 require (
 	github.com/apenella/go-ansible v1.3.0
 	github.com/creasty/defaults v1.8.0
-	github.com/go-git/go-git/v5 v5.17.0
+	github.com/go-git/go-git/v5 v5.17.1
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/hashicorp/hc-install v0.9.2
 	github.com/spf13/cobra v1.10.2
@@ -18,7 +18,7 @@ require gopkg.in/yaml.v2 v2.4.0 // indirect
 
 require (
 	dario.cat/mergo v1.0.2 // indirect
-	github.com/cloudflare/circl v1.6.1 // indirect
+	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
