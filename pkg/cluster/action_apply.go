@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/MusicDin/kubitect/embed"
 	"github.com/MusicDin/kubitect/pkg/cluster/event"
@@ -312,6 +313,13 @@ func (c *Cluster) generateSshKeys() error {
 	// - Check if the user has provided a custom path to the key pair
 	pkPath := string(c.NewConfig.Cluster.NodeTemplate.SSH.PrivateKeyPath)
 	if pkPath != "" {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return fmt.Errorf("keygen: %v", err)
+		}
+
+		pkPath = strings.Replace(pkPath, "~", homeDir, 1)
+
 		kp, err := keygen.ReadKeyPair(path.Dir(pkPath), path.Base(pkPath))
 		if err != nil {
 			return err
